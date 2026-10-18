@@ -1,0 +1,208 @@
+<!doctype html><html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deck Analyzer — Il Tempio Dei Duelli</title><meta name="theme-color" content="#15101f">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMiIgZmlsbD0iIzE1MTAxZiIvPgo8ZyBmaWxsPSIjYzQyYTQxIj48cGF0aCBkPSJNODIgMTcwUTI1NiAxMzIgNDMwIDE3MEw0MTQgMjA2UTI1NiAxNzYgOTggMjA2WiIvPjxyZWN0IHg9IjEzMiIgeT0iMjI4IiB3aWR0aD0iMjQ4IiBoZWlnaHQ9IjE4IiByeD0iNCIvPjxyZWN0IHg9IjE1NiIgeT0iMjA2IiB3aWR0aD0iMzAiIGhlaWdodD0iMjE0IiByeD0iNCIvPjxyZWN0IHg9IjMyNiIgeT0iMjA2IiB3aWR0aD0iMzAiIGhlaWdodD0iMjE0IiByeD0iNCIvPjxyZWN0IHg9IjEyMCIgeT0iNDIwIiB3aWR0aD0iMjcyIiBoZWlnaHQ9IjE2IiByeD0iNCIvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU2IDMyMikgcm90YXRlKDQ1KSI+PHJlY3QgeD0iLTQ0IiB5PSItNDQiIHdpZHRoPSI4OCIgaGVpZ2h0PSI4OCIgcng9IjEwIiBmaWxsPSIjZjRlY2RjIi8+PHJlY3QgeD0iLTIyIiB5PSItMjIiIHdpZHRoPSI0NCIgaGVpZ2h0PSI0NCIgcng9IjYiIGZpbGw9IiNjNDJhNDEiLz48L2c+PC9zdmc+Cg==" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Instrument+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>/* Il Tempio Dei Duelli — stile condiviso. Notte viola, cremisi, avorio. */
+:root{--bg:#15101f;--surf:#1e1730;--raise:#2a2040;--red:#c42a41;--red2:#ff6b7f;--ivory:#f4ecdc;--mute:#a99fbf;--line:rgba(244,236,220,.14);--r:12px;
+ --serif:Fraunces,Georgia,serif;--sans:"Instrument Sans",system-ui,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;color:var(--ivory);font:17px/1.6 var(--sans);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.12;margin:0;text-wrap:balance}
+a{color:var(--red2)}
+:focus-visible{outline:3px solid var(--red2);outline-offset:3px;border-radius:6px}
+.pg{max-width:880px;margin:0 auto;padding:44px 18px 72px}
+.kicker{margin:0 0 8px;font:700 .76rem var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--red2)}
+.pg h1{font-size:clamp(2.2rem,8vw,3.8rem)}
+.lead{color:var(--mute);max-width:36em;margin:14px 0 0;font-size:1.1rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:46px;padding:.5rem 1.1rem;border-radius:var(--r);border:2px solid var(--red);background:var(--red);color:var(--ivory);font:700 1rem var(--sans);text-decoration:none;cursor:pointer}
+.btn:hover{background:#d8344c;border-color:#d8344c}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--ivory)}.btn.ghost:hover{border-color:var(--red2);color:var(--red2)}
+.btn.sm{min-height:38px;padding:.25rem .8rem;font-size:.92rem}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+input,select,textarea{width:100%;min-height:46px;padding:10px 12px;border-radius:10px;border:1px solid rgba(244,236,220,.28);background:var(--bg);color:var(--ivory);font:inherit}
+label{display:block;margin:0 0 4px;font-weight:600;font-size:.9rem}
+.mute{color:var(--mute)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button,.opt{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--surf);color:var(--ivory);font:700 .95rem var(--sans);cursor:pointer}
+.seg button[aria-pressed=true],.opt[aria-pressed=true]{background:var(--red);border-color:var(--red)}
+.chip{display:inline-block;padding:1px 9px;border-radius:99px;font-size:.76rem;font-weight:700;border:1px solid var(--line);color:var(--mute)}
+.chip.s{color:#7fe0b0;border-color:#7fe0b0}.chip.h{color:#ffd166;border-color:#ffd166}.chip.k{color:#ff6b7f;border-color:#ff6b7f}.chip.b{color:#8ecbff;border-color:#8ecbff}
+.sec{margin-top:34px}.sec>h2{font-size:1.5rem;margin:0 0 10px}
+.g2{display:grid;gap:12px}@media(min-width:620px){.g2{grid-template-columns:1fr 1fr}}
+.it{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line)}
+.empty{padding:12px 0;color:var(--mute)}
+table{width:100%;border-collapse:collapse}th,td{padding:9px 6px;border-top:1px solid var(--line);text-align:left}th{color:var(--mute);font-size:.78rem;text-transform:uppercase;letter-spacing:.08em}
+.scroll{overflow-x:auto}
+.bar{height:10px;border-radius:9px;background:var(--bg);border:1px solid var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--red)}
+
+.btn:disabled,.btn[disabled]{opacity:.4;cursor:not-allowed;pointer-events:none}
+.scroll td,.scroll th{white-space:nowrap}
+</style>
+<style>
+.pg{max-width:980px}
+.cr{display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--line)}
+.cr img{width:36px;height:52px;object-fit:cover;border-radius:4px;background:var(--bg);flex:none}
+.cr .n{flex:1;min-width:0;overflow-wrap:anywhere}.cr small{color:var(--mute);display:block}
+.q{display:flex;align-items:center;gap:6px}.q button{width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--surf);color:var(--ivory);font:700 1.1rem var(--sans);cursor:pointer}
+.warn{margin:10px 0 0;padding:10px 12px;border-radius:10px;background:rgba(255,209,102,.12);border:1px solid #ffd166;color:#ffd166;font-size:.92rem}.warn[hidden]{display:none}
+td input[type=checkbox]{width:24px;min-height:0;height:24px;accent-color:var(--red)}
+.kp{display:grid;gap:10px;margin-top:10px}.kp div{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}.kp b{font-variant-numeric:tabular-nums}.kp .bar{grid-column:1/-1}
+.hand{padding:10px 0;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px}
+.hand span{padding:3px 10px;border-radius:8px;border:1px solid var(--line);font-size:.9rem}
+.hand .s{border-color:#7fe0b0}.hand .h{border-color:#ffd166}.hand .k{border-color:#ff6b7f}.hand .b{border-color:#8ecbff}
+.res{display:grid;gap:10px}@media(min-width:620px){.res{grid-template-columns:1fr 1fr}}
+.sr{display:flex;gap:10px;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--surf)}.sr img{width:44px;height:64px;object-fit:cover;border-radius:4px}.sr .n{flex:1;font-weight:600}.sr small{color:var(--mute);display:block;font-weight:400}
+</style></head><body>
+<main class="pg">
+ <header><p class="kicker">Strumento</p><h1>Deck Analyzer</h1><p class="lead">Importa un deck, assegna i ruoli alle carte e scopri quanto è consistente: probabilità d’apertura esatte, mani simulate e controlli sul numero di carte.</p></header>
+
+ <section class="sec"><h2>1. Il deck</h2>
+  <div class="card"><div class="row"><label class="btn" style="margin:0">Importa .ydk<input id="file" type="file" accept=".ydk,.txt" hidden></label><button class="btn ghost" id="clear">Svuota deck</button><span class="mute" id="dname"></span></div>
+   <label for="paste" style="margin-top:12px">Oppure incolla il contenuto di un .ydk (codici carta)</label><textarea id="paste" rows="3" placeholder="#main&#10;14558127&#10;..."></textarea><div class="row" style="margin-top:8px"><button class="btn sm" id="loadPaste">Carica</button></div>
+   <p class="mute" id="msg" role="status" style="margin:10px 0 0"></p></div>
+  <div class="card" style="margin-top:12px"><label for="q">Cerca una carta da aggiungere (min. 3 lettere)</label><div class="row"><input id="q" placeholder="Es. Ash Blossom" style="flex:1;min-width:180px"><button class="btn" id="search">Cerca</button></div><div class="res" id="results" style="margin-top:12px"></div></div>
+  <div class="warn" id="warn" hidden></div>
+  <div id="deckView" style="margin-top:12px"></div></section>
+
+ <section class="sec"><h2>2. Ruoli delle carte</h2><p class="mute" style="margin-top:0"><span class="chip s">Starter</span> apre il gioco · <span class="chip h">HT</span> hand trap · <span class="chip k">Brick</span> carta morta in mano · <span class="chip b">Bridge</span> aiuta la consistenza</p>
+  <div class="row"><button class="btn sm" id="preset">Preset Hand Trap</button><button class="btn sm" id="auto">Rilevamento automatico</button><label style="margin:0;display:flex;gap:8px;align-items:center"><input type="checkbox" id="over" style="width:20px;min-height:0;accent-color:var(--red)"> Sovrascrivi</label><button class="btn ghost sm" id="clrRoles">Pulisci ruoli</button></div>
+  <div class="scroll" style="margin-top:10px"><table><thead><tr><th>Carta</th><th>x</th><th>S</th><th>HT</th><th>Br</th><th>Bg</th></tr></thead><tbody id="roles"></tbody></table></div><p class="mute" style="margin:6px 0 0">Il rilevamento è un aiuto: controlla sempre i ruoli a mano. Vengono salvati sul dispositivo per ogni deck.</p></section>
+
+ <section class="sec"><h2>3. Probabilità d’apertura</h2>
+  <div class="row"><label style="margin:0">Mano iniziale</label><div class="seg" id="hs"><button data-h="5" aria-pressed="true">5 carte (primo)</button><button data-h="6" aria-pressed="false">6 carte (secondo)</button></div></div>
+  <div class="card kp" id="kpi"></div>
+  <div class="card" style="margin-top:12px"><label for="pc">Probabilità per carta</label><div class="row"><select id="pc" style="flex:1;min-width:180px"></select></div><p id="pcOut" style="margin:10px 0 0"></p></div></section>
+
+ <section class="sec"><h2>4. Mani simulate</h2>
+  <div class="row"><label for="simN" style="margin:0">Quante mani</label><input id="simN" type="number" min="1" max="100" value="12" style="width:90px"><button class="btn" id="sim">Simula</button><button class="btn ghost" id="csv">Esporta CSV</button></div><div id="hands" style="margin-top:10px"></div></section>
+</main>
+<script>/* menu.js — colonna di navigazione fissa a sinistra. Percorsi relativi: funziona su qualsiasi repository GitHub Pages. */
+(function(){
+  const CS=document.currentScript;const BASE=(CS&&CS.src)?new URL('../',CS.src).href:new URL('./',location.href).href;const LOGO='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMiIgZmlsbD0iIzE1MTAxZiIvPgo8ZyBmaWxsPSIjYzQyYTQxIj48cGF0aCBkPSJNODIgMTcwUTI1NiAxMzIgNDMwIDE3MEw0MTQgMjA2UTI1NiAxNzYgOTggMjA2WiIvPjxyZWN0IHg9IjEzMiIgeT0iMjI4IiB3aWR0aD0iMjQ4IiBoZWlnaHQ9IjE4IiByeD0iNCIvPjxyZWN0IHg9IjE1NiIgeT0iMjA2IiB3aWR0aD0iMzAiIGhlaWdodD0iMjE0IiByeD0iNCIvPjxyZWN0IHg9IjMyNiIgeT0iMjA2IiB3aWR0aD0iMzAiIGhlaWdodD0iMjE0IiByeD0iNCIvPjxyZWN0IHg9IjEyMCIgeT0iNDIwIiB3aWR0aD0iMjcyIiBoZWlnaHQ9IjE2IiByeD0iNCIvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU2IDMyMikgcm90YXRlKDQ1KSI+PHJlY3QgeD0iLTQ0IiB5PSItNDQiIHdpZHRoPSI4OCIgaGVpZ2h0PSI4OCIgcng9IjEwIiBmaWxsPSIjZjRlY2RjIi8+PHJlY3QgeD0iLTIyIiB5PSItMjIiIHdpZHRoPSI0NCIgaGVpZ2h0PSI0NCIgcng9IjYiIGZpbGw9IiNjNDJhNDEiLz48L2c+PC9zdmc+Cg==';
+  const NAV=[["Home","index.html",1],["Il Sentiero","sfida.html",1],["Gestisci torneo","gestisci-torneo.html",1],["Match Pro","match-pro.html",1],["Deck Analyzer","deck-analyzer.html",1]];
+  const CSS=`:root{--tm-w:230px}
+  @media(min-width:720px){html{padding-left:var(--tm-w)}}
+  .tm{position:fixed;inset:0 auto 0 0;width:var(--tm-w);z-index:1000;display:flex;flex-direction:column;background:#0f0b18;border-right:1px solid rgba(244,236,220,.14);font-family:"Instrument Sans",system-ui,sans-serif;color:#f4ecdc}
+  .tm-h{padding:18px 16px 14px;border-bottom:1px solid rgba(244,236,220,.14)}
+  .tm-b{display:flex;align-items:center;gap:10px;color:#f4ecdc;text-decoration:none;font:600 1.12rem/1.1 Fraunces,Georgia,serif}
+  .tm-b img{width:46px;height:46px;border-radius:12px;flex:none}
+  .tm-n{flex:1;overflow-y:auto;padding:10px 0}
+  .tm-n a,.tm-n span{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:46px;padding:0 16px 0 22px;color:#f4ecdc;text-decoration:none;font-weight:600}
+  .tm-n a:hover{background:#2a2040}
+  .tm-n a[aria-current]{background:#2a2040;color:#ff6b7f}
+  .tm-n a[aria-current]::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:4px;border-radius:0 4px 4px 0;background:#ff6b7f}
+  .tm-n span{color:#a99fbf;cursor:default}
+  .tm-n small{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:1px solid rgba(244,236,220,.25);border-radius:99px;padding:2px 8px}
+  .tm-f{padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(244,236,220,.14);font-size:.8rem;color:#a99fbf}
+  .tm-x,.tm-t,.tm-s{display:none}
+  @media(max-width:719px){
+   html{padding-left:34px}
+   .tm{width:min(80vw,300px);transform:translateX(-100%);visibility:hidden;transition:transform .22s,visibility .22s}
+   .tm.open{transform:none;visibility:visible}
+   .tm-x{display:block;margin-top:10px;min-height:40px;padding:0 14px;border-radius:10px;border:2px solid rgba(244,236,220,.3);background:none;color:#f4ecdc;font:700 .95rem "Instrument Sans",sans-serif}
+   .tm-t{display:flex;align-items:center;position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:999;writing-mode:vertical-rl;padding:16px 9px;background:#c42a41;color:#f4ecdc;border:0;border-radius:0 10px 10px 0;font:700 .85rem "Instrument Sans",sans-serif;letter-spacing:.12em;cursor:pointer}
+   .tm-s{display:block;position:fixed;inset:0;background:rgba(8,5,14,.65);opacity:0;pointer-events:none;transition:opacity .2s;z-index:999}
+   .tm-s.on{opacity:1;pointer-events:auto}}`;
+  function mount(){
+    if(document.getElementById('tm-css'))return;
+    const st=document.createElement('style');st.id='tm-css';st.textContent=CSS;document.head.appendChild(st);
+    const here=location.pathname.replace(/\/$/,'/index.html');
+    const links=NAV.map(([n,f,ok])=>{const u=new URL(f,BASE);return ok?`<a href="${u.href}"${u.pathname===here?' aria-current="page"':''}>${n}</a>`:`<span aria-disabled="true">${n}<small>presto</small></span>`}).join('');
+    const col=document.createElement('aside');col.className='tm';col.id='tmCol';col.setAttribute('aria-label','Navigazione');
+    col.innerHTML=`<div class="tm-h"><a class="tm-b" href="${BASE}index.html"><img src="${LOGO=='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMiIgZmlsbD0iIzE1MTAxZiIvPgo8ZyBmaWxsPSIjYzQyYTQxIj48cGF0aCBkPSJNODIgMTcwUTI1NiAxMzIgNDMwIDE3MEw0MTQgMjA2UTI1NiAxNzYgOTggMjA2WiIvPjxyZWN0IHg9IjEzMiIgeT0iMjI4IiB3aWR0aD0iMjQ4IiBoZWlnaHQ9IjE4IiByeD0iNCIvPjxyZWN0IHg9IjE1NiIgeT0iMjA2IiB3aWR0aD0iMzAiIGhlaWdodD0iMjE0IiByeD0iNCIvPjxyZWN0IHg9IjMyNiIgeT0iMjA2IiB3aWR0aD0iMzAiIGhlaWdodD0iMjE0IiByeD0iNCIvPjxyZWN0IHg9IjEyMCIgeT0iNDIwIiB3aWR0aD0iMjcyIiBoZWlnaHQ9IjE2IiByeD0iNCIvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU2IDMyMikgcm90YXRlKDQ1KSI+PHJlY3QgeD0iLTQ0IiB5PSItNDQiIHdpZHRoPSI4OCIgaGVpZ2h0PSI4OCIgcng9IjEwIiBmaWxsPSIjZjRlY2RjIi8+PHJlY3QgeD0iLTIyIiB5PSItMjIiIHdpZHRoPSI0NCIgaGVpZ2h0PSI0NCIgcng9IjYiIGZpbGw9IiNjNDJhNDEiLz48L2c+PC9zdmc+Cg=='?BASE+'icons/logo.svg':LOGO}" alt=""><span>Il Tempio Dei Duelli</span></a><button class="tm-x" id="tmX">Chiudi</button></div><nav class="tm-n">${links}</nav><div class="tm-f">Yu-Gi-Oh! · Bologna</div>`;
+    const t=document.createElement('button');t.className='tm-t';t.textContent='MENU';t.setAttribute('aria-expanded','false');t.setAttribute('aria-controls','tmCol');
+    const s=document.createElement('div');s.className='tm-s';
+    document.body.append(col,t,s);
+    const set=v=>{col.classList.toggle('open',v);s.classList.toggle('on',v);t.setAttribute('aria-expanded',v);(v?document.getElementById('tmX'):t).focus()};
+    t.onclick=()=>set(true);document.getElementById('tmX').onclick=()=>set(false);s.onclick=()=>set(false);
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&col.classList.contains('open'))set(false)});
+  }
+  window.TM={mount};
+})();
+</script>
+<script>
+TM.mount();if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+(function(){
+const API='https://db.ygoprodeck.com/api/v7/cardinfo.php',IMG='https://images.ygoprodeck.com/images/cards_small/',KC='tempio.cards.v1',KD='tempio.deck.v1',KR='tempio.roles.';
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let C={},R={},H=5,deck={name:'Deck',main:[],extra:[],side:[]},csvT='';
+try{C=JSON.parse(localStorage.getItem(KC)||'{}')}catch(e){}
+try{const d=JSON.parse(localStorage.getItem(KD));if(d&&d.main)deck=d}catch(e){}
+try{R=JSON.parse(localStorage.getItem(KR+deck.name)||'{}')}catch(e){}
+const msg=t=>$('msg').textContent=t||'';
+const saveC=()=>{try{localStorage.setItem(KC,JSON.stringify(C))}catch(e){C={};try{localStorage.removeItem(KC)}catch(_){}}};
+const saveD=()=>{try{localStorage.setItem(KD,JSON.stringify(deck));localStorage.setItem(KR+deck.name,JSON.stringify(R))}catch(e){}};
+const isExtra=t=>/Fusion|Synchro|XYZ|Link/i.test(t||'');
+function keep(c){const i={n:c.name,t:c.type,d:(c.desc||'').slice(0,600),l:c.level||0};C[c.id]=i;(c.card_images||[]).forEach(x=>C[x.id]=i)}
+async function need(ids){const miss=[...new Set(ids)].filter(i=>!C[i]);if(!miss.length)return;msg('Scarico i dati delle carte…');
+ for(let i=0;i<miss.length;i+=40){try{const r=await fetch(API+'?id='+miss.slice(i,i+40).join(','));if(!r.ok)throw 0;(await r.json()).data.forEach(keep)}catch(e){msg('Alcune carte non sono state scaricate: serve la connessione. Riprova.');saveC();return}}saveC();msg('')}
+function parse(txt){const out={main:{},extra:{},side:{}};let sec='main';
+ txt.split(/\r?\n/).forEach(r=>{const l=r.trim();if(!l)return;if(l=='#main'){sec='main';return}if(l=='#extra'){sec='extra';return}if(l=='!side'){sec='side';return}if(l[0]=='#'||l[0]=='!')return;const id=+l;if(id>0)out[sec][id]=(out[sec][id]||0)+1});
+ const f=o=>Object.entries(o).map(([id,qty])=>({id:+id,qty}));return{main:f(out.main),extra:f(out.extra),side:f(out.side)}}
+async function setDeck(d,name){deck={name,...d};try{R=JSON.parse(localStorage.getItem(KR+name)||'{}')}catch(e){R={}}saveD();await need([...d.main,...d.extra,...d.side].map(c=>c.id));render()}
+$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;await setDeck(parse(await f.text()),f.name.replace(/\.(ydk|txt)$/i,''));e.target.value=''};
+$('loadPaste').onclick=async()=>{const t=$('paste').value;if(!t.trim())return;await setDeck(parse(t),'Deck incollato');$('paste').value=''};
+$('clear').onclick=()=>{if(deck.main.length+deck.extra.length+deck.side.length&&!confirm('Svuotare il deck?'))return;deck={name:'Deck',main:[],extra:[],side:[]};R={};saveD();render()};
+$('search').onclick=async()=>{const q=$('q').value.trim();if(q.length<3){msg('Scrivi almeno 3 lettere.');return}msg('Cerco…');
+ try{const r=await fetch(API+'?fname='+encodeURIComponent(q));if(!r.ok)throw 0;const j=await r.json();j.data.forEach(keep);saveC();msg('');
+  $('results').innerHTML=j.data.slice(0,24).map(c=>`<div class="sr"><img src="${IMG}${c.id}.jpg" alt="" loading="lazy"><div class="n">${esc(c.name)}<small>${esc(c.type)}</small><div class="row" style="margin-top:6px"><button class="btn sm" data-add="${c.id}" data-s="${isExtra(c.type)?'extra':'main'}">+ ${isExtra(c.type)?'Extra':'Main'}</button><button class="btn ghost sm" data-add="${c.id}" data-s="side">+ Side</button></div></div></div>`).join('')||'<p class="empty">Nessun risultato.</p>'}catch(e){msg('Ricerca non riuscita: serve la connessione.')}};
+$('q').onkeydown=e=>{if(e.key=='Enter')$('search').click()};
+$('results').onclick=e=>{const b=e.target.closest('[data-add]');if(b)add(+b.dataset.add,b.dataset.s)};
+function add(id,sec){const a=deck[sec],x=a.find(c=>c.id==id);if(x)x.qty=Math.min(3,x.qty+1);else a.push({id,qty:1});saveD();render()}
+$('deckView').onclick=e=>{const b=e.target.closest('[data-q]');if(!b)return;const[sec,id,d]=b.dataset.q.split(':'),a=deck[sec],i=a.findIndex(c=>c.id==id);if(i<0)return;a[i].qty+=+d;if(a[i].qty<=0)a.splice(i,1);saveD();render()};
+const nm=id=>C[id]?C[id].n:'Carta '+id;
+function rows(sec,label){const a=deck[sec],n=a.reduce((t,c)=>t+c.qty,0);return`<h3 style="font-size:1.15rem;margin:16px 0 4px">${label} <span class="mute">(${n})</span></h3>`+(a.length?a.map(c=>`<div class="cr"><img src="${IMG}${c.id}.jpg" alt="" loading="lazy"><div class="n">${esc(nm(c.id))}<small>${esc(C[c.id]?C[c.id].t:'')}</small></div><div class="q"><button data-q="${sec}:${c.id}:-1" aria-label="Rimuovi una copia">−</button><b>${c.qty}</b><button data-q="${sec}:${c.id}:1" aria-label="Aggiungi una copia">+</button></div></div>`).join(''):'<p class="empty">Vuoto.</p>')}
+const cnt=a=>a.reduce((t,c)=>t+c.qty,0);
+const PRE=new Set(['Ash Blossom & Joyous Spring','Maxx "C"','Effect Veiler','Droll & Lock Bird','Ghost Ogre & Snow Rabbit','Infinite Impermanence','Nibiru, the Primal Being','PSY-Framegear Gamma','Ghost Belle & Haunted Mansion','Dimension Shifter','Skull Meister','Contact "C"','D.D. Crow','Herald of Orange Light','Ghost Mourner & Moonlit Chill']);
+const has=(t,...a)=>{t=t.toLowerCase();return a.some(s=>t.includes(s))};
+function detect(c){const t=(c.t||'').toLowerCase(),d=c.d||'',n=c.n||'',m=t.includes('monster'),sp=t.includes('spell'),r={};
+ if(PRE.has(n)||(has(d,'during your opponent','quick effect')&&has(d,'discard this card','tribute this card','send this card from your hand')))r.h=1;
+ if((m&&has(d,'if this card is normal summoned','if this card is summoned','you can add 1','special summon 1','from your deck'))||(sp&&has(d,'add 1','from your deck to your hand')&&!has(d,'except')))r.s=1;
+ if(sp&&has(d,'draw 1 card','draw 2 cards','excavate the top','search your deck'))r.b=1;
+ if((has(d,'cannot be normal summoned/set','must be special summoned','if you control no')&&!has(d,'you can special summon this card from your hand'))||(m&&c.l>=8&&!has(d,'you can special summon this card')))r.k=1;return r}
+$('preset').onclick=()=>{deck.main.forEach(c=>{if(PRE.has(nm(c.id)))R[c.id]=Object.assign({},R[c.id],{h:1})});saveD();render()};
+$('auto').onclick=()=>{const o=$('over').checked;deck.main.forEach(c=>{if(!C[c.id])return;const cur=R[c.id]||{};if(!o&&(cur.s||cur.h||cur.k||cur.b))return;R[c.id]=detect(C[c.id])});saveD();render()};
+$('clrRoles').onclick=()=>{R={};saveD();render()};
+$('roles').onchange=e=>{const i=e.target.dataset.r;if(!i)return;const[id,k]=i.split(':');R[id]=Object.assign({},R[id],{[k]:e.target.checked?1:0});saveD();metrics()};
+$('hs').onclick=e=>{const b=e.target.closest('[data-h]');if(!b)return;H=+b.dataset.h;[...$('hs').children].forEach(x=>x.setAttribute('aria-pressed',x==b));metrics()};
+function comb(n,r){if(r<0||r>n)return 0;let v=1;for(let i=0;i<r;i++)v=v*(n-i)/(i+1);return v}
+const pAtLeast=(k,K,N,h)=>{let p=0;for(let i=0;i<k;i++)p+=comb(K,i)*comb(N-K,h-i)/comb(N,h);return Math.max(0,1-p)};
+const pct=x=>(x*100).toFixed(1)+'%';
+const mask=id=>{const r=R[id]||{};return(r.s?1:0)|(r.h?2:0)|(r.k?4:0)|(r.b?8:0)};
+function pool(){const a=[];deck.main.forEach(c=>{for(let i=0;i<c.qty;i++)a.push(c.id)});return a}
+function metrics(){const N=cnt(deck.main),P=pool();
+ if(N<H){$('kpi').innerHTML='<p class="empty" style="margin:0">Carica un deck con almeno '+H+' carte nel Main.</p>';$('pc').innerHTML='';$('pcOut').textContent='';return}
+ const K=m=>deck.main.reduce((t,c)=>t+(mask(c.id)&m?c.qty:0),0),S=K(1),Hh=K(2),Bk=K(4),Bg=K(8);
+ const sims=20000,mk=new Int8Array(P.map(mask)),cnts={st:0,dead:0,brick2:0,play:0,ht1:0,ht2:0,perf:0};
+ for(let t=0;t<sims;t++){for(let i=0;i<H;i++){const j=i+Math.floor(Math.random()*(N-i)),x=mk[i];mk[i]=mk[j];mk[j]=x}
+  let s=0,h=0,k=0,b=0;for(let i=0;i<H;i++){const m=mk[i];if(m&1)s++;if(m&2)h++;if(m&4)k++;if(m&8)b++}
+  if(s)cnts.st++;if(!s&&!b)cnts.dead++;if(k>=2)cnts.brick2++;if(s&&!k)cnts.play++;if(h)cnts.ht1++;if(h>=2)cnts.ht2++;if(s&&h&&!k)cnts.perf++}
+ const row=(l,p,tip)=>`<div><span>${l}${tip?` <small class="mute">${tip}</small>`:''}</span><b>${pct(p)}</b><div class="bar"><i style="width:${p*100}%"></i></div></div>`;
+ $('kpi').innerHTML=`<p class="mute" style="margin:0">Main ${N} carte · Starter ${S} · HT ${Hh} · Brick ${Bk} · Bridge ${Bg}</p>`+
+  row('Almeno 1 Starter',cnts.st/sims)+row('Mano giocabile',cnts.play/sims,'(Starter, nessun Brick)')+row('Mano ideale',cnts.perf/sims,'(Starter + HT, nessun Brick)')+row('Almeno 1 Hand Trap',cnts.ht1/sims)+row('Almeno 2 Hand Trap',cnts.ht2/sims)+row('Mano morta',cnts.dead/sims,'(né Starter né Bridge)')+row('Almeno 2 Brick',cnts.brick2/sims);
+ const cur=$('pc').value;$('pc').innerHTML=deck.main.map(c=>`<option value="${c.id}">${esc(nm(c.id))} (x${c.qty})</option>`).join('');if(cur)$('pc').value=cur;pc()}
+function pc(){const id=$('pc').value,c=deck.main.find(x=>x.id==id);if(!c)return;const N=cnt(deck.main);$('pcOut').innerHTML=`Almeno 1 copia in mano: <b>${pct(pAtLeast(1,c.qty,N,H))}</b>`+(c.qty>1?` · Almeno 2 copie: <b>${pct(pAtLeast(2,c.qty,N,H))}</b>`:'')}
+$('pc').onchange=pc;
+$('sim').onclick=()=>{const n=Math.min(100,Math.max(1,+$('simN').value||12)),P=pool();if(P.length<H){$('hands').innerHTML='<p class="empty">Carica prima un deck.</p>';return}
+ const lines=[['mano',...Array.from({length:H},(_,i)=>'carta'+(i+1))].join(',')];let h='';
+ for(let k=0;k<n;k++){const a=P.slice();for(let i=0;i<H;i++){const j=i+Math.floor(Math.random()*(a.length-i));[a[i],a[j]]=[a[j],a[i]]}const hand=a.slice(0,H);
+  lines.push([k+1,...hand.map(id=>'"'+nm(id).replace(/"/g,'""')+'"')].join(','));
+  h+=`<div class="hand">${hand.map(id=>{const m=mask(id);return`<span class="${m&1?'s':m&2?'h':m&4?'k':m&8?'b':''}">${esc(nm(id))}</span>`}).join('')}</div>`}
+ csvT=lines.join('\n');$('hands').innerHTML=h};
+$('csv').onclick=()=>{if(!csvT){$('sim').click()}const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csvT],{type:'text/csv'}));a.download='mani-simulate.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+function render(){$('dname').textContent=deck.main.length?deck.name:'';
+ $('deckView').innerHTML=rows('main','Main Deck')+rows('extra','Extra Deck')+rows('side','Side Deck');
+ const w=[],m=cnt(deck.main),e=cnt(deck.extra),s=cnt(deck.side);if(m&&(m<40||m>60))w.push(`Il Main ha ${m} carte (consentite da 40 a 60).`);if(e>15)w.push(`L’Extra ha ${e} carte (massimo 15).`);if(s>15)w.push(`Il Side ha ${s} carte (massimo 15).`);
+ const tot={};[...deck.main,...deck.extra,...deck.side].forEach(c=>tot[c.id]=(tot[c.id]||0)+c.qty);Object.entries(tot).forEach(([id,q])=>{if(q>3)w.push(`${nm(id)}: ${q} copie in totale (massimo 3).`)});
+ $('warn').hidden=!w.length;$('warn').innerHTML=w.map(esc).join('<br>');
+ $('roles').innerHTML=deck.main.length?deck.main.map(c=>{const r=R[c.id]||{};const cb=k=>`<td><input type="checkbox" data-r="${c.id}:${k}" ${r[k]?'checked':''} aria-label="${k}"></td>`;return`<tr><td>${esc(nm(c.id))}</td><td>${c.qty}</td>${cb('s')}${cb('h')}${cb('k')}${cb('b')}</tr>`}).join(''):'<tr><td colspan="6" class="empty">Carica un deck per assegnare i ruoli.</td></tr>';
+ metrics()}
+render();need([...deck.main,...deck.extra,...deck.side].map(c=>c.id)).then(render);
+})();
+</script></body></html>
