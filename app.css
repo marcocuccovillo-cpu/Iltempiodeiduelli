@@ -1,0 +1,23 @@
+/* Il Tempio Dei Duelli — stile condiviso. Notte viola, cremisi, avorio. */
+:root{--bg:#15101f;--surf:#1e1730;--raise:#2a2040;--red:#c42a41;--red2:#ff6b7f;--ivory:#f4ecdc;--mute:#a99fbf;--line:rgba(244,236,220,.14);--r:12px;
+ --serif:Fraunces,Georgia,serif;--sans:"Instrument Sans",system-ui,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;color:var(--ivory);font:17px/1.6 var(--sans);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.12;margin:0;text-wrap:balance}
+a{color:var(--red2)}
+:focus-visible{outline:3px solid var(--red2);outline-offset:3px;border-radius:6px}
+.pg{max-width:880px;margin:0 auto;padding:44px 18px 72px}
+.kicker{margin:0 0 8px;font:700 .76rem var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--red2)}
+.pg h1{font-size:clamp(2.2rem,8vw,3.8rem)}
+.lead{color:var(--mute);max-width:36em;margin:14px 0 0;font-size:1.1rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:46px;padding:.5rem 1.1rem;border-radius:var(--r);border:2px solid var(--red);background:var(--red);color:var(--ivory);font:700 1rem var(--sans);text-decoration:none;cursor:pointer}
+.btn:hover{background:#d8344c;border-color:#d8344c}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--ivory)}.btn.ghost:hover{border-color:var(--red2);color:var(--red2)}
+.btn.sm{min-height:38px;padding:.25rem .8rem;font-size:.92rem}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+input,select,textarea{width:100%;min-height:46px;padding:10px 12px;border-radius:10px;border:1px solid rgba(244,236,220,.28);background:var(--bg);color:var(--ivory);font:inherit}
+label{display:block;margin:0 0 4px;font-weight:600;font-size:.9rem}
+.mute{color:var(--mute)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
