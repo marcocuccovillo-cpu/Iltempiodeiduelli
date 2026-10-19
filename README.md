@@ -19,13 +19,14 @@ Sito/PWA della community Yu-Gi-Oh! di Bologna. Funziona su GitHub Pages: **tutti
 | `black-market-setup.sql`, `black-market-test.sql` | Database del Black Market (migrazione 001) e i suoi 10 scenari di test |
 | `black-market-ladder.sql`, `black-market-ladder-test.sql`, `black-market-ladder-down.sql` | Migrazione 003: Ladder Elo e immagine avatar, relativi test e annullamento |
 | `black-market-ladder-rewards.sql`, `black-market-ladder-rewards-test.sql`, `black-market-ladder-rewards-down.sql` | Migrazione 004: bonus 1000 BC, premi della Ladder in BC, vittorie Ladder come match WPA ufficiali, relativi test e annullamento |
+| `black-market-moderatore.sql`, `black-market-moderatore-test.sql`, `black-market-moderatore-down.sql` | Migrazione 005: ruolo Moderatore e sezione Funzioni Mod, relativi test e annullamento |
 | `black-market-moduli.sql`, `black-market-moduli-test.sql`, `black-market-moduli-down.sql` | Migrazione 002 dei tre moduli, relativi test e annullamento |
 | `workflow-keepalive.yml` | Promemoria anti-pausa per Supabase (vedi sotto) |
 
 ## Pubblicare (da telefono)
 1. Nel repository GitHub: **Add file › Upload files**, seleziona **tutti** i file di questa cartella (compreso `.nojekyll`, se il telefono lo mostra) e fai commit.
 2. **Settings › Pages**: *Deploy from a branch*, branch `main`, cartella `/ (root)`.
-3. Apri l'indirizzo del sito. Se vedi una versione vecchia, ricarica due volte (il service worker aggiorna la cache in automatico, `tempio-v8`).
+3. Apri l'indirizzo del sito. Se vedi una versione vecchia, ricarica due volte (il service worker aggiorna la cache in automatico, `tempio-v9`).
 
 Se manca `tempio.css` o `tempio.js` le pagine appaiono senza stile e senza menu: controlla che siano stati caricati.
 
@@ -93,6 +94,22 @@ Nuova migrazione **004** (`black-market-ladder-rewards.sql`): si applica dopo 00
 **Test**: ogni file di test va eseguito su un database di prova **vuoto**, subito dopo la propria migrazione (il test 003 afferma che la Ladder non muove BC, vero solo prima della 004, oppure con premi e match ufficiali spenti).
 **Provato davvero** (PostgreSQL 16 locale): 9 scenari di `black-market-ladder-rewards-test.sql` (bonus, premio e registro, idempotenza, limiti 24 ore, match ufficiale, Hall of Fame, punti fazione, blocco e revisione delle taglie, interruttori, decisioni admin, contabilità, permessi); i test 001, 002 e 003 con la 004 applicata e premi spenti; annullamento e riapplicazione; prova di aggiornamento su dati reali; un test deliberatamente rotto (limite 3 al giorno) viene scoperto. Interfaccia e home provate con Playwright e Supabase simulato (390 e 1280 px). **Non provato**: Supabase reale con più utenti, e il comportamento dell'economia con tanti giocatori (20 BC a vittoria creano BC nuovi: tieni d'occhio i totali e, se serve, abbassa `ladder_reward_bc`).
 **Limiti noti**: più account della stessa persona possono accumulare i premi e il bonus di benvenuto (i limiti li rallentano, non li impediscono); un match ufficiale nato dalla Ladder non può essere "annullato" dopo la conferma (si interviene sulle taglie con la revisione, sui punti fazione con l'esclusione del match e sui BC con una rettifica motivata).
+
+## Ruolo Moderatore e Funzioni Mod (migrazione 005)
+Nuova migrazione **005** (`black-market-moderatore.sql`): si applica dopo 001–004, una volta sola. Aggiunge il ruolo **Moderatore**, che **assegni solo tu** da Admin › Utenti (menu del ruolo, con motivazione). Nessuno può nominarsi o promuoversi, nemmeno un moderatore.
+
+**Cosa può fare un moderatore** (sempre con audit; la sezione è nel menu del Black Market: **Funzioni Mod**, visibile solo a te e ai moderatori):
+- **Verificare i match ufficiali** in attesa, di qualsiasi evento (`mod_verify_match`). La verifica non si modifica più e sblocca la riscossione delle taglie.
+- **Gestire la Ladder**: decidere i match contestati o fermi e annullare le sfide abbandonate. Il risultato deciso chiude il match come una conferma normale: Elo, premio di 20 BC e match WPA seguono le regole della 004.
+- **Rimuovere un duellante**: "rimuovere" significa **sospendere** l'account (non può più agire e non si può sfidare), con possibilità di riattivarlo. Match, saldi e registro restano intatti. Non può sospendere amministratori o altri moderatori.
+- È anche un **duellante normale**: ha wallet, mette e riceve taglie, gioca in Ladder.
+
+**Cosa non può fare**: gestire i moduli, cambiare impostazioni (compresi premi e bonus), assegnare o rettificare crediti, premi di partecipazione, creare eventi o match, annullare o congelare taglie, chiudere le contestazioni generiche, esportare i dati, leggere l'audit e i saldi altrui, cambiare ruoli. **Un moderatore non può verificare né decidere un match in cui gioca lui.** Un moderatore sospeso perde subito tutti i poteri.
+Tu (admin) conservi tutto. Se vuoi dare ai moderatori anche la chiusura delle contestazioni o il congelamento delle taglie, è un cambio di una riga per funzione: dimmelo.
+
+**Come si applica**: Supabase › SQL Editor › incolla `black-market-moderatore.sql` › Run, poi carica i file. Senza la migrazione il sito funziona come prima e la sezione Funzioni Mod avvisa di eseguirla. **Annullare**: `black-market-moderatore-down.sql` (i moderatori tornano duellanti, con una riga di audit per ciascuno; la voce "moderator" resta nell'elenco dei ruoli, inerte, perché PostgreSQL non permette di toglierla).
+**Provato davvero** (PostgreSQL 16 locale): 7 scenari di `black-market-moderatore-test.sql` (nomina, poteri e divieti, verifica match, decisioni Ladder, sospensioni, regressione dei ruoli e dei permessi); test 001–004 ancora tutti verdi con la 005 applicata; applicazione come unica transazione (come l'editor SQL); annullamento e riapplicazione; un'alterazione volontaria della protezione degli admin viene scoperta dal test. Interfaccia provata con Playwright (390 px) per moderatore, admin, organizzatore e duellante. **Non provato**: Supabase reale con più utenti.
+**Limite noto**: decidendo un match Ladder un moderatore fa scattare il premio automatico di 20 BC e il match WPA previsti dalle regole (non assegna crediti a piacere, ma può favorire un amico): ogni decisione è nell'audit, che leggi tu.
 
 ## Stato verificato (19 ottobre 2026)
 **Provato davvero**

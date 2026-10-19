@@ -9,10 +9,11 @@
 window.BM_MODULES = function (BM) {
   'use strict';
   const { R, shell, q, rpc, toast, esc, BC, when, av, pn, ask } = BM;
-  const ROLE = { user: 'Duellante', organizer: 'Organizzatore', admin: 'Amministratore' };
+  const ROLE = { user: 'Duellante', organizer: 'Organizzatore', moderator: 'Moderatore', admin: 'Amministratore' };
   const MODS = [['ladder', 'Ladder', 'ladder'], ['hall_of_fame', 'Hall of Fame', 'hof'], ['faction_wars', 'Faction Wars', 'factions'], ['underground', 'Underground', 'challenges']];
   const on = k => BM.S['module_' + k] == 1;
-  const isOrg = () => BM.me && BM.me.role !== 'user';
+  const isOrg = () => BM.me && (BM.me.role === 'organizer' || BM.me.role === 'admin');
+  const isStaff = () => BM.me && (BM.me.role === 'moderator' || BM.me.role === 'admin');
   const isAdm = () => BM.me && BM.me.role === 'admin';
   const day = d => d ? new Date(d.length === 10 ? d + 'T12:00:00' : d).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }) : 'n/d';
   const num = n => Number(n || 0).toLocaleString('it-IT');
@@ -30,7 +31,7 @@ window.BM_MODULES = function (BM) {
   const fail = (er, cur) => shell(`<div class="err" role="alert">Qualcosa è andato storto: ${esc(er.message)}</div>`, cur || '');
 
   /* ---------- navigazione: solo moduli accesi ---------- */
-  BM.navItems = () => MODS.filter(m => on(m[0])).map(m => [m[2], m[1]]);
+  BM.navItems = () => [...MODS.filter(m => on(m[0])).map(m => [m[2], m[1]]), ...(isStaff() ? [['mod', 'Funzioni Mod']] : [])];
 
   /* =============================== HALL OF FAME =============================== */
   const REC = { most_wins: ['Più vittorie ufficiali', ''], most_events: ['Più eventi disputati', ''], longest_win_streak: ['Serie di vittorie consecutive più lunga', ''], biggest_claim: ['Riscossione più alta', 'BC'] };
@@ -292,6 +293,39 @@ window.BM_MODULES = function (BM) {
     } catch (er) { fail(er, 'ladder') }
   };
 
+
+  /* ============================== FUNZIONI MOD ============================== */
+  R.mod = async () => {
+    const head = '<h1 class="t">Funzioni <em>Mod</em></h1><p class="sub">Strumenti per moderatori e amministratori: verificare le vittorie, decidere i match della Ladder, rimuovere un duellante. Ogni azione chiede una motivazione (o una conferma) ed è registrata nell\'audit. Nulla viene cancellato.</p>';
+    if (!isStaff()) return shell('<div class="err">Area riservata a moderatori e amministratori.</div>', '');
+    shell(head + loading, 'mod');
+    try {
+      const sb = BM.sb, me = BM.me, imMod = me.role === 'moderator';
+      const [pm, evs, lad] = await Promise.all([
+        q(sb.from('matches').select('id,event_id,round,player_a,player_b,status,created_at,source').eq('status', 'pending').order('created_at', { ascending: false }).limit(100)),
+        q(sb.from('events').select('id,name').limit(300)),
+        on('ladder') ? q(sb.from('ladder_matches').select('*').in('status', ['pending', 'accepted', 'reported', 'disputed']).order('created_at', { ascending: false }).limit(80)) : Promise.resolve([])]);
+      const en = Object.fromEntries(evs.map(e => [e.id, e.name]));
+      const mine = m => imMod && (m.challenger_id === me.id || m.opponent_id === me.id || m.player_a === me.id || m.player_b === me.id);
+      const rank = { disputed: 0, reported: 1, accepted: 2, pending: 3 };
+      lad.sort((a, b) => rank[a.status] - rank[b.status]);
+      const users = [...BM.P.values()].filter(u => u.id !== me.id).sort((a, b) => (b.suspended - a.suspended) || a.nickname.localeCompare(b.nickname));
+      const protectedU = u => imMod && (u.role === 'admin' || u.role === 'moderator');
+      const disputed = lad.filter(m => m.status === 'disputed').length;
+      shell(`${head}
+      <div class="box" style="margin-top:18px"><h2 style="margin-top:0">Match ufficiali da verificare (${pm.length})</h2><p class="mute" style="font-size:.9rem;margin-top:0">Scegli il vincitore dopo aver controllato il risultato. Una verifica non si modifica più e sblocca la riscossione delle taglie. Non puoi verificare un match in cui giochi tu.</p>
+      ${pm.map(m => `<div class="row2"><div class="g">T${m.round} · ${esc(pn(m.player_a))} <span class="mute">vs</span> ${esc(pn(m.player_b))}<small>${esc(en[m.event_id] || 'evento')} · ${when(m.created_at)}</small></div>${mine(m) ? '<small class="mute">è un tuo match: lo verifica un collega</small>' : `<button class="btn sm" data-act="modWin" data-m="${m.id}" data-w="${m.player_a}">${esc(pn(m.player_a))} vince</button><button class="btn sm" data-act="modWin" data-m="${m.id}" data-w="${m.player_b}">${esc(pn(m.player_b))} vince</button>`}</div>`).join('') || empty('Nessun match in attesa di verifica.')}</div>
+      ${on('ladder') ? `<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Ladder: match da gestire (${lad.length}${disputed ? ' · ' + disputed + ' contestati' : ''})</h2><p class="mute" style="font-size:.9rem;margin-top:0">Decidi il risultato dei match contestati o fermi, oppure annulla le sfide abbandonate. Il risultato deciso chiude il match (Elo, premio e match WPA come per una conferma normale).</p>${lad.map(m => lrow(m, mine(m) ? '<small class="mute">è un tuo match</small>' : (m.status === 'reported' || m.status === 'disputed' || m.status === 'accepted' ? `<select id="lar-${m.id}" aria-label="Esito">${outcomeOpts(m)}</select><button class="btn sm" data-act="ldAdmRes" data-c="${m.id}">Decidi</button>` : '') + `<button class="btn ghost sm" data-act="ldAdmVoid" data-c="${m.id}">Annulla</button>`)).join('') || empty('Nessun match da gestire.')}</div>` : '<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Ladder</h2><p class="mute" style="margin:0">La Ladder è al momento spenta: solo un amministratore può riattivarla.</p></div>'}
+      <div class="box" style="margin-top:14px"><h2 style="margin-top:0">Rimuovi un duellante</h2><p class="mute" style="font-size:.9rem;margin-top:0">La rimozione è una <b>sospensione</b>: l'account non può più agire e non si può sfidare, ma match, saldi e registro restano intatti e si può riattivare. ${imMod ? 'I moderatori non possono sospendere amministratori o altri moderatori.' : ''}</p>
+      <input id="mus" type="search" placeholder="Cerca duellante…" aria-label="Cerca duellante" style="margin-bottom:8px">
+      ${users.map(u => `<div class="row2 mur" data-n="${esc(u.nickname.toLowerCase())}">${av(u)}<div class="g">${esc(u.nickname)}<small>${ROLE[u.role] || u.role}${u.suspended ? ' · SOSPESO' : ''}</small></div>${protectedU(u) ? '<small class="mute">protetto</small>' : `<button class="btn ${u.suspended ? 'ghost' : 'danger'} sm" data-act="susp" data-u="${u.id}" data-on="${u.suspended ? 0 : 1}">${u.suspended ? 'Riattiva' : 'Rimuovi (sospendi)'}</button>`}</div>`).join('') || empty('Nessun altro utente.')}</div>`, 'mod');
+      const inp = document.getElementById('mus');
+      inp.oninput = () => { const t = inp.value.trim().toLowerCase(); document.querySelectorAll('.mur').forEach(r => r.hidden = !!t && !r.dataset.n.includes(t)) };
+    } catch (er) {
+      fail(/could not find|schema cache|invalid input value for enum/i.test(er.message) ? new Error('Funzioni Mod non disponibili: esegui la migrazione black-market-moderatore.sql') : er, 'mod');
+    }
+  };
+
   /* ============================== AZIONI (clic) ============================== */
   const done = async (msg) => { toast(msg); await BM.core(); BM.route() };
   const ACT = {
@@ -306,6 +340,7 @@ window.BM_MODULES = function (BM) {
     chCan: async el => { if (!confirm('Annullare la sfida?')) return; await rpc('cancel_challenge', { p_id: el.dataset.c }); await done('Sfida annullata.') },
     chLink: async el => { const m = document.getElementById('lm-' + el.dataset.c).value; await rpc('link_challenge_match', { p_id: el.dataset.c, p_match: m }); await done('Match collegato. La sfida è in corso.') },
     chDone: async el => { if (!confirm('Confermare la sfida? Il risultato ufficiale è quello già verificato nell\'evento.')) return; await rpc('complete_challenge', { p_id: el.dataset.c }); await done('Sfida completata.') },
+    modWin: async el => { if (!confirm(`Registrare la vittoria di ${pn(el.dataset.w)}? La verifica non si può modificare.`)) return; await rpc('mod_verify_match', { p_match: el.dataset.m, p_winner: el.dataset.w }); await done('Match verificato.') },
     avPick: async () => { const i = document.getElementById('avf'); if (i) i.click() },
     avDel: async () => { if (!confirm('Rimuovere la foto del profilo?')) return; await rpc('set_my_avatar_img', { p_img: null }).catch(er => { throw avErr(er) }); await BM.core(); toast('Foto rimossa.'); BM.route() },
     ldAcc: async el => { await rpc('ladder_respond', { p_id: el.dataset.c, p_accept: true }); await done('Sfida accettata: ora giocate e inviate il risultato.') },
