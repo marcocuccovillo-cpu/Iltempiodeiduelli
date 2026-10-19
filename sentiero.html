@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Il Sentiero dei Sigilli — Il Tempio Dei Duelli</title><meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tempio.css">
+<style>
+.grade{margin-top:20px;display:grid;gap:14px}
+.grade b{font:700 clamp(1.8rem,8vw,2.6rem)/1 var(--disp);color:var(--ac2)}
+.p{padding-top:20px}.p[hidden]{display:none}.p h2{font-size:1.25rem;margin:0 0 10px}.p h2:not(:first-child){margin-top:28px}
+.sig{display:grid;gap:10px}@media(min-width:620px){.sig{grid-template-columns:1fr 1fr}}
+.sg{padding:14px;border:1px solid var(--line);border-radius:var(--r);background:var(--surf)}
+.sg.ok{border-color:var(--ac);background:linear-gradient(135deg,rgba(0,229,255,.16),var(--surf))}
+.sg h3{font-size:1rem;display:flex;justify-content:space-between;gap:8px}.sg p{margin:4px 0 8px;color:var(--mu);font-size:.92rem}
+.sg .bar{height:7px}
+.it{padding:12px 0}.it:last-child{border-bottom:1px solid var(--line)}
+.res{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:8px;font-weight:700;margin-right:10px;color:#001219}
+.W{background:var(--good)}.L{background:var(--bad)}.D{background:#94a3b8}
+.tag{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mu)}.tag.ok{color:var(--good);border-color:var(--good)}
+td:last-child,th:last-child{text-align:right}
+</style></head><body>
+
+<main class="pg">
+ <header><p class="kicker">Sfida stagionale</p><h1>Il Sentiero dei Sigilli</h1>
+ <p class="lead">Registra i tuoi duelli, fai confermare i risultati dall’avversario, conquista i Sigilli e accumula punti nel Campionato del Tempio.</p></header>
+
+ <section class="card grade" aria-label="Il tuo grado">
+  <div id="nickBox"></div>
+  <div><span class="mute">Grado</span><br><b id="gname">Novizio</b></div>
+  <div><div class="bar"><i id="gbar" style="width:0"></i></div><p class="mute" id="gtxt" style="margin:6px 0 0"></p></div>
+ </section>
+
+ <div class="tabs" role="tablist"><button role="tab" data-t="sig" aria-selected="true">Sigilli</button><button role="tab" data-t="lib" aria-selected="false">Libretto</button><button role="tab" data-t="cam" aria-selected="false">Campionato</button></div>
+
+ <section class="p" id="p-sig"><h2>I Sigilli della stagione</h2><p class="mute" style="margin-top:0">Contano solo i duelli confermati dall’avversario. Ogni Sigillo vale 5 punti.</p><div class="sig" id="sigs"></div></section>
+
+ <section class="p" id="p-lib" hidden>
+  <h2>Registra un duello</h2>
+  <div class="card g2">
+   <div><label for="dOpp">Avversario</label><input id="dOpp" placeholder="Nome o nickname"></div>
+   <div><label for="dDeck">Il tuo deck</label><input id="dDeck" placeholder="Es. Snake-Eye"></div>
+   <div><label for="dRes">Esito</label><select id="dRes"><option value="W">Vittoria</option><option value="L">Sconfitta</option><option value="D">Pareggio</option></select></div>
+   <div style="align-self:end"><button class="btn" id="dAdd" style="width:100%">Aggiungi al libretto</button></div>
+  </div>
+  <div id="codeBox" hidden class="card" style="margin-top:12px"><p style="margin:0"><b>Manda questo codice al tuo avversario</b> per farlo confermare:</p><pre id="codeTxt"></pre><div class="row"><button class="btn sm" id="codeCopy">Copia</button><button class="btn ghost sm" id="codeShare">Condividi</button></div></div>
+  <h2>Importa un codice</h2>
+  <div class="card"><label for="imp">Incolla qui un codice ricevuto (duello, conferma o risultati di un torneo)</label><textarea id="imp" rows="2"></textarea>
+   <div class="row" style="margin-top:10px"><input id="impDeck" placeholder="Il tuo deck (se è un duello)" style="flex:1;min-width:160px"><button class="btn" id="impGo">Importa</button></div><p class="mute" id="impMsg" style="margin:8px 0 0" role="status"></p></div>
+  <h2>Il tuo libretto</h2><div id="duels"></div>
+ </section>
+
+ <section class="p" id="p-cam" hidden>
+  <h2>Registra un torneo del Tempio</h2>
+  <div class="card g2">
+   <div><label for="tName">Nome del torneo</label><input id="tName" placeholder="Es. Torneo del venerdì"></div>
+   <div><label for="tDate">Data</label><input id="tDate" type="date"></div>
+   <div><label for="tPlace">Piazzamento</label><input id="tPlace" type="number" min="1" placeholder="1 = primo"></div>
+   <div style="align-self:end"><button class="btn" id="tAdd" style="width:100%">Aggiungi</button></div>
+  </div>
+  <p class="mute">Punti: 3 per la partecipazione, più 10 al 1°, 7 al 2°, 5 in Top 4, 3 in Top 8.</p>
+  <div id="tourns"></div>
+  <h2>La tua tessera</h2>
+  <div class="card"><p style="margin:0">Mandala all’organizzatore a fine stagione per entrare in classifica.</p><pre id="cardTxt"></pre><div class="row"><button class="btn sm" id="cardCopy">Copia tessera</button><button class="btn ghost sm" id="cardShare">Condividi</button></div></div>
+  <h2>Classifica del Campionato</h2>
+  <div class="card"><label for="tess">Organizzatore: incolla le tessere dei giocatori, una per riga</label><textarea id="tess" rows="3"></textarea><div class="row" style="margin-top:10px"><button class="btn" id="tessGo">Aggiorna classifica</button><button class="btn ghost sm" id="tessClr">Svuota</button></div></div>
+  <div id="rank" style="margin-top:14px"></div>
+ </section>
+</main>
+<script src="tempio.js"></script>
+<script>
+(function(){
+const KEY='tempio.sentiero.v1';
+let S={nick:'',duels:[],tourn:[],tess:[]};
+try{Object.assign(S,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const enc=o=>'TD1:'+btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+const dec=t=>{t=t.trim();if(!t.startsWith('TD1:'))throw 0;return JSON.parse(decodeURIComponent(escape(atob(t.slice(4)))))};
+const RES={W:'Vittoria',L:'Sconfitta',D:'Pareggio'};
+const GRADI=[[0,'Novizio'],[10,'Duellante'],[25,'Custode'],[45,'Maestro']];
+const SIGILLI=[
+ {n:'Primo Sangue',d:'Vinci il tuo primo duello confermato',t:s=>[s.wins,1]},
+ {n:'Cinque Volti',d:'Batti 5 avversari diversi',t:s=>[s.oppWon,5]},
+ {n:'Tre Maschere',d:'Vinci con 3 deck diversi',t:s=>[s.decksWon,3]},
+ {n:'Marcia Trionfale',d:'Vinci 3 duelli di fila',t:s=>[s.streak,3]},
+ {n:'Ostinato',d:'Gioca 20 duelli confermati',t:s=>[s.played,20]},
+ {n:'Rivincita',d:'Batti chi ti aveva battuto',t:s=>[s.revenge,1]},
+ {n:'Cuore del Tempio',d:'Partecipa a 3 tornei del Tempio',t:s=>[s.tourn,3]},
+ {n:'Sul Podio',d:'Entra nella Top 4 di un torneo',t:s=>[s.top4,1]},
+ {n:'Il Campione',d:'Vinci un torneo del Tempio',t:s=>[s.champ,1]}];
+const bonus=p=>p==1?10:p==2?7:p<=4?5:p<=8?3:0;
+function stats(){
+ const d=S.duels.filter(x=>x.ok).sort((a,b)=>a.date<b.date?-1:1),k=x=>x.toLowerCase().trim();
+ const st={played:d.length,wins:0,oppWon:0,decksWon:0,streak:0,revenge:0,tourn:S.tourn.length,top4:0,champ:0};
+ const ow=new Set,dw=new Set,lost=new Set;let run=0;
+ d.forEach(x=>{if(x.res=='W'){st.wins++;ow.add(k(x.opp));if(x.deck)dw.add(k(x.deck));run++;st.streak=Math.max(st.streak,run);if(lost.has(k(x.opp)))st.revenge=1}else{run=0;if(x.res=='L')lost.add(k(x.opp))}});
+ st.oppWon=ow.size;st.decksWon=dw.size;
+ S.tourn.forEach(t=>{if(t.place<=4)st.top4++;if(t.place==1)st.champ++});
+ st.camp=S.tourn.reduce((a,t)=>a+3+bonus(t.place),0);
+ st.done=SIGILLI.filter(g=>{const[v,m]=g.t(st);return v>=m}).length;
+ st.pts=st.done*5+st.camp;return st}
+function render(){
+ const st=stats();
+ $('nickBox').innerHTML=S.nick?`<span class="mute">Duellante</span><br><strong style="font:600 1.4rem var(--disp)">${esc(S.nick)}</strong> <button class="btn ghost sm" id="chg" style="margin-left:8px">Cambia</button>`:
+  `<label for="nIn">Come ti chiami nel Tempio?</label><div class="row"><input id="nIn" placeholder="Nickname" style="flex:1;min-width:160px"><button class="btn" id="nGo">Inizia</button></div>`;
+ if($('chg'))$('chg').onclick=()=>{S.nick='';save();render()};
+ if($('nGo'))$('nGo').onclick=()=>{const v=$('nIn').value.trim();if(v){S.nick=v;save();render()}};
+ let gi=0;GRADI.forEach((g,i)=>{if(st.pts>=g[0])gi=i});const nx=GRADI[gi+1];
+ $('gname').textContent=GRADI[gi][1];
+ $('gbar').style.width=(nx?Math.min(100,(st.pts-GRADI[gi][0])/(nx[0]-GRADI[gi][0])*100):100)+'%';
+ $('gtxt').textContent=`${st.pts} punti · ${st.done}/${SIGILLI.length} Sigilli`+(nx?` · ${nx[0]-st.pts} al grado ${nx[1]}`:' · grado massimo');
+ $('sigs').innerHTML=SIGILLI.map(g=>{const[v,m]=g.t(st),ok=v>=m;return `<div class="sg${ok?' ok':''}"><h3>${g.n}${ok?'<span aria-label="Conquistato">✔</span>':''}</h3><p>${g.d}</p><div class="bar"><i style="width:${Math.min(100,v/m*100)}%"></i></div><small class="mute">${Math.min(v,m)} / ${m}</small></div>`}).join('');
+ $('duels').innerHTML=S.duels.length?[...S.duels].reverse().map(x=>`<div class="it"><span><span class="res ${x.res}" aria-label="${RES[x.res]}">${x.res}</span>${esc(x.opp)}${x.deck?` <span class="mute">· ${esc(x.deck)}</span>`:''}</span><span class="row"><span class="mute">${x.date}</span><span class="tag${x.ok?' ok':''}">${x.ok?'confermato':'da confermare'}</span>${x.ok?'':`<button class="btn ghost sm" data-code="${x.id}">Codice</button>`}<button class="btn ghost sm" data-del="${x.id}" aria-label="Elimina">✕</button></span></div>`).join(''):'<p class="empty">Nessun duello ancora. Registra il primo!</p>';
+ $('tourns').innerHTML=S.tourn.length?[...S.tourn].reverse().map(t=>`<div class="it"><span><strong>${esc(t.name)}</strong> <span class="mute">· ${t.date} · ${t.place}º posto</span></span><span class="row"><span class="tag ok">+${3+bonus(t.place)} pt</span><button class="btn ghost sm" data-delt="${t.id}" aria-label="Elimina">✕</button></span></div>`).join(''):'<p class="empty">Nessun torneo registrato.</p>';
+ const card=enc({k:'card',nick:S.nick||'?',pts:st.pts,sig:st.done,w:st.wins,p:st.played,c:st.camp});$('cardTxt').textContent=card;
+ const rows=S.tess.slice().sort((a,b)=>b.pts-a.pts);
+ $('rank').innerHTML=rows.length?`<table><thead><tr><th>#</th><th>Giocatore</th><th>Sigilli</th><th>Punti</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.nick)}</td><td>${r.sig}</td><td><strong>${r.pts}</strong></td></tr>`).join('')}</tbody></table>`:'<p class="empty">Nessuna tessera importata.</p>';
+}
+const show=n=>{document.querySelectorAll('.tabs [data-t]').forEach(b=>{b.setAttribute('aria-selected',b.dataset.t==n);$('p-'+b.dataset.t).hidden=b.dataset.t!=n})};
+document.querySelectorAll('.tabs [data-t]').forEach(b=>b.onclick=()=>show(b.dataset.t));
+const share=(t)=>navigator.share?navigator.share({text:t}).catch(()=>{}):navigator.clipboard.writeText(t);
+const copy=(t,b)=>navigator.clipboard.writeText(t).then(()=>{const o=b.textContent;b.textContent='Copiato!';setTimeout(()=>b.textContent=o,1400)}).catch(()=>{});
+let cur='';
+function showCode(x){cur=enc({k:'duel',id:x.id,from:S.nick||'?',res:x.res,deck:x.deck,date:x.date});$('codeTxt').textContent=cur;$('codeBox').hidden=false}
+$('dAdd').onclick=()=>{const opp=$('dOpp').value.trim();if(!opp){$('dOpp').focus();return}
+ const x={id:uid(),date:new Date().toISOString().slice(0,10),opp,deck:$('dDeck').value.trim(),res:$('dRes').value,ok:false};
+ S.duels.push(x);save();showCode(x);$('dOpp').value='';render()};
+$('codeCopy').onclick=e=>copy(cur,e.target);$('codeShare').onclick=()=>share(cur);
+$('duels').onclick=e=>{const c=e.target.dataset.code,d=e.target.dataset.del;
+ if(c){showCode(S.duels.find(x=>x.id==c));$('codeBox').scrollIntoView({block:'center'})}
+ if(d&&confirm('Eliminare questo duello?')){S.duels=S.duels.filter(x=>x.id!=d);save();render()}};
+$('tourns').onclick=e=>{const d=e.target.dataset.delt;if(d&&confirm('Eliminare questo torneo?')){S.tourn=S.tourn.filter(x=>x.id!=d);save();render()}};
+$('impGo').onclick=()=>{const m=$('impMsg');let o;try{o=dec($('imp').value)}catch(e){m.textContent='Codice non valido.';return}
+ if(o.k=='duel'){if(S.duels.some(x=>x.id==o.id)){m.textContent='Duello già nel libretto.';return}
+  const flip={W:'L',L:'W',D:'D'}[o.res];S.duels.push({id:o.id,date:o.date,opp:o.from,deck:$('impDeck').value.trim(),res:flip,ok:true});save();
+  cur=enc({k:'ack',id:o.id});$('codeTxt').textContent=cur;$('codeBox').hidden=false;m.textContent=`Duello contro ${o.from} confermato. Rimanda il codice di conferma qui sopra a ${o.from}.`;$('imp').value='';render()}
+ else if(o.k=='tourn'){const i=o.rank.findIndex(n=>n.toLowerCase().trim()==(S.nick||'').toLowerCase().trim());
+  if(i<0){m.textContent='Il tuo nickname non compare nella classifica di questo torneo.';return}
+  if(S.tourn.some(t=>t.id==o.id)){m.textContent='Torneo già registrato.';return}
+  S.tourn.push({id:o.id,name:o.name,date:o.date,place:i+1});save();m.textContent=`Torneo "${o.name}" registrato: ${i+1}º posto.`;$('imp').value='';render()}
+ else if(o.k=='ack'){const x=S.duels.find(d=>d.id==o.id);if(!x){m.textContent='Duello non trovato su questo dispositivo.';return}x.ok=true;save();m.textContent='Duello confermato!';$('imp').value='';render()}
+ else m.textContent='Codice non riconosciuto.'};
+$('tAdd').onclick=()=>{const n=$('tName').value.trim(),p=parseInt($('tPlace').value,10);if(!n||!(p>=1)){(n?$('tPlace'):$('tName')).focus();return}
+ S.tourn.push({id:uid(),name:n,date:$('tDate').value||new Date().toISOString().slice(0,10),place:p});save();$('tName').value='';$('tPlace').value='';render()};
+$('cardCopy').onclick=e=>copy($('cardTxt').textContent,e.target);$('cardShare').onclick=()=>share($('cardTxt').textContent);
+$('tessGo').onclick=()=>{const by={};S.tess.forEach(r=>by[r.nick.toLowerCase()]=r);
+ $('tess').value.split(/\n+/).forEach(l=>{try{const o=dec(l);if(o.k=='card')by[o.nick.toLowerCase()]={nick:o.nick,pts:o.pts,sig:o.sig}}catch(e){}});
+ S.tess=Object.values(by);save();$('tess').value='';render()};
+$('tessClr').onclick=()=>{if(confirm('Svuotare la classifica?')){S.tess=[];save();render()}};
+render();
+})();
+</script></body></html>

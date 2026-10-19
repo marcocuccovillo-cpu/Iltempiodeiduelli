@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gestisci torneo — Il Tempio Dei Duelli</title><meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tempio.css">
+</head><body>
+<main class="pg">
+ <header><p class="kicker">Organizzatori</p><h1>Gestisci torneo</h1></header>
+ <div id="app"></div>
+</main>
+<div class="dock" id="dock" hidden></div>
+<script src="tempio.js"></script>
+<script>
+(function(){
+const K='tempio.torneo.v1',KD='tempio.torneo.bozza.v1',$=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let T=null;try{T=JSON.parse(localStorage.getItem(K))}catch(e){}
+if(T&&T.phase==='setup')T=null;
+let D={name:'',date:new Date().toISOString().slice(0,10),players:[],rounds:3,cut:0,avoid:true,touched:false};
+try{Object.assign(D,JSON.parse(localStorage.getItem(KD)||'{}'))}catch(e){}
+let view='tavoli';
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(T))}catch(e){}};
+const saveD=()=>{try{localStorage.setItem(KD,JSON.stringify(D))}catch(e){}};
+const enc=o=>'TD1:'+btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+const suggest=n=>n<=8?3:n<=16?4:n<=32?5:n<=64?6:n<=128?7:8;
+
+/* ---------- logica del torneo ---------- */
+function calc(){const s=T.players.map(p=>({id:p.id,name:p.name,drop:p.drop,pts:0,w:0,l:0,pl:0,wn:0,opp:[],bye:0}));
+ T.rounds.forEach(r=>r.forEach(m=>{if(m.b==null){const a=s[m.a];a.pts+=3;a.w++;a.bye++;return}if(!m.res)return;const a=s[m.a],b=s[m.b];a.pl++;b.pl++;a.opp.push(m.b);b.opp.push(m.a);
+  if(m.res=='A'){a.pts+=3;a.w++;b.l++;a.wn++}else if(m.res=='B'){b.pts+=3;b.w++;a.l++;b.wn++}else{a.l++;b.l++}}));
+ s.forEach(x=>x.mw=x.pl?Math.max(1/3,x.wn/x.pl):1/3);
+ s.forEach(x=>x.omw=x.opp.length?x.opp.reduce((t,o)=>t+s[o].mw,0)/x.opp.length:0);return s}
+const order=a=>a.slice().sort((x,y)=>y.pts-x.pts||y.omw-x.omw||x.name.localeCompare(y.name));
+function pairRound(){const s=calc();let pool=T.players.filter(p=>!p.drop).map(p=>s[p.id]);
+ if(!T.rounds.length)pool.sort(()=>Math.random()-.5);else pool=order(pool);
+ let bye=null;if(pool.length%2){for(let i=pool.length-1;i>=0;i--)if(!pool[i].bye){bye=pool[i];break}if(!bye)bye=pool[pool.length-1];pool=pool.filter(x=>x!==bye)}
+ let nodes=0;const dfs=(l,strict)=>{if(!l.length)return[];if(++nodes>30000)return null;const a=l[0];
+  for(let j=1;j<l.length;j++){const b=l[j];if(strict&&a.opp.includes(b.id))continue;const r=dfs(l.filter((_,k)=>k&&k!==j),strict);if(r)return[[a,b],...r];if(nodes>30000)return null}return null};
+ let pairs=T.avoid?dfs(pool,true):null;nodes=0;if(!pairs)pairs=dfs(pool,false)||[];
+ const ms=pairs.map(([a,b])=>({a:a.id,b:b.id,res:null}));if(bye)ms.push({a:bye.id,b:null,res:'A'});T.rounds.push(ms)}
+function startCut(){const o=order(calc().filter(x=>!x.drop)).slice(0,T.cut);T.seeds=o.map(x=>x.id);
+ const ix=T.cut==4?[[0,3],[1,2]]:[[0,7],[3,4],[1,6],[2,5]];T.cutR=[ix.map(([i,j])=>({a:T.seeds[i],b:T.seeds[j],res:null}))];T.phase='cut'}
+function nextCut(){const last=T.cutR[T.cutR.length-1],w=last.map(m=>m.res=='A'?m.a:m.b);if(w.length==1){T.phase='done';return}
+ const nx=[];for(let i=0;i<w.length;i+=2)nx.push({a:w[i],b:w[i+1],res:null});T.cutR.push(nx)}
+function finalRank(){const s=order(calc());if(!(T.cutR&&T.cutR.length))return s.map(x=>x.id);
+ const rank=[],used=new Set(),add=id=>{if(id!=null&&!used.has(id)){used.add(id);rank.push(id)}};
+ const f=T.cutR[T.cutR.length-1][0];if(f.res){add(f.res=='A'?f.a:f.b);add(f.res=='A'?f.b:f.a)}
+ for(let r=T.cutR.length-2;r>=0;r--)T.cutR[r].map(m=>m.res?(m.res=='A'?m.b:m.a):null).filter(x=>x!=null).sort((x,y)=>T.seeds.indexOf(x)-T.seeds.indexOf(y)).forEach(add);
+ s.forEach(x=>add(x.id));return rank}
+const nm=id=>esc(T.players[id].name),pct=x=>(x*100).toFixed(1)+'%';
+const cutName=n=>n==4?'Quarti di finale':n==2?'Semifinali':'Finale';
+
+/* ---------- vista: preparazione ---------- */
+function setupHTML(){return`<section class="card gt-set" style="margin-top:18px">
+  <div class="g2"><div><label for="tn">Nome del torneo</label><input id="tn" value="${esc(D.name)}" placeholder="Es. Torneo del venerdì" autocomplete="off"></div>
+  <div><label for="td">Data</label><input id="td" type="date" value="${esc(D.date)}"></div></div>
+ </section>
+ <section class="card" style="margin-top:12px"><label for="pn">Giocatori <span class="mute" id="cnt"></span></label>
+  <div class="gt-add"><input id="pn" placeholder="Nome del giocatore" enterkeyhint="done" autocomplete="off"><button class="btn" id="padd" type="button">Aggiungi</button></div>
+  <div class="gt-list" id="plist" aria-live="polite"></div>
+  <details style="margin-top:6px"><summary>Incolla un elenco (uno per riga)</summary><textarea id="bulk" rows="5" placeholder="Marco&#10;Elisa&#10;Kevin" aria-label="Elenco giocatori"></textarea><button class="btn ghost block" id="bulkgo" type="button" style="margin-top:8px">Aggiungi tutti</button></details>
+  <button class="btn ghost sm" id="ex" type="button" style="margin-top:8px">Carica un esempio</button>
+ </section>
+ <section class="card gt-set" style="margin-top:12px">
+  <div class="g2"><div><label for="rn">Turni Swiss</label><input id="rn" type="number" inputmode="numeric" min="1" max="12" value="${D.rounds}"></div>
+  <div><label for="cut">Fase finale</label><select id="cut"><option value="0">Nessuna</option><option value="4">Top 4</option><option value="8">Top 8</option></select></div></div>
+  <label class="gt-sw" for="av"><span>Evita rematch</span><input id="av" type="checkbox" ${D.avoid?'checked':''}></label>
+  <p class="mute" id="err" role="alert" style="margin:0"></p>
+ </section>`}
+function plist(){const n=D.players.length;$('cnt').textContent='('+n+')';
+ $('plist').innerHTML=n?D.players.map((p,i)=>`<span class="gt-p">${esc(p)}<button type="button" data-rm="${i}" aria-label="Rimuovi ${esc(p)}">×</button></span>`).join(''):'<span class="mute">Nessun giocatore: aggiungine almeno 2.</span>';
+ [...$('cut').options].forEach(o=>{if(+o.value)o.disabled=n<+o.value});if($('cut').selectedOptions[0]&&$('cut').selectedOptions[0].disabled)$('cut').value='0';
+ if(!D.touched&&n)$('rn').value=D.rounds=suggest(n);
+ dockSetup()}
+function dockSetup(){const n=D.players.length;const d=$('dock');d.hidden=false;d.innerHTML=`<div class="info">${n<2?'Servono almeno 2 giocatori':n+' giocatori pronti'}</div><button class="btn" id="start" type="button" ${n<2?'disabled':''}>Inizia torneo</button>`}
+function addPlayers(list){let dup=0;list.forEach(n=>{n=n.trim();if(!n)return;if(D.players.some(p=>p.toLowerCase()==n.toLowerCase())){dup++;return}D.players.push(n)});saveD();plist();$('err').textContent=dup?dup+(dup==1?' nome duplicato ignorato':' nomi duplicati ignorati')+': aggiungi un’iniziale per distinguerli.':''}
+function bindSetup(){
+ $('tn').oninput=e=>{D.name=e.target.value;saveD()};$('td').onchange=e=>{D.date=e.target.value;saveD()};
+ $('rn').oninput=e=>{D.touched=true;D.rounds=Math.max(1,Math.min(12,+e.target.value||3));saveD()};
+ $('cut').onchange=e=>{D.cut=+e.target.value;saveD()};$('av').onchange=e=>{D.avoid=e.target.checked;saveD()};
+ const add=()=>{const v=$('pn').value;if(!v.trim())return;addPlayers([v]);$('pn').value='';$('pn').focus()};
+ $('padd').onclick=add;$('pn').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();add()}};
+ $('plist').onclick=e=>{const b=e.target.closest('[data-rm]');if(!b)return;D.players.splice(+b.dataset.rm,1);saveD();plist()};
+ $('bulkgo').onclick=()=>{addPlayers($('bulk').value.split('\n'));$('bulk').value=''};
+ $('ex').onclick=()=>addPlayers(['Marco','Elisa','Kevin','Jaafar','Gadaleta','Sofia','Luca','Anna','Davide','Chiara']);
+ $('cut').value=String(D.cut);plist()}
+function startTournament(){if(D.players.length<2){return}
+ const cut=D.cut&&D.players.length>=D.cut?D.cut:0;
+ T={phase:'swiss',name:D.name.trim(),date:D.date,players:D.players.map((n,i)=>({id:i,name:n,drop:false})),total:Math.max(1,Math.min(12,D.rounds||3)),cut,avoid:D.avoid,rounds:[]};
+ pairRound();save();view='tavoli';render();scrollTo(0,0)}
+
+/* ---------- vista: torneo in corso ---------- */
+function tableHTML(m,i,cut,label){
+ if(m.b==null)return`<div class="gt-bye"><b>${nm(m.a)}</b> riposa: bye, vittoria assegnata.</div>`;
+ const p=v=>m.res==v?'true':'false';
+ return`<div class="gt-t ${m.res?'done':''}"><div class="tn"><span>${label} ${i+1}</span><span>${m.res?'Risultato inserito':'Da giocare'}</span></div>
+  <button class="gt-pb" type="button" data-act="r" data-m="${i}" data-v="A" aria-pressed="${p('A')}">${nm(m.a)}<em>${m.res=='A'?'Vince':'Tocca per far vincere'}</em></button>
+  <div class="gt-vs">contro</div>
+  <button class="gt-pb" type="button" data-act="r" data-m="${i}" data-v="B" aria-pressed="${p('B')}">${nm(m.b)}<em>${m.res=='B'?'Vince':'Tocca per far vincere'}</em></button>
+  ${cut?'':`<button class="gt-dl" type="button" data-act="r" data-m="${i}" data-v="DL" aria-pressed="${p('DL')}">${m.res=='DL'?'Doppia sconfitta segnata (annulla)':'Doppia sconfitta (0 punti a entrambi)'}</button>`}</div>`}
+function standings(fin){const ord=order(calc());
+ return ord.map((x,i)=>`<div class="gt-rk ${x.drop?'drop':''}"><span class="rp">${i+1}</span><span class="nm">${nm(x.id)}${x.drop?' <span class="chip">drop</span>':''}</span><span class="pt">${x.pts}</span>
+  <span class="st">${x.w}-${x.l} · OMW ${pct(x.omw)}</span>${fin?'':`<span class="ac"><button class="btn ghost" type="button" data-act="drop" data-p="${x.id}">${x.drop?'Rientra':'Drop'}</button></span>`}</div>`).join('')}
+function runHTML(){const fin=T.phase=='done',cutPh=T.phase=='cut';
+ let h=`<div class="gt-head"><div><h2>${esc(T.name||'Torneo')}</h2><span class="mute">${esc(T.date)} · ${T.players.length} giocatori · ${T.total} turni${T.cut?' + Top '+T.cut:''}</span></div><button class="btn ghost sm" data-act="new" type="button">Nuovo</button></div>`;
+ if(fin){const r=finalRank();
+  h+=`<section class="card" style="margin-top:14px;text-align:center"><p class="kicker">Torneo concluso</p><div class="gt-win">${nm(r[0])}</div><p class="mute" style="margin:0">Campione del ${esc(T.name||'torneo')}</p></section>
+  <div class="row" style="margin-top:12px"><button class="btn" data-act="copy" type="button" style="flex:1">Copia classifica</button><button class="btn ghost" data-act="code" type="button" style="flex:1">Codice per il Sentiero</button></div>
+  <pre id="codeOut" hidden></pre><p class="mute" style="margin:10px 0 0">Il codice si manda ai giocatori su WhatsApp: lo incollano ne Il Sentiero (scheda Libretto, “Importa un codice”) e il torneo entra nel loro Campionato.</p>
+  <h2 style="font-size:1.2rem;margin:24px 0 4px">Classifica finale</h2>${r.map((id,i)=>`<div class="gt-rk"><span class="rp">${i+1}</span><span class="nm">${nm(id)}</span></div>`).join('')}
+  <h2 style="font-size:1.2rem;margin:24px 0 4px">Classifica Swiss</h2>${standings(true)}`;
+  return h}
+ const R=cutPh?T.cutR:T.rounds,cr=R[R.length-1],real=cr.filter(m=>m.b!=null),pend=real.filter(m=>!m.res).length,doneN=real.length-pend;
+ const title=cutPh?cutName(cr.length):`Turno ${T.rounds.length} di ${T.total}`;
+ h+=`<div class="gt-prog"><div class="txt"><b style="color:var(--tx)">${title}</b><span>${doneN} di ${real.length} risultati</span></div><div class="bar"><i style="width:${real.length?doneN/real.length*100:100}%"></i></div></div>
+  <div class="tabs" role="tablist"><button role="tab" data-v="tavoli" aria-selected="${view=='tavoli'}">Tavoli</button><button role="tab" data-v="class" aria-selected="${view=='class'}">Classifica</button><button role="tab" data-v="storico" aria-selected="${view=='storico'}">Storico</button></div><div class="tp">`;
+ if(view=='tavoli'){h+=cr.map((m,i)=>[m,i]).filter(([m])=>m.b!=null).map(([m,i])=>tableHTML(m,i,cutPh,cutPh?'Match':'Tavolo')).join('')+cr.map((m,i)=>[m,i]).filter(([m])=>m.b==null).map(([m,i])=>tableHTML(m,i,cutPh)).join('')}
+ else if(view=='class'){h+=`<h2>Classifica Swiss</h2>${standings(false)}<p class="mute" style="margin-top:10px">Spareggio: punti, poi OMW% (minimo 33,3%).</p>`}
+ else{const past=T.rounds.slice(0,cutPh?T.rounds.length:T.rounds.length-1);
+  h+=past.length?past.map((r,i)=>`<details class="card" style="margin-top:10px;padding:0 14px"><summary>Turno ${i+1}</summary><div style="padding-bottom:10px">${r.map(m=>m.b==null?`<div class="it"><span>${nm(m.a)}</span><span class="chip">bye</span></div>`:`<div class="it"><span>${nm(m.a)} vs ${nm(m.b)}</span><span class="chip">${m.res=='A'?nm(m.a)+' vince':m.res=='B'?nm(m.b)+' vince':m.res=='DL'?'doppia sconfitta':'—'}</span></div>`).join('')}</div></details>`).join(''):'<p class="empty">Nessun turno concluso ancora.</p>'}
+ h+='</div>';
+ const done=pend===0,last=!cutPh&&T.rounds.length>=T.total;
+ const label=cutPh?(cr.length==1?'Concludi torneo':'Prossimo turno finale'):last?(T.cut?'Passa alla fase finale':'Concludi torneo'):`Genera turno ${T.rounds.length+1}`;
+ const act=cutPh?'nextcut':last?'finish':'next';
+ const d=$('dock');d.hidden=false;d.innerHTML=`<div class="info">${done?'Tutti i risultati inseriti':'Mancano '+pend+(pend==1?' risultato':' risultati')}</div><button class="btn" type="button" data-act="${act}" ${done?'':'disabled'}>${label}</button>`;
+ return h}
+function render(){const A=$('app');
+ if(!T){A.innerHTML=setupHTML();bindSetup();return}
+ A.innerHTML=runHTML();if(T.phase=='done')$('dock').hidden=true}
+
+document.addEventListener('click',e=>{
+ const tb=e.target.closest('.tabs button[data-v]');if(tb){view=tb.dataset.v;render();return}
+ if(e.target.closest('#start')){startTournament();return}
+ const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+ if(a=='r'){const R=T.phase=='cut'?T.cutR:T.rounds,m=R[R.length-1][+b.dataset.m],v=b.dataset.v;m.res=m.res==v?null:v;save();const y=scrollY;render();scrollTo(0,y);return}
+ if(a=='next'){pairRound();save();view='tavoli';render();scrollTo(0,0);return}
+ if(a=='finish'){if(T.cut)startCut();else T.phase='done';save();view='tavoli';render();scrollTo(0,0);return}
+ if(a=='nextcut'){nextCut();save();render();scrollTo(0,0);return}
+ if(a=='drop'){const p=T.players[+b.dataset.p];p.drop=!p.drop;save();const y=scrollY;render();scrollTo(0,y);return}
+ if(a=='new'){if(confirm('Chiudere questo torneo e iniziarne uno nuovo? I dati attuali andranno persi.')){T=null;D.players=[];D.touched=false;D.cut=0;saveD();try{localStorage.removeItem(K)}catch(_){}render();scrollTo(0,0)}return}
+ if(a=='copy'){const r=finalRank(),s=calc(),t=`${T.name||'Torneo'} — ${T.date}\n`+r.map((id,i)=>`${i+1}. ${T.players[id].name} (${s[id].pts} pt)`).join('\n');
+  navigator.clipboard.writeText(t).then(()=>{b.textContent='Copiato!'}).catch(()=>{});return}
+ if(a=='code'){const c=enc({k:'tourn',id:'t'+T.date+(T.name||'').replace(/\W/g,'').slice(0,8),name:T.name||'Torneo',date:T.date,rank:finalRank().map(id=>T.players[id].name)});
+  const o=$('codeOut');o.textContent=c;o.hidden=false;navigator.clipboard.writeText(c).then(()=>{b.textContent='Codice copiato!'}).catch(()=>{})}});
+render();
+})();
+</script></body></html>

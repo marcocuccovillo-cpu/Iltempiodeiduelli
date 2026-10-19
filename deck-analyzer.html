@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deck Analyzer — Il Tempio Dei Duelli</title><meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tempio.css">
+</head><body>
+<main class="pg">
+ <header><p class="kicker">Strumento</p><h1>Deck Analyzer</h1><p class="lead">Importa un deck, assegna i ruoli alle carte e scopri quanto è consistente.</p></header>
+
+ <div class="tabs" role="tablist" aria-label="Sezioni">
+  <button role="tab" data-t="deck" aria-selected="true">Deck</button>
+  <button role="tab" data-t="ruoli" aria-selected="false">Ruoli</button>
+  <button role="tab" data-t="analisi" aria-selected="false">Analisi</button>
+  <button role="tab" data-t="mani" aria-selected="false">Mani</button>
+ </div>
+
+ <section class="tp" id="t-deck">
+  <div class="da-imp">
+   <label class="btn" style="margin:0">Importa .ydk<input id="file" type="file" accept=".ydk,.txt" hidden></label>
+   <button class="btn ghost" id="clear" type="button">Svuota deck</button>
+  </div>
+  <p class="da-name" id="dname"></p>
+  <details class="card" style="margin-top:12px;padding:0 14px"><summary>Incolla un file .ydk</summary>
+   <div style="padding-bottom:14px"><textarea id="paste" rows="4" placeholder="#main&#10;14558127&#10;..." aria-label="Contenuto del file .ydk"></textarea>
+   <button class="btn block" id="loadPaste" type="button" style="margin-top:8px">Carica deck</button></div></details>
+  <p class="mute" id="msg" role="status" style="margin:10px 0 0"></p>
+
+  <div class="card" style="margin-top:12px"><label for="q">Cerca una carta da aggiungere</label>
+   <div class="gt-add"><input id="q" type="search" enterkeyhint="search" placeholder="Es. Ash Blossom"><button class="btn" id="search" type="button">Cerca</button></div>
+   <div class="da-sr" id="results"></div></div>
+
+  <div class="warn" id="warn" hidden></div>
+  <div id="deckView" style="margin-top:6px"></div>
+ </section>
+
+ <section class="tp" id="t-ruoli" hidden>
+  <div class="da-legend card" style="margin-bottom:12px">
+   <span><span class="chip s">Starter</span> apre il gioco</span><span><span class="chip h">HT</span> hand trap</span>
+   <span><span class="chip k">Brick</span> carta morta in mano</span><span><span class="chip b">Bridge</span> aiuta la consistenza</span></div>
+  <div class="da-tools">
+   <button class="btn sm" id="preset" type="button">Preset Hand Trap</button>
+   <button class="btn sm" id="auto" type="button">Rilevamento automatico</button>
+   <button class="btn ghost sm" id="over" type="button" aria-pressed="false">Sovrascrivi: no</button>
+   <button class="btn ghost sm" id="clrRoles" type="button">Pulisci ruoli</button>
+  </div>
+  <div id="roles"></div>
+  <p class="mute" style="margin:10px 0 0">Il rilevamento automatico è solo un aiuto: controlla sempre i ruoli a mano. Vengono salvati su questo dispositivo, deck per deck.</p>
+ </section>
+
+ <section class="tp" id="t-analisi" hidden>
+  <label>Mano iniziale</label>
+  <div class="seg" id="hs"><button data-h="5" aria-pressed="true" type="button">5 carte · primo</button><button data-h="6" aria-pressed="false" type="button">6 carte · secondo</button></div>
+  <div class="card kp" id="kpi" style="margin-top:14px"></div>
+  <div class="card" style="margin-top:12px"><label for="pc">Probabilità per una carta</label><select id="pc"></select><p id="pcOut" style="margin:10px 0 0"></p></div>
+ </section>
+
+ <section class="tp" id="t-mani" hidden>
+  <div class="g2"><div><label for="simN">Quante mani</label><input id="simN" type="number" inputmode="numeric" min="1" max="100" value="12"></div>
+  <div class="row" style="align-items:flex-end"><button class="btn" id="sim" type="button" style="flex:1">Simula</button><button class="btn ghost" id="csv" type="button">CSV</button></div></div>
+  <div id="hands" style="margin-top:12px"></div>
+ </section>
+</main>
+<script src="tempio.js"></script>
+<script>
+(function(){
+const API='https://db.ygoprodeck.com/api/v7/cardinfo.php',IMG='https://images.ygoprodeck.com/images/cards_small/',KC='tempio.cards.v1',KD='tempio.deck.v1',KR='tempio.roles.';
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let C={},R={},H=5,deck={name:'Deck',main:[],extra:[],side:[]},csvT='',over=false;const openG=new Set(['main']);
+try{C=JSON.parse(localStorage.getItem(KC)||'{}')}catch(e){}
+try{const d=JSON.parse(localStorage.getItem(KD));if(d&&d.main)deck=d}catch(e){}
+try{R=JSON.parse(localStorage.getItem(KR+deck.name)||'{}')}catch(e){}
+const msg=t=>$('msg').textContent=t||'';
+const saveC=()=>{try{localStorage.setItem(KC,JSON.stringify(C))}catch(e){C={};try{localStorage.removeItem(KC)}catch(_){}}};
+const saveD=()=>{try{localStorage.setItem(KD,JSON.stringify(deck));localStorage.setItem(KR+deck.name,JSON.stringify(R))}catch(e){}};
+const isExtra=t=>/Fusion|Synchro|XYZ|Link/i.test(t||'');
+
+/* schede */
+function tab(t){document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));
+ document.querySelectorAll('.tp').forEach(p=>p.hidden=p.id!=='t-'+t);scrollTo(0,0)}
+document.querySelector('.tabs').onclick=e=>{const b=e.target.closest('button');if(b)tab(b.dataset.t)};
+
+function keep(c){const i={n:c.name,t:c.type,d:(c.desc||'').slice(0,600),l:c.level||0};C[c.id]=i;(c.card_images||[]).forEach(x=>C[x.id]=i)}
+async function need(ids){const miss=[...new Set(ids)].filter(i=>!C[i]);if(!miss.length)return;msg('Scarico i dati delle carte…');
+ for(let i=0;i<miss.length;i+=40){try{const r=await fetch(API+'?id='+miss.slice(i,i+40).join(','));if(!r.ok)throw 0;(await r.json()).data.forEach(keep)}catch(e){msg('Alcune carte non sono state scaricate: serve la connessione. Riprova.');saveC();return}}saveC();msg('')}
+function parse(txt){const out={main:{},extra:{},side:{}};let sec='main';
+ txt.split(/\r?\n/).forEach(r=>{const l=r.trim();if(!l)return;if(l=='#main'){sec='main';return}if(l=='#extra'){sec='extra';return}if(l=='!side'){sec='side';return}if(l[0]=='#'||l[0]=='!')return;const id=+l;if(id>0)out[sec][id]=(out[sec][id]||0)+1});
+ const f=o=>Object.entries(o).map(([id,qty])=>({id:+id,qty}));return{main:f(out.main),extra:f(out.extra),side:f(out.side)}}
+async function setDeck(d,name){deck={name,...d};try{R=JSON.parse(localStorage.getItem(KR+name)||'{}')}catch(e){R={}}saveD();await need([...d.main,...d.extra,...d.side].map(c=>c.id));render()}
+$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;await setDeck(parse(await f.text()),f.name.replace(/\.(ydk|txt)$/i,''));e.target.value=''};
+$('loadPaste').onclick=async()=>{const t=$('paste').value;if(!t.trim())return;await setDeck(parse(t),'Deck incollato');$('paste').value='';$('paste').closest('details').open=false};
+$('clear').onclick=()=>{if(deck.main.length+deck.extra.length+deck.side.length&&!confirm('Svuotare il deck?'))return;deck={name:'Deck',main:[],extra:[],side:[]};R={};saveD();render()};
+
+$('search').onclick=async()=>{const q=$('q').value.trim();if(q.length<3){msg('Scrivi almeno 3 lettere.');return}msg('Cerco…');
+ try{const r=await fetch(API+'?fname='+encodeURIComponent(q));if(!r.ok)throw 0;const j=await r.json();j.data.forEach(keep);saveC();msg('');
+  $('results').innerHTML=j.data.slice(0,24).map(c=>{const x=isExtra(c.type);return`<div class="it2"><img src="${IMG}${c.id}.jpg" alt="" loading="lazy"><div><div class="nn">${esc(c.name)}<small>${esc(c.type)}</small></div><div class="acts"><button class="btn sm" type="button" data-add="${c.id}" data-s="${x?'extra':'main'}">+ ${x?'Extra':'Main'}</button><button class="btn ghost sm" type="button" data-add="${c.id}" data-s="side">+ Side</button></div></div></div>`}).join('')||'<p class="empty">Nessun risultato.</p>'}catch(e){msg('Ricerca non riuscita: serve la connessione.')}};
+$('q').onkeydown=e=>{if(e.key=='Enter')$('search').click()};
+$('results').onclick=e=>{const b=e.target.closest('[data-add]');if(b){add(+b.dataset.add,b.dataset.s);b.textContent='Aggiunta ✓'}};
+function add(id,sec){const a=deck[sec],x=a.find(c=>c.id==id);if(x)x.qty=Math.min(3,x.qty+1);else a.push({id,qty:1});saveD();render(true)}
+$('deckView').onclick=e=>{const b=e.target.closest('[data-q]');if(!b)return;const[sec,id,d]=b.dataset.q.split(':'),a=deck[sec],i=a.findIndex(c=>c.id==id);if(i<0)return;a[i].qty+=+d;if(a[i].qty<=0)a.splice(i,1);saveD();render(true)};
+$('deckView').addEventListener('toggle',e=>{const d=e.target.closest('details[data-g]');if(!d)return;d.open?openG.add(d.dataset.g):openG.delete(d.dataset.g)},true);
+const nm=id=>C[id]?C[id].n:'Carta '+id;
+const cnt=a=>a.reduce((t,c)=>t+c.qty,0);
+function group(sec,label){const a=deck[sec];return`<details class="da-grp" data-g="${sec}" ${openG.has(sec)?'open':''}><summary>${label}&nbsp;<b>${cnt(a)}</b></summary>`+(a.length?a.map(c=>`<div class="da-cr"><img src="${IMG}${c.id}.jpg" alt="" loading="lazy"><div class="nn">${esc(nm(c.id))}<small>${esc(C[c.id]?C[c.id].t:'')}</small></div><div class="da-q"><button type="button" data-q="${sec}:${c.id}:-1" aria-label="Rimuovi una copia di ${esc(nm(c.id))}">−</button><b>${c.qty}</b><button type="button" data-q="${sec}:${c.id}:1" aria-label="Aggiungi una copia di ${esc(nm(c.id))}">+</button></div></div>`).join(''):'<p class="empty">Vuoto. Importa un .ydk o cerca una carta.</p>')+'</details>'}
+
+const PRE=new Set(['Ash Blossom & Joyous Spring','Maxx "C"','Effect Veiler','Droll & Lock Bird','Ghost Ogre & Snow Rabbit','Infinite Impermanence','Nibiru, the Primal Being','PSY-Framegear Gamma','Ghost Belle & Haunted Mansion','Dimension Shifter','Skull Meister','Contact "C"','D.D. Crow','Herald of Orange Light','Ghost Mourner & Moonlit Chill']);
+const has=(t,...a)=>{t=t.toLowerCase();return a.some(s=>t.includes(s))};
+function detect(c){const t=(c.t||'').toLowerCase(),d=c.d||'',n=c.n||'',m=t.includes('monster'),sp=t.includes('spell'),r={};
+ if(PRE.has(n)||(has(d,'during your opponent','quick effect')&&has(d,'discard this card','tribute this card','send this card from your hand')))r.h=1;
+ if((m&&has(d,'if this card is normal summoned','if this card is summoned','you can add 1','special summon 1','from your deck'))||(sp&&has(d,'add 1','from your deck to your hand')&&!has(d,'except')))r.s=1;
+ if(sp&&has(d,'draw 1 card','draw 2 cards','excavate the top','search your deck'))r.b=1;
+ if((has(d,'cannot be normal summoned/set','must be special summoned','if you control no')&&!has(d,'you can special summon this card from your hand'))||(m&&c.l>=8&&!has(d,'you can special summon this card')))r.k=1;return r}
+$('preset').onclick=()=>{deck.main.forEach(c=>{if(PRE.has(nm(c.id)))R[c.id]=Object.assign({},R[c.id],{h:1})});saveD();render()};
+$('auto').onclick=()=>{deck.main.forEach(c=>{if(!C[c.id])return;const cur=R[c.id]||{};if(!over&&(cur.s||cur.h||cur.k||cur.b))return;R[c.id]=detect(C[c.id])});saveD();render()};
+$('over').onclick=()=>{over=!over;$('over').setAttribute('aria-pressed',over);$('over').textContent='Sovrascrivi: '+(over?'sì':'no')};
+$('clrRoles').onclick=()=>{R={};saveD();render()};
+const LAB={s:'Starter',h:'HT',k:'Brick',b:'Bridge'};
+$('roles').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;const[id,k]=b.dataset.r.split(':');R[id]=Object.assign({},R[id],{[k]:R[id]&&R[id][k]?0:1});b.setAttribute('aria-pressed',R[id][k]===1);saveD();metrics()};
+$('hs').onclick=e=>{const b=e.target.closest('[data-h]');if(!b)return;H=+b.dataset.h;[...$('hs').children].forEach(x=>x.setAttribute('aria-pressed',x==b));metrics()};
+function comb(n,r){if(r<0||r>n)return 0;let v=1;for(let i=0;i<r;i++)v=v*(n-i)/(i+1);return v}
+const pAtLeast=(k,K,N,h)=>{let p=0;for(let i=0;i<k;i++)p+=comb(K,i)*comb(N-K,h-i)/comb(N,h);return Math.max(0,1-p)};
+const pct=x=>(x*100).toFixed(1)+'%';
+const mask=id=>{const r=R[id]||{};return(r.s?1:0)|(r.h?2:0)|(r.k?4:0)|(r.b?8:0)};
+function pool(){const a=[];deck.main.forEach(c=>{for(let i=0;i<c.qty;i++)a.push(c.id)});return a}
+function metrics(){const N=cnt(deck.main),P=pool();
+ if(N<H){$('kpi').innerHTML='<p class="empty" style="margin:0">Carica un deck con almeno '+H+' carte nel Main per vedere le probabilità.</p>';$('pc').innerHTML='';$('pcOut').textContent='';return}
+ const K=m=>deck.main.reduce((t,c)=>t+(mask(c.id)&m?c.qty:0),0),S=K(1),Hh=K(2),Bk=K(4),Bg=K(8);
+ const sims=20000,mk=new Int8Array(P.map(mask)),cnts={st:0,dead:0,brick2:0,play:0,ht1:0,ht2:0,perf:0};
+ for(let t=0;t<sims;t++){for(let i=0;i<H;i++){const j=i+Math.floor(Math.random()*(N-i)),x=mk[i];mk[i]=mk[j];mk[j]=x}
+  let s=0,h=0,k=0,b=0;for(let i=0;i<H;i++){const m=mk[i];if(m&1)s++;if(m&2)h++;if(m&4)k++;if(m&8)b++}
+  if(s)cnts.st++;if(!s&&!b)cnts.dead++;if(k>=2)cnts.brick2++;if(s&&!k)cnts.play++;if(h)cnts.ht1++;if(h>=2)cnts.ht2++;if(s&&h&&!k)cnts.perf++}
+ const row=(l,p,tip)=>`<div class="k1"><span>${l}${tip?`<small>${tip}</small>`:''}</span><b>${pct(p)}</b><div class="bar"><i style="width:${p*100}%"></i></div></div>`;
+ $('kpi').innerHTML=`<p class="sum">Main ${N} carte · Starter ${S} · HT ${Hh} · Brick ${Bk} · Bridge ${Bg}</p>`+
+  row('Almeno 1 Starter',cnts.st/sims)+row('Mano giocabile',cnts.play/sims,'Starter e nessun Brick')+row('Mano ideale',cnts.perf/sims,'Starter + HT, nessun Brick')+row('Almeno 1 Hand Trap',cnts.ht1/sims)+row('Almeno 2 Hand Trap',cnts.ht2/sims)+row('Mano morta',cnts.dead/sims,'né Starter né Bridge')+row('Almeno 2 Brick',cnts.brick2/sims)+
+  (S+Hh+Bk+Bg===0?'<p class="warn" style="margin:0">Nessun ruolo assegnato: vai nella scheda Ruoli per ottenere percentuali utili.</p>':'');
+ const cur=$('pc').value;$('pc').innerHTML=deck.main.map(c=>`<option value="${c.id}">${esc(nm(c.id))} (x${c.qty})</option>`).join('');if(cur)$('pc').value=cur;pc()}
+function pc(){const id=$('pc').value,c=deck.main.find(x=>x.id==id);if(!c)return;const N=cnt(deck.main);$('pcOut').innerHTML=`Almeno 1 copia in mano: <b>${pct(pAtLeast(1,c.qty,N,H))}</b>`+(c.qty>1?`<br>Almeno 2 copie: <b>${pct(pAtLeast(2,c.qty,N,H))}</b>`:'')}
+$('pc').onchange=pc;
+$('sim').onclick=()=>{const n=Math.min(100,Math.max(1,+$('simN').value||12)),P=pool();if(P.length<H){$('hands').innerHTML='<p class="empty">Carica prima un deck.</p>';return}
+ const lines=[['mano',...Array.from({length:H},(_,i)=>'carta'+(i+1))].join(',')];let h='';
+ for(let k=0;k<n;k++){const a=P.slice();for(let i=0;i<H;i++){const j=i+Math.floor(Math.random()*(a.length-i));[a[i],a[j]]=[a[j],a[i]]}const hand=a.slice(0,H);
+  lines.push([k+1,...hand.map(id=>'"'+nm(id).replace(/"/g,'""')+'"')].join(','));
+  h+=`<div class="hand">${hand.map(id=>{const m=mask(id);return`<span class="${m&1?'s':m&2?'h':m&4?'k':m&8?'b':''}">${esc(nm(id))}</span>`}).join('')}</div>`}
+ csvT=lines.join('\n');$('hands').innerHTML=h};
+$('csv').onclick=()=>{if(!csvT){$('sim').click()}if(!csvT)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csvT],{type:'text/csv'}));a.download='mani-simulate.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+
+function render(keepScroll){$('dname').textContent=deck.main.length?'Deck caricato: '+deck.name:'';
+ $('deckView').innerHTML=group('main','Main Deck')+group('extra','Extra Deck')+group('side','Side Deck');
+ const w=[],m=cnt(deck.main),e=cnt(deck.extra),s=cnt(deck.side);if(m&&(m<40||m>60))w.push(`Il Main ha ${m} carte (consentite da 40 a 60).`);if(e>15)w.push(`L’Extra ha ${e} carte (massimo 15).`);if(s>15)w.push(`Il Side ha ${s} carte (massimo 15).`);
+ const tot={};[...deck.main,...deck.extra,...deck.side].forEach(c=>tot[c.id]=(tot[c.id]||0)+c.qty);Object.entries(tot).forEach(([id,q])=>{if(q>3)w.push(`${nm(id)}: ${q} copie in totale (massimo 3).`)});
+ $('warn').hidden=!w.length;$('warn').innerHTML=w.map(esc).join('<br>');
+ $('roles').innerHTML=deck.main.length?deck.main.map(c=>{const r=R[c.id]||{};return`<div class="da-role"><div class="hd"><span>${esc(nm(c.id))}</span><small>x${c.qty}</small></div><div class="da-tg">${['s','h','k','b'].map(k=>`<button type="button" class="${k}" data-r="${c.id}:${k}" aria-pressed="${r[k]?'true':'false'}">${LAB[k]}</button>`).join('')}</div></div>`}).join(''):'<p class="empty">Carica un deck per assegnare i ruoli.</p>';
+ metrics()}
+render();need([...deck.main,...deck.extra,...deck.side].map(c=>c.id)).then(render);
+})();
+</script></body></html>

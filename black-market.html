@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Black Market — Il Tempio Dei Duelli</title><meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tempio.css">
+<style>
+
+/* Palette Black Market: nero, antracite, rosso scuro e oro */
+:root{--bg:#000;--surf:#121216;--raise:#1c1c22;--ac:#9c1f31;--ac2:#e8707d;--on-ac:#fff;--gold:#d4a843;--tx:#ece7db;--mu:#9a9aa6;--line:rgba(212,168,67,.18)}
+html,body{background:var(--bg)}
+.pg{max-width:940px}
+.bm-nav{display:flex;gap:4px;overflow-x:auto;margin:0 -16px 24px;padding:0 8px;border-bottom:1px solid var(--line);position:sticky;top:var(--bar-h);background:var(--bg);z-index:5}
+.bm-nav a,.bm-nav button{flex:none;display:flex;align-items:center;min-height:48px;padding:0 14px;border:0;background:none;color:var(--mu);font:700 .95rem var(--ui);text-decoration:none;cursor:pointer}
+.bm-nav a[aria-current]{color:var(--gold);box-shadow:inset 0 -3px var(--gold)}
+h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold)}
+.sub{color:var(--mu);margin:8px 0 0}
+.grid{display:grid;gap:14px}@media(min-width:700px){.grid.c2{grid-template-columns:1fr 1fr}.grid.c3{grid-template-columns:repeat(3,1fr)}}
+.box{padding:18px;border:1px solid var(--line);border-radius:12px;background:var(--surf)}
+.box h2{font-size:1.2rem;margin:0 0 10px;color:var(--gold)}
+.big{font:600 clamp(2rem,8vw,3rem)/1 var(--disp);color:var(--tx)}.big small{font-size:.5em;color:var(--gold)}
+.av{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--raise);border:1px solid var(--gold);font:600 1.1rem var(--disp);flex:none}
+.row2{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.row2:first-of-type{border-top:0}
+.row2 .g{flex:1;min-width:0}.row2 a{color:var(--tx);text-decoration:none;font-weight:700}.row2 a:hover{color:var(--gold)}
+.row2 small{color:var(--mu);display:block}
+.val{font:600 1.3rem var(--disp);color:var(--gold);white-space:nowrap}
+.rank{width:26px;font:600 1.1rem var(--disp);color:var(--mu);text-align:center}
+.btn{background:var(--ac);border-color:var(--ac)}.btn:hover{background:#a8243a;border-color:#a8243a}
+.seg button[aria-pressed=true]{background:rgba(212,168,67,.14);border-color:var(--gold);color:var(--gold)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#16120a}.btn.gold:hover{background:#dbb55c}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--tx)}
+.tag{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mu)}
+.tag.g{color:var(--gold);border-color:var(--gold)}.tag.r{color:var(--ac2);border-color:var(--ac2)}
+.pos{color:#7fe0b0}.neg{color:var(--ac2)}
+.note{padding:12px;border-radius:10px;background:rgba(201,162,74,.1);border:1px solid var(--gold);color:var(--tx);font-size:.92rem}
+.err{padding:12px;border-radius:10px;background:rgba(224,98,111,.12);border:1px solid var(--ac2)}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);max-width:90vw;padding:12px 18px;border-radius:10px;background:var(--raise);border:1px solid var(--gold);z-index:2000;font-weight:600}
+#toast.bad{border-color:var(--ac2)}#toast[hidden]{display:none}
+.cols{display:grid;gap:12px}@media(min-width:620px){.cols{grid-template-columns:1fr 1fr}}
+</style></head><body>
+
+<main class="pg" id="app"><p class="mute">Caricamento…</p></main><div id="toast" hidden role="status"></div>
+<script src="tempio.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+/* ============ CONFIGURAZIONE: incolla qui i due valori di Supabase (Project Settings > API) ============ */
+const SUPABASE_URL = '';        // es. https://abcdefgh.supabase.co
+const SUPABASE_ANON_KEY = '';   // chiave "anon public" (è pensata per stare nel browser)
+/* ========================================================================================================= */
+(function(){
+const $app=document.getElementById('app'),$t=document.getElementById('toast');
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const BC=n=>Number(n||0).toLocaleString('it-IT')+' BC';
+const when=d=>new Date(d).toLocaleString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+const KIND={initial_bonus:'Bonus iniziale',bounty_stake:'Taglia pubblicata',bounty_payout:'Ricompensa riscossa',bounty_refund:'Quota restituita',participation_reward:'Partecipazione a evento',admin_adjustment:'Rettifica amministrativa'};
+const ROLE={user:'Duellante',organizer:'Organizzatore',admin:'Amministratore'};
+let sb,me=null,wallet=0,P=new Map(),S={},tt;
+const toast=(m,bad)=>{$t.textContent=m;$t.className=bad?'bad':'';$t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>$t.hidden=true,4200)};
+const pn=id=>id?(P.get(id)?.nickname||'Sconosciuto'):'Anonimo';
+const av=p=>`<span class="av" aria-hidden="true">${esc(p?.avatar||(p?.nickname||'?')[0].toUpperCase())}</span>`;
+const link=id=>id?`<a href="#/p/${id}">${esc(pn(id))}</a>`:'Anonimo';
+async function q(b){const{data,error}=await b;if(error)throw new Error(error.message);return data}
+const rpc=async(n,a)=>{const{data,error}=await sb.rpc(n,a);if(error)throw new Error(error.message);return data};
+function setup(){$app.innerHTML=`<h1 class="t">Black <em>Market</em></h1><div class="box" style="margin-top:20px"><h2>Configurazione mancante</h2><p>Per attivare il Black Market servono i dati del tuo progetto Supabase. Apri <b>black-market.html</b> su GitHub, cerca le due righe <code>SUPABASE_URL</code> e <code>SUPABASE_ANON_KEY</code> in alto nello script e incolla i valori (Supabase › Project Settings › API). Le istruzioni complete sono nel file <b>LEGGIMI-BLACK-MARKET.md</b>.</p></div>`}
+/* ---------- accesso ---------- */
+function authView(mode){mode=mode||'in';$app.innerHTML=`<h1 class="t">Black <em>Market</em></h1><p class="sub">Il mercato clandestino dei duellanti. Accedi per entrare.</p>
+ <div class="box" style="margin-top:22px;max-width:460px"><div class="seg" style="margin-bottom:14px"><button data-act="mode" data-m="in" aria-pressed="${mode=='in'}">Accedi</button><button data-act="mode" data-m="up" aria-pressed="${mode=='up'}">Registrati</button></div>
+ <form id="af" class="cols" style="grid-template-columns:1fr">${mode=='up'?'<div><label for="nk">Nickname pubblico</label><input id="nk" required minlength="3" maxlength="24" autocomplete="nickname"></div>':''}
+ <div><label for="em">Email</label><input id="em" type="email" required autocomplete="email"></div><div><label for="pw">Password (min. 8 caratteri)</label><input id="pw" type="password" required minlength="8" autocomplete="${mode=='up'?'new-password':'current-password'}"></div>
+ <button class="btn gold" type="submit">${mode=='up'?'Crea account':'Entra'}</button></form>
+ ${mode=='up'?'<p class="mute" style="font-size:.9rem">Riceverai 300 BC di benvenuto. I Black Credits sono una valuta solo virtuale: non si comprano e non si convertono in denaro.</p>':''}</div>`;
+ document.getElementById('af').onsubmit=async e=>{e.preventDefault();const em=document.getElementById('em').value.trim(),pw=document.getElementById('pw').value;
+  try{if(mode=='up'){const nk=document.getElementById('nk').value.trim();localStorage.setItem('bm.nick',nk);const{data,error}=await sb.auth.signUp({email:em,password:pw});if(error)throw error;
+    if(!data.session){toast('Account creato: conferma l’email, poi accedi.');authView('in');return}}
+   else{const{error}=await sb.auth.signInWithPassword({email:em,password:pw});if(error)throw error}
+  }catch(err){toast(err.message==='Invalid login credentials'?'Email o password errate.':err.message,1)}}}
+async function nickView(){$app.innerHTML=`<h1 class="t">Scegli il tuo <em>nickname</em></h1><div class="box" style="margin-top:20px;max-width:460px"><form id="nf" class="cols" style="grid-template-columns:1fr"><div><label for="nk">Nickname pubblico</label><input id="nk" required minlength="3" maxlength="24" value="${esc(localStorage.getItem('bm.nick')||'')}"></div><button class="btn gold">Conferma</button></form></div>`;
+ document.getElementById('nf').onsubmit=async e=>{e.preventDefault();try{await rpc('register_profile',{p_nickname:document.getElementById('nk').value.trim()});localStorage.removeItem('bm.nick');await boot()}catch(er){toast(er.message,1)}}}
+/* ---------- dati comuni ---------- */
+async function core(){const ps=await q(sb.from('profiles').select('id,nickname,avatar,role,wanted_enabled,suspended'));P=new Map(ps.map(p=>[p.id,p]));
+ const u=(await sb.auth.getUser()).data.user;me=P.get(u.id)||null;if(!me)return false;
+ const w=await q(sb.from('wallets').select('balance').eq('user_id',me.id));wallet=w[0]?.balance||0;
+ const st=await q(sb.from('system_settings').select('key,value_int'));S=Object.fromEntries(st.map(s=>[s.key,s.value_int]));return true}
+function shell(inner,cur){const items=[['','Dashboard'],['wanted','Most Wanted'],['new','Metti una taglia'],['log','Registro'],['wallet','Wallet'],['events','Eventi']];if(me.role=='admin')items.push(['admin','Admin']);
+ $app.innerHTML=`<nav class="bm-nav" aria-label="Black Market">${items.map(([h,l])=>`<a href="#/${h}" ${cur==h?'aria-current="page"':''}>${l}</a>`).join('')}<button data-act="out">Esci</button></nav>${inner}`}
+const card=(r,i)=>`<div class="row2">${i!=null?`<span class="rank">${i+1}</span>`:''}${av(P.get(r.id))}<div class="g"><a href="#/p/${r.id}">${esc(r.nickname)}</a><small>${r.active_count} ${r.active_count==1?'taglia attiva':'taglie attive'} · ultima ${when(r.last_at)}</small></div><span class="val">${BC(r.bounty_value)}</span></div>`;
+const feedRow=f=>f.kind=='bounty'?`<div class="row2"><div class="g">${f.actor_id?link(f.actor_id):'Anonimo'} ha messo una taglia su ${link(f.target_id)}<small>${when(f.at)}</small></div><span class="val">${BC(f.amount)}</span></div>`
+ :`<div class="row2"><div class="g">${link(f.actor_id)} ha riscosso la taglia su ${link(f.target_id)}<small>${when(f.at)}</small></div><span class="val">${BC(f.amount)}</span></div>`;
+/* ---------- pagine ---------- */
+const R={};
+R['']=async()=>{const[mw,fd]=await Promise.all([q(sb.from('most_wanted_v').select('*').order('bounty_value',{ascending:false}).limit(5)),q(sb.from('market_feed_v').select('*').order('at',{ascending:false}).limit(24))]);
+ const bn=fd.filter(f=>f.kind=='bounty').slice(0,6),cl=fd.filter(f=>f.kind=='claim').slice(0,5);
+ shell(`<h1 class="t">Black <em>Market</em></h1><p class="sub">Metti una taglia sui tuoi rivali. Chi li sconfigge in un match ufficiale verificato riscuote il montepremi.</p>
+ <div class="grid c2" style="margin-top:22px"><div class="box"><p class="mute" style="margin:0">Il tuo saldo</p><div class="big">${Number(wallet).toLocaleString('it-IT')} <small>BC</small></div><div class="row" style="margin-top:14px"><a class="btn gold" href="#/new">Metti una taglia</a><a class="btn ghost" href="#/wanted">Esplora il Black Market</a></div></div>
+ <div class="box"><h2>Duellanti più ricercati</h2>${mw.length?mw.map((r,i)=>card(r,i)).join(''):'<p class="mute">Nessuna taglia attiva. Sii il primo a metterne una.</p>'}</div></div>
+ <div class="grid c2" style="margin-top:14px"><div class="box"><h2>Ultime taglie pubblicate</h2>${bn.map(feedRow).join('')||'<p class="mute">Ancora nessuna taglia.</p>'}</div><div class="box"><h2>Ultime riscossioni</h2>${cl.map(feedRow).join('')||'<p class="mute">Nessuna ricompensa riscossa.</p>'}</div></div>`,'')};
+R.wanted=async()=>{const rows=await q(sb.from('most_wanted_v').select('*'));const k=sessionStorage.getItem('bm.sort')||'value';
+ rows.sort((a,b)=>k=='recent'?new Date(b.last_at)-new Date(a.last_at):k=='activity'?b.active_count-a.active_count||b.bounty_value-a.bounty_value:b.bounty_value-a.bounty_value);
+ shell(`<h1 class="t">Most <em>Wanted</em></h1><p class="sub">I duellanti con le taglie più alte. Non è la classifica dei risultati WPA.</p><div class="seg" style="margin:18px 0">${[['value','Valore'],['recent','Più recenti'],['activity','Attività']].map(([v,l])=>`<button data-act="sort" data-v="${v}" aria-pressed="${k==v}">${l}</button>`).join('')}</div>
+ <div class="box">${rows.length?rows.map((r,i)=>card(r,i)).join(''):'<p class="mute">Nessun ricercato al momento.</p>'}</div>`,'wanted')};
+R.p=async id=>{const p=P.get(id);if(!p){shell('<div class="err">Duellante non trovato.</div>','');return}
+ const[bs,ss]=await Promise.all([q(sb.from('bounties_public_v').select('*').eq('target_id',id).order('created_at',{ascending:false})),q(sb.from('bounty_settlements').select('*').or(`target_id.eq.${id},winner_id.eq.${id}`).order('created_at',{ascending:false}))]);
+ const act=bs.filter(b=>b.status=='active'),old=bs.filter(b=>b.status!='active'),val=act.reduce((t,b)=>t+b.amount,0),mine=id==me.id;
+ const st={settled:'riscossa',cancelled:'annullata',under_review:'in revisione'};
+ shell(`<div class="row" style="gap:16px">${av(p).replace('width:40px','')}<div><h1 class="t" style="font-size:2.2rem">${esc(p.nickname)}</h1><span class="tag">${ROLE[p.role]}</span> ${p.wanted_enabled?'':'<span class="tag">non accetta taglie</span>'}</div></div>
+ <div class="grid c2" style="margin-top:20px"><div class="box"><p class="mute" style="margin:0">Bounty Value attuale</p><div class="big">${Number(val).toLocaleString('it-IT')} <small>BC</small></div>${!mine&&p.wanted_enabled?`<a class="btn gold" style="margin-top:14px" href="#/new/${id}">Metti una taglia</a>`:''}
+ ${mine?`<div style="margin-top:14px"><label style="display:flex;gap:10px;align-items:center;font-weight:600"><input type="checkbox" id="wn" ${p.wanted_enabled?'checked':''} style="width:22px;min-height:0"> Accetto taglie su di me</label><div class="row" style="margin-top:10px"><input id="avi" maxlength="8" placeholder="Avatar (emoji o sigla)" value="${esc(p.avatar||'')}" style="max-width:200px"><button class="btn sm" data-act="saveprof">Salva</button></div></div>`:''}</div>
+ <div class="box"><h2>Taglie attive (${act.length})</h2>${act.map(b=>`<div class="row2"><div class="g">${b.creator_id?link(b.creator_id):'Anonimo'}<small>${when(b.created_at)}${b.message?' · “'+esc(b.message)+'”':''}</small></div><span class="val">${BC(b.amount)}</span></div>`).join('')||'<p class="mute">Nessuna taglia attiva.</p>'}</div></div>
+ <div class="grid c2" style="margin-top:14px"><div class="box"><h2>Storico taglie</h2>${old.map(b=>`<div class="row2"><div class="g">${b.creator_id?link(b.creator_id):'Anonimo'}<small>${when(b.created_at)}</small></div><span class="tag">${st[b.status]||b.status}</span><span class="val">${BC(b.amount)}</span></div>`).join('')||'<p class="mute">Nessuna taglia chiusa.</p>'}</div>
+ <div class="box"><h2>Riscossioni e rivalità</h2>${ss.map(s=>`<div class="row2"><div class="g">${link(s.winner_id)} ha battuto ${link(s.target_id)}<small>${when(s.created_at)}${s.refunded?' · '+BC(s.refunded)+' restituiti':''}</small></div><span class="val">${BC(s.payout)}</span></div>`).join('')||'<p class="mute">Nessuna riscossione.</p>'}</div></div>`,'')};
+R.new=async tid=>{const cand=[...P.values()].filter(p=>p.wanted_enabled&&!p.suspended&&p.id!=me.id).sort((a,b)=>a.nickname.localeCompare(b.nickname));const min=S.min_bounty,max=S.max_bounty,rq=crypto.randomUUID();
+ shell(`<h1 class="t">Metti una <em>taglia</em></h1><p class="sub">Scegli il bersaglio e l’importo. Il Bounty Value del duellante salirà subito.</p>
+ <form id="nb" class="box cols" style="grid-template-columns:1fr;margin-top:20px;max-width:560px" data-rq="${rq}"><div><label for="tg">Bersaglio</label><select id="tg" required><option value="">Scegli un duellante…</option>${cand.map(p=>`<option value="${p.id}" ${p.id==tid?'selected':''}>${esc(p.nickname)}</option>`).join('')}</select></div>
+ <div><label for="am">Importo (${min}–${max} BC)</label><input id="am" type="number" min="${min}" max="${max}" step="1" inputmode="numeric" required></div>
+ <div><label for="ms">Messaggio o motivo della rivalità (facoltativo)</label><input id="ms" maxlength="140"></div>
+ <div class="note" id="sm">Saldo disponibile: <b>${BC(wallet)}</b></div>
+ <label style="display:flex;gap:10px;align-items:flex-start;font-weight:400"><input type="checkbox" id="ok" required style="width:22px;min-height:0;margin-top:3px"> Ho capito che dopo la pubblicazione la quota non può essere ritirata da me e potrà essere riscossa da un altro giocatore secondo le regole.</label>
+ <button class="btn gold" type="submit">Pubblica la taglia</button></form>`,'new');
+ const sum=()=>{const a=+document.getElementById('am').value||0,t=document.getElementById('tg').selectedOptions[0]?.text;document.getElementById('sm').innerHTML=`Saldo disponibile: <b>${BC(wallet)}</b><br>${a?`Dopo la conferma: <b class="${wallet-a<0?'neg':''}">${BC(wallet-a)}</b>${t&&document.getElementById('tg').value?` · taglia di ${BC(a)} su <b>${esc(t)}</b>`:''}`:''}`};
+ ['am','tg'].forEach(i=>document.getElementById(i).oninput=sum);sum();
+ document.getElementById('nb').onsubmit=async e=>{e.preventDefault();const a=+document.getElementById('am').value;if(a>wallet){toast('Saldo insufficiente.',1);return}
+  const b=e.target.querySelector('button');b.disabled=true;try{await rpc('create_bounty',{p_target:document.getElementById('tg').value,p_amount:a,p_message:document.getElementById('ms').value,p_request_id:e.target.dataset.rq});wallet-=a;toast('Taglia pubblicata.');location.hash='#/p/'+document.getElementById('tg').value}catch(er){toast(er.message,1);b.disabled=false}}};
+R.log=async()=>{const fd=await q(sb.from('market_feed_v').select('*').order('at',{ascending:false}).limit(100));shell(`<h1 class="t">Registro del <em>Black Market</em></h1><p class="sub">Tutto quello che accade, in ordine cronologico.</p><div class="box" style="margin-top:18px">${fd.map(feedRow).join('')||'<p class="mute">Il registro è vuoto.</p>'}</div>`,'log')};
+R.wallet=async()=>{const[lg,bs]=await Promise.all([q(sb.from('ledger_entries').select('*').eq('user_id',me.id).order('created_at',{ascending:false}).limit(150)),q(sb.from('bounties').select('amount,status').eq('creator_id',me.id))]);
+ const held=bs.filter(b=>b.status=='active'||b.status=='under_review').reduce((t,b)=>t+b.amount,0),recv=lg.filter(l=>l.kind=='bounty_payout'||l.kind=='bounty_refund').reduce((t,l)=>t+l.amount,0);
+ shell(`<h1 class="t">Il tuo <em>Wallet</em></h1><div class="grid c3" style="margin-top:20px"><div class="box"><p class="mute" style="margin:0">Disponibile</p><div class="big">${Number(wallet).toLocaleString('it-IT')}<small> BC</small></div></div><div class="box"><p class="mute" style="margin:0">Crediti ricevuti dalle riscossioni</p><div class="big">${Number(recv).toLocaleString('it-IT')}<small> BC</small></div></div><div class="box"><p class="mute" style="margin:0">Impegnati in taglie attive</p><div class="big">${Number(held).toLocaleString('it-IT')}<small> BC</small></div></div></div>
+ <div class="box" style="margin-top:14px"><h2>Movimenti</h2>${lg.map(l=>`<div class="row2"><div class="g">${KIND[l.kind]||l.kind}<small>${when(l.created_at)}${l.memo?' · '+esc(l.memo):''} · rif. ${esc(String(l.ref_id||'').slice(0,8))} · saldo ${BC(l.balance_after)}</small></div><span class="val ${l.amount>0?'pos':'neg'}">${l.amount>0?'+':''}${Number(l.amount).toLocaleString('it-IT')}</span></div>`).join('')||'<p class="mute">Nessun movimento.</p>'}</div>
+ <p class="mute" style="font-size:.9rem;margin-top:12px">I Black Credits sono una valuta virtuale della community: non sono acquistabili, convertibili in denaro né trasferibili tra utenti.</p>`,'wallet')};
+R.events=async()=>{const ev=await q(sb.from('events').select('*').order('event_date',{ascending:false}).limit(50)),org=me.role!='user';
+ shell(`<h1 class="t">Eventi e <em>match WPA</em></h1><p class="sub">Solo i match verificati dall’organizzatore possono far riscuotere una taglia.</p>
+ ${org?`<form id="ne" class="box row" style="margin-top:18px"><input id="en" placeholder="Nome evento" required minlength="3" style="flex:1;min-width:180px"><input id="ed" type="date" value="${new Date().toISOString().slice(0,10)}" style="max-width:170px"><button class="btn gold">Crea evento</button></form>`:''}
+ <div class="box" style="margin-top:14px">${ev.map(e=>`<div class="row2"><div class="g"><a href="#/e/${e.id}">${esc(e.name)}</a><small>${e.event_date} · organizzato da ${esc(pn(e.created_by))}</small></div></div>`).join('')||'<p class="mute">Nessun evento registrato.</p>'}</div>`,'events');
+ const f=document.getElementById('ne');if(f)f.onsubmit=async e=>{e.preventDefault();try{const id=await rpc('create_event',{p_name:document.getElementById('en').value,p_date:document.getElementById('ed').value});location.hash='#/e/'+id}catch(er){toast(er.message,1)}}};
+R.e=async id=>{const[evs,ms,sts]=await Promise.all([q(sb.from('events').select('*').eq('id',id)),q(sb.from('matches').select('*').eq('event_id',id).order('round')),q(sb.from('bounty_settlements').select('*'))]);const e=evs[0];if(!e){shell('<div class="err">Evento non trovato.</div>','events');return}
+ const can=me.role=='admin'||e.created_by==me.id,done=new Set(sts.map(s=>s.match_id)),opts=[...P.values()].sort((a,b)=>a.nickname.localeCompare(b.nickname)).map(p=>`<option value="${p.id}">${esc(p.nickname)}</option>`).join('');
+ shell(`<p><a href="#/events">← Eventi</a></p><h1 class="t" style="font-size:2.2rem">${esc(e.name)}</h1><p class="sub">${e.event_date} · organizzatore: ${link(e.created_by)}</p>
+ ${can?`<form id="nm" class="box row" style="margin-top:18px"><select id="ma" required aria-label="Giocatore A"><option value="">Giocatore A</option>${opts}</select><span>vs</span><select id="mb" required aria-label="Giocatore B"><option value="">Giocatore B</option>${opts}</select><input id="mr" type="number" min="1" value="1" style="max-width:80px" aria-label="Turno"><button class="btn gold">Aggiungi match</button><button type="button" class="btn ghost" data-act="award" data-e="${id}">Assegna ricompense partecipazione</button></form>`:''}
+ <div class="box" style="margin-top:14px"><h2>Match</h2>${ms.map(m=>{const w=m.winner_id;return`<div class="row2"><div class="g">T${m.round} · ${link(m.player_a)} vs ${link(m.player_b)}<small>${m.status=='verified'?'Verificato · vincitore '+esc(pn(w)):'In attesa di verifica'}</small></div>
+  ${m.status=='pending'&&can?`<button class="btn sm" data-act="win" data-m="${m.id}" data-w="${m.player_a}">${esc(pn(m.player_a))} vince</button><button class="btn sm" data-act="win" data-m="${m.id}" data-w="${m.player_b}">${esc(pn(m.player_b))} vince</button>`:''}
+  ${m.status=='verified'&&w==me.id&&!done.has(m.id)?`<button class="btn gold sm" data-act="claim" data-m="${m.id}">Riscuoti taglia</button>`:''}
+  ${m.status=='verified'&&done.has(m.id)?'<span class="tag g">liquidato</span>':''}
+  ${m.status=='verified'&&(m.player_a==me.id||m.player_b==me.id)?`<button class="btn ghost sm" data-act="dispute" data-m="${m.id}">Contesta</button>`:''}</div>`}).join('')||'<p class="mute">Nessun match registrato.</p>'}</div>`,'events');
+ const f=document.getElementById('nm');if(f)f.onsubmit=async x=>{x.preventDefault();try{await rpc('create_match',{p_event:id,p_round:+document.getElementById('mr').value,p_a:document.getElementById('ma').value,p_b:document.getElementById('mb').value});toast('Match aggiunto.');route()}catch(er){toast(er.message,1)}}};
+R.admin=async()=>{if(me.role!='admin'){shell('<div class="err">Area riservata agli amministratori.</div>','');return}
+ const[set,bs,ds,au,rc]=await Promise.all([q(sb.from('system_settings').select('*').order('key')),q(sb.from('bounties').select('*').in('status',['active','under_review']).order('created_at',{ascending:false}).limit(60)),q(sb.from('disputes').select('*').eq('status','open').order('created_at')),q(sb.from('audit_logs').select('*').order('id',{ascending:false}).limit(40)),q(sb.from('wallet_reconciliation_v').select('*'))]);
+ const bad=rc.filter(r=>!r.ok);const users=[...P.values()].sort((a,b)=>a.nickname.localeCompare(b.nickname));
+ shell(`<h1 class="t">Pannello <em>amministratore</em></h1><p class="sub">Ogni intervento chiede una motivazione e finisce nel registro di audit. Nulla viene cancellato.</p>
+ <div class="grid c2" style="margin-top:18px"><div class="box"><h2>Quadratura saldi</h2><p>${bad.length?`<span class="neg"><b>${bad.length}</b> wallet non coincidono con il registro contabile!</span>`:`<span class="pos">Tutti i ${rc.length} saldi coincidono con il registro.</span>`}</p><button class="btn ghost sm" data-act="export">Esporta storico completo (JSON)</button></div>
+ <div class="box"><h2>Impostazioni economiche</h2>${set.map(s=>`<div class="row2"><div class="g">${esc(s.description||s.key)}<small>${s.key}</small></div><input type="number" min="0" value="${s.value_int}" data-k="${s.key}" style="width:90px"><button class="btn sm" data-act="setting" data-k="${s.key}">Salva</button></div>`).join('')}</div></div>
+ <div class="box" style="margin-top:14px"><h2>Utenti</h2>${users.map(u=>`<div class="row2">${av(u)}<div class="g">${link(u.id)}<small>${ROLE[u.role]}${u.suspended?' · SOSPESO':''}</small></div><select data-act="role" data-u="${u.id}" aria-label="Ruolo di ${esc(u.nickname)}">${['user','organizer','admin'].map(r=>`<option value="${r}" ${u.role==r?'selected':''}>${ROLE[r]}</option>`).join('')}</select><button class="btn ghost sm" data-act="susp" data-u="${u.id}" data-on="${u.suspended?0:1}">${u.suspended?'Riattiva':'Sospendi'}</button><button class="btn ghost sm" data-act="adj" data-u="${u.id}">Rettifica saldo</button></div>`).join('')}</div>
+ <div class="grid c2" style="margin-top:14px"><div class="box"><h2>Contestazioni aperte (${ds.length})</h2>${ds.map(d=>`<div class="row2"><div class="g">${esc(d.reason)}<small>${esc(pn(d.opened_by))} · ${when(d.created_at)}</small></div><button class="btn sm" data-act="resolve" data-d="${d.id}">Chiudi</button></div>`).join('')||'<p class="mute">Nessuna contestazione.</p>'}</div>
+ <div class="box"><h2>Taglie attive e in revisione</h2>${bs.map(b=>`<div class="row2"><div class="g">${esc(pn(b.creator_id))} → ${esc(pn(b.target_id))}<small>${b.status=='under_review'?'IN REVISIONE · ':''}${when(b.created_at)}</small></div><span class="val">${BC(b.amount)}</span><button class="btn ghost sm" data-act="review" data-b="${b.id}" data-on="${b.status=='active'?1:0}">${b.status=='active'?'Metti in revisione':'Riattiva'}</button><button class="btn ghost sm" data-act="cancelb" data-b="${b.id}">Annulla</button></div>`).join('')||'<p class="mute">Nessuna.</p>'}</div></div>
+ <div class="box" style="margin-top:14px"><h2>Registro di audit (ultimi 40)</h2>${au.map(a=>`<div class="row2"><div class="g"><b>${esc(a.action)}</b> · ${esc(pn(a.actor_id))}<small>${when(a.created_at)}${a.reason?' · '+esc(a.reason):''}</small></div></div>`).join('')}</div>`,'admin')};
+/* ---------- azioni ---------- */
+const ask=m=>{const r=prompt(m);return r&&r.trim().length>=5?r.trim():(r!==null&&toast('Motivazione obbligatoria (almeno 5 caratteri).',1),null)};
+async function act(el){const a=el.dataset.act;
+ try{
+ if(a=='out'){await sb.auth.signOut();return}
+ if(a=='mode'){authView(el.dataset.m);return}
+ if(a=='sort'){sessionStorage.setItem('bm.sort',el.dataset.v);route();return}
+ if(a=='saveprof'){await rpc('update_my_profile',{p_avatar:document.getElementById('avi').value.trim()||null,p_wanted:document.getElementById('wn').checked});await core();toast('Profilo aggiornato.');route();return}
+ if(a=='win'){if(!confirm('Confermare il risultato? Non potrà più essere modificato.'))return;await rpc('verify_match',{p_match:el.dataset.m,p_winner:el.dataset.w});toast('Match verificato.');route();return}
+ if(a=='claim'){const r=await rpc('claim_bounty',{p_match:el.dataset.m});await core();toast(r.already?'Già liquidato.':`Riscossi ${BC(r.payout)}${r.refunded?' + '+BC(r.refunded)+' restituiti':''}.`);route();return}
+ if(a=='award'){const n=await rpc('award_participation',{p_event:el.dataset.e});toast(`Ricompense assegnate: ${n}.`);return}
+ if(a=='dispute'){const r=prompt('Descrivi il problema (min. 5 caratteri):');if(!r)return;await rpc('open_dispute',{p_match:el.dataset.m,p_bounty:null,p_reason:r});toast('Contestazione inviata agli amministratori.');return}
+ if(a=='export'){const d=await rpc('admin_export',{}),b=new Blob([JSON.stringify(d,null,1)],{type:'application/json'}),l=document.createElement('a');l.href=URL.createObjectURL(b);l.download='black-market-'+new Date().toISOString().slice(0,10)+'.json';l.click();return}
+ if(a=='setting'){const v=document.querySelector(`input[data-k="${el.dataset.k}"]`).value,r=ask('Motivazione della modifica:');if(!r)return;await rpc('admin_set_setting',{p_key:el.dataset.k,p_value:+v,p_reason:r});toast('Impostazione salvata.');await core();route();return}
+ if(a=='susp'){const r=ask('Motivazione:');if(!r)return;await rpc('admin_set_suspended',{p_user:el.dataset.u,p_on:el.dataset.on=='1',p_reason:r});await core();route();return}
+ if(a=='adj'){const v=prompt('Importo della rettifica in BC (negativo per addebitare):');if(!v)return;const r=ask('Motivazione:');if(!r)return;await rpc('admin_adjust_balance',{p_user:el.dataset.u,p_amount:parseInt(v,10),p_reason:r});toast('Rettifica registrata.');route();return}
+ if(a=='resolve'){const r=ask('Esito della contestazione:');if(!r)return;await rpc('resolve_dispute',{p_id:el.dataset.d,p_resolution:r});route();return}
+ if(a=='review'){const r=ask('Motivazione:');if(!r)return;await rpc('admin_set_bounty_review',{p_bounty:el.dataset.b,p_on:el.dataset.on=='1',p_reason:r});route();return}
+ if(a=='cancelb'){if(!confirm('Annullare la taglia e restituire i BC al creatore?'))return;const r=ask('Motivazione:');if(!r)return;await rpc('admin_cancel_bounty',{p_bounty:el.dataset.b,p_reason:r});route();return}
+ }catch(er){toast(er.message,1)}}
+$app.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(b){if(b.tagName=='SELECT')return;act(b)}});
+$app.addEventListener('change',async e=>{const s=e.target;if(s.dataset.act=='role'){const r=ask('Motivazione del cambio ruolo:');if(!r){route();return}try{await rpc('admin_set_role',{p_user:s.dataset.u,p_role:s.value,p_reason:r});await core();route()}catch(er){toast(er.message,1);route()}}});
+async function route(){if(!me)return;const h=location.hash.replace(/^#\/?/,'').split('/'),k=h[0]||'';
+ try{await (R[k]||R[''])(h[1])}catch(er){shell(`<div class="err">Qualcosa è andato storto: ${esc(er.message)}</div>`,'')}scrollTo(0,0)}
+async function boot(){const{data:{session}}=await sb.auth.getSession();if(!session){me=null;authView('in');return}
+ let ok;try{ok=await core()}catch(er){$app.innerHTML=`<div class="err">Impossibile contattare il database: ${esc(er.message)}. Controlla la configurazione.</div>`;return}
+ if(!ok){const n=localStorage.getItem('bm.nick');if(n){try{await rpc('register_profile',{p_nickname:n});localStorage.removeItem('bm.nick');ok=await core()}catch(er){toast(er.message,1)}}}
+ if(!ok){nickView();return}route()}
+if(!SUPABASE_URL||!SUPABASE_ANON_KEY){setup();return}
+if(!window.supabase){$app.innerHTML='<div class="err">Impossibile caricare la libreria di accesso. Controlla la connessione.</div>';return}
+sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+sb.auth.onAuthStateChange((ev)=>{if(ev==='SIGNED_IN'||ev==='SIGNED_OUT'||ev==='INITIAL_SESSION')setTimeout(boot,0)});
+addEventListener('hashchange',route);
+})();
+</script></body></html>

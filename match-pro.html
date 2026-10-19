@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Match Pro — Il Tempio Dei Duelli</title><meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tempio.css">
+</head><body>
+<main class="pg" style="padding-top:12px">
+ <h1 class="sr">Match Pro</h1>
+
+ <div class="mp">
+  <section class="card mp-clock" aria-label="Timer del turno">
+   <div class="mp-time" id="clock" role="timer" aria-live="off">50:00</div>
+   <div class="go"><button class="btn" id="tToggle" type="button">Avvia</button><button class="btn ghost" id="tReset" type="button" aria-label="Azzera timer">↺</button></div>
+   <details><summary>Impostazioni timer</summary>
+    <div class="mp-opt"><label>Minuti <input id="tMin" type="number" inputmode="numeric" min="1" max="180" value="50"></label>
+     <button class="opt" id="oSound" type="button" aria-pressed="true">Suono</button><button class="opt" id="oVibe" type="button" aria-pressed="true">Vibrazione</button><button class="opt" id="oWake" type="button" aria-pressed="true">Schermo acceso</button></div></details>
+  </section>
+
+  <div class="mp-banner" id="banner" hidden role="status"></div>
+
+  <section class="mp-pl" id="pl1" aria-label="Giocatore B">
+   <div class="mp-top"><input id="n1" value="Avversario" aria-label="Nome giocatore B"><div class="mp-pips" id="pips1" aria-label="Game vinti"></div></div>
+   <button class="mp-lp" id="lp1" type="button" aria-label="Imposta un importo personalizzato">8000</button>
+   <div class="mp-btns" data-p="1"></div>
+  </section>
+
+  <div class="mp-bar" aria-label="Azioni">
+   <button id="undo" type="button"><span>↶</span>Annulla</button>
+   <button id="redo" type="button"><span>↷</span>Ripeti</button>
+   <button id="coin" type="button"><span>◎</span>Moneta</button>
+   <button id="dice" type="button"><span>⚀</span>Dado</button>
+  </div>
+
+  <section class="mp-pl" id="pl0" aria-label="Giocatore A">
+   <div class="mp-top"><input id="n0" value="Io" aria-label="Nome giocatore A"><div class="mp-pips" id="pips0" aria-label="Game vinti"></div></div>
+   <button class="mp-lp" id="lp0" type="button" aria-label="Imposta un importo personalizzato">8000</button>
+   <div class="mp-btns" data-p="0"></div>
+  </section>
+
+  <div class="row" style="margin-top:2px"><button class="btn ghost sm" id="newGame" type="button" style="flex:1">Nuovo game</button><button class="btn ghost sm" id="face" type="button" aria-pressed="false" style="flex:1">Faccia a faccia</button><button class="btn danger sm" id="resetAll" type="button" style="flex:1">Reset match</button></div>
+
+  <details class="card" style="padding:0 14px"><summary>Cronologia</summary><div style="padding-bottom:12px"><input id="note" placeholder="Nota per la prossima mossa (facoltativa)" aria-label="Nota"><div class="mp-hist" id="hist" style="margin-top:8px"></div></div></details>
+
+  <details class="card" style="padding:0 14px"><summary>Salva nel Libretto</summary><div style="padding-bottom:14px">
+   <p class="mute" style="margin-top:0">Registra il match come duello nel tuo Sentiero, poi fai confermare l’esito dall’avversario.</p>
+   <div class="g2"><div><label for="me">Chi sei?</label><select id="me"><option value="0">Giocatore A</option><option value="1">Giocatore B</option></select></div><div><label for="deck">Il tuo deck</label><input id="deck" placeholder="Es. Snake-Eye"></div></div>
+   <div class="row" style="margin-top:12px"><button class="btn" id="saveLib" type="button" style="flex:1 1 150px">Salva nel Libretto</button><a class="btn ghost" href="sentiero.html" style="flex:1 1 150px">Apri Il Sentiero</a></div><p class="mute" id="saveMsg" role="status" style="margin:8px 0 0"></p></div></details>
+ </div>
+</main>
+
+<div class="mp-sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-label="Importo personalizzato"><div>
+ <label for="amt" id="amtLbl">Importo</label><input id="amt" type="number" inputmode="numeric" min="1" placeholder="0">
+ <div class="two"><button class="btn danger" id="amtMinus" type="button">− Danno</button><button class="btn" id="amtPlus" type="button">+ Cura</button></div>
+ <button class="btn ghost block" id="amtCancel" type="button" style="margin-top:10px">Annulla</button></div></div>
+
+<script src="tempio.js"></script>
+<script>
+(function(){
+const K='tempio.matchpro.v1',$=id=>document.getElementById(id);
+let S={min:50,running:false,endAt:null,left:null,sound:true,vibe:true,wake:true,face:false,names:['Io','Avversario'],lp:[8000,8000],games:[0,0],stack:[],redo:[],hist:[]};
+try{Object.assign(S,JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+let tmr=null,wl=null,ac=null,sheetFor=0;
+const fmt=s=>{s=Math.max(0,s|0);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+const left=()=>S.running?Math.max(0,Math.round((S.endAt-Date.now())/1000)):(S.left!=null?S.left:S.min*60);
+const say=t=>{$('banner').hidden=!t;$('banner').textContent=t||''};
+function beep(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();[0,.35,.7].forEach(t=>{const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=880;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(.25,ac.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+t+.3);o.start(ac.currentTime+t);o.stop(ac.currentTime+t+.3)})}catch(e){}}
+async function wake(on){try{if(on&&S.wake&&navigator.wakeLock)wl=await navigator.wakeLock.request('screen');else if(wl){wl.release();wl=null}}catch(e){}}
+function tick(){const l=left();$('clock').textContent=fmt(l);$('clock').classList.toggle('low',l<=300&&l>0);
+ $('tToggle').textContent=S.running?'Pausa':(S.left!=null&&S.left>0?'Riprendi':'Avvia');
+ if(S.running&&l<=0){S.running=false;S.left=0;clearInterval(tmr);wake(false);if(S.sound)beep();if(S.vibe&&navigator.vibrate)navigator.vibrate([300,200,300]);say('Tempo scaduto! Si gioca fino alla fine del turno.');save();tick()}}
+function run(){clearInterval(tmr);tmr=setInterval(tick,250);tick()}
+$('tToggle').onclick=()=>{
+ if(S.running){S.left=left();S.running=false;clearInterval(tmr);wake(false);tick();save();return}
+ const l=S.left!=null&&S.left>0?S.left:S.min*60;S.endAt=Date.now()+l*1000;S.running=true;S.left=null;say('');wake(true);run();save()};
+$('tReset').onclick=()=>{S.running=false;S.left=null;clearInterval(tmr);wake(false);say('');tick();save()};
+$('tMin').onchange=e=>{S.min=Math.min(180,Math.max(1,parseInt(e.target.value,10)||50));e.target.value=S.min;if(!S.running&&S.left==null)tick();save()};
+[['oSound','sound'],['oVibe','vibe'],['oWake','wake']].forEach(([id,k])=>$(id).onclick=()=>{S[k]=!S[k];$(id).setAttribute('aria-pressed',S[k]);save()});
+
+function hist(t){S.hist.unshift(new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})+' · '+t);S.hist=S.hist.slice(0,150)}
+function setLP(i,v,why){const prev=S.lp[i];let nv=Math.max(0,Math.round(v)),won=null;S.lp[i]=nv;
+ const note=$('note').value.trim();hist(`${S.names[i]}: ${prev} → ${nv} (${why}${note?' · '+note:''})`);
+ if(nv===0&&prev>0){won=1-i;S.games[won]++;say(`${S.names[won]} vince il game! Punteggio ${S.games[0]}–${S.games[1]}`);hist(`Game a ${S.names[won]}`)}
+ S.stack.push({i,prev,next:nv,won});S.redo=[];save();draw();if(navigator.vibrate)navigator.vibrate(8)}
+/* pulsantiera di ogni giocatore: danno a sinistra (rosso), cura a destra (verde) */
+document.querySelectorAll('.mp-btns').forEach(w=>{const i=+w.dataset.p;
+ w.innerHTML=[['m',1000],['m',500],['m',100],['p',100],['p',500],['p',1000]].map(([t,d])=>`<button type="button" class="${t}" data-d="${t=='m'?-d:d}">${t=='m'?'−':'+'}${d}</button>`).join('')+
+  `<button type="button" class="o" data-half>÷ 2</button><button type="button" class="o" data-cust style="grid-column:span 2">Altro importo…</button>`;
+ w.onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.hasAttribute('data-half'))return setLP(i,Math.floor(S.lp[i]/2),'÷2');
+  if(b.hasAttribute('data-cust'))return openSheet(i);
+  const d=+b.dataset.d;setLP(i,S.lp[i]+d,(d>0?'+':'−')+Math.abs(d))}});
+$('lp0').onclick=()=>openSheet(0);$('lp1').onclick=()=>openSheet(1);
+function openSheet(i){sheetFor=i;$('amtLbl').textContent='Importo per '+S.names[i];$('amt').value='';$('sheet').hidden=false;setTimeout(()=>$('amt').focus(),30)}
+const closeSheet=()=>{$('sheet').hidden=true};
+function applyAmt(sign){const d=parseInt($('amt').value,10);if(!(d>0)){$('amt').focus();return}closeSheet();setLP(sheetFor,S.lp[sheetFor]+sign*d,(sign>0?'+':'−')+d)}
+$('amtMinus').onclick=()=>applyAmt(-1);$('amtPlus').onclick=()=>applyAmt(1);$('amtCancel').onclick=closeSheet;
+$('sheet').onclick=e=>{if(e.target===$('sheet'))closeSheet()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('sheet').hidden)closeSheet()});
+$('amt').onkeydown=e=>{if(e.key==='Enter')applyAmt(-1)};
+
+$('undo').onclick=()=>{const e=S.stack.pop();if(!e)return;S.lp[e.i]=e.prev;if(e.won!=null)S.games[e.won]--;S.redo.push(e);hist(`Annulla: ${S.names[e.i]} torna a ${e.prev}`);say('');save();draw()};
+$('redo').onclick=()=>{const e=S.redo.pop();if(!e)return;S.lp[e.i]=e.next;if(e.won!=null)S.games[e.won]++;S.stack.push(e);hist(`Ripeti: ${S.names[e.i]} a ${e.next}`);save();draw()};
+$('newGame').onclick=()=>{S.lp=[8000,8000];S.stack=[];S.redo=[];say('');hist('Nuovo game');save();draw()};
+$('resetAll').onclick=()=>{if(!confirm('Azzerare LP, game e cronologia?'))return;S.lp=[8000,8000];S.games=[0,0];S.stack=[];S.redo=[];S.hist=[];say('');save();draw()};
+$('coin').onclick=()=>{const t=Math.random()<.5?'Testa':'Croce';hist('Moneta: '+t);say('Moneta: '+t);save();draw()};
+$('dice').onclick=()=>{const t=1+Math.floor(Math.random()*6);hist('Dado: '+t);say('Dado: '+t);save();draw()};
+$('face').onclick=()=>{S.face=!S.face;save();draw()};
+[0,1].forEach(i=>{$('n'+i).oninput=e=>{S.names[i]=e.target.value||('Giocatore '+'AB'[i]);save();fillMe()}});
+function fillMe(){const me=$('me'),v=me.value;me.innerHTML=S.names.map((n,i)=>`<option value="${i}">${n.replace(/[<>&"]/g,'')}</option>`).join('');me.value=v||'0'}
+function draw(){[0,1].forEach(i=>{$('lp'+i).textContent=S.lp[i];$('lp'+i).classList.toggle('dead',S.lp[i]===0);
+  $('pips'+i).innerHTML='Game '+Array.from({length:Math.max(2,S.games[i])},(_,k)=>`<i class="${k<S.games[i]?'on':''}"></i>`).join('')});
+ $('pl1').classList.toggle('face',!!S.face);$('face').setAttribute('aria-pressed',!!S.face);
+ $('undo').disabled=!S.stack.length;$('redo').disabled=!S.redo.length;
+ $('hist').innerHTML=S.hist.length?S.hist.map(h=>`<div class="it">${h.replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</div>`).join(''):'<p class="empty">Nessuna azione ancora.</p>'}
+$('saveLib').onclick=()=>{const me=+$('me').value,opp=S.names[1-me];const g=S.games;let res=g[me]>g[1-me]?'W':g[me]<g[1-me]?'L':'D';
+ if(g[0]===0&&g[1]===0){const lp=S.lp;if(lp[me]!==lp[1-me])res=lp[me]>lp[1-me]?'W':'L'}
+ try{const K2='tempio.sentiero.v1';const st=JSON.parse(localStorage.getItem(K2)||'{}');st.duels=st.duels||[];st.duels.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),date:new Date().toISOString().slice(0,10),opp,deck:$('deck').value.trim(),res,ok:false});localStorage.setItem(K2,JSON.stringify(st));
+  $('saveMsg').textContent=`Salvato: ${{W:'vittoria',L:'sconfitta',D:'pareggio'}[res]} contro ${opp}. Apri Il Sentiero per ottenere il codice di conferma.`}catch(e){$('saveMsg').textContent='Impossibile salvare su questo dispositivo.'}};
+$('tMin').value=S.min;[['oSound','sound'],['oVibe','vibe'],['oWake','wake']].forEach(([id,k])=>$(id).setAttribute('aria-pressed',S[k]));
+$('n0').value=S.names[0];$('n1').value=S.names[1];fillMe();draw();
+if(S.running){if(S.endAt-Date.now()>0)run();else{S.running=false;S.left=0;tick()}}else tick();
+})();
+</script></body></html>
