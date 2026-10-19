@@ -58,7 +58,7 @@
     var col = document.createElement('aside');
     col.className = 'tm'; col.id = 'tmCol'; col.setAttribute('aria-label', 'Navigazione');
     col.innerHTML = '<div class="tm-h"><a class="tm-b" href="index.html"><img src="logo1.png" alt="Il Tempio Dei Duelli"></a><button class="tm-x" id="tmX" type="button">Chiudi menu</button></div>' +
-      '<nav class="tm-n">' + links + '<button type="button" class="tm-i" id="tmI"><i aria-hidden="true">⤓</i>Installa app</button></nav><div class="tm-f">Community Yu-Gi-Oh! · Bologna · v7</div>';
+      '<nav class="tm-n">' + links + '<button type="button" class="tm-i" id="tmI"><i aria-hidden="true">⤓</i>Installa app</button></nav><div class="tm-f">Community Yu-Gi-Oh! · Bologna · v8</div>';
     var bar = document.createElement('div');
     bar.className = 'tm-bar';
     bar.innerHTML = '<button type="button" id="tmT" aria-label="Apri il menu" aria-expanded="false" aria-controls="tmCol">☰</button><img src="tempio-mark.png" alt=""><span>Il Tempio Dei Duelli</span>';

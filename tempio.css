@@ -116,11 +116,27 @@ details[open]>summary::after{content:"−"}
 .hero img{width:min(100%,430px);height:auto;display:block;margin:0 auto;filter:drop-shadow(0 0 28px rgba(0,229,255,.25))}
 .hero .lead{margin:6px auto 0;text-align:center}
 .hero .row{justify-content:center;margin-top:18px}
-.cal{display:block;width:100%;height:min(72vh,620px);min-height:420px;margin-top:14px;border:1px solid var(--line);border-radius:var(--r);background:#fff}
 .tools{display:grid;gap:12px;margin-top:14px}@media(min-width:620px){.tools{grid-template-columns:1fr 1fr}}
 .tool{display:block;padding:16px;border:1px solid var(--line);border-radius:var(--r);background:var(--surf);color:var(--tx);text-decoration:none;box-shadow:0 0 18px rgba(0,229,255,.06)}
 a.tool:hover{border-color:var(--ac)}.tool h3{font-size:1.1rem}.tool p{margin:4px 0 0;color:var(--mu);font-size:.95rem}
 .tool.bm{border-color:rgba(232,184,74,.4)}.tool.bm h3{color:var(--gold)}
+
+/* spiegazioni in home */
+.sec{scroll-margin-top:calc(var(--bar-h) + 12px)}
+.card.bm{border-color:rgba(232,184,74,.4);box-shadow:0 0 22px rgba(232,184,74,.07)}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:st}
+@media(min-width:620px){.steps{grid-template-columns:1fr 1fr}.steps.compact{grid-template-columns:1fr 1fr}}
+.steps li{counter-increment:st;position:relative;padding:12px 12px 12px 56px;border:1px solid var(--line);border-radius:var(--r);background:var(--surf);min-height:64px}
+.steps li::before{content:counter(st);position:absolute;left:12px;top:12px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:rgba(0,229,255,.14);border:1px solid var(--ac);color:var(--ac2);font:700 1rem var(--disp)}
+.steps li>b{display:block;font-family:var(--disp);font-size:1.02rem}.steps li>span{display:block;color:var(--mu);font-size:.95rem;margin-top:2px}
+.card.bm .steps li{background:#050b1a}
+.facts{margin:14px 0 0;display:grid;gap:0}
+.facts>div{padding:10px 0;border-top:1px solid var(--line)}
+.facts dt{font:700 .85rem var(--ui);color:var(--gold);text-transform:uppercase;letter-spacing:.04em}
+.facts dd{margin:3px 0 0;color:var(--tx)}
+.h3{font-size:1.05rem;margin:18px 0 8px;color:var(--ac2)}
+.rw{margin:0}.rw td,.rw th{white-space:normal}
+.notes{margin:14px 0 0;padding-left:20px;color:var(--mu);font-size:.95rem;line-height:1.5}.notes li{margin-top:7px}.notes b{color:var(--tx)}
 
 /* =====================================================================
    DECK ANALYZER (mobile first)

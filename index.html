@@ -2,29 +2,81 @@
 <html lang="it"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Il Tempio Dei Duelli</title><meta name="theme-color" content="#000000">
+<meta name="description" content="Community Yu-Gi-Oh! di Bologna: Sentiero dei Sigilli, Black Market con 1000 BC di benvenuto e Ladder con premi in Black Credits e match WPA.">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="tempio.css?v=7">
+<link rel="stylesheet" href="tempio.css?v=8">
 </head><body>
 <main class="pg">
  <header class="hero">
   <img src="logo1.png" alt="Il Tempio Dei Duelli" width="640" height="481">
-  <p class="lead">Eventi, tornei e una sfida stagionale a cui partecipare con il tuo libretto dei duelli.</p>
-  <div class="row"><a class="btn" href="sentiero.html">Inizia il Sentiero</a><a class="btn ghost" href="#calendario">Calendario eventi</a></div>
+  <p class="lead">La community Yu-Gi-Oh! di Bologna: eventi, tornei, sfide a classifica e un mercato di taglie a Black Credits.</p>
+  <div class="row"><a class="btn" href="#come">Come funziona</a><a class="btn gold" href="black-market.html">Entra nel Black Market</a><a class="btn ghost" href="sentiero.html">Il Sentiero</a></div>
  </header>
 
- <section class="sec" id="calendario"><h2>Calendario eventi</h2><p class="mute" style="margin:0">Tornei e appuntamenti del Tempio.</p>
-  <iframe class="cal" title="Calendario del Tempio" loading="lazy" src="https://calendar.google.com/calendar/embed?src=836eb45fc83a74f58b64052fe7184eda9276943a37d4c37887b9614953062a50@group.calendar.google.com&amp;ctz=Europe%2FRome&amp;bgcolor=%23ffffff"></iframe></section>
+ <section class="sec" id="come"><h2>Come funziona il sito</h2>
+  <p class="mute" style="margin:0 0 12px">Il Tempio ha due anime: gli strumenti per giocare e organizzare (nessun account necessario) e il <b>Black Market</b>, dove con un profilo gratuito fai sfide, guadagni Black Credits e metti taglie.</p>
+  <ol class="steps">
+   <li><b>Crea il profilo</b><span>Dal <a href="black-market.html">Black Market</a> scegli un nickname, email e password. Entri con <b>1000 BC</b> di benvenuto.</span></li>
+   <li><b>Gioca</b><span>Partecipa agli eventi, segui il Sentiero dei Sigilli oppure sfida un duellante nella <a href="black-market.html#/ladder">Ladder</a>.</span></li>
+   <li><b>Guadagna</b><span>Ogni vittoria in Ladder confermata ti dà Black Credits e vale come match WPA ufficiale.</span></li>
+   <li><b>Sfida e incassa</b><span>Con i BC metti taglie sui rivali. Se li batti in un match ufficiale, incassi il montepremi.</span></li>
+  </ol>
+  <p class="mute" style="margin:10px 0 0;font-size:.92rem">Gli strumenti (Sentiero, Gestisci torneo, Match Pro, Deck Analyzer) funzionano subito, anche senza account. Dal menu ☰ puoi anche installare il Tempio sulla schermata Home come app.</p>
+ </section>
 
- <section class="sec"><h2>Strumenti</h2>
+ <section class="sec" id="blackmarket"><h2>Il Black Market</h2>
+  <div class="card bm">
+   <p style="margin:0">Il mercato clandestino dei duellanti. Funziona con i <b>Black Credits (BC)</b>, una valuta <b>solo virtuale</b>: non si comprano, non si convertono in denaro e non si possono trasferire da un utente all’altro.</p>
+   <dl class="facts">
+    <div><dt>Ingresso</dt><dd><b>1000 BC</b> di benvenuto, una sola volta per profilo.</dd></div>
+    <div><dt>Eventi</dt><dd><b>30 BC</b> per ogni evento a cui partecipi, assegnati dall’organizzatore.</dd></div>
+    <div><dt>Taglie</dt><dd>Puoi mettere una taglia da <b>50 a 500 BC</b> su un duellante che ha accettato di riceverle (massimo 5 taglie attive per utente). Le taglie sommate formano il <b>Most Wanted</b>.</dd></div>
+    <div><dt>Riscossione</dt><dd>Chi batte il bersaglio in un <b>match WPA ufficiale</b> incassa le quote messe dagli altri e si vede restituite le proprie. Ogni match paga una sola volta.</dd></div>
+    <div><dt>Trasparenza</dt><dd>Ogni movimento è nel registro del tuo wallet e non si può modificare. Risultati contestati e casi dubbi li decide l’amministrazione, con motivazione registrata.</dd></div>
+   </dl>
+   <div class="row" style="margin-top:12px"><a class="btn gold" href="black-market.html">Apri il Black Market</a></div>
+  </div>
+ </section>
+
+ <section class="sec" id="ladder"><h2>La Ladder</h2>
+  <div class="card bm">
+   <p style="margin:0">Sfide dirette con classifica <b>Elo</b>: tutti partono da 1000, e battere chi è più forte vale di più. Giochi quando vuoi, contro chi vuoi.</p>
+   <h3 class="h3">Come si gioca</h3>
+   <ol class="steps compact">
+    <li><b>Sfida</b><span>Scegli un duellante e un formato (Advanced, Traditional, GOAT, Edison).</span></li>
+    <li><b>Accetta</b><span>L’avversario accetta la sfida.</span></li>
+    <li><b>Duellate</b><span>Uno dei due invia il risultato.</span></li>
+    <li><b>Conferma</b><span>L’<b>altro</b> giocatore lo conferma: solo allora contano Elo, premio e match WPA. Se non è d’accordo, contesta e decide l’amministrazione.</span></li>
+   </ol>
+   <h3 class="h3">Cosa ottieni</h3>
+   <div class="scroll"><table class="rw">
+    <thead><tr><th>Esito confermato</th><th>Elo</th><th>Black Credits</th><th>Match WPA</th></tr></thead>
+    <tbody>
+     <tr><td><b>Vittoria</b></td><td>sale</td><td><b>+20 BC</b> al vincitore</td><td>sì, ufficiale</td></tr>
+     <tr><td>Pareggio</td><td>si muove poco</td><td>—</td><td>no</td></tr>
+     <tr><td>Sconfitta</td><td>scende</td><td>nessuna perdita</td><td>—</td></tr>
+    </tbody></table></div>
+   <ul class="notes">
+    <li><b>I BC li crea il sistema</b>: il premio non viene tolto allo sconfitto e non si possono scambiare BC tra giocatori.</li>
+    <li><b>Premi limitati</b>: al massimo <b>3 vittorie premiate nelle 24 ore</b> e <b>1 per avversario</b>. Le altre partite contano comunque per l’Elo.</li>
+    <li><b>Punti per gli eventi WPA</b>: ogni vittoria confermata viene registrata come <b>match WPA ufficiale</b> nell’evento «Ladder WPA» del giorno, come un match verificato da un organizzatore. Conta per le taglie e, quando attivi, per Hall of Fame e Faction Wars. Per coppia di giocatori conta un solo match ufficiale ogni 24 ore.</li>
+    <li><b>Taglie sui match Ladder</b>: per evitare accordi tra amici, una taglia vinta con un match Ladder si può riscuotere <b>dopo 24 ore</b> dalla conferma, tempo in cui l’amministrazione può controllare.</li>
+    <li>Importi e limiti sono quelli attuali e possono essere modificati dall’amministrazione.</li>
+   </ul>
+   <div class="row" style="margin-top:12px"><a class="btn gold" href="black-market.html#/ladder">Vai alla Ladder</a></div>
+  </div>
+ </section>
+
+ <section class="sec"><h2>Gli strumenti</h2>
   <div class="tools">
    <a class="tool" href="sentiero.html"><h3>Il Sentiero dei Sigilli</h3><p>Libretto dei duelli, sigilli e campionato stagionale.</p></a>
-   <a class="tool bm" href="black-market.html"><h3>Black Market</h3><p>Taglie sui rivali con i Black Credits, Most Wanted e registro del mercato.</p></a>
+   <a class="tool bm" href="black-market.html"><h3>Black Market</h3><p>Taglie sui rivali con i Black Credits, Most Wanted, Ladder e registro del mercato.</p></a>
    <a class="tool" href="gestisci-torneo.html"><h3>Gestisci torneo</h3><p>Accoppiamenti Swiss, risultati tavolo per tavolo e classifica.</p></a>
    <a class="tool" href="match-pro.html"><h3>Match Pro</h3><p>Life Points, timer e cronologia del match.</p></a>
    <a class="tool" href="deck-analyzer.html"><h3>Deck Analyzer</h3><p>Ruoli, probabilità d’apertura e mani simulate.</p></a>
   </div></section>
 </main>
-<script src="tempio.js?v=7"></script>
+<script src="tempio.js?v=8"></script>
 </body></html>
