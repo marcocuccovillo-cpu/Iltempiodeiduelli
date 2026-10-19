@@ -46,7 +46,8 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 
 <main class="pg" id="app"><p class="mute">Caricamento…</p></main><div id="toast" hidden role="status"></div>
 <script src="tempio.js?v=8"></script>
-<script src="black-market-moduli.js?v=10"></script>
+<script src="badge.js?v=11"></script>
+<script src="black-market-moduli.js?v=11"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 /* ============ CONFIGURAZIONE: incolla qui i due valori di Supabase (Project Settings > API) ============ */
@@ -108,10 +109,11 @@ R.wanted=async()=>{const rows=await q(sb.from('most_wanted_v').select('*'));cons
  shell(`<h1 class="t">Most <em>Wanted</em></h1><p class="sub">I duellanti con le taglie più alte. Non è la classifica dei risultati WPA.</p><div class="seg" style="margin:18px 0">${[['value','Valore'],['recent','Più recenti'],['activity','Attività']].map(([v,l])=>`<button data-act="sort" data-v="${v}" aria-pressed="${k==v}">${l}</button>`).join('')}</div>
  <div class="box">${rows.length?rows.map((r,i)=>card(r,i)).join(''):'<p class="mute">Nessun ricercato al momento.</p>'}</div>`,'wanted')};
 R.p=async id=>{const p=P.get(id);if(!p){shell('<div class="err">Duellante non trovato.</div>','');return}
- const[bs,ss]=await Promise.all([q(sb.from('bounties_public_v').select('*').eq('target_id',id).order('created_at',{ascending:false})),q(sb.from('bounty_settlements').select('*').or(`target_id.eq.${id},winner_id.eq.${id}`).order('created_at',{ascending:false}))]);
+ const[bs,ss,bdg]=await Promise.all([q(sb.from('bounties_public_v').select('*').eq('target_id',id).order('created_at',{ascending:false})),q(sb.from('bounty_settlements').select('*').or(`target_id.eq.${id},winner_id.eq.${id}`).order('created_at',{ascending:false})),BM.badgeBox?BM.badgeBox(id,id==me.id):'']);
  const act=bs.filter(b=>b.status=='active'),old=bs.filter(b=>b.status!='active'),val=act.reduce((t,b)=>t+b.amount,0),mine=id==me.id;
  const st={settled:'riscossa',cancelled:'annullata',under_review:'in revisione'};
  shell(`<div class="row" style="gap:16px">${av(p).replace('width:40px','')}<div><h1 class="t" style="font-size:2.2rem">${esc(p.nickname)}</h1><span class="tag">${ROLE[p.role]}</span> ${p.wanted_enabled?'':'<span class="tag">non accetta taglie</span>'}</div></div>
+ ${bdg}
  <div class="grid c2" style="margin-top:20px"><div class="box"><p class="mute" style="margin:0">Bounty Value attuale</p><div class="big">${Number(val).toLocaleString('it-IT')} <small>BC</small></div>${!mine&&p.wanted_enabled?`<a class="btn gold" style="margin-top:14px" href="#/new/${id}">Metti una taglia</a>`:''}
  ${mine?`<div style="margin-top:14px"><label style="display:flex;gap:10px;align-items:center;font-weight:600"><input type="checkbox" id="wn" ${p.wanted_enabled?'checked':''} style="width:22px;min-height:0"> Accetto taglie su di me</label><div class="row" style="margin-top:10px"><input id="avi" maxlength="8" placeholder="Avatar (emoji o sigla)" value="${esc(p.avatar||'')}" style="max-width:200px"><button class="btn sm" data-act="saveprof">Salva</button></div></div>`:''}</div>
  <div class="box"><h2>Taglie attive (${act.length})</h2>${act.map(b=>`<div class="row2"><div class="g">${b.creator_id?link(b.creator_id):'Anonimo'}<small>${when(b.created_at)}${b.message?' · “'+esc(b.message)+'”':''}</small></div><span class="val">${BC(b.amount)}</span></div>`).join('')||'<p class="mute">Nessuna taglia attiva.</p>'}</div></div>

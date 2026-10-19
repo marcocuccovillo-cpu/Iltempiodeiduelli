@@ -199,6 +199,26 @@ window.BM_MODULES = function (BM) {
   };
 
 
+  /* ============== BADGE: vetrina nel profilo e nella dashboard (grafica in badge.js, calcolo nel database) ============== */
+  let bdRows = [];
+  BM.badgeBox = async (uid, own) => {
+    if (!window.TDB) return '';
+    try {
+      TDB.init();
+      const rows = await TDB.load(BM.sb, uid);
+      bdRows = rows;
+      const sm = TDB.summary(rows);
+      return `<div class="box" id="bdBox" style="margin-top:14px"><h2>Badge e traguardi</h2>${TDB.sumBox(sm)}${TDB.showcase(rows, own ? 6 : 10, 'md')}` +
+        (own ? '<p style="margin:14px 0 0"><a class="btn ghost sm" href="sentiero.html">Tutti i traguardi nel Sentiero</a></p>' : '') + '</div>';
+    } catch (er) {
+      return BM.me && BM.me.role === 'admin' ? `<div class="box" style="margin-top:14px"><h2>Badge e traguardi</h2><p class="mute" style="margin:0">${esc(er.message)}</p></div>` : '';
+    }
+  };
+  (document.getElementById('app') || document).addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('#bdBox [data-bd]'); if (!b || !window.TDB) return;
+    const r = bdRows.filter(x => x.code === b.dataset.bd)[0]; if (r) TDB.detail(r);
+  });
+
   /* ============== PROFILO IN DASHBOARD: avatar + statistiche personali ============== */
   const tile = (v, l) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`;
   BM.dashHero = async () => {
@@ -225,7 +245,7 @@ window.BM_MODULES = function (BM) {
     } catch (er) { note = `<p class="mute">Statistiche non disponibili: ${esc(er.message)}</p>` }
     return `<div class="box" style="margin-top:22px"><div style="display:flex;gap:16px;align-items:center">${av(me).replace('class="av"', 'class="av xl"')}<div style="min-width:0;flex:1"><h2 style="margin:0;font-size:1.6rem;color:var(--tx);overflow-wrap:anywhere">${esc(me.nickname)}</h2><span class="tag">${ROLE[me.role]}</span>
       <div class="row" style="margin-top:10px"><button class="btn ghost sm" data-act="avPick">${me.avatar_img ? 'Cambia foto' : 'Aggiungi foto'}</button>${me.avatar_img ? '<button class="btn ghost sm" data-act="avDel">Rimuovi foto</button>' : ''}<input id="avf" type="file" accept="image/*" hidden></div></div></div>
-      <div class="stats" style="margin-top:16px">${tiles}</div>${note}<p class="mute" style="font-size:.85rem;margin:12px 0 0">Statistiche calcolate dai match ufficiali verificati, dalle taglie e dalla Ladder. Dove non ci sono dati compare “n/d”.</p></div>`;
+      <div class="stats" style="margin-top:16px">${tiles}</div>${note}<p class="mute" style="font-size:.85rem;margin:12px 0 0">Statistiche calcolate dai match ufficiali verificati, dalle taglie e dalla Ladder. Dove non ci sono dati compare “n/d”.</p></div>` + await BM.badgeBox(id, true);
   };
   const toAvatar = async file => {
     let bmp;

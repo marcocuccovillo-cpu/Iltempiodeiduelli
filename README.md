@@ -5,8 +5,9 @@ Sito/PWA della community Yu-Gi-Oh! di Bologna. Funziona su GitHub Pages: **tutti
 ## Cosa c'è
 | File | A cosa serve |
 |---|---|
-| `index.html` | Home: spiega come funziona il sito, il Black Market (1000 BC di benvenuto) e la Ladder (premi in BC e match WPA), poi l'elenco degli strumenti. Il calendario Google è stato tolto |
-| `sentiero.html` | Il Sentiero dei Sigilli + Campionato del Tempio (libretto duelli, sigilli, classifica) |
+| `index.html` | Home: spiega come funziona il sito, il Black Market (1000 BC di benvenuto), la Ladder (premi in BC e match WPA) e i badge, poi l'elenco degli strumenti. Il calendario Google è stato tolto |
+| `sentiero.html` | Il Sentiero: badge e traguardi del Black Market e della Ladder, con accesso unico dal Black Market. Restano il Libretto duelli e il Campionato del Tempio |
+| `badge.js` | Grafica (medaglie SVG), nomi e schede dei badge, condivisa da Sentiero e Black Market |
 | `black-market.html` | Black Market (taglie con i Black Credits, serve Supabase) |
 | `black-market-moduli.js` | Interfaccia dei moduli opzionali Hall of Fame, Faction Wars, Underground Challenges (vedi sotto) |
 | `gestisci-torneo.html` | Gestione torneo: Swiss senza rematch, bye, doppia sconfitta, drop, OMW%, Top 4/8 |
@@ -21,6 +22,7 @@ Sito/PWA della community Yu-Gi-Oh! di Bologna. Funziona su GitHub Pages: **tutti
 | `black-market-ladder-rewards.sql`, `black-market-ladder-rewards-test.sql`, `black-market-ladder-rewards-down.sql` | Migrazione 004: bonus 1000 BC, premi della Ladder in BC, vittorie Ladder come match WPA ufficiali, relativi test e annullamento |
 | `black-market-moderatore.sql`, `black-market-moderatore-test.sql`, `black-market-moderatore-down.sql` | Migrazione 005: ruolo Moderatore e sezione Funzioni Mod, relativi test e annullamento |
 | `black-market-moderatore-taglie.sql`, `black-market-moderatore-taglie-test.sql`, `black-market-moderatore-taglie-down.sql` | Migrazione 006: i moderatori gestiscono anche le taglie, relativi test e annullamento |
+| `black-market-badge.sql`, `black-market-badge-test.sql`, `black-market-badge-down.sql` | Migrazione 007: catalogo dei 48 traguardi e funzione di lettura dei badge, relativi test e annullamento |
 | `black-market-moduli.sql`, `black-market-moduli-test.sql`, `black-market-moduli-down.sql` | Migrazione 002 dei tre moduli, relativi test e annullamento |
 | `workflow-keepalive.yml` | Promemoria anti-pausa per Supabase (vedi sotto) |
 
@@ -117,7 +119,23 @@ Tu (admin) conservi tutto. Se vuoi dare ai moderatori anche la chiusura delle co
 `black-market-moderatore-taglie.sql`, da eseguire dopo la 005. Il moderatore vede tutte le taglie (prima solo creatore e admin) e, con motivazione e audit, può **metterle in revisione** (sospende la riscossione sul bersaglio) e **annullarle**: l'annullamento restituisce al creatore **solo i BC che aveva versato**, una volta sola, senza creare crediti. Non può gestire una taglia che ha creato o in cui è il bersaglio (le decide un collega o l'admin). La logica è quella della 001 con ruolo e un controllo in più.
 **Annullare**: `black-market-moderatore-taglie-down.sql` (revisioni e annullamenti già fatti restano nello storico). **Provato**: 2 scenari in `black-market-moderatore-taglie-test.sql` (rimborso corretto e una sola volta, riscossione sospesa in revisione, taglie proprie vietate, nessun credito assegnabile) e tutti i test 001–006 verdi insieme, annullamento e riapplicazione compresi. Nota: con la 006 due controlli del test 005 (divieto di annullare/congelare taglie) non esistono più, per scelta.
 
-## Stato verificato (19 ottobre 2026)
+## Badge, traguardi e Sentiero con accesso unico (migrazione 007)
+**Un solo profilo.** Il Sentiero non ha più un nickname proprio: usa il profilo del Black Market (nickname, foto, ruolo, saldo ed Elo della Ladder). L'unico accesso è quello del Black Market: chi non è entrato vede l'invito ad accedere e l'anteprima dei traguardi. Il libretto duelli e il campionato locali restano, ma giocano con il nickname del profilo. I vecchi «Sigilli» sono sostituiti dai badge (la tessera del campionato ora porta solo i punti dei tornei).
+
+**I badge** sono 48 traguardi in 4 livelli (Bronzo, Argento, Oro, Leggenda) più 3 speciali, in 4 aree:
+- *Black Market*: taglie lanciate (1/5/15/40), taglie riscosse (1/5/15/30), taglie ricevute (1/5/15/30), bottino più grosso (100/300/600 BC in una riscossione).
+- *Match ufficiali*: vittorie verificate (1/5/15/40), serie di vittorie (3/5/8), eventi giocati (1/5/15/30).
+- *Ladder*: vittorie (1/10/30/75), Elo massimo (1100/1200/1350/1500), serie di vittorie (3/5/8), avversari diversi battuti (3/8/15), Ammazzagiganti (vittoria su chi aveva 100+ Elo più di te: 1/3/10), rivincite (1/5).
+- *Speciali*: Iniziato (tutti), Doppia Anima (vittoria in Ladder + taglia riscossa), Custode del Tempio (admin, moderatori, organizzatori).
+I punti Tempio (Bronzo 1, Argento 3, Oro 6, Leggenda 10, speciali 5) fanno salire il **grado**: Novizio, Duellante, Veterano, Maestro, Campione, Leggenda del Tempio.
+
+**Come funziona (sicurezza).** `black-market-badge.sql` aggiunge solo il catalogo `badge_defs` (sola lettura) e la funzione `badge_progress(utente)`, che calcola ogni badge **al momento** dai dati ufficiali (match verificati, partecipazioni, taglie, riscossioni, partite di Ladder concluse). Nessun badge è scritto da nessuna parte: non si possono assegnare a mano né barare dal browser, non danno Black Credits e **nessuna funzione economica è stata toccata**. Le soglie si cambiano solo con una nuova migrazione. Privacy: se l'amministrazione nasconde gli autori delle taglie, «taglie lanciate» resta visibile solo al diretto interessato e allo staff; con il modulo Ladder spento i badge della Ladder spariscono e tornano identici alla riaccensione. Un badge di ruolo (Custode) segue il ruolo attuale.
+
+**Dove si vedono**: nel Sentiero (muro dei traguardi con filtri e «I più vicini»), nella dashboard e nel profilo di ogni duellante del Black Market (vetrina con i badge più alti). Toccando una medaglia si apre la scheda con data di sblocco o progresso.
+
+**Ordine**: esegui `black-market-badge.sql` dopo la 006. **Annullare**: `black-market-badge-down.sql` (non perde nulla: i badge sono derivati; il Sentiero e i profili mostrano un avviso al posto dei badge). **Provato**: 7 scenari in `black-market-badge-test.sql` (catalogo e permessi, nuovo iscritto, vittorie/serie/eventi con date, taglie e privacy, Ladder completa, ruoli e modulo spento/acceso, sicurezza) con controlli di mutazione, tutti i test 001–007 verdi, annullamento e riapplicazione compresi; pagine provate in Chromium a 390 e 1100 px con un Supabase simulato. **Limiti**: le prestazioni su un database con molti utenti non sono misurate (il calcolo avviene per singolo giocatore a ogni apertura del profilo); non è stato provato su un Supabase vero.
+
+## Stato verificato (20 ottobre 2026)
 **Provato davvero**
 - Tutte le pagine si caricano senza errori, senza scorrimento orizzontale a 390 px e a 1280 px (Chromium, test automatici).
 - Match Pro, Gestisci torneo (torneo completo con Top 4, doppia sconfitta, drop, codice per il Sentiero), Deck Analyzer (con le API delle carte simulate) e Sentiero (compreso l'import del codice torneo e del duello salvato da Match Pro) provati con test automatici a 390 px.
