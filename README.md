@@ -8,6 +8,7 @@ Sito/PWA della community Yu-Gi-Oh! di Bologna. Funziona su GitHub Pages: **tutti
 | `index.html` | Home con il calendario Google degli eventi e l'elenco degli strumenti |
 | `sentiero.html` | Il Sentiero dei Sigilli + Campionato del Tempio (libretto duelli, sigilli, classifica) |
 | `black-market.html` | Black Market (taglie con i Black Credits, serve Supabase) |
+| `black-market-moduli.js` | Interfaccia dei moduli opzionali Hall of Fame, Faction Wars, Underground Challenges (vedi sotto) |
 | `gestisci-torneo.html` | Gestione torneo: Swiss senza rematch, bye, doppia sconfitta, drop, OMW%, Top 4/8 |
 | `match-pro.html` | Life Points, timer, cronologia, salvataggio nel Libretto |
 | `deck-analyzer.html` | Import .ydk, ruoli, probabilità d'apertura, mani simulate |
@@ -15,13 +16,14 @@ Sito/PWA della community Yu-Gi-Oh! di Bologna. Funziona su GitHub Pages: **tutti
 | `logo1.png`, `tempio-mark.png`, `icon-*.png`, `apple-touch-icon.png` | Logo originale e icone dell'app |
 | `manifest.webmanifest`, `sw.js` | Installazione come app e uso offline |
 | `.nojekyll` | Dice a GitHub Pages di non elaborare i file |
-| `black-market-setup.sql`, `black-market-test.sql` | Database del Black Market e i suoi 10 scenari di test |
+| `black-market-setup.sql`, `black-market-test.sql` | Database del Black Market (migrazione 001) e i suoi 10 scenari di test |
+| `black-market-moduli.sql`, `black-market-moduli-test.sql`, `black-market-moduli-down.sql` | Migrazione 002 dei tre moduli, relativi test e annullamento |
 | `workflow-keepalive.yml` | Promemoria anti-pausa per Supabase (vedi sotto) |
 
 ## Pubblicare (da telefono)
 1. Nel repository GitHub: **Add file › Upload files**, seleziona **tutti** i file di questa cartella (compreso `.nojekyll`, se il telefono lo mostra) e fai commit.
 2. **Settings › Pages**: *Deploy from a branch*, branch `main`, cartella `/ (root)`.
-3. Apri l'indirizzo del sito. Se vedi una versione vecchia, ricarica due volte (il service worker aggiorna la cache in automatico, `tempio-v4`).
+3. Apri l'indirizzo del sito. Se vedi una versione vecchia, ricarica due volte (il service worker aggiorna la cache in automatico, `tempio-v5`).
 
 Se manca `tempio.css` o `tempio.js` le pagine appaiono senza stile e senza menu: controlla che siano stati caricati.
 
@@ -40,6 +42,27 @@ Se manca `tempio.css` o `tempio.js` le pagine appaiono senza stile e senza menu:
 - Riscossione solo dal vincitore di un match verificato da un organizzatore. Premio = quote di altri utenti; le proprie quote tornano al vincitore senza guadagno. Contano solo le quote create prima della verifica.
 - Il registro contabile (`ledger_entries`) non si può modificare né cancellare; ogni intervento admin richiede una motivazione ed è in `audit_logs`.
 - I BC sono solo virtuali: nessun acquisto, nessuna conversione in denaro, niente XP o missioni.
+
+## Moduli opzionali: Hall of Fame, Faction Wars, Underground Challenges
+Tre moduli nuovi, **spenti per impostazione iniziale**. Most Wanted, taglie, wallet e registro contabile non sono stati ricreati né modificati.
+
+**Cosa fanno (tutto letto dai dati ufficiali, nessuna copia)**
+- **Hall of Fame** (`#/hof`): classifica per vittorie/% vittorie/eventi/BC riscossi, record permanenti, traguardi, archivio eventi con i match verificati, rivalità (almeno 3 match ufficiali tra gli stessi due), riscossioni registrate, statistiche per stagione, scheda del singolo duellante. Dove non c'è un dato compare "n/d" o "nessun…": niente numeri inventati.
+- **Faction Wars** (`#/factions`): fondazione e gestione fazioni (nome, descrizione, simbolo), adesione/uscita (una sola fazione, attesa dopo l'uscita, massimo membri), classifica complessiva e per stagione, storico. Il punteggio è **calcolato dai match verificati** (3 punti a vittoria su un avversario di un'altra fazione, valore modificabile da Admin): ogni match conta una volta sola, chi cambia fazione non riscrive il passato, nessun legame con i BC e nessun premio automatico. L'admin può rinominare/sciogliere, spostare un membro ed escludere/reintegrare un match con motivazione.
+- **Underground Challenges** (`#/challenges`): sfida a un duellante; stati in attesa, accettata, rifiutata, annullata, scaduta, in corso, completata. Scade dopo 7 giorni se non accettata. Un organizzatore/admin collega il match giocato e, **solo dopo la verifica ufficiale** del match (processo già esistente), conferma la sfida. Accettare non genera vittorie, punti fazione, riscossioni o BC; nessuna scommessa, nessun trasferimento di BC.
+
+**Come si applicano (in sicurezza)**
+1. Fai prima un backup: Admin › *Esporta storico completo (JSON)*.
+2. Supabase › SQL Editor: incolla `black-market-moduli.sql` › Run. Si applica **dopo** `black-market-setup.sql`, non cancella né modifica dati esistenti, ed è "tutto o niente" (se qualcosa fallisce non resta nulla a metà). Va eseguita una volta sola: se la rilanci a moduli già installati ti dà un errore e non cambia nulla.
+3. (Consigliato, solo su un database di prova o subito dopo il setup, perché crea utenti di prova e poi annulla tutto) `black-market-moduli-test.sql`: mostra una riga OK per ciascun gruppo di controlli. Ha bisogno di nickname liberi (Admin, Org, Marco, Luca, Andrea, Giulia, Paolo, Povero): su un database con utenti reali con quei nickname fallisce senza cambiare nulla.
+4. Carica su GitHub i file aggiornati: `black-market.html`, `black-market-moduli.js`, `sw.js` (**attenzione**: sostituendo `black-market.html` vanno reincollati `SUPABASE_URL` e `SUPABASE_ANON_KEY`).
+
+**Come si attivano dopo l'approvazione**: accedi come amministratore › Black Market › **Admin › Moduli aggiuntivi › Attiva** (un modulo alla volta, serve una motivazione). Compare subito nel menu. Per spegnerlo: **Disattiva**. A modulo spento il database rifiuta ogni operazione e nasconde i dati agli utenti, anche con richieste dirette; gli altri moduli restano attivi. In Admin si creano anche le stagioni.
+
+**Annullare la migrazione**: `black-market-moduli-down.sql` rimuove i tre moduli. Cancella i dati creati dai moduli (fazioni, sfide, stagioni): esporta prima ciò che ti serve. Non tocca nulla del Black Market originale; le righe di audit restano.
+
+**Provato davvero** (PostgreSQL 16 locale, adattatore `auth` simulato come sopra): i 10 gruppi di `black-market-moduli-test.sql` e i 10 scenari originali di `black-market-test.sql` con la migrazione 002 applicata; prima/dopo la 002 l'impronta (md5) di tutte le tabelle del Black Market è identica; `down` e nuova applicazione riusciti anche con dati nei moduli. Interfaccia provata con Playwright e Supabase simulato (moduli spenti: nascosti; accesi: pagine, azioni e pannello Admin chiamano le funzioni giuste; nessun errore, nessun scorrimento orizzontale a 390 px).
+**Non provato**: su Supabase reale con login vero; con più utenti contemporanei sull'interfaccia (la concorrenza è stata verificata solo per le riscossioni, a livello database). Nessun branch, commit o deploy: non ho accesso a GitHub da qui.
 
 ## Stato verificato (19 ottobre 2026)
 **Provato davvero**

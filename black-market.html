@@ -23,7 +23,7 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 .big{font:600 clamp(2rem,8vw,3rem)/1 var(--disp);color:var(--tx)}.big small{font-size:.5em;color:var(--gold)}
 .av{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--raise);border:1px solid var(--gold);font:600 1.1rem var(--disp);flex:none}
 .row2{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.row2:first-of-type{border-top:0}
-.row2 .g{flex:1;min-width:0}.row2 a{color:var(--tx);text-decoration:none;font-weight:700}.row2 a:hover{color:var(--gold)}
+.row2{flex-wrap:wrap}.row2 .g{flex:1 1 150px;min-width:0}.row2 select{max-width:100%}.row2 .tag{flex:none;width:auto}.row2 a{color:var(--tx);text-decoration:none;font-weight:700}.row2 a:hover{color:var(--gold)}
 .row2 small{color:var(--mu);display:block}
 .val{font:600 1.3rem var(--disp);color:var(--gold);white-space:nowrap}
 .rank{width:26px;font:600 1.1rem var(--disp);color:var(--mu);text-align:center}
@@ -43,11 +43,12 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 
 <main class="pg" id="app"><p class="mute">Caricamento…</p></main><div id="toast" hidden role="status"></div>
 <script src="tempio.js"></script>
+<script src="black-market-moduli.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 /* ============ CONFIGURAZIONE: incolla qui i due valori di Supabase (Project Settings > API) ============ */
-const SUPABASE_URL = 'https://ceujhsmdvbcoszehbhxp.supabase.co';        // es. https://abcdefgh.supabase.co
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNldWpoc21kdmJjb3N6ZWhiaHhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0MDk4OTMsImV4cCI6MjEwNzk4NTg5M30.b9qzjnHZQJTbZCVY-3xPrQPQd_HdqKqKJALZFlrNUj4';   // chiave "anon public" (è pensata per stare nel browser)
+const SUPABASE_URL = '';        // es. https://abcdefgh.supabase.co
+const SUPABASE_ANON_KEY = '';   // chiave "anon public" (è pensata per stare nel browser)
 /* ========================================================================================================= */
 (function(){
 const $app=document.getElementById('app'),$t=document.getElementById('toast');
@@ -83,13 +84,16 @@ async function core(){const ps=await q(sb.from('profiles').select('id,nickname,a
  const u=(await sb.auth.getUser()).data.user;me=P.get(u.id)||null;if(!me)return false;
  const w=await q(sb.from('wallets').select('balance').eq('user_id',me.id));wallet=w[0]?.balance||0;
  const st=await q(sb.from('system_settings').select('key,value_int'));S=Object.fromEntries(st.map(s=>[s.key,s.value_int]));return true}
-function shell(inner,cur){const items=[['','Dashboard'],['wanted','Most Wanted'],['new','Metti una taglia'],['log','Registro'],['wallet','Wallet'],['events','Eventi']];if(me.role=='admin')items.push(['admin','Admin']);
+function shell(inner,cur){const items=[['','Dashboard'],['wanted','Most Wanted'],['new','Metti una taglia'],['log','Registro'],['wallet','Wallet'],['events','Eventi']];if(BM.navItems)items.push(...BM.navItems());if(me.role=='admin')items.push(['admin','Admin']);
  $app.innerHTML=`<nav class="bm-nav" aria-label="Black Market">${items.map(([h,l])=>`<a href="#/${h}" ${cur==h?'aria-current="page"':''}>${l}</a>`).join('')}<button data-act="out">Esci</button></nav>${inner}`}
 const card=(r,i)=>`<div class="row2">${i!=null?`<span class="rank">${i+1}</span>`:''}${av(P.get(r.id))}<div class="g"><a href="#/p/${r.id}">${esc(r.nickname)}</a><small>${r.active_count} ${r.active_count==1?'taglia attiva':'taglie attive'} · ultima ${when(r.last_at)}</small></div><span class="val">${BC(r.bounty_value)}</span></div>`;
 const feedRow=f=>f.kind=='bounty'?`<div class="row2"><div class="g">${f.actor_id?link(f.actor_id):'Anonimo'} ha messo una taglia su ${link(f.target_id)}<small>${when(f.at)}</small></div><span class="val">${BC(f.amount)}</span></div>`
  :`<div class="row2"><div class="g">${link(f.actor_id)} ha riscosso la taglia su ${link(f.target_id)}<small>${when(f.at)}</small></div><span class="val">${BC(f.amount)}</span></div>`;
 /* ---------- pagine ---------- */
 const R={};
+/* Punto di aggancio per i moduli opzionali (black-market-moduli.js): Hall of Fame, Faction Wars, Underground. Se il file manca, non cambia nulla. */
+const BM={R,shell,q,rpc,toast,esc,BC,when,av,link,pn,route,core,ask:m=>ask(m),get sb(){return sb},get me(){return me},get P(){return P},get S(){return S}};
+try{if(window.BM_MODULES)window.BM_MODULES(BM)}catch(e){console.error('Moduli aggiuntivi non caricati',e)}
 R['']=async()=>{const[mw,fd]=await Promise.all([q(sb.from('most_wanted_v').select('*').order('bounty_value',{ascending:false}).limit(5)),q(sb.from('market_feed_v').select('*').order('at',{ascending:false}).limit(24))]);
  const bn=fd.filter(f=>f.kind=='bounty').slice(0,6),cl=fd.filter(f=>f.kind=='claim').slice(0,5);
  shell(`<h1 class="t">Black <em>Market</em></h1><p class="sub">Metti una taglia sui tuoi rivali. Chi li sconfigge in un match ufficiale verificato riscuote il montepremi.</p>
@@ -148,15 +152,17 @@ R.admin=async()=>{if(me.role!='admin'){shell('<div class="err">Area riservata ag
  const bad=rc.filter(r=>!r.ok);const users=[...P.values()].sort((a,b)=>a.nickname.localeCompare(b.nickname));
  shell(`<h1 class="t">Pannello <em>amministratore</em></h1><p class="sub">Ogni intervento chiede una motivazione e finisce nel registro di audit. Nulla viene cancellato.</p>
  <div class="grid c2" style="margin-top:18px"><div class="box"><h2>Quadratura saldi</h2><p>${bad.length?`<span class="neg"><b>${bad.length}</b> wallet non coincidono con il registro contabile!</span>`:`<span class="pos">Tutti i ${rc.length} saldi coincidono con il registro.</span>`}</p><button class="btn ghost sm" data-act="export">Esporta storico completo (JSON)</button></div>
- <div class="box"><h2>Impostazioni economiche</h2>${set.map(s=>`<div class="row2"><div class="g">${esc(s.description||s.key)}<small>${s.key}</small></div><input type="number" min="0" value="${s.value_int}" data-k="${s.key}" style="width:90px"><button class="btn sm" data-act="setting" data-k="${s.key}">Salva</button></div>`).join('')}</div></div>
+ <div class="box"><h2>Impostazioni economiche</h2>${set.filter(s=>!s.key.startsWith('module_')).map(s=>`<div class="row2"><div class="g">${esc(s.description||s.key)}<small>${s.key}</small></div><input type="number" min="0" value="${s.value_int}" data-k="${s.key}" style="width:90px"><button class="btn sm" data-act="setting" data-k="${s.key}">Salva</button></div>`).join('')}</div></div>
+ <div id="bm-ext"></div>
  <div class="box" style="margin-top:14px"><h2>Utenti</h2>${users.map(u=>`<div class="row2">${av(u)}<div class="g">${link(u.id)}<small>${ROLE[u.role]}${u.suspended?' · SOSPESO':''}</small></div><select data-act="role" data-u="${u.id}" aria-label="Ruolo di ${esc(u.nickname)}">${['user','organizer','admin'].map(r=>`<option value="${r}" ${u.role==r?'selected':''}>${ROLE[r]}</option>`).join('')}</select><button class="btn ghost sm" data-act="susp" data-u="${u.id}" data-on="${u.suspended?0:1}">${u.suspended?'Riattiva':'Sospendi'}</button><button class="btn ghost sm" data-act="adj" data-u="${u.id}">Rettifica saldo</button></div>`).join('')}</div>
  <div class="grid c2" style="margin-top:14px"><div class="box"><h2>Contestazioni aperte (${ds.length})</h2>${ds.map(d=>`<div class="row2"><div class="g">${esc(d.reason)}<small>${esc(pn(d.opened_by))} · ${when(d.created_at)}</small></div><button class="btn sm" data-act="resolve" data-d="${d.id}">Chiudi</button></div>`).join('')||'<p class="mute">Nessuna contestazione.</p>'}</div>
  <div class="box"><h2>Taglie attive e in revisione</h2>${bs.map(b=>`<div class="row2"><div class="g">${esc(pn(b.creator_id))} → ${esc(pn(b.target_id))}<small>${b.status=='under_review'?'IN REVISIONE · ':''}${when(b.created_at)}</small></div><span class="val">${BC(b.amount)}</span><button class="btn ghost sm" data-act="review" data-b="${b.id}" data-on="${b.status=='active'?1:0}">${b.status=='active'?'Metti in revisione':'Riattiva'}</button><button class="btn ghost sm" data-act="cancelb" data-b="${b.id}">Annulla</button></div>`).join('')||'<p class="mute">Nessuna.</p>'}</div></div>
- <div class="box" style="margin-top:14px"><h2>Registro di audit (ultimi 40)</h2>${au.map(a=>`<div class="row2"><div class="g"><b>${esc(a.action)}</b> · ${esc(pn(a.actor_id))}<small>${when(a.created_at)}${a.reason?' · '+esc(a.reason):''}</small></div></div>`).join('')}</div>`,'admin')};
+ <div class="box" style="margin-top:14px"><h2>Registro di audit (ultimi 40)</h2>${au.map(a=>`<div class="row2"><div class="g"><b>${esc(a.action)}</b> · ${esc(pn(a.actor_id))}<small>${when(a.created_at)}${a.reason?' · '+esc(a.reason):''}</small></div></div>`).join('')}</div>`,'admin');if(BM.adminExt)BM.adminExt(document.getElementById('bm-ext'))};
 /* ---------- azioni ---------- */
 const ask=m=>{const r=prompt(m);return r&&r.trim().length>=5?r.trim():(r!==null&&toast('Motivazione obbligatoria (almeno 5 caratteri).',1),null)};
 async function act(el){const a=el.dataset.act;
  try{
+ if(BM.act&&await BM.act(a,el))return;
  if(a=='out'){await sb.auth.signOut();return}
  if(a=='mode'){authView(el.dataset.m);return}
  if(a=='sort'){sessionStorage.setItem('bm.sort',el.dataset.v);route();return}
@@ -183,7 +189,8 @@ async function boot(){const{data:{session}}=await sb.auth.getSession();if(!sessi
  if(!ok){nickView();return}route()}
 if(!SUPABASE_URL||!SUPABASE_ANON_KEY){setup();return}
 if(!window.supabase){$app.innerHTML='<div class="err">Impossibile caricare la libreria di accesso. Controlla la connessione.</div>';return}
-sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+let base;try{base=new URL(SUPABASE_URL.trim()).origin}catch(e){$app.innerHTML='<div class="err">SUPABASE_URL non è un indirizzo valido. Deve essere nel formato https://xxxxxxxx.supabase.co, senza altro dopo.</div>';return}
+sb=window.supabase.createClient(base,SUPABASE_ANON_KEY.trim(),{auth:{persistSession:true,autoRefreshToken:true}});
 sb.auth.onAuthStateChange((ev)=>{if(ev==='SIGNED_IN'||ev==='SIGNED_OUT'||ev==='INITIAL_SESSION')setTimeout(boot,0)});
 addEventListener('hashchange',route);
 })();
