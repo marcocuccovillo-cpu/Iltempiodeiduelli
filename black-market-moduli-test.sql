@@ -5,6 +5,13 @@
 -- Se un controllo fallisce compare un errore con il nome dello scenario.
 -- =====================================================================
 begin;
+-- PROTEZIONE: il test crea utenti e match di prova e confronta conteggi globali (il primo utente registrato diventa admin).
+-- Su un database che contiene già dati veri non può funzionare: si ferma subito, senza toccare nulla.
+do $$ begin
+  if exists (select 1 from public.profiles) or exists (select 1 from public.events) then
+    raise exception 'TEST NON ESEGUITO: questo database contiene già dati. Eseguilo solo su un database di prova vuoto (per esempio un secondo progetto Supabase gratuito), mai su quello reale. Non è stato modificato nulla.';
+  end if;
+end $$;
 create temp table t_log (n serial, msg text);
 
 create function pg_temp.uid(n text) returns uuid language sql immutable as $$ select md5('tempio-moduli-' || n)::uuid $$;

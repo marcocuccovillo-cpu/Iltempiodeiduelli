@@ -23,14 +23,14 @@ Sito/PWA della community Yu-Gi-Oh! di Bologna. Funziona su GitHub Pages: **tutti
 ## Pubblicare (da telefono)
 1. Nel repository GitHub: **Add file › Upload files**, seleziona **tutti** i file di questa cartella (compreso `.nojekyll`, se il telefono lo mostra) e fai commit.
 2. **Settings › Pages**: *Deploy from a branch*, branch `main`, cartella `/ (root)`.
-3. Apri l'indirizzo del sito. Se vedi una versione vecchia, ricarica due volte (il service worker aggiorna la cache in automatico, `tempio-v5`).
+3. Apri l'indirizzo del sito. Se vedi una versione vecchia, ricarica due volte (il service worker aggiorna la cache in automatico, `tempio-v6`).
 
 Se manca `tempio.css` o `tempio.js` le pagine appaiono senza stile e senza menu: controlla che siano stati caricati.
 
 ## Black Market: configurazione
 1. Crea un progetto gratuito su supabase.com.
 2. **SQL Editor › New query**: incolla tutto `black-market-setup.sql` › Run (una volta sola).
-3. (Consigliato) incolla `black-market-test.sql` › Run: gira in una transazione annullata alla fine e mostra una riga "OK" per ognuno dei 10 scenari.
+3. (Facoltativo, **solo su un progetto Supabase di prova ancora vuoto**: si rifiuta di partire se trova già utenti) incolla `black-market-test.sql` › Run: gira in una transazione annullata alla fine e mostra una riga "OK" per ognuno dei 10 scenari.
 4. **Authentication › Providers › Email**: per le prove disattiva *Confirm email*. In *URL Configuration* metti l'indirizzo del sito.
 5. **Project Settings › API**: copia *Project URL* e la chiave *anon public*, apri `black-market.html` su GitHub (matita) e incollali in `SUPABASE_URL` e `SUPABASE_ANON_KEY`. **Mai** la chiave `service_role`.
 6. Il PRIMO account che si registra diventa amministratore: registrati subito tu. Poi dal pannello Admin assegna il ruolo *Organizzatore* a chi gestirà eventi e match.
@@ -54,7 +54,7 @@ Tre moduli nuovi, **spenti per impostazione iniziale**. Most Wanted, taglie, wal
 **Come si applicano (in sicurezza)**
 1. Fai prima un backup: Admin › *Esporta storico completo (JSON)*.
 2. Supabase › SQL Editor: incolla `black-market-moduli.sql` › Run. Si applica **dopo** `black-market-setup.sql`, non cancella né modifica dati esistenti, ed è "tutto o niente" (se qualcosa fallisce non resta nulla a metà). Va eseguita una volta sola: se la rilanci a moduli già installati ti dà un errore e non cambia nulla.
-3. (Consigliato, solo su un database di prova o subito dopo il setup, perché crea utenti di prova e poi annulla tutto) `black-market-moduli-test.sql`: mostra una riga OK per ciascun gruppo di controlli. Ha bisogno di nickname liberi (Admin, Org, Marco, Luca, Andrea, Giulia, Paolo, Povero): su un database con utenti reali con quei nickname fallisce senza cambiare nulla.
+3. (Facoltativo, **solo su un progetto Supabase di prova ancora vuoto**, con setup 001 + 002 applicati: si rifiuta di partire se trova già utenti o eventi, senza modificare nulla) `black-market-moduli-test.sql`: crea utenti di prova, mostra una riga OK per ciascun gruppo di controlli e annulla tutto. **Non eseguirlo sul database con i dati veri.**
 4. Carica su GitHub i file aggiornati: `black-market.html`, `black-market-moduli.js`, `sw.js` (**attenzione**: sostituendo `black-market.html` vanno reincollati `SUPABASE_URL` e `SUPABASE_ANON_KEY`).
 
 **Come si attivano dopo l'approvazione**: accedi come amministratore › Black Market › **Admin › Moduli aggiuntivi › Attiva** (un modulo alla volta, serve una motivazione). Compare subito nel menu. Per spegnerlo: **Disattiva**. A modulo spento il database rifiuta ogni operazione e nasconde i dati agli utenti, anche con richieste dirette; gli altri moduli restano attivi. In Admin si creano anche le stagioni.

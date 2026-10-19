@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="tempio.css">
+<link rel="stylesheet" href="tempio.css?v=6">
 <style>
 
 /* Palette Black Market: nero, antracite, rosso scuro e oro */
@@ -42,13 +42,13 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 </style></head><body>
 
 <main class="pg" id="app"><p class="mute">Caricamento…</p></main><div id="toast" hidden role="status"></div>
-<script src="tempio.js"></script>
-<script src="black-market-moduli.js"></script>
+<script src="tempio.js?v=6"></script>
+<script src="black-market-moduli.js?v=6"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 /* ============ CONFIGURAZIONE: incolla qui i due valori di Supabase (Project Settings > API) ============ */
-const SUPABASE_URL = 'https://ceujhsmdvbcoszehbhxp.supabase.co';        // es. https://abcdefgh.supabase.co
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNldWpoc21kdmJjb3N6ZWhiaHhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0MDk4OTMsImV4cCI6MjEwNzk4NTg5M30.b9qzjnHZQJTbZCVY-3xPrQPQd_HdqKqKJALZFlrNUj4';   // chiave "anon public" (è pensata per stare nel browser)
+const SUPABASE_URL = '';        // es. https://abcdefgh.supabase.co
+const SUPABASE_ANON_KEY = '';   // chiave "anon public" (è pensata per stare nel browser)
 /* ========================================================================================================= */
 (function(){
 const $app=document.getElementById('app'),$t=document.getElementById('toast');
