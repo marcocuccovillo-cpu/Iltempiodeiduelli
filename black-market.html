@@ -5,7 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="tempio.css?v=6">
+<link rel="stylesheet" href="tempio.css?v=7">
 <style>
 
 /* Palette Black Market: nero, antracite, rosso scuro e oro */
@@ -21,6 +21,9 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 .box{padding:18px;border:1px solid var(--line);border-radius:12px;background:var(--surf)}
 .box h2{font-size:1.2rem;margin:0 0 10px;color:var(--gold)}
 .big{font:600 clamp(2rem,8vw,3rem)/1 var(--disp);color:var(--tx)}.big small{font-size:.5em;color:var(--gold)}
+.av img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}.av.xl{width:88px;height:88px;font-size:2.2rem}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}@media(min-width:700px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--raise);min-width:0}.stat b{display:block;font:600 1.35rem var(--disp);color:var(--gold);overflow-wrap:anywhere}.stat span{color:var(--mu);font-size:.82rem}
 .av{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--raise);border:1px solid var(--gold);font:600 1.1rem var(--disp);flex:none}
 .row2{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.row2:first-of-type{border-top:0}
 .row2{flex-wrap:wrap}.row2 .g{flex:1 1 150px;min-width:0}.row2 select{max-width:100%}.row2 .tag{flex:none;width:auto}.row2 a{color:var(--tx);text-decoration:none;font-weight:700}.row2 a:hover{color:var(--gold)}
@@ -42,12 +45,12 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 </style></head><body>
 
 <main class="pg" id="app"><p class="mute">Caricamento…</p></main><div id="toast" hidden role="status"></div>
-<script src="tempio.js?v=6"></script>
-<script src="black-market-moduli.js?v=6"></script>
+<script src="tempio.js?v=7"></script>
+<script src="black-market-moduli.js?v=7"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 /* ============ CONFIGURAZIONE: incolla qui i due valori di Supabase (Project Settings > API) ============ */
-const SUPABASE_URL = 'https://ceujhsmdvbcoszehbhxp.supabase.co';        // es. https://abcdefgh.supabase.co
+const SUPABASE_URL = 'https://ceujhsmdvbcoszehbhxp.supabase.co/';        // es. https://abcdefgh.supabase.co
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNldWpoc21kdmJjb3N6ZWhiaHhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0MDk4OTMsImV4cCI6MjEwNzk4NTg5M30.b9qzjnHZQJTbZCVY-3xPrQPQd_HdqKqKJALZFlrNUj4';   // chiave "anon public" (è pensata per stare nel browser)
 /* ========================================================================================================= */
 (function(){
@@ -60,7 +63,7 @@ const ROLE={user:'Duellante',organizer:'Organizzatore',admin:'Amministratore'};
 let sb,me=null,wallet=0,P=new Map(),S={},tt;
 const toast=(m,bad)=>{$t.textContent=m;$t.className=bad?'bad':'';$t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>$t.hidden=true,4200)};
 const pn=id=>id?(P.get(id)?.nickname||'Sconosciuto'):'Anonimo';
-const av=p=>`<span class="av" aria-hidden="true">${esc(p?.avatar||(p?.nickname||'?')[0].toUpperCase())}</span>`;
+const av=p=>p?.avatar_img?`<span class="av" aria-hidden="true"><img src="${esc(p.avatar_img)}" alt=""></span>`:`<span class="av" aria-hidden="true">${esc(p?.avatar||(p?.nickname||'?')[0].toUpperCase())}</span>`;
 const link=id=>id?`<a href="#/p/${id}">${esc(pn(id))}</a>`:'Anonimo';
 async function q(b){const{data,error}=await b;if(error)throw new Error(error.message);return data}
 const rpc=async(n,a)=>{const{data,error}=await sb.rpc(n,a);if(error)throw new Error(error.message);return data};
@@ -80,7 +83,7 @@ function authView(mode){mode=mode||'in';$app.innerHTML=`<h1 class="t">Black <em>
 async function nickView(){$app.innerHTML=`<h1 class="t">Scegli il tuo <em>nickname</em></h1><div class="box" style="margin-top:20px;max-width:460px"><form id="nf" class="cols" style="grid-template-columns:1fr"><div><label for="nk">Nickname pubblico</label><input id="nk" required minlength="3" maxlength="24" value="${esc(localStorage.getItem('bm.nick')||'')}"></div><button class="btn gold">Conferma</button></form></div>`;
  document.getElementById('nf').onsubmit=async e=>{e.preventDefault();try{await rpc('register_profile',{p_nickname:document.getElementById('nk').value.trim()});localStorage.removeItem('bm.nick');await boot()}catch(er){toast(er.message,1)}}}
 /* ---------- dati comuni ---------- */
-async function core(){const ps=await q(sb.from('profiles').select('id,nickname,avatar,role,wanted_enabled,suspended'));P=new Map(ps.map(p=>[p.id,p]));
+async function core(){let ps;try{ps=await q(sb.from('profiles').select('id,nickname,avatar,avatar_img,role,wanted_enabled,suspended'))}catch(e){ps=await q(sb.from('profiles').select('id,nickname,avatar,role,wanted_enabled,suspended'))}/* senza migrazione 003 manca avatar_img */P=new Map(ps.map(p=>[p.id,p]));
  const u=(await sb.auth.getUser()).data.user;me=P.get(u.id)||null;if(!me)return false;
  const w=await q(sb.from('wallets').select('balance').eq('user_id',me.id));wallet=w[0]?.balance||0;
  const st=await q(sb.from('system_settings').select('key,value_int'));S=Object.fromEntries(st.map(s=>[s.key,s.value_int]));return true}
@@ -92,11 +95,11 @@ const feedRow=f=>f.kind=='bounty'?`<div class="row2"><div class="g">${f.actor_id
 /* ---------- pagine ---------- */
 const R={};
 /* Punto di aggancio per i moduli opzionali (black-market-moduli.js): Hall of Fame, Faction Wars, Underground. Se il file manca, non cambia nulla. */
-const BM={R,shell,q,rpc,toast,esc,BC,when,av,link,pn,route,core,ask:m=>ask(m),get sb(){return sb},get me(){return me},get P(){return P},get S(){return S}};
+const BM={R,shell,q,rpc,toast,esc,BC,when,av,link,pn,route,core,ask:m=>ask(m),get sb(){return sb},get wallet(){return wallet},get me(){return me},get P(){return P},get S(){return S}};
 try{if(window.BM_MODULES)window.BM_MODULES(BM)}catch(e){console.error('Moduli aggiuntivi non caricati',e)}
-R['']=async()=>{const[mw,fd]=await Promise.all([q(sb.from('most_wanted_v').select('*').order('bounty_value',{ascending:false}).limit(5)),q(sb.from('market_feed_v').select('*').order('at',{ascending:false}).limit(24))]);
+R['']=async()=>{const[mw,fd,hero]=await Promise.all([q(sb.from('most_wanted_v').select('*').order('bounty_value',{ascending:false}).limit(5)),q(sb.from('market_feed_v').select('*').order('at',{ascending:false}).limit(24)),BM.dashHero?BM.dashHero():''/* profilo e statistiche (black-market-moduli.js) */]);
  const bn=fd.filter(f=>f.kind=='bounty').slice(0,6),cl=fd.filter(f=>f.kind=='claim').slice(0,5);
- shell(`<h1 class="t">Black <em>Market</em></h1><p class="sub">Metti una taglia sui tuoi rivali. Chi li sconfigge in un match ufficiale verificato riscuote il montepremi.</p>
+ shell(`<h1 class="t">Black <em>Market</em></h1><p class="sub">Metti una taglia sui tuoi rivali. Chi li sconfigge in un match ufficiale verificato riscuote il montepremi.</p>${hero}
  <div class="grid c2" style="margin-top:22px"><div class="box"><p class="mute" style="margin:0">Il tuo saldo</p><div class="big">${Number(wallet).toLocaleString('it-IT')} <small>BC</small></div><div class="row" style="margin-top:14px"><a class="btn gold" href="#/new">Metti una taglia</a><a class="btn ghost" href="#/wanted">Esplora il Black Market</a></div></div>
  <div class="box"><h2>Duellanti più ricercati</h2>${mw.length?mw.map((r,i)=>card(r,i)).join(''):'<p class="mute">Nessuna taglia attiva. Sii il primo a metterne una.</p>'}</div></div>
  <div class="grid c2" style="margin-top:14px"><div class="box"><h2>Ultime taglie pubblicate</h2>${bn.map(feedRow).join('')||'<p class="mute">Ancora nessuna taglia.</p>'}</div><div class="box"><h2>Ultime riscossioni</h2>${cl.map(feedRow).join('')||'<p class="mute">Nessuna ricompensa riscossa.</p>'}</div></div>`,'')};

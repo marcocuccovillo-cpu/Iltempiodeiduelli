@@ -17,13 +17,14 @@ Sito/PWA della community Yu-Gi-Oh! di Bologna. Funziona su GitHub Pages: **tutti
 | `manifest.webmanifest`, `sw.js` | Installazione come app e uso offline |
 | `.nojekyll` | Dice a GitHub Pages di non elaborare i file |
 | `black-market-setup.sql`, `black-market-test.sql` | Database del Black Market (migrazione 001) e i suoi 10 scenari di test |
+| `black-market-ladder.sql`, `black-market-ladder-test.sql`, `black-market-ladder-down.sql` | Migrazione 003: Ladder Elo e immagine avatar, relativi test e annullamento |
 | `black-market-moduli.sql`, `black-market-moduli-test.sql`, `black-market-moduli-down.sql` | Migrazione 002 dei tre moduli, relativi test e annullamento |
 | `workflow-keepalive.yml` | Promemoria anti-pausa per Supabase (vedi sotto) |
 
 ## Pubblicare (da telefono)
 1. Nel repository GitHub: **Add file › Upload files**, seleziona **tutti** i file di questa cartella (compreso `.nojekyll`, se il telefono lo mostra) e fai commit.
 2. **Settings › Pages**: *Deploy from a branch*, branch `main`, cartella `/ (root)`.
-3. Apri l'indirizzo del sito. Se vedi una versione vecchia, ricarica due volte (il service worker aggiorna la cache in automatico, `tempio-v6`).
+3. Apri l'indirizzo del sito. Se vedi una versione vecchia, ricarica due volte (il service worker aggiorna la cache in automatico, `tempio-v7`).
 
 Se manca `tempio.css` o `tempio.js` le pagine appaiono senza stile e senza menu: controlla che siano stati caricati.
 
@@ -63,6 +64,17 @@ Tre moduli nuovi, **spenti per impostazione iniziale**. Most Wanted, taglie, wal
 
 **Provato davvero** (PostgreSQL 16 locale, adattatore `auth` simulato come sopra): i 10 gruppi di `black-market-moduli-test.sql` e i 10 scenari originali di `black-market-test.sql` con la migrazione 002 applicata; prima/dopo la 002 l'impronta (md5) di tutte le tabelle del Black Market è identica; `down` e nuova applicazione riusciti anche con dati nei moduli. Interfaccia provata con Playwright e Supabase simulato (moduli spenti: nascosti; accesi: pagine, azioni e pannello Admin chiamano le funzioni giuste; nessun errore, nessun scorrimento orizzontale a 390 px).
 **Non provato**: su Supabase reale con login vero; con più utenti contemporanei sull'interfaccia (la concorrenza è stata verificata solo per le riscossioni, a livello database). Nessun branch, commit o deploy: non ho accesso a GitHub da qui.
+
+## Ladder, foto profilo e statistiche (migrazione 003)
+Nuova migrazione **003** (`black-market-ladder.sql`): si applica dopo la 001 e la 002, una sola volta, ed è "tutto o niente". Non modifica né cancella dati esistenti.
+
+- **Ladder** (menu ☰ › *Ladder*, oppure Black Market › *Ladder*): classifica Elo (si parte da 1000, K=32). Si sfida un duellante scegliendo il formato (Advanced, Traditional, GOAT, Edison); l'avversario accetta; dopo il duello **uno invia il risultato e l'altro lo conferma** (chi invia non può confermare da solo: era il difetto della vecchia ladder). Pareggi inclusi. Se l'avversario non è d'accordo può contestare e decide un amministratore (Admin › *Ladder: match da gestire*). Le sfide non accettate scadono dopo 7 giorni; massimo 5 sfide aperte a testa e 3 match al giorno tra gli stessi due. Un match concluso non si modifica più. La Ladder è **separata** dal Black Market: non muove BC, non tocca taglie né match ufficiali WPA. Si può spegnere da Admin › *Moduli aggiuntivi* (è attiva per impostazione iniziale).
+- **Profilo in dashboard**: nome, ruolo, foto (si sceglie dalla galleria o dalla fotocamera; viene ritagliata e ridotta a 128 px prima dell'invio, circa 5-10 KB, e salvata nel profilo) e statistiche personali: saldo, match ufficiali vinti/persi e %, eventi giocati, taglie su di te, lanciate e riscosse, Elo e posizione in Ladder. Dove non ci sono dati compare "n/d".
+- Il collegamento al database (`SUPABASE_URL` e chiave *anon public*) è già inserito in `black-market.html`. L'indirizzo deve essere solo `https://xxxx.supabase.co` (la barra finale va bene). Se un giorno sostituisci quel file, controlla che le due righe siano ancora compilate.
+
+**Come si applica**: Supabase › SQL Editor › incolla `black-market-ladder.sql` › Run (dopo aver fatto il backup da Admin). Poi carica su GitHub **tutti** i file dello zip. Senza la migrazione il Black Market funziona come prima, ma Ladder e foto profilo non sono disponibili (la Ladder resta nascosta e caricare la foto dà il messaggio di eseguire la migrazione).
+**Annullare**: `black-market-ladder-down.sql` (cancella la Ladder e le foto; eseguilo *prima* di `black-market-moduli-down.sql`, se mai userai anche quello).
+**Provato davvero**: i 9 gruppi di `black-market-ladder-test.sql` (calcolo Elo a mano, conferma solo dell'altro giocatore, mai contato due volte, contestazioni, limiti, scadenze, visibilità, interruttore lato database, nessun effetto su BC/match ufficiali/taglie) più i test 001 e 002 con la 003 applicata, su PostgreSQL 16 locale; prima/dopo la 003 l'impronta di tutte le tabelle del Black Market è identica; annullamento e riapplicazione riusciti. Interfaccia provata con Playwright e Supabase simulato (390 px). **Non provato**: su Supabase reale con più utenti; il ritaglio della foto con una vera foto del telefono.
 
 ## Stato verificato (19 ottobre 2026)
 **Provato davvero**

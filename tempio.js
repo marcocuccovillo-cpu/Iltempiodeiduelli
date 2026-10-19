@@ -5,6 +5,7 @@
     ['Home', 'index.html', '⌂', ''],
     ['Il Sentiero', 'sentiero.html', '✦', ''],
     ['Black Market', 'black-market.html', '◈', 'bm'],
+    ['Ladder', 'black-market.html#/ladder', '⚔', 'bm'],
     ['Gestisci torneo', 'gestisci-torneo.html', '♜', ''],
     ['Match Pro', 'match-pro.html', '⏱', ''],
     ['Deck Analyzer', 'deck-analyzer.html', '▤', '']
@@ -44,13 +45,20 @@
   function mount() {
     if (document.getElementById('tmCol')) return;
     var cur = here();
+    /* una voce con #… (es. Ladder) è la pagina corrente solo se l'indirizzo comincia con quel #; la voce senza # lo è negli altri casi */
+    function isCur(n) {
+      var f = n[1].split('#')[0], h = n[1].split('#')[1];
+      if (f !== cur) return false;
+      if (h) return location.hash.indexOf('#' + h) === 0;
+      return !NAV.some(function (m) { var mh = m[1].split('#')[1]; return m !== n && m[1].split('#')[0] === f && mh && location.hash.indexOf('#' + mh) === 0; });
+    }
     var links = NAV.map(function (n) {
-      return '<a class="' + n[3] + '" href="' + n[1] + '"' + (n[1] === cur ? ' aria-current="page"' : '') + '><i aria-hidden="true">' + n[2] + '</i>' + n[0] + '</a>';
+      return '<a class="' + n[3] + '" href="' + n[1] + '"' + (isCur(n) ? ' aria-current="page"' : '') + '><i aria-hidden="true">' + n[2] + '</i>' + n[0] + '</a>';
     }).join('');
     var col = document.createElement('aside');
     col.className = 'tm'; col.id = 'tmCol'; col.setAttribute('aria-label', 'Navigazione');
     col.innerHTML = '<div class="tm-h"><a class="tm-b" href="index.html"><img src="logo1.png" alt="Il Tempio Dei Duelli"></a><button class="tm-x" id="tmX" type="button">Chiudi menu</button></div>' +
-      '<nav class="tm-n">' + links + '<button type="button" class="tm-i" id="tmI"><i aria-hidden="true">⤓</i>Installa app</button></nav><div class="tm-f">Community Yu-Gi-Oh! · Bologna · v6</div>';
+      '<nav class="tm-n">' + links + '<button type="button" class="tm-i" id="tmI"><i aria-hidden="true">⤓</i>Installa app</button></nav><div class="tm-f">Community Yu-Gi-Oh! · Bologna · v7</div>';
     var bar = document.createElement('div');
     bar.className = 'tm-bar';
     bar.innerHTML = '<button type="button" id="tmT" aria-label="Apri il menu" aria-expanded="false" aria-controls="tmCol">☰</button><img src="tempio-mark.png" alt=""><span>Il Tempio Dei Duelli</span>';
@@ -63,6 +71,10 @@
       t.setAttribute('aria-expanded', v);
       (v ? x : t).focus();
     }
+    addEventListener('hashchange', function () {
+      var as = col.querySelectorAll('.tm-n a');
+      NAV.forEach(function (n, i) { if (isCur(n)) as[i].setAttribute('aria-current', 'page'); else as[i].removeAttribute('aria-current'); });
+    });
     document.getElementById('tmI').onclick = function () { set(false); install(); };
     refreshInstall();
     t.onclick = function () { set(true); };

@@ -9,7 +9,8 @@
 window.BM_MODULES = function (BM) {
   'use strict';
   const { R, shell, q, rpc, toast, esc, BC, when, av, pn, ask } = BM;
-  const MODS = [['hall_of_fame', 'Hall of Fame', 'hof'], ['faction_wars', 'Faction Wars', 'factions'], ['underground', 'Underground', 'challenges']];
+  const ROLE = { user: 'Duellante', organizer: 'Organizzatore', admin: 'Amministratore' };
+  const MODS = [['ladder', 'Ladder', 'ladder'], ['hall_of_fame', 'Hall of Fame', 'hof'], ['faction_wars', 'Faction Wars', 'factions'], ['underground', 'Underground', 'challenges']];
   const on = k => BM.S['module_' + k] == 1;
   const isOrg = () => BM.me && BM.me.role !== 'user';
   const isAdm = () => BM.me && BM.me.role === 'admin';
@@ -196,6 +197,96 @@ window.BM_MODULES = function (BM) {
     } catch (er) { fail(er, 'challenges') }
   };
 
+
+  /* ============== PROFILO IN DASHBOARD: avatar + statistiche personali ============== */
+  const tile = (v, l) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`;
+  BM.dashHero = async () => {
+    const me = BM.me, sb = BM.sb, id = me.id;
+    let tiles = '', note = '';
+    try {
+      const [ms, bs, ss, mw, lad] = await Promise.all([
+        q(sb.from('matches').select('event_id,winner_id').eq('status', 'verified').or(`player_a.eq.${id},player_b.eq.${id}`)),
+        q(sb.from('bounties').select('amount,status').eq('creator_id', id)),
+        q(sb.from('bounty_settlements').select('payout').eq('winner_id', id)),
+        q(sb.from('most_wanted_v').select('bounty_value,active_count').eq('id', id)),
+        on('ladder') ? q(sb.from('ladder_standings_v').select('*').eq('user_id', id)) : Promise.resolve([])]);
+      const w = ms.filter(m => m.winner_id === id).length, l = ms.length - w, ev = new Set(ms.map(m => m.event_id)).size;
+      const placed = bs.filter(b => b.status !== 'cancelled'), got = ss.reduce((t, x) => t + x.payout, 0);
+      tiles = tile(BC(BM.wallet), 'Saldo') +
+        tile(ms.length ? `${w}V · ${l}S` : 'n/d', 'Match ufficiali' + (ms.length ? ` · ${pct(w, l)}` : '')) +
+        tile(ev || 'n/d', 'Eventi giocati') +
+        tile(mw[0] ? BC(mw[0].bounty_value) : '0 BC', 'Taglie su di te' + (mw[0] ? ` (${mw[0].active_count})` : '')) +
+        tile(placed.length, 'Taglie lanciate' + (placed.length ? ` · ${BC(placed.reduce((t, b) => t + b.amount, 0))}` : '')) +
+        tile(ss.length, 'Taglie riscosse' + (ss.length ? ` · ${BC(got)}` : ''));
+      if (on('ladder')) tiles += tile(lad[0] ? lad[0].elo : 'n/d', 'Elo Ladder' + (lad[0] ? ` · #${lad[0].rank} · ${lad[0].wins}V ${lad[0].draws}P ${lad[0].losses}S` : ' · non ancora classificato'));
+    } catch (er) { note = `<p class="mute">Statistiche non disponibili: ${esc(er.message)}</p>` }
+    return `<div class="box" style="margin-top:22px"><div style="display:flex;gap:16px;align-items:center">${av(me).replace('class="av"', 'class="av xl"')}<div style="min-width:0;flex:1"><h2 style="margin:0;font-size:1.6rem;color:var(--tx);overflow-wrap:anywhere">${esc(me.nickname)}</h2><span class="tag">${ROLE[me.role]}</span>
+      <div class="row" style="margin-top:10px"><button class="btn ghost sm" data-act="avPick">${me.avatar_img ? 'Cambia foto' : 'Aggiungi foto'}</button>${me.avatar_img ? '<button class="btn ghost sm" data-act="avDel">Rimuovi foto</button>' : ''}<input id="avf" type="file" accept="image/*" hidden></div></div></div>
+      <div class="stats" style="margin-top:16px">${tiles}</div>${note}<p class="mute" style="font-size:.85rem;margin:12px 0 0">Statistiche calcolate dai match ufficiali verificati, dalle taglie e dalla Ladder. Dove non ci sono dati compare “n/d”.</p></div>`;
+  };
+  const toAvatar = async file => {
+    let bmp;
+    try { bmp = await createImageBitmap(file) } catch (e) { throw new Error('Formato immagine non supportato: scegli una foto JPG o PNG') }
+    const N = 128, c = document.createElement('canvas'); c.width = c.height = N;
+    const side = Math.min(bmp.width, bmp.height), sx = (bmp.width - side) / 2, sy = (bmp.height - side) / 2, g = c.getContext('2d');
+    g.fillStyle = '#000'; g.fillRect(0, 0, N, N); g.drawImage(bmp, sx, sy, side, side, 0, 0, N, N);
+    let url = '';
+    for (const qa of [0.85, 0.72, 0.58, 0.45]) { url = c.toDataURL('image/jpeg', qa); if (url.length <= 22000) break }
+    if (url.length > 22000) throw new Error('Immagine troppo complessa: scegline un\'altra');
+    return url;
+  };
+  const avErr = er => /could not find the function|schema cache/i.test(er.message) ? new Error('Funzione non trovata: esegui prima la migrazione black-market-ladder.sql') : er;
+  document.addEventListener('change', async e => {
+    if (!e.target || e.target.id !== 'avf' || !e.target.files || !e.target.files[0]) return;
+    try { const img = await toAvatar(e.target.files[0]); await rpc('set_my_avatar_img', { p_img: img }).catch(er => { throw avErr(er) }); await BM.core(); toast('Foto del profilo aggiornata.'); BM.route() }
+    catch (er) { toast(er.message, 1) }
+  });
+
+  /* =================================== LADDER =================================== */
+  const FMT = ['Advanced', 'Traditional', 'GOAT', 'Edison'];
+  const LST = { pending: ['In attesa', ''], accepted: ['Da giocare', 'g'], reported: ['Da confermare', 'g'], disputed: ['Contestato', 'r'], closed: ['Concluso', 'g'], declined: ['Rifiutata', 'r'], cancelled: ['Annullata', 'r'], expired: ['Scaduta', 'r'], voided: ['Annullato', 'r'] };
+  const ldHead = '<h1 class="t">La <em>Ladder</em></h1><p class="sub">Sfide dirette con classifica Elo. Parti da 1000: vincere contro chi è più forte vale di più. Il risultato lo invia uno e lo <b>conferma l\'altro</b>. La Ladder è separata dai match ufficiali WPA e non muove Black Credits.</p>';
+  const outcomeOpts = m => `<option value="challenger|2-0">Vince ${esc(pn(m.challenger_id))} 2-0</option><option value="challenger|2-1">Vince ${esc(pn(m.challenger_id))} 2-1</option><option value="opponent|0-2">Vince ${esc(pn(m.opponent_id))} 2-0</option><option value="opponent|1-2">Vince ${esc(pn(m.opponent_id))} 2-1</option><option value="draw|1-1">Pareggio 1-1</option>`;
+  const outcomeText = m => m.reported_result === 'draw' ? 'pareggio 1-1' : `ha vinto ${esc(pn(m.reported_result === 'challenger' ? m.challenger_id : m.opponent_id))} ${m.reported_result === 'challenger' ? m.reported_score : m.reported_score.split('-').reverse().join('-')}`;
+  const dlt = n => `<span class="${n >= 0 ? 'pos' : 'neg'}">${n >= 0 ? '+' : ''}${n}</span>`;
+  const lrow = (m, extra) => `<div class="row2"><div class="g">${esc(pn(m.challenger_id))} <span class="mute">vs</span> ${esc(pn(m.opponent_id))}<small>${esc(m.format)} · ${when(m.created_at)}${m.message ? ' · “' + esc(m.message) + '”' : ''}${m.status === 'reported' ? ' · ' + outcomeText(m) : ''}${m.dispute_reason ? ' · contestazione: ' + esc(m.dispute_reason) : ''}</small></div>${tag(LST[m.status][0], LST[m.status][1])}${extra || ''}</div>`;
+
+  R.ladder = async () => {
+    if (!on('ladder')) return off('La <em>Ladder</em>', 'ladder');
+    shell(ldHead + loading, 'ladder');
+    try {
+      try { await rpc('ladder_expire', {}) } catch (e) { /* manutenzione */ }
+      const sb = BM.sb, me = BM.me;
+      const [st, ms] = await Promise.all([q(sb.from('ladder_standings_v').select('*').order('rank').limit(100)), q(sb.from('ladder_matches').select('*').order('created_at', { ascending: false }).limit(200))]);
+      const mine = st.find(r => r.user_id === me.id), isMine = m => m.challenger_id === me.id || m.opponent_id === me.id;
+      const incoming = ms.filter(m => m.status === 'pending' && m.opponent_id === me.id);
+      const outgoing = ms.filter(m => m.status === 'pending' && m.challenger_id === me.id);
+      const toPlay = ms.filter(m => m.status === 'accepted' && isMine(m));
+      const toConfirm = ms.filter(m => m.status === 'reported' && isMine(m));
+      const disputed = ms.filter(m => m.status === 'disputed' && isMine(m));
+      const closed = ms.filter(m => m.status === 'closed').sort((a, b) => new Date(b.closed_at) - new Date(a.closed_at)).slice(0, 15);
+      const elo = new Map(st.map(r => [r.user_id, r.elo]));
+      const cand = [...BM.P.values()].filter(p => p.id !== me.id && !p.suspended).sort((a, b) => a.nickname.localeCompare(b.nickname));
+      shell(`${ldHead}
+      <div class="box" style="margin-top:18px"><div class="row" style="gap:16px">${av(me)}<div class="g"><b>${esc(me.nickname)}</b><small class="mute" style="display:block">${mine ? `${mine.wins}V · ${mine.draws}P · ${mine.losses}S · ${mine.matches} match` : 'Non ancora classificato: gioca il tuo primo match'}</small></div><span class="val">${mine ? mine.elo + ' <small>Elo</small>' : '1000 <small>Elo</small>'}</span>${mine ? tag('#' + mine.rank, 'g') : ''}</div></div>
+      <form id="ldnew" class="box row" style="margin-top:14px" data-rq="${crypto.randomUUID()}"><select id="ldo" required aria-label="Avversario" style="flex:1;min-width:170px"><option value="">Sfida un duellante…</option>${cand.map(p => `<option value="${p.id}">${esc(p.nickname)} · ${elo.has(p.id) ? elo.get(p.id) + ' Elo' : 'non classificato'}</option>`).join('')}</select>
+        <select id="ldf" aria-label="Formato">${FMT.map(f => `<option>${f}</option>`).join('')}</select><input id="ldm" maxlength="140" placeholder="Messaggio (facoltativo)" style="flex:2;min-width:170px"><button class="btn gold" type="submit">Lancia la sfida</button></form>
+      ${incoming.length ? `<div class="box" style="margin-top:14px"><h2>Ti hanno sfidato (${incoming.length})</h2>${incoming.map(m => lrow(m, `<button class="btn gold sm" data-act="ldAcc" data-c="${m.id}">Accetta</button><button class="btn ghost sm" data-act="ldDec" data-c="${m.id}">Rifiuta</button>`)).join('')}</div>` : ''}
+      ${toPlay.length ? `<div class="box" style="margin-top:14px"><h2>Da giocare (${toPlay.length})</h2><p class="mute" style="font-size:.9rem;margin-top:0">Dopo il duello, uno dei due invia il risultato; l'altro lo conferma.</p>${toPlay.map(m => lrow(m, `<select id="lr-${m.id}" aria-label="Risultato">${outcomeOpts(m)}</select><button class="btn sm" data-act="ldRep" data-c="${m.id}">Invia risultato</button><button class="btn ghost sm" data-act="ldCan" data-c="${m.id}">Annulla</button>`)).join('')}</div>` : ''}
+      ${toConfirm.length ? `<div class="box" style="margin-top:14px"><h2>Risultati da confermare (${toConfirm.length})</h2>${toConfirm.map(m => lrow(m, m.reported_by === me.id ? '<small class="mute">attende la conferma dell\'avversario</small>' : `<button class="btn gold sm" data-act="ldConf" data-c="${m.id}">Conferma</button><button class="btn ghost sm" data-act="ldDisp" data-c="${m.id}">Contesta</button>`)).join('')}</div>` : ''}
+      ${disputed.length ? `<div class="box" style="margin-top:14px"><h2>Contestati</h2><p class="mute" style="font-size:.9rem;margin-top:0">Decide un amministratore.</p>${disputed.map(m => lrow(m)).join('')}</div>` : ''}
+      ${outgoing.length ? `<div class="box" style="margin-top:14px"><h2>Sfide inviate</h2>${outgoing.map(m => lrow(m, `<button class="btn ghost sm" data-act="ldCan" data-c="${m.id}">Annulla</button>`)).join('')}</div>` : ''}
+      <div class="box" style="margin-top:14px"><h2>Classifica</h2><input id="lds" type="search" placeholder="Cerca giocatore…" aria-label="Cerca giocatore" style="margin-bottom:8px">${st.map(r => `<div class="row2 ldr" data-n="${esc(r.nickname.toLowerCase())}"><span class="rank">${r.rank}</span>${av(BM.P.get(r.user_id) || { nickname: r.nickname, avatar: r.avatar })}<div class="g"><a href="#/p/${r.user_id}">${esc(r.nickname)}</a><small>${r.wins}V · ${r.draws}P · ${r.losses}S</small></div><span class="val">${r.elo}</span>${r.user_id !== me.id ? `<button class="btn ghost sm" data-act="ldPick" data-u="${r.user_id}">Sfida</button>` : ''}</div>`).join('') || empty('Nessun match concluso: la classifica comparirà dopo il primo risultato confermato.')}</div>
+      <div class="box" style="margin-top:14px"><h2>Ultimi risultati</h2>${closed.map(m => { const dr = m.reported_result === 'draw', wn = m.reported_result === 'challenger' ? m.challenger_id : m.opponent_id, ls = wn === m.challenger_id ? m.opponent_id : m.challenger_id; return `<div class="row2"><div class="g">${dr ? esc(pn(m.challenger_id)) + ' e ' + esc(pn(m.opponent_id)) + ' pareggiano' : esc(pn(wn)) + ' ha battuto ' + esc(pn(ls))}<small>${esc(m.format)} · ${when(m.closed_at)} · ${esc(pn(m.challenger_id))} ${dlt(m.elo_challenger_delta)} · ${esc(pn(m.opponent_id))} ${dlt(m.elo_opponent_delta)}</small></div></div>` }).join('') || empty('Ancora nessun risultato.')}</div>`, 'ladder');
+      const f = document.getElementById('ldnew');
+      f.onsubmit = async e => { e.preventDefault(); const b = f.querySelector('button[type=submit]'); b.disabled = true;
+        try { await rpc('ladder_challenge', { p_opponent: f.ldo.value, p_format: f.ldf.value, p_message: f.ldm.value || null, p_request_id: f.dataset.rq }); toast('Sfida lanciata.'); BM.route() }
+        catch (er) { toast(er.message, 1); b.disabled = false } };
+      const sInp = document.getElementById('lds');
+      sInp.oninput = () => { const t = sInp.value.trim().toLowerCase(); document.querySelectorAll('.ldr').forEach(r => r.hidden = !!t && !r.dataset.n.includes(t)) };
+    } catch (er) { fail(er, 'ladder') }
+  };
+
   /* ============================== AZIONI (clic) ============================== */
   const done = async (msg) => { toast(msg); await BM.core(); BM.route() };
   const ACT = {
@@ -210,6 +301,17 @@ window.BM_MODULES = function (BM) {
     chCan: async el => { if (!confirm('Annullare la sfida?')) return; await rpc('cancel_challenge', { p_id: el.dataset.c }); await done('Sfida annullata.') },
     chLink: async el => { const m = document.getElementById('lm-' + el.dataset.c).value; await rpc('link_challenge_match', { p_id: el.dataset.c, p_match: m }); await done('Match collegato. La sfida è in corso.') },
     chDone: async el => { if (!confirm('Confermare la sfida? Il risultato ufficiale è quello già verificato nell\'evento.')) return; await rpc('complete_challenge', { p_id: el.dataset.c }); await done('Sfida completata.') },
+    avPick: async () => { const i = document.getElementById('avf'); if (i) i.click() },
+    avDel: async () => { if (!confirm('Rimuovere la foto del profilo?')) return; await rpc('set_my_avatar_img', { p_img: null }).catch(er => { throw avErr(er) }); await BM.core(); toast('Foto rimossa.'); BM.route() },
+    ldAcc: async el => { await rpc('ladder_respond', { p_id: el.dataset.c, p_accept: true }); await done('Sfida accettata: ora giocate e inviate il risultato.') },
+    ldDec: async el => { if (!confirm('Rifiutare la sfida?')) return; await rpc('ladder_respond', { p_id: el.dataset.c, p_accept: false }); await done('Sfida rifiutata.') },
+    ldCan: async el => { if (!confirm('Annullare la sfida?')) return; await rpc('ladder_cancel', { p_id: el.dataset.c }); await done('Sfida annullata.') },
+    ldRep: async el => { const [r, sc] = document.getElementById('lr-' + el.dataset.c).value.split('|'); await rpc('ladder_report', { p_id: el.dataset.c, p_result: r, p_score: sc }); await done('Risultato inviato: ora deve confermarlo l\'avversario.') },
+    ldConf: async el => { const r = await rpc('ladder_confirm', { p_id: el.dataset.c }); await done(`Risultato confermato. Elo: ${r.challenger_delta >= 0 ? '+' : ''}${r.challenger_delta} / ${r.opponent_delta >= 0 ? '+' : ''}${r.opponent_delta}.`) },
+    ldDisp: async el => { const r = ask('Perché contesti il risultato? (almeno 5 caratteri)'); if (!r) return; await rpc('ladder_dispute', { p_id: el.dataset.c, p_reason: r }); await done('Contestazione inviata: deciderà un amministratore.') },
+    ldPick: async el => { const f = document.getElementById('ldo'); if (f) { f.value = el.dataset.u; f.scrollIntoView({ behavior: 'smooth', block: 'center' }); f.focus() } },
+    ldAdmRes: async el => { const sel = document.getElementById('lar-' + el.dataset.c).value.split('|'); const r = ask('Motivazione della decisione:'); if (!r) return; await rpc('admin_ladder_resolve', { p_id: el.dataset.c, p_result: sel[0], p_score: sel[1], p_reason: r }); await done('Match risolto e Elo aggiornato.') },
+    ldAdmVoid: async el => { if (!confirm('Annullare il match senza modificare l\'Elo?')) return; const r = ask('Motivazione dell\'annullamento:'); if (!r) return; await rpc('admin_ladder_void', { p_id: el.dataset.c, p_reason: r }); await done('Match annullato.') },
     /* amministrazione */
     modTog: async el => { const r = ask((el.dataset.on === '1' ? 'Motivazione dell\'attivazione' : 'Motivazione della disattivazione') + ' del modulo:'); if (!r) return; await rpc('admin_set_module', { p_module: el.dataset.m, p_enabled: el.dataset.on === '1', p_reason: r }); await done('Modulo aggiornato.') },
     seasonNew: async () => { const f = document.getElementById('sn'); if (!f.reportValidity()) return; const r = ask('Motivazione:'); if (!r) return; await rpc('admin_create_season', { p_name: f.sname.value, p_start: f.sfrom.value, p_end: f.sto.value, p_reason: r }); await done('Stagione creata.') },
@@ -227,15 +329,16 @@ window.BM_MODULES = function (BM) {
   BM.adminExt = async box => {
     box.innerHTML = '<div class="box" style="margin-top:14px"><h2>Moduli aggiuntivi</h2>' + loading + '</div>';
     try {
-      const sb = BM.sb, anyOn = MODS.some(m => on(m[0]));
-      const [ss, fs, mem, sm, ex, ch, au] = await Promise.all([
+      const sb = BM.sb, anyOn = on('hall_of_fame') || on('faction_wars');
+      const [ss, fs, mem, sm, ex, ch, au, lad] = await Promise.all([
         anyOn ? q(sb.from('seasons').select('*').order('starts_on', { ascending: false })) : [],
         on('faction_wars') ? q(sb.from('factions').select('*').order('created_at')) : [],
         on('faction_wars') ? q(sb.from('faction_members').select('user_id,faction_id').is('left_at', null)) : [],
         on('faction_wars') ? q(sb.from('faction_scored_matches_v').select('*').order('verified_at', { ascending: false }).limit(20)) : [],
         on('faction_wars') ? q(sb.from('faction_match_exclusions').select('*').order('created_at', { ascending: false }).limit(20)) : [],
         on('underground') ? q(sb.from('challenges_v').select('*').in('status', ['pending', 'accepted', 'in_progress']).order('created_at', { ascending: false }).limit(50)) : [],
-        q(sb.from('audit_logs').select('*').in('action', ['set_module', 'create_season', 'create_faction', 'rename_faction', 'disband_faction', 'join_faction', 'leave_faction', 'kick_member', 'move_faction_member', 'transfer_leadership', 'update_faction', 'exclude_match_from_factions', 'include_match_in_factions', 'create_challenge', 'accept_challenge', 'decline_challenge', 'cancel_challenge', 'admin_cancel_challenge', 'link_challenge_match', 'complete_challenge', 'expire_challenges']).order('id', { ascending: false }).limit(30))]);
+        q(sb.from('audit_logs').select('*').in('action', ['set_module', 'create_season', 'create_faction', 'rename_faction', 'disband_faction', 'join_faction', 'leave_faction', 'kick_member', 'move_faction_member', 'transfer_leadership', 'update_faction', 'exclude_match_from_factions', 'include_match_in_factions', 'create_challenge', 'accept_challenge', 'decline_challenge', 'cancel_challenge', 'admin_cancel_challenge', 'link_challenge_match', 'complete_challenge', 'expire_challenges', 'ladder_challenge', 'ladder_accept', 'ladder_decline', 'ladder_cancel', 'ladder_report', 'ladder_confirm', 'ladder_dispute', 'admin_ladder_resolve', 'admin_ladder_void', 'ladder_expire']).order('id', { ascending: false }).limit(30)),
+        on('ladder') ? q(sb.from('ladder_matches').select('*').in('status', ['pending', 'accepted', 'reported', 'disputed']).order('created_at', { ascending: false }).limit(60)) : []]);
       const act = fs.filter(f => f.status === 'active'), users = [...BM.P.values()].sort((a, b) => a.nickname.localeCompare(b.nickname));
       const fname = Object.fromEntries(fs.map(f => [f.id, f.name])), inF = new Set(mem.map(m => m.user_id));
       box.innerHTML = `<div class="box" style="margin-top:14px"><h2>Moduli aggiuntivi</h2><p class="mute" style="font-size:.92rem">Gli interruttori sono verificati anche dal database: a modulo spento le operazioni vengono rifiutate. Ogni cambio chiede una motivazione ed è registrato nell'audit.</p>
@@ -246,6 +349,7 @@ window.BM_MODULES = function (BM) {
         ${act.length ? `<div class="row" style="margin-top:10px"><select id="mvu" aria-label="Duellante"><option value="">Sposta duellante…</option>${users.map(u => `<option value="${u.id}">${esc(u.nickname)}${inF.has(u.id) ? ' (in una fazione)' : ''}</option>`).join('')}</select><select id="mvf" aria-label="Fazione di destinazione"><option value="">verso la fazione…</option>${act.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select><button class="btn sm" data-act="afMove">Sposta</button></div>` : ''}</div>
         <div class="grid c2" style="margin-top:14px"><div class="box"><h2>Match che danno punti (ultimi 20)</h2>${sm.map(m => `<div class="row2"><div class="g">${esc(pn(m.winner_id))} → ${esc(fname[m.faction_id] || 'fazione')}<small>${day(m.verified_at)} · +${m.points}</small></div><button class="btn ghost sm" data-act="afExc" data-m="${m.match_id}">Escludi</button></div>`).join('') || empty('Nessuno.')}</div>
         <div class="box"><h2>Match esclusi dal punteggio</h2>${ex.map(x => `<div class="row2"><div class="g">${esc(x.reason)}<small>${day(x.created_at)}</small></div><button class="btn ghost sm" data-act="afInc" data-m="${x.match_id}">Reintegra</button></div>`).join('') || empty('Nessuna esclusione.')}</div></div>` : ''}
+      ${on('ladder') ? `<div class="box" style="margin-top:14px"><h2>Ladder: match da gestire (${lad.length})</h2><p class="mute" style="font-size:.9rem;margin-top:0">Risolvi i contestati o i risultati fermi; annulla le sfide abbandonate. L'Elo cambia solo quando un match viene chiuso.</p>${lad.map(m => lrow(m, (m.status === 'reported' || m.status === 'disputed' || m.status === 'accepted' ? `<select id="lar-${m.id}" aria-label="Esito">${outcomeOpts(m)}</select><button class="btn sm" data-act="ldAdmRes" data-c="${m.id}">Risolvi</button>` : '') + `<button class="btn ghost sm" data-act="ldAdmVoid" data-c="${m.id}">Annulla</button>`)).join('') || empty('Nessun match da gestire.')}</div>` : ''}
       ${on('underground') ? `<div class="box" style="margin-top:14px"><h2>Moderazione sfide aperte (${ch.length})</h2>${ch.map(c => chRow(c, `<button class="btn ghost sm" data-act="acCan" data-c="${c.id}">Annulla</button>`)).join('') || empty('Nessuna sfida aperta.')}</div>` : ''}
       <div class="box" style="margin-top:14px"><h2>Audit dei moduli (ultimi 30)</h2>${au.map(a => `<div class="row2"><div class="g"><b>${esc(a.action)}</b> · ${esc(pn(a.actor_id))}<small>${when(a.created_at)}${a.reason ? ' · ' + esc(a.reason) : ''}</small></div></div>`).join('') || empty('Nessun evento registrato.')}</div>`;
     } catch (er) {
