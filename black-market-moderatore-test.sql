@@ -138,8 +138,6 @@ begin
   assert pg_temp.err_as('Mod', format('select public.create_match(%L, 1, %L, %L)', ev, pg_temp.uid('Marco'), pg_temp.uid('Luca'))) like '%Permessi insufficienti%', 'P3: non crea match';
   assert pg_temp.err_as('Mod', format('select public.verify_match(%L, %L)', gen_random_uuid(), pg_temp.uid('Luca'))) like '%Permessi insufficienti%', 'P3: verify_match resta degli organizzatori (usa mod_verify_match)';
   assert pg_temp.err_as('Mod', 'select public.admin_export()') like '%Permessi insufficienti%', 'P3: niente esportazione dei dati';
-  assert pg_temp.err_as('Mod', format('select public.admin_cancel_bounty(%L, ''annullamento non autorizzato'')', gen_random_uuid())) like '%Permessi insufficienti%', 'P3: non annulla taglie';
-  assert pg_temp.err_as('Mod', format('select public.admin_set_bounty_review(%L, true, ''revisione non autorizzata'')', gen_random_uuid())) like '%Permessi insufficienti%', 'P3: non congela taglie';
   assert pg_temp.err_as('Mod', format('select public.resolve_dispute(%L, ''chiusura non autorizzata'')', gen_random_uuid())) like '%Permessi insufficienti%', 'P3: non chiude le contestazioni generiche';
   assert pg_temp.err_as('Mod', 'select public.admin_create_season(''Stagione'', current_date, current_date, ''creazione non autorizzata'')') like '%Permessi insufficienti%', 'P3: niente stagioni (moduli)';
   assert pg_temp.rows_as('Mod', 'select * from public.audit_logs') = 0, 'P3: non legge l''audit';
@@ -148,7 +146,7 @@ begin
   assert pg_temp.rows_as('Mod', format('select * from public.ledger_entries where user_id = %L', pg_temp.uid('Mod'))) >= 2, 'P3: vede i propri movimenti';
   assert (select md5(string_agg(user_id || ':' || balance, ',' order by user_id)) from public.wallets) = t0, 'P3: nessun saldo è cambiato';
   assert pg_temp.err_as('Org', 'select public.admin_ladder_void(gen_random_uuid(), ''prova senza permessi'')') like '%Permessi insufficienti%' and pg_temp.err_as('Marco', 'select public.admin_set_suspended(gen_random_uuid(), true, ''prova senza permessi'')') like '%Permessi insufficienti%', 'P3: organizzatori e duellanti restano senza i poteri di moderazione';
-  insert into t_log (msg) values ('OK P3 — il moderatore non può gestire moduli, crediti, impostazioni, ruoli, eventi, taglie, esportazioni, audit né vedere i saldi altrui');
+  insert into t_log (msg) values ('OK P3 — il moderatore non può gestire moduli, crediti, impostazioni, ruoli, eventi, esportazioni, audit né vedere i saldi altrui (le taglie sono coperte dal test 006)');
 end $$;
 
 -- P4 — Verifica dei match ufficiali
