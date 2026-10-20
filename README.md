@@ -26,7 +26,7 @@ Sito/PWA della community Yu-Gi-Oh! di Bologna. Funziona su GitHub Pages: **tutti
 | `black-market-shop.js`, `shop-art.js` | Pagina Black Market Shop (catalogo, collezione, conferma d'acquisto, gestione catalogo per gli admin) e grafica dei premi: pet, cornici, aure, emblemi, effetti, titoli, tutti in SVG/CSS |
 | `black-market-shop.sql`, `black-market-shop-test.sql`, `black-market-shop-down.sql` | Migrazione 008: catalogo, acquisti, equipaggiamento, 39 premi iniziali, relativi test e annullamento |
 | `black-market-caccia.js` | Caccia alle taglie: pulsante «Sfida» su Most Wanted, dashboard e profilo, pagina `#/hunt` (ricercati e taglie da riscuotere) e `#/hunt/<duellante>` (lancio della sfida in Ladder) |
-| `black-market-notifiche.js` | Pagina Notifiche (`#/notifiche`): elenco, contatore nel menu, preferenze, attivazione delle push su questo dispositivo, notifica di prova, chiave VAPID per l'admin |
+| `black-market-notifiche.js` | Pagina Notifiche (`#/notifiche`): elenco, preferenze, attivazione delle push su questo dispositivo, notifica di prova, chiave VAPID per l'admin |
 | `black-market-notifiche.sql`, `black-market-notifiche-test.sql`, `black-market-notifiche-down.sql` | Migrazione 009: notifiche (taglia ricevuta, sfida in Ladder, sfida per la taglia), preferenze, dispositivi push, relativi test e annullamento |
 | `send-push.ts` | Edge Function di Supabase che invia le push. **Non è una pagina del sito**: si incolla in Supabase (vedi sotto) |
 | `black-market-moduli.sql`, `black-market-moduli-test.sql`, `black-market-moduli-down.sql` | Migrazione 002 dei tre moduli, relativi test e annullamento |
@@ -160,7 +160,7 @@ I punti Tempio (Bronzo 1, Argento 3, Oro 6, Leggenda 10, speciali 5) fanno salir
 **Regole: nessuna nuova.** La sfida è una sfida Ladder; lo sfidato può accettare, rifiutare o lasciarla scadere (la taglia resta dov'è). Se si vince, il match Ladder verificato è un match WPA ufficiale e, dopo l'attesa anti-accordi (`ladder_claim_hold_hours`, 24 ore), la taglia si riscuote con la normale `claim_bounty`. Il browser non calcola né scrive importi. Serve il modulo Ladder acceso (altrimenti la pagina lo spiega).
 
 ## Notifiche push (migrazione 009)
-**Cosa arriva.** Una notifica quando qualcuno: (1) mette una **taglia** su di te, (2) ti **sfida in Ladder**, (3) ti sfida **per riscuotere la taglia** che hai addosso. La notifica della taglia non dice mai chi l'ha messa. Ognuno sceglie cosa ricevere dalla pagina Notifiche. Le notifiche **dentro l'app** (elenco + contatore nel menu) funzionano appena esegui la migrazione; le **push ad app chiusa** richiedono la configurazione qui sotto (una volta sola).
+**Cosa arriva.** Una notifica quando qualcuno: (1) mette una **taglia** su di te, (2) ti **sfida in Ladder**, (3) ti sfida **per riscuotere la taglia** che hai addosso. La notifica della taglia non dice mai chi l'ha messa. In alto a destra, su ogni schermata del Black Market, c'è la **campanella** con il numero delle notifiche non lette: toccandola si apre la pagina Notifiche, dove ognuno sceglie cosa ricevere. Le notifiche **dentro l'app** (elenco + contatore nel menu) funzionano appena esegui la migrazione; le **push ad app chiusa** richiedono la configurazione qui sotto (una volta sola).
 
 **Come funziona.** Trigger del database → riga in `notifications` → Database Webhook → Edge Function `send-push` → Web Push (VAPID). Un errore nelle notifiche non blocca mai una taglia o una sfida. Nessuna notifica muove BC.
 

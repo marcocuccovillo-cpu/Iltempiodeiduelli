@@ -2,7 +2,7 @@
    BLACK MARKET — NOTIFICHE (migrazione 009)
    Pagina #/notifiche: elenco delle notifiche (taglia ricevuta, sfida in Ladder, sfida per la taglia),
    cosa ricevere, attivazione delle notifiche PUSH su questo dispositivo, notifica di prova.
-   Nel menu compare «Notifiche» con il numero di quelle non lette.
+   In alto a destra c'è la campanella con il numero delle notifiche non lette.
    Le notifiche nascono nel database (trigger); le push le invia la Edge Function send-push.
    Se la migrazione manca, la voce di menu non compare e il resto del Black Market non cambia.
    ===================================================================== */
@@ -14,10 +14,18 @@ window.BM_NOTIF = function (BM) {
   const present = () => BM.S && BM.S.notifications_enabled !== undefined;
   const on = () => present() && BM.S.notifications_enabled === 1;
 
-  /* ---------- menu con contatore ---------- */
-  let unread = 0, last = null, lastAt = 0;
-  const badge = n => n > 0 ? ` <span class="nb" aria-label="${n} non lette">${n > 99 ? '99+' : n}</span>` : '';
-  const paint = () => { const a = document.querySelector('.bm-nav a[href="#/notifiche"]'); if (a) a.innerHTML = 'Notifiche' + badge(unread) };
+  /* ---------- campanella in alto a destra, con il numero delle non lette ---------- */
+  let unread = 0, last = null, lastAt = 0, bell = null;
+  const BELL = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>';
+  const paint = () => {
+    if (!bell) return;
+    const show = on() && !!BM.me; bell.hidden = !show; document.documentElement.classList.toggle('has-bell', show); if (!show) return;
+    const t = unread > 99 ? '99+' : String(unread), cur = location.hash.indexOf('#/notifiche') === 0, key = t + '|' + cur;
+    if (bell.dataset.k === key) return; bell.dataset.k = key;   // nessun ridisegno se non è cambiato nulla
+    bell.setAttribute('aria-label', unread > 0 ? `Notifiche: ${unread} non lette` : 'Notifiche');
+    bell.innerHTML = BELL + (unread > 0 ? `<span class="nb" aria-hidden="true">${t}</span>` : '');
+    if (cur) bell.setAttribute('aria-current', 'page'); else bell.removeAttribute('aria-current');
+  };
   async function refresh(force) {
     if (!on() || !BM.me || (!force && Date.now() - lastAt < 20000)) return;
     lastAt = Date.now();
@@ -27,14 +35,22 @@ window.BM_NOTIF = function (BM) {
       last = unread = n; paint();
     } catch (e) { /* offline o migrazione assente: nessun rumore */ }
   }
-  BM.navItems = (prev => () => { refresh(); return [...(prev ? prev() : []), ...(on() ? [['notifiche', 'Notifiche' + badge(unread)]] : [])] })(BM.navItems);
-  setInterval(() => { if (!document.hidden) refresh(true) }, 60000);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(true) });
   const css = document.createElement('style');
-  css.textContent = `.nb{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;margin-left:6px;border-radius:99px;background:var(--ac);color:#fff;font:700 .72rem var(--ui)}
+  css.textContent = `.nf-bell{position:fixed;top:5px;right:10px;z-index:950;display:grid;place-items:center;width:46px;height:46px;padding:0;border-radius:12px;border:1px solid var(--line);background:rgba(3,8,22,.92);color:var(--cy2);cursor:pointer;backdrop-filter:blur(8px)}
+.nf-bell[hidden]{display:none}.nf-bell:hover,.nf-bell[aria-current]{border-color:var(--ac);color:var(--ac)}
+.nb{position:absolute;top:-6px;right:-6px;display:grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:99px;border:2px solid #030816;background:#e5304a;color:#fff;font:700 .72rem var(--ui);line-height:1;box-sizing:content-box}
+@media(min-width:720px){.nf-bell{top:14px;right:18px}html.has-bell .bm-nav{margin-right:56px}}
 .nf-item{border-left:3px solid transparent;padding-left:10px}.nf-item.un{border-left-color:var(--gold);background:rgba(212,168,67,.06)}
 .nf-item b{color:var(--tx)}.nf-st{display:flex;gap:10px;align-items:center;flex-wrap:wrap}`;
   document.head.appendChild(css);
+  bell = document.createElement('button'); bell.type = 'button'; bell.className = 'nf-bell'; bell.hidden = true; bell.setAttribute('aria-label', 'Notifiche');
+  bell.onclick = () => { location.hash = '#/notifiche' };
+  document.body.appendChild(bell);
+  BM.navItems = (prev => () => { refresh(); paint(); return prev ? prev() : [] })(BM.navItems);
+  setInterval(() => { if (!document.hidden) refresh(true) }, 60000);
+  setInterval(paint, 1500);   // la campanella sparisce da sola quando si esce dall'account
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(true) });
+  window.addEventListener('hashchange', paint);
 
   /* ---------- push: stato di questo dispositivo ---------- */
   const supported = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
@@ -95,7 +111,7 @@ ${items.map(n => `<div class="row2 nf-item ${n.read_at ? '' : 'un'}"><div class=
     nfOff: async () => { await disablePush(); toast('Notifiche disattivate su questo dispositivo.'); BM.route() },
     nfTest: async () => { await rpc('push_send_test', {}); toast('Prova inviata: dovrebbe arrivare tra pochi secondi.'); setTimeout(() => BM.route(), 1500) },
     nfAll: async () => { await rpc('notif_mark_read', {}); BM.route() },
-    nfOpen: async el => { try { await rpc('notif_mark_read', { p_id: el.dataset.i }) } catch (e) { /* non blocca l'apertura */ } location.hash = el.dataset.h || '#/notifiche' },
+    nfOpen: async el => { if (el.closest('.nf-item.un')) { unread = Math.max(0, unread - 1); last = unread; paint() } try { await rpc('notif_mark_read', { p_id: el.dataset.i }) } catch (e) { /* non blocca l'apertura */ } location.hash = el.dataset.h || '#/notifiche' },
     nfKey: async () => { const k = document.getElementById('nfk').value.trim(); if (!k) { toast('Incolla la chiave pubblica.', 1); return } const r = BM.ask('Motivazione (resterà nell\'audit):'); if (!r) return; await rpc('admin_set_push_key', { p_key: k, p_reason: r }); toast('Chiave salvata.'); BM.route() }
   };
   const prev = BM.act;
