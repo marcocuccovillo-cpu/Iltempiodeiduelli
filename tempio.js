@@ -6,6 +6,7 @@
     ['Il Sentiero', 'sentiero.html', '✦', ''],
     ['Black Market', 'black-market.html', '◈', 'bm'],
     ['Ladder', 'black-market.html#/ladder', '⚔', 'bm'],
+    ['Black Market Shop', 'black-market.html#/shop', '❖', 'bm'],
     ['Gestisci torneo', 'gestisci-torneo.html', '♜', ''],
     ['Match Pro', 'match-pro.html', '⏱', ''],
     ['Deck Analyzer', 'deck-analyzer.html', '▤', '']

@@ -45,9 +45,11 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 </style></head><body>
 
 <main class="pg" id="app"><p class="mute">Caricamento…</p></main><div id="toast" hidden role="status"></div>
-<script src="tempio.js?v=8"></script>
+<script src="tempio.js?v=9"></script>
 <script src="badge.js?v=11"></script>
-<script src="black-market-moduli.js?v=11"></script>
+<script src="black-market-moduli.js?v=12"></script>
+<script src="shop-art.js?v=12"></script>
+<script src="black-market-shop.js?v=12"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 /* ============ CONFIGURAZIONE: incolla qui i due valori di Supabase (Project Settings > API) ============ */
@@ -59,7 +61,7 @@ const $app=document.getElementById('app'),$t=document.getElementById('toast');
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const BC=n=>Number(n||0).toLocaleString('it-IT')+' BC';
 const when=d=>new Date(d).toLocaleString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-const KIND={initial_bonus:'Bonus iniziale',bounty_stake:'Taglia pubblicata',bounty_payout:'Ricompensa riscossa',bounty_refund:'Quota restituita',participation_reward:'Partecipazione a evento',admin_adjustment:'Rettifica amministrativa',ladder_reward:'Vittoria in Ladder'};
+const KIND={initial_bonus:'Bonus iniziale',bounty_stake:'Taglia pubblicata',bounty_payout:'Ricompensa riscossa',bounty_refund:'Quota restituita',participation_reward:'Partecipazione a evento',admin_adjustment:'Rettifica amministrativa',ladder_reward:'Vittoria in Ladder',shop_purchase:'Acquisto nello Shop'};
 const ROLE={user:'Duellante',organizer:'Organizzatore',moderator:'Moderatore',admin:'Amministratore'};
 let sb,me=null,wallet=0,P=new Map(),S={},tt;
 const toast=(m,bad)=>{$t.textContent=m;$t.className=bad?'bad':'';$t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>$t.hidden=true,4200)};
@@ -98,6 +100,7 @@ const R={};
 /* Punto di aggancio per i moduli opzionali (black-market-moduli.js): Hall of Fame, Faction Wars, Underground. Se il file manca, non cambia nulla. */
 const BM={R,shell,q,rpc,toast,esc,BC,when,av,link,pn,route,core,ask:m=>ask(m),get sb(){return sb},get wallet(){return wallet},get me(){return me},get P(){return P},get S(){return S}};
 try{if(window.BM_MODULES)window.BM_MODULES(BM)}catch(e){console.error('Moduli aggiuntivi non caricati',e)}
+try{if(window.BM_SHOP)window.BM_SHOP(BM)}catch(e){console.error('Shop non caricato',e)}
 R['']=async()=>{const[mw,fd,hero]=await Promise.all([q(sb.from('most_wanted_v').select('*').order('bounty_value',{ascending:false}).limit(5)),q(sb.from('market_feed_v').select('*').order('at',{ascending:false}).limit(24)),BM.dashHero?BM.dashHero():''/* profilo e statistiche (black-market-moduli.js) */]);
  const bn=fd.filter(f=>f.kind=='bounty').slice(0,6),cl=fd.filter(f=>f.kind=='claim').slice(0,5);
  shell(`<h1 class="t">Black <em>Market</em></h1><p class="sub">Metti una taglia sui tuoi rivali. Chi li sconfigge in un match ufficiale verificato riscuote il montepremi.</p>${hero}
@@ -109,10 +112,12 @@ R.wanted=async()=>{const rows=await q(sb.from('most_wanted_v').select('*'));cons
  shell(`<h1 class="t">Most <em>Wanted</em></h1><p class="sub">I duellanti con le taglie più alte. Non è la classifica dei risultati WPA.</p><div class="seg" style="margin:18px 0">${[['value','Valore'],['recent','Più recenti'],['activity','Attività']].map(([v,l])=>`<button data-act="sort" data-v="${v}" aria-pressed="${k==v}">${l}</button>`).join('')}</div>
  <div class="box">${rows.length?rows.map((r,i)=>card(r,i)).join(''):'<p class="mute">Nessun ricercato al momento.</p>'}</div>`,'wanted')};
 R.p=async id=>{const p=P.get(id);if(!p){shell('<div class="err">Duellante non trovato.</div>','');return}
- const[bs,ss,bdg]=await Promise.all([q(sb.from('bounties_public_v').select('*').eq('target_id',id).order('created_at',{ascending:false})),q(sb.from('bounty_settlements').select('*').or(`target_id.eq.${id},winner_id.eq.${id}`).order('created_at',{ascending:false})),BM.badgeBox?BM.badgeBox(id,id==me.id):'']);
+ const[bs,ss,bdg,eq]=await Promise.all([q(sb.from('bounties_public_v').select('*').eq('target_id',id).order('created_at',{ascending:false})),q(sb.from('bounty_settlements').select('*').or(`target_id.eq.${id},winner_id.eq.${id}`).order('created_at',{ascending:false})),BM.badgeBox?BM.badgeBox(id,id==me.id):'',BM.shopEq?BM.shopEq(id):null]);
  const act=bs.filter(b=>b.status=='active'),old=bs.filter(b=>b.status!='active'),val=act.reduce((t,b)=>t+b.amount,0),mine=id==me.id;
  const st={settled:'riscossa',cancelled:'annullata',under_review:'in revisione'};
- shell(`<div class="row" style="gap:16px">${av(p).replace('width:40px','')}<div><h1 class="t" style="font-size:2.2rem">${esc(p.nickname)}</h1><span class="tag">${ROLE[p.role]}</span> ${p.wanted_enabled?'':'<span class="tag">non accetta taglie</span>'}</div></div>
+ const tags=`<span class="tag">${ROLE[p.role]}</span> ${p.wanted_enabled?'':'<span class="tag">non accetta taglie</span>'}`;/* con lo Shop: cornice, titolo, emblema, aura, effetto e pet equipaggiati; senza, l'intestazione di sempre */
+ const hd=BM.shopHead&&eq&&Object.keys(eq).length?BM.shopHead(p,eq,{avatar:av(p).replace('class="av"','class="av xl"'),h:'h1',hcls:'t',tag:tags,petSize:104}):`<div class="row" style="gap:16px">${av(p).replace('width:40px','')}<div><h1 class="t" style="font-size:2.2rem">${esc(p.nickname)}</h1>${tags}</div></div>`;
+ shell(`${hd}
  ${bdg}
  <div class="grid c2" style="margin-top:20px"><div class="box"><p class="mute" style="margin:0">Bounty Value attuale</p><div class="big">${Number(val).toLocaleString('it-IT')} <small>BC</small></div>${!mine&&p.wanted_enabled?`<a class="btn gold" style="margin-top:14px" href="#/new/${id}">Metti una taglia</a>`:''}
  ${mine?`<div style="margin-top:14px"><label style="display:flex;gap:10px;align-items:center;font-weight:600"><input type="checkbox" id="wn" ${p.wanted_enabled?'checked':''} style="width:22px;min-height:0"> Accetto taglie su di me</label><div class="row" style="margin-top:10px"><input id="avi" maxlength="8" placeholder="Avatar (emoji o sigla)" value="${esc(p.avatar||'')}" style="max-width:200px"><button class="btn sm" data-act="saveprof">Salva</button></div></div>`:''}</div>
