@@ -243,7 +243,7 @@ window.BM_MODULES = function (BM) {
       if (on('ladder')) tiles += tile(lad[0] ? lad[0].elo : 'n/d', 'Elo Ladder' + (lad[0] ? ` · #${lad[0].rank} · ${lad[0].wins}V ${lad[0].draws}P ${lad[0].losses}S` : ' · non ancora classificato'));
       if (on('ladder')) tiles += tile(BC(lrw.reduce((t, x) => t + x.amount, 0)), 'Guadagnati in Ladder' + (lrw.length ? ` · ${lrw.length} vittorie premiate` : ''));
     } catch (er) { note = `<p class="mute">Statistiche non disponibili: ${esc(er.message)}</p>` }
-    const btns = `<div class="row" style="margin-top:10px"><button class="btn ghost sm" data-act="avPick">${me.avatar_img ? 'Cambia foto' : 'Aggiungi foto'}</button>${me.avatar_img ? '<button class="btn ghost sm" data-act="avDel">Rimuovi foto</button>' : ''}<input id="avf" type="file" accept="image/*" hidden></div>`;
+    const btns = `<div class="row" style="margin-top:10px"><a class="btn gold sm" href="#/p/${id}">Il mio profilo e le taglie</a><button class="btn ghost sm" data-act="avPick">${me.avatar_img ? 'Cambia foto' : 'Aggiungi foto'}</button>${me.avatar_img ? '<button class="btn ghost sm" data-act="avDel">Rimuovi foto</button>' : ''}<input id="avf" type="file" accept="image/*" hidden></div>`;
     const eq = BM.shopEq ? await BM.shopEq(id) : null;   /* Shop: premi equipaggiati (se ce ne sono) */
     const who = BM.shopHead && eq && Object.keys(eq).length
       ? BM.shopHead(me, eq, { avatar: av(me).replace('class="av"', 'class="av xl"'), h: 'h2', tag: `<span class="tag">${ROLE[me.role]}</span>`, extra: btns, petSize: 104 })
