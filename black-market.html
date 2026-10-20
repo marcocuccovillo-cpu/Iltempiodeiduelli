@@ -50,6 +50,8 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 <script src="black-market-moduli.js?v=12"></script>
 <script src="shop-art.js?v=12"></script>
 <script src="black-market-shop.js?v=12"></script>
+<script src="black-market-notifiche.js?v=13"></script>
+<script src="black-market-caccia.js?v=13"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 /* ============ CONFIGURAZIONE: incolla qui i due valori di Supabase (Project Settings > API) ============ */
@@ -92,7 +94,7 @@ async function core(){let ps;try{ps=await q(sb.from('profiles').select('id,nickn
  const st=await q(sb.from('system_settings').select('key,value_int'));S=Object.fromEntries(st.map(s=>[s.key,s.value_int]));return true}
 function shell(inner,cur){const items=[['','Dashboard'],['wanted','Most Wanted'],['new','Metti una taglia'],['log','Registro'],['wallet','Wallet'],['events','Eventi']];if(BM.navItems)items.push(...BM.navItems());if(me.role=='admin')items.push(['admin','Admin']);
  $app.innerHTML=`<nav class="bm-nav" aria-label="Black Market">${items.map(([h,l])=>`<a href="#/${h}" ${cur==h?'aria-current="page"':''}>${l}</a>`).join('')}<button data-act="out">Esci</button></nav>${inner}`}
-const card=(r,i)=>`<div class="row2">${i!=null?`<span class="rank">${i+1}</span>`:''}${av(P.get(r.id))}<div class="g"><a href="#/p/${r.id}">${esc(r.nickname)}</a><small>${r.active_count} ${r.active_count==1?'taglia attiva':'taglie attive'} · ultima ${when(r.last_at)}</small></div><span class="val">${BC(r.bounty_value)}</span></div>`;
+const card=(r,i)=>`<div class="row2">${i!=null?`<span class="rank">${i+1}</span>`:''}${av(P.get(r.id))}<div class="g"><a href="#/p/${r.id}">${esc(r.nickname)}</a><small>${r.active_count} ${r.active_count==1?'taglia attiva':'taglie attive'} · ultima ${when(r.last_at)}</small></div><span class="val">${BC(r.bounty_value)}</span>${BM.huntBtn?BM.huntBtn(r.id,'Sfida'):''}</div>`;
 const feedRow=f=>f.kind=='bounty'?`<div class="row2"><div class="g">${f.actor_id?link(f.actor_id):'Anonimo'} ha messo una taglia su ${link(f.target_id)}<small>${when(f.at)}</small></div><span class="val">${BC(f.amount)}</span></div>`
  :`<div class="row2"><div class="g">${link(f.actor_id)} ha riscosso la taglia su ${link(f.target_id)}<small>${when(f.at)}</small></div><span class="val">${BC(f.amount)}</span></div>`;
 /* ---------- pagine ---------- */
@@ -101,6 +103,8 @@ const R={};
 const BM={R,shell,q,rpc,toast,esc,BC,when,av,link,pn,route,core,ask:m=>ask(m),get sb(){return sb},get wallet(){return wallet},get me(){return me},get P(){return P},get S(){return S}};
 try{if(window.BM_MODULES)window.BM_MODULES(BM)}catch(e){console.error('Moduli aggiuntivi non caricati',e)}
 try{if(window.BM_SHOP)window.BM_SHOP(BM)}catch(e){console.error('Shop non caricato',e)}
+try{if(window.BM_NOTIF)window.BM_NOTIF(BM)}catch(e){console.error('Notifiche non caricate',e)}
+try{if(window.BM_HUNT)window.BM_HUNT(BM)}catch(e){console.error('Caccia alle taglie non caricata',e)}
 R['']=async()=>{const[mw,fd,hero]=await Promise.all([q(sb.from('most_wanted_v').select('*').order('bounty_value',{ascending:false}).limit(5)),q(sb.from('market_feed_v').select('*').order('at',{ascending:false}).limit(24)),BM.dashHero?BM.dashHero():''/* profilo e statistiche (black-market-moduli.js) */]);
  const bn=fd.filter(f=>f.kind=='bounty').slice(0,6),cl=fd.filter(f=>f.kind=='claim').slice(0,5);
  shell(`<h1 class="t">Black <em>Market</em></h1><p class="sub">Metti una taglia sui tuoi rivali. Chi li sconfigge in un match ufficiale verificato riscuote il montepremi.</p>${hero}
@@ -109,7 +113,7 @@ R['']=async()=>{const[mw,fd,hero]=await Promise.all([q(sb.from('most_wanted_v').
  <div class="grid c2" style="margin-top:14px"><div class="box"><h2>Ultime taglie pubblicate</h2>${bn.map(feedRow).join('')||'<p class="mute">Ancora nessuna taglia.</p>'}</div><div class="box"><h2>Ultime riscossioni</h2>${cl.map(feedRow).join('')||'<p class="mute">Nessuna ricompensa riscossa.</p>'}</div></div>`,'')};
 R.wanted=async()=>{const rows=await q(sb.from('most_wanted_v').select('*'));const k=sessionStorage.getItem('bm.sort')||'value';
  rows.sort((a,b)=>k=='recent'?new Date(b.last_at)-new Date(a.last_at):k=='activity'?b.active_count-a.active_count||b.bounty_value-a.bounty_value:b.bounty_value-a.bounty_value);
- shell(`<h1 class="t">Most <em>Wanted</em></h1><p class="sub">I duellanti con le taglie più alte. Non è la classifica dei risultati WPA.</p><div class="seg" style="margin:18px 0">${[['value','Valore'],['recent','Più recenti'],['activity','Attività']].map(([v,l])=>`<button data-act="sort" data-v="${v}" aria-pressed="${k==v}">${l}</button>`).join('')}</div>
+ shell(`<h1 class="t">Most <em>Wanted</em></h1><p class="sub">I duellanti con le taglie più alte. Non è la classifica dei risultati WPA.</p>${BM.huntBtn?'<div class="row" style="gap:10px;margin-top:12px"><a class="btn gold sm" href="#/hunt">Caccia alle taglie: sfida e riscuoti</a></div>':''}<div class="seg" style="margin:18px 0">${[['value','Valore'],['recent','Più recenti'],['activity','Attività']].map(([v,l])=>`<button data-act="sort" data-v="${v}" aria-pressed="${k==v}">${l}</button>`).join('')}</div>
  <div class="box">${rows.length?rows.map((r,i)=>card(r,i)).join(''):'<p class="mute">Nessun ricercato al momento.</p>'}</div>`,'wanted')};
 R.p=async id=>{const p=P.get(id);if(!p){shell('<div class="err">Duellante non trovato.</div>','');return}
  const[bs,ss,bdg,eq]=await Promise.all([q(sb.from('bounties_public_v').select('*').eq('target_id',id).order('created_at',{ascending:false})),q(sb.from('bounty_settlements').select('*').or(`target_id.eq.${id},winner_id.eq.${id}`).order('created_at',{ascending:false})),BM.badgeBox?BM.badgeBox(id,id==me.id):'',BM.shopEq?BM.shopEq(id):null]);
@@ -119,7 +123,7 @@ R.p=async id=>{const p=P.get(id);if(!p){shell('<div class="err">Duellante non tr
  const hd=BM.shopHead&&eq&&Object.keys(eq).length?BM.shopHead(p,eq,{avatar:av(p).replace('class="av"','class="av xl"'),h:'h1',hcls:'t',tag:tags,petSize:104}):`<div class="row" style="gap:16px">${av(p).replace('width:40px','')}<div><h1 class="t" style="font-size:2.2rem">${esc(p.nickname)}</h1>${tags}</div></div>`;
  shell(`${hd}
  ${bdg}
- <div class="grid c2" style="margin-top:20px"><div class="box"><p class="mute" style="margin:0">Bounty Value attuale</p><div class="big">${Number(val).toLocaleString('it-IT')} <small>BC</small></div>${!mine&&p.wanted_enabled?`<a class="btn gold" style="margin-top:14px" href="#/new/${id}">Metti una taglia</a>`:''}
+ <div class="grid c2" style="margin-top:20px"><div class="box"><p class="mute" style="margin:0">Bounty Value attuale</p><div class="big">${Number(val).toLocaleString('it-IT')} <small>BC</small></div>${!mine&&p.wanted_enabled?`<div class="row" style="margin-top:14px;gap:10px"><a class="btn gold" href="#/new/${id}">Metti una taglia</a>${val>0&&BM.huntBtn?BM.huntBtn(id,'Sfida per la taglia').replace('btn gold sm','btn ghost'):''}</div>`:(!mine&&val>0&&BM.huntBtn?`<div style="margin-top:14px">${BM.huntBtn(id,'Sfida per la taglia')}</div>`:'')}
  ${mine?`<div style="margin-top:14px"><label style="display:flex;gap:10px;align-items:center;font-weight:600"><input type="checkbox" id="wn" ${p.wanted_enabled?'checked':''} style="width:22px;min-height:0"> Accetto taglie su di me</label><div class="row" style="margin-top:10px"><input id="avi" maxlength="8" placeholder="Avatar (emoji o sigla)" value="${esc(p.avatar||'')}" style="max-width:200px"><button class="btn sm" data-act="saveprof">Salva</button></div></div>`:''}</div>
  <div class="box"><h2>Taglie attive (${act.length})</h2>${act.map(b=>`<div class="row2"><div class="g">${b.creator_id?link(b.creator_id):'Anonimo'}<small>${when(b.created_at)}${b.message?' · “'+esc(b.message)+'”':''}</small></div><span class="val">${BC(b.amount)}</span></div>`).join('')||'<p class="mute">Nessuna taglia attiva.</p>'}</div></div>
  <div class="grid c2" style="margin-top:14px"><div class="box"><h2>Storico taglie</h2>${old.map(b=>`<div class="row2"><div class="g">${b.creator_id?link(b.creator_id):'Anonimo'}<small>${when(b.created_at)}</small></div><span class="tag">${st[b.status]||b.status}</span><span class="val">${BC(b.amount)}</span></div>`).join('')||'<p class="mute">Nessuna taglia chiusa.</p>'}</div>

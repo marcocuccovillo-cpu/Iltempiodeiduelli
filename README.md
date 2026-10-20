@@ -25,6 +25,10 @@ Sito/PWA della community Yu-Gi-Oh! di Bologna. Funziona su GitHub Pages: **tutti
 | `black-market-badge.sql`, `black-market-badge-test.sql`, `black-market-badge-down.sql` | Migrazione 007: catalogo dei 48 traguardi e funzione di lettura dei badge, relativi test e annullamento |
 | `black-market-shop.js`, `shop-art.js` | Pagina Black Market Shop (catalogo, collezione, conferma d'acquisto, gestione catalogo per gli admin) e grafica dei premi: pet, cornici, aure, emblemi, effetti, titoli, tutti in SVG/CSS |
 | `black-market-shop.sql`, `black-market-shop-test.sql`, `black-market-shop-down.sql` | Migrazione 008: catalogo, acquisti, equipaggiamento, 39 premi iniziali, relativi test e annullamento |
+| `black-market-caccia.js` | Caccia alle taglie: pulsante «Sfida» su Most Wanted, dashboard e profilo, pagina `#/hunt` (ricercati e taglie da riscuotere) e `#/hunt/<duellante>` (lancio della sfida in Ladder) |
+| `black-market-notifiche.js` | Pagina Notifiche (`#/notifiche`): elenco, contatore nel menu, preferenze, attivazione delle push su questo dispositivo, notifica di prova, chiave VAPID per l'admin |
+| `black-market-notifiche.sql`, `black-market-notifiche-test.sql`, `black-market-notifiche-down.sql` | Migrazione 009: notifiche (taglia ricevuta, sfida in Ladder, sfida per la taglia), preferenze, dispositivi push, relativi test e annullamento |
+| `send-push.ts` | Edge Function di Supabase che invia le push. **Non è una pagina del sito**: si incolla in Supabase (vedi sotto) |
 | `black-market-moduli.sql`, `black-market-moduli-test.sql`, `black-market-moduli-down.sql` | Migrazione 002 dei tre moduli, relativi test e annullamento |
 | `workflow-keepalive.yml` | Promemoria anti-pausa per Supabase (vedi sotto) |
 
@@ -149,6 +153,27 @@ I punti Tempio (Bronzo 1, Argento 3, Oro 6, Leggenda 10, speciali 5) fanno salir
 **Prezzi senza toccare il codice.** Gli admin, dalla scheda «Gestione catalogo» dello Shop, creano e disattivano premi e modificano prezzo, descrizione, rarità, grafica e ordine; vedono gli acquisti e lo storico delle modifiche (valori prima/dopo, chi, quando, perché). Ogni modifica chiede una motivazione ed entra nell'audit (`shop_item_create/update/activate/deactivate`). Cambiare un prezzo vale solo per i nuovi acquisti. L'impostazione `shop_enabled` (anche dal pulsante «Chiudi gli acquisti») chiude gli acquisti senza impedire di equipaggiare.
 
 **Ordine**: esegui `black-market-shop.sql` dopo la 007 (si può rieseguire senza danni). **Annullare**: `black-market-shop-down.sql` toglie funzioni e vista ma **conserva** tabelle, acquisti e movimenti contabili: nulla di ciò che gli utenti hanno pagato va perso. **Provato**: 8 scenari in `black-market-shop-test.sql` (catalogo, acquisto, saldo insufficiente e atomicità, duplicati/Shop chiuso/premio disattivato, manomissioni dal client, equipaggiamento e visibilità pubblica, permessi admin e audit, compatibilità con taglie, riscossioni e Ladder), 6 varianti sbagliate delle funzioni individuate dai test, 8 acquisti simultanei del premio da 1000 BC da sessioni separate (uno solo andato a buon fine, saldo mai negativo, registro = saldi), 6 acquisti diversi simultanei con saldo insufficiente per tutti (saldo mai negativo), e il flusso della pagina (filtri, conferma, doppio clic, equipaggia, profilo pubblico, admin, smartphone) in Chromium con un Supabase simulato.
+
+## Caccia alle taglie (nessuna migrazione)
+**Cos'è.** Come si sfida chi ha una taglia addosso. Accanto a ogni ricercato (Most Wanted, dashboard, profilo) c'è il pulsante **Sfida**: porta alla pagina `#/hunt/<duellante>`, che mostra Bounty Value, quanto si potrebbe incassare (le proprie quote tornano indietro) e il modulo per lanciare una **normale sfida in Ladder**. La pagina `#/hunt` (menu Most Wanted → «Caccia alle taglie») elenca tutti i ricercati e le **taglie pronte da riscuotere**.
+
+**Regole: nessuna nuova.** La sfida è una sfida Ladder; lo sfidato può accettare, rifiutare o lasciarla scadere (la taglia resta dov'è). Se si vince, il match Ladder verificato è un match WPA ufficiale e, dopo l'attesa anti-accordi (`ladder_claim_hold_hours`, 24 ore), la taglia si riscuote con la normale `claim_bounty`. Il browser non calcola né scrive importi. Serve il modulo Ladder acceso (altrimenti la pagina lo spiega).
+
+## Notifiche push (migrazione 009)
+**Cosa arriva.** Una notifica quando qualcuno: (1) mette una **taglia** su di te, (2) ti **sfida in Ladder**, (3) ti sfida **per riscuotere la taglia** che hai addosso. La notifica della taglia non dice mai chi l'ha messa. Ognuno sceglie cosa ricevere dalla pagina Notifiche. Le notifiche **dentro l'app** (elenco + contatore nel menu) funzionano appena esegui la migrazione; le **push ad app chiusa** richiedono la configurazione qui sotto (una volta sola).
+
+**Come funziona.** Trigger del database → riga in `notifications` → Database Webhook → Edge Function `send-push` → Web Push (VAPID). Un errore nelle notifiche non blocca mai una taglia o una sfida. Nessuna notifica muove BC.
+
+**Configurazione push (una volta, dall'admin):**
+1. Esegui `black-market-notifiche.sql` in Supabase (SQL Editor), dopo la 008.
+2. Genera le chiavi VAPID (sul computer, con Node): `npx web-push generate-vapid-keys`. Ottieni una chiave pubblica e una privata.
+3. Accedi come admin, apri Black Market → **Notifiche** e incolla la chiave **pubblica** nel riquadro «Amministratore».
+4. Supabase → Edge Functions → *Create a new function* → nome `send-push` → incolla `send-push.ts` → Deploy. Se il webhook dovesse ricevere errore 401 dall'infrastruttura, disattiva «Verify JWT» per questa funzione: il controllo vero lo fa il segreto `x-webhook-secret`.
+5. Edge Functions → `send-push` → Secrets: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` (la **privata** non va mai nel sito né nel database), `VAPID_SUBJECT` (es. `mailto:tuo@indirizzo.it`), `PUSH_WEBHOOK_SECRET` (una stringa lunga a caso).
+6. Database → Webhooks → *Create*: tabella `notifications`, evento **Insert**, tipo *Supabase Edge Functions* → `send-push`, con intestazione `x-webhook-secret` uguale a `PUSH_WEBHOOK_SECRET`.
+7. Ogni giocatore apre Notifiche → **Attiva le notifiche su questo dispositivo** (e può usare «Invia una notifica di prova»). Su iPhone/iPad il Tempio va prima installato sulla schermata Home.
+
+**Annullare**: `black-market-notifiche-down.sql` toglie trigger e funzioni ma **conserva** tabelle e notifiche. **Provato**: 9 scenari SQL in `black-market-notifiche-test.sql` (destinatari corretti, anonimato di chi mette la taglia, preferenze, permessi e RLS, invarianza di BC/registro, resistenza agli errori), 10 varianti sbagliate individuate dai test, annullamento e riapplicazione senza perdere dati; interfaccia (caccia, notifiche, attivazione/disattivazione push, stati negato/non supportato/senza chiave/migrazione assente, smartphone) in Chromium con Supabase e push simulati; logica di `send-push.ts` con web-push simulato. **Non provato**: l'invio push reale (servono le tue chiavi VAPID e un progetto Supabase vero) e il pacchetto `web-push` (non installabile nel mio ambiente di test).
 
 ## Stato verificato (20 ottobre 2026)
 **Provato davvero**
