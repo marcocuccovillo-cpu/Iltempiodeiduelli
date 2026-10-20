@@ -76,6 +76,8 @@ window.BM_NOTIF = function (BM) {
   }
 
   /* ---------- pagina ---------- */
+  let setOpen = false;
+  document.addEventListener('toggle', e => { if (e.target && e.target.id === 'nfset') setOpen = e.target.open }, true);
   const where = u => { const h = String(u || '').split('#')[1]; return h ? '#' + h : '#/notifiche' };
   R.notifiche = async () => {
     if (!present()) { shell('<h1 class="t"><em>Notifiche</em></h1><div class="box" style="margin-top:18px"><h2>Notifiche non ancora attivate</h2><p>Manca la migrazione del database. Un amministratore deve eseguire <b>black-market-notifiche.sql</b> in Supabase (dopo le migrazioni precedenti).</p></div>', 'notifiche'); return }
@@ -85,32 +87,37 @@ window.BM_NOTIF = function (BM) {
     const pr = prefs[0] || { bounty: true, ladder: true, hunt: true };
     const sub = supported() ? await localSub() : null, perm = supported() ? Notification.permission : 'unsupported';
     if (sub && key && perm === 'granted') { try { await rpc('push_subscribe', { p_endpoint: sub.endpoint, p_p256dh: sub.toJSON().keys.p256dh, p_auth: sub.toJSON().keys.auth, p_ua: (navigator.userAgent || '').slice(0, 200) }) } catch (e) { /* già collegato o al limite */ } }   // se sullo stesso telefono entra un altro account, il dispositivo passa a lui
-    let st;
+    let st, active = false;
     if (!supported()) st = `<p class="mute" style="margin:0">Questo browser non supporta le notifiche push. <b>Su iPhone e iPad</b> bisogna prima installare il Tempio sulla schermata Home (Condividi → Aggiungi alla schermata Home) e aprirlo da lì. Intanto le notifiche qui sotto funzionano sempre.</p>`;
     else if (perm === 'denied') st = '<p style="margin:0">Hai bloccato le notifiche per questo sito. Riattivale dalle impostazioni del browser (icona del lucchetto accanto all\'indirizzo), poi torna qui.</p>';
     else if (!key) st = '<p class="mute" style="margin:0">Le notifiche push non sono ancora attivate dall\'amministratore del Tempio. Quelle qui sotto funzionano già dentro l\'app.</p>';
-    else if (sub && perm === 'granted') st = `<div class="nf-st"><span class="tag g">Attive su questo dispositivo</span><button class="btn ghost sm" data-act="nfTest">Invia una notifica di prova</button><button class="btn ghost sm" data-act="nfOff">Disattiva</button></div><p class="mute" style="font-size:.88rem;margin:8px 0 0">Riceverai un avviso anche ad app chiusa. Se la prova non arriva entro qualche secondo, controlla che le notifiche del browser non siano silenziate.</p>`;
+    else if (sub && perm === 'granted') { active = true; st = `<div class="nf-st"><span class="tag g">Attive su questo dispositivo</span><button class="btn ghost sm" data-act="nfTest">Invia una notifica di prova</button><button class="btn ghost sm" data-act="nfOff">Disattiva</button></div><p class="mute" style="font-size:.88rem;margin:8px 0 0">Riceverai un avviso anche ad app chiusa. Se la prova non arriva entro qualche secondo, controlla che le notifiche del browser non siano silenziate.</p>`; }
     else st = '<div class="nf-st"><button class="btn gold" data-act="nfOn">Attiva le notifiche su questo dispositivo</button></div><p class="mute" style="font-size:.88rem;margin:8px 0 0">Il browser chiederà il permesso. Puoi attivarle su più dispositivi (telefono, Chromebook…).</p>';
-    const un = items.filter(n => !n.read_at).length;
+    const un = items.filter(n => !n.read_at).length, rd = items.length - un;
+    const chk = (k, t, last) => `<label style="display:flex;gap:10px;align-items:center;font-weight:600;${last ? '' : 'margin-bottom:8px'}"><input type="checkbox" data-nfp="${k}" ${pr[k] ? 'checked' : ''} style="width:22px;min-height:0"> ${t}</label>`;
     shell(`<h1 class="t"><em>Notifiche</em></h1><p class="sub">Ti avvisiamo quando ricevi una taglia, una sfida in Ladder o una sfida per riscuotere la taglia che hai addosso.</p>
-<div class="box" style="margin-top:18px"><h2 style="margin-top:0">Notifiche sul dispositivo</h2>${st}</div>
-<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Cosa vuoi ricevere</h2>
- <label style="display:flex;gap:10px;align-items:center;font-weight:600;margin-bottom:8px"><input type="checkbox" data-nfp="bounty" ${pr.bounty ? 'checked' : ''} style="width:22px;min-height:0"> Quando ricevo una taglia</label>
- <label style="display:flex;gap:10px;align-items:center;font-weight:600;margin-bottom:8px"><input type="checkbox" data-nfp="ladder" ${pr.ladder ? 'checked' : ''} style="width:22px;min-height:0"> Quando qualcuno mi sfida in Ladder</label>
- <label style="display:flex;gap:10px;align-items:center;font-weight:600"><input type="checkbox" data-nfp="hunt" ${pr.hunt ? 'checked' : ''} style="width:22px;min-height:0"> Quando qualcuno mi sfida per riscuotere la mia taglia</label>
- <p class="mute" style="font-size:.85rem;margin:10px 0 0">Le scelte si salvano subito. La notifica di una taglia non dice mai chi l'ha messa.</p></div>
-${isAdm() ? `<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Amministratore: invio push</h2><p style="margin:0 0 8px">Chiave pubblica VAPID: ${key ? '<span class="tag g">impostata</span>' : '<span class="tag r">mancante</span>'} <span class="mute" style="font-size:.88rem">— senza chiave le push non si possono attivare. Procedura completa nel README, sezione «Notifiche push».</span></p><div class="row" style="gap:8px"><input id="nfk" placeholder="Incolla qui la chiave pubblica (inizia con B…)" style="flex:1;min-width:200px" aria-label="Chiave pubblica VAPID"><button class="btn sm" data-act="nfKey">Salva chiave</button></div></div>` : ''}
-<div class="box" style="margin-top:14px"><div class="row" style="justify-content:space-between;gap:10px"><h2 style="margin:0">Le tue notifiche${un ? ` <span class="tag g">${un} nuove</span>` : ''}</h2>${un ? '<button class="btn ghost sm" data-act="nfAll">Segna tutte come lette</button>' : ''}</div>
-${items.map(n => `<div class="row2 nf-item ${n.read_at ? '' : 'un'}"><div class="g"><b>${esc(n.title)}</b><small style="display:block;color:var(--tx);opacity:.85;margin:2px 0">${esc(n.body)}</small><small>${when(n.created_at)}</small></div><span class="tag ${(KIND[n.kind] || [])[1] || ''}">${(KIND[n.kind] || [n.kind])[0]}</span><button class="btn ghost sm" data-act="nfOpen" data-i="${n.id}" data-h="${esc(where(n.url))}">Apri</button></div>`).join('') || '<p class="mute">Nessuna notifica per ora. Quando qualcuno ti metterà una taglia o ti sfiderà, la vedrai qui.</p>'}</div>`, 'notifiche');
+<div class="box" style="margin-top:18px"><div class="row" style="justify-content:space-between;gap:10px;align-items:center"><h2 style="margin:0">Le tue notifiche${un ? ` <span class="tag g">${un} nuove</span>` : ''}</h2><div class="row" style="gap:8px">${un ? '<button class="btn ghost sm" data-act="nfAll">Segna tutte come lette</button>' : ''}${rd ? '<button class="btn ghost sm" data-act="nfDelAll">Elimina le lette</button>' : ''}</div></div>
+${items.map(n => `<div class="row2 nf-item ${n.read_at ? '' : 'un'}"><div class="g"><b>${esc(n.title)}</b><small style="display:block;color:var(--tx);opacity:.85;margin:2px 0">${esc(n.body)}</small><small>${when(n.created_at)}</small></div><span class="tag ${(KIND[n.kind] || [])[1] || ''}">${(KIND[n.kind] || [n.kind])[0]}</span><button class="btn ghost sm" data-act="nfOpen" data-i="${n.id}" data-h="${esc(where(n.url))}">Apri</button>${n.read_at ? `<button class="btn ghost sm" data-act="nfDel" data-i="${n.id}" aria-label="Elimina questa notifica">Elimina</button>` : ''}</div>`).join('') || '<p class="mute">Nessuna notifica per ora. Quando qualcuno ti metterà una taglia o ti sfiderà, la vedrai qui.</p>'}
+${un && rd === 0 ? '<p class="mute" style="font-size:.85rem;margin:10px 0 0">Una notifica si può eliminare dopo averla letta.</p>' : ''}</div>
+${active ? '' : `<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Notifiche sul dispositivo</h2>${st}</div>`}
+<details class="box" id="nfset" style="margin-top:14px" ${setOpen ? 'open' : ''}><summary>Impostazioni notifiche</summary>
+ ${active ? `<h3 style="margin:12px 0 8px">Su questo dispositivo</h3>${st}` : ''}
+ <h3 style="margin:${active ? '18px' : '12px'} 0 8px">Cosa vuoi ricevere</h3>
+ ${chk('bounty', 'Quando ricevo una taglia')}${chk('ladder', 'Quando qualcuno mi sfida in Ladder')}${chk('hunt', 'Quando qualcuno mi sfida per riscuotere la mia taglia', 1)}
+ <p class="mute" style="font-size:.85rem;margin:10px 0 0">Le scelte si salvano subito. La notifica di una taglia non dice mai chi l'ha messa.</p></details>
+${isAdm() ? `<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Amministratore: invio push</h2><p style="margin:0 0 8px">Chiave pubblica VAPID: ${key ? '<span class="tag g">impostata</span>' : '<span class="tag r">mancante</span>'} <span class="mute" style="font-size:.88rem">— senza chiave le push non si possono attivare. Procedura completa nel README, sezione «Notifiche push».</span></p><div class="row" style="gap:8px"><input id="nfk" placeholder="Incolla qui la chiave pubblica (inizia con B…)" style="flex:1;min-width:200px" aria-label="Chiave pubblica VAPID"><button class="btn sm" data-act="nfKey">Salva chiave</button></div></div>` : ''}`, 'notifiche');
     lastAt = 0; refresh(true);
   };
 
   /* ---------- azioni ---------- */
+  const delErr = er => /notif_delete|schema cache|Could not find/i.test(er.message || '') ? 'Per eliminare serve la migrazione black-market-notifiche-elimina.sql: chiedi a un amministratore di eseguirla.' : er.message;
   const ACT = {
     nfOn: async el => { el.disabled = true; try { await enablePush(); toast('Notifiche attivate su questo dispositivo.'); } catch (er) { toast(er.message, 1) } BM.route() },
     nfOff: async () => { await disablePush(); toast('Notifiche disattivate su questo dispositivo.'); BM.route() },
     nfTest: async () => { await rpc('push_send_test', {}); toast('Prova inviata: dovrebbe arrivare tra pochi secondi.'); setTimeout(() => BM.route(), 1500) },
     nfAll: async () => { await rpc('notif_mark_read', {}); BM.route() },
+    nfDel: async el => { try { await rpc('notif_delete', { p_id: el.dataset.i }); toast('Notifica eliminata.') } catch (er) { toast(delErr(er), 1) } BM.route() },
+    nfDelAll: async () => { if (!confirm('Eliminare tutte le notifiche già lette? Le non lette restano.')) return; try { const n = await rpc('notif_delete', {}); toast(n == 1 ? 'Eliminata 1 notifica.' : `Eliminate ${n} notifiche.`) } catch (er) { toast(delErr(er), 1) } BM.route() },
     nfOpen: async el => { if (el.closest('.nf-item.un')) { unread = Math.max(0, unread - 1); last = unread; paint() } try { await rpc('notif_mark_read', { p_id: el.dataset.i }) } catch (e) { /* non blocca l'apertura */ } location.hash = el.dataset.h || '#/notifiche' },
     nfKey: async () => { const k = document.getElementById('nfk').value.trim(); if (!k) { toast('Incolla la chiave pubblica.', 1); return } const r = BM.ask('Motivazione (resterà nell\'audit):'); if (!r) return; await rpc('admin_set_push_key', { p_key: k, p_reason: r }); toast('Chiave salvata.'); BM.route() }
   };
