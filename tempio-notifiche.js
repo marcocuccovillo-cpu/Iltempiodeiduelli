@@ -35,10 +35,10 @@
   function css() {
     if (cssDone) return; cssDone = true;
     var s = document.createElement('style');
-    s.textContent = '.nf-bell{position:fixed;top:5px;right:10px;z-index:950;display:grid;place-items:center;width:46px;height:46px;padding:0;border-radius:12px;border:1px solid var(--line,#12304d);background:rgba(3,8,22,.92);color:var(--cy2,#6ff0ff);cursor:pointer;backdrop-filter:blur(8px)}' +
+    s.textContent = '.nf-bell{position:fixed;top:5px;right:10px;z-index:950;display:grid;place-items:center;width:46px;height:46px;padding:0;border-radius:12px;border:1px solid var(--line,#2a1f4d);background:rgba(var(--deep-rgb,5,3,12),.92);color:var(--cy2,#c9b8ff);cursor:pointer;backdrop-filter:blur(8px)}' +
       '.nf-bell[hidden]{display:none}.nf-bell:hover{border-color:var(--ac,#00e5ff);color:var(--ac,#00e5ff)}' +
-      '.nb{position:absolute;top:-6px;right:-6px;display:grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:99px;border:2px solid #030816;background:#e5304a;color:#fff;font:700 .72rem system-ui,sans-serif;line-height:1;box-sizing:content-box}' +
-      '.nf-toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:960;max-width:min(92vw,420px);padding:12px 16px;border-radius:12px;border:1px solid var(--ac,#00e5ff);background:#030816;color:#fff;font:600 .95rem system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.5)}' +
+      '.nb{position:absolute;top:-6px;right:-6px;display:grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:99px;border:2px solid var(--deep,#05030c);background:#e5304a;color:#fff;font:700 .72rem system-ui,sans-serif;line-height:1;box-sizing:content-box}' +
+      '.nf-toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:960;max-width:min(92vw,420px);padding:12px 16px;border-radius:12px;border:1px solid var(--ac,#a78bfa);background:var(--deep,#05030c);color:#fff;font:600 .95rem system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.5)}' +
       '@media(min-width:720px){.nf-bell{top:14px;right:18px}html.has-bell{padding-top:64px}html.has-bell .tabs{padding-right:68px}}';
     document.head.appendChild(s);
   }

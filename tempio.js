@@ -58,7 +58,7 @@
     }).join('');
     var col = document.createElement('aside');
     col.className = 'tm'; col.id = 'tmCol'; col.setAttribute('aria-label', 'Navigazione');
-    col.innerHTML = '<div class="tm-h"><a class="tm-b" href="index.html"><img src="logo1.png" alt="Il Tempio Dei Duelli"></a><button class="tm-x" id="tmX" type="button">Chiudi menu</button></div>' +
+    col.innerHTML = '<div class="tm-h"><a class="tm-b" href="index.html"><img src="tempio-logo.svg?v=1" alt="" width="512" height="512"><span class="tm-t">Il Tempio<br>Dei Duelli</span></a><button class="tm-x" id="tmX" type="button">Chiudi menu</button></div>' +
       '<nav class="tm-n">' + links + '<button type="button" class="tm-i" id="tmI"><i aria-hidden="true">⤓</i>Installa app</button></nav><div class="tm-f">Community Yu-Gi-Oh! · Bologna · v8</div>';
     var bar = document.createElement('div');
     bar.className = 'tm-bar';

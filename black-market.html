@@ -2,14 +2,16 @@
 <html lang="it"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Black Market — Il Tempio Dei Duelli</title><meta name="theme-color" content="#000000">
-<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png?v=2" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="tempio.css?v=8">
+<link rel="stylesheet" href="tempio.css?v=10">
 <style>
 
 /* Palette Black Market: nero, antracite, rosso scuro e oro */
-:root{--bg:#000;--surf:#121216;--raise:#1c1c22;--ac:#9c1f31;--ac2:#e8707d;--on-ac:#fff;--gold:#d4a843;--tx:#ece7db;--mu:#9a9aa6;--line:rgba(212,168,67,.18)}
+:root{--bg:#000;--surf:#121216;--raise:#1c1c22;--ac:#9c1f31;--ac2:#e8707d;--on-ac:#fff;--gold:#d4a843;--tx:#ece7db;--mu:#9a9aa6;--line:rgba(212,168,67,.18);
+  /* Il Black Market NON segue la palette del resto del sito: qui restano i valori di prima per le variabili condivise di tempio.css */
+  --cy:#00e5ff;--cy2:#6ff0ff;--ac-rgb:0,229,255;--mu-rgb:148,163,184;--raise-rgb:19,34,74;--inp:#050b1a;--inp-rgb:5,11,26;--deep:#030816;--deep-rgb:3,8,22;--hero-a:#162a5c;--hero-b:#0b1326;--bar-a:#0891b2}
 html,body{background:var(--bg)}
 .pg{max-width:940px}
 .bm-nav{display:flex;gap:4px;overflow-x:auto;margin:0 -16px 24px;padding:0 8px;border-bottom:1px solid var(--line);position:sticky;top:var(--bar-h);background:var(--bg);z-index:5}
@@ -54,8 +56,8 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 </style></head><body>
 
 <main class="pg" id="app"><p class="mute">Caricamento…</p></main><div id="toast" hidden role="status"></div>
-<script src="tempio.js?v=9"></script>
-<script src="badge.js?v=11"></script>
+<script src="tempio.js?v=10"></script>
+<script src="badge.js?v=12"></script>
 <script src="black-market-moduli.js?v=14"></script>
 <script src="shop-art.js?v=12"></script>
 <script src="black-market-shop.js?v=12"></script>
