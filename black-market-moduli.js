@@ -223,15 +223,17 @@ window.BM_MODULES = function (BM) {
   const tile = (v, l) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`;
   BM.dashHero = async () => {
     const me = BM.me, sb = BM.sb, id = me.id;
-    let tiles = '', note = '';
+    let tiles = '', note = '', pend = [], pendVal = new Map();
     try {
-      const [ms, bs, ss, mw, lad, lrw] = await Promise.all([
+      const [ms, bs, ss, mw, lad, lrw, pend0] = await Promise.all([
         q(sb.from('matches').select('event_id,winner_id').eq('status', 'verified').or(`player_a.eq.${id},player_b.eq.${id}`)),
         q(sb.from('bounties').select('amount,status').eq('creator_id', id)),
         q(sb.from('bounty_settlements').select('payout').eq('winner_id', id)),
         q(sb.from('most_wanted_v').select('bounty_value,active_count').eq('id', id)),
         on('ladder') ? q(sb.from('ladder_standings_v').select('*').eq('user_id', id)) : Promise.resolve([]),
-        on('ladder') ? q(sb.from('ledger_entries').select('amount').eq('kind', 'ladder_reward').eq('user_id', id)) : Promise.resolve([])]);
+        on('ladder') ? q(sb.from('ledger_entries').select('amount').eq('kind', 'ladder_reward').eq('user_id', id)) : Promise.resolve([]),
+        on('ladder') ? q(sb.from('ladder_matches').select('*').eq('status', 'pending').eq('opponent_id', id).order('created_at', { ascending: false }).limit(5)).catch(() => []) : Promise.resolve([])]);
+      pend = pend0.filter(m => !m.expires_at || new Date(m.expires_at) > Date.now()); pendVal = new Map([[id, mw[0] ? mw[0].bounty_value : 0]]);
       const w = ms.filter(m => m.winner_id === id).length, l = ms.length - w, ev = new Set(ms.map(m => m.event_id)).size;
       const placed = bs.filter(b => b.status !== 'cancelled'), got = ss.reduce((t, x) => t + x.payout, 0);
       tiles = tile(BC(BM.wallet), 'Saldo') +
@@ -240,7 +242,10 @@ window.BM_MODULES = function (BM) {
         tile(mw[0] ? BC(mw[0].bounty_value) : '0 BC', 'Taglie su di te' + (mw[0] ? ` (${mw[0].active_count})` : '')) +
         tile(placed.length, 'Taglie lanciate' + (placed.length ? ` · ${BC(placed.reduce((t, b) => t + b.amount, 0))}` : '')) +
         tile(ss.length, 'Taglie riscosse' + (ss.length ? ` · ${BC(got)}` : ''));
-      if (on('ladder')) tiles += tile(lad[0] ? lad[0].elo : 'n/d', 'Elo Ladder' + (lad[0] ? ` · #${lad[0].rank} · ${lad[0].wins}V ${lad[0].draws}P ${lad[0].losses}S` : ' · non ancora classificato'));
+      if (on('ladder')) {
+        const fm = (await BM.hasV11()) ? ['Advanced', 'Edison'] : [null];   // con la migrazione 011 c'è un Elo per formato
+        fm.forEach(f => { const r = f ? lad.find(x => x.format === f) : lad[0]; tiles += tile(r ? r.elo : 'n/d', 'Elo ' + (f || 'Ladder') + (r ? ` · #${r.rank} · ${r.wins}V ${r.draws}P ${r.losses}S` : ' · non ancora classificato')) });
+      }
       if (on('ladder')) tiles += tile(BC(lrw.reduce((t, x) => t + x.amount, 0)), 'Guadagnati in Ladder' + (lrw.length ? ` · ${lrw.length} vittorie premiate` : ''));
     } catch (er) { note = `<p class="mute">Statistiche non disponibili: ${esc(er.message)}</p>` }
     const btns = `<div class="row" style="margin-top:10px"><a class="btn gold sm" href="#/p/${id}">Il mio profilo e le taglie</a><button class="btn ghost sm" data-act="avPick">${me.avatar_img ? 'Cambia foto' : 'Aggiungi foto'}</button>${me.avatar_img ? '<button class="btn ghost sm" data-act="avDel">Rimuovi foto</button>' : ''}<input id="avf" type="file" accept="image/*" hidden></div>`;
@@ -248,7 +253,7 @@ window.BM_MODULES = function (BM) {
     const who = BM.shopHead && eq && Object.keys(eq).length
       ? BM.shopHead(me, eq, { avatar: av(me).replace('class="av"', 'class="av xl"'), h: 'h2', tag: `<span class="tag">${ROLE[me.role]}</span>`, extra: btns, petSize: 104 })
       : `<div style="display:flex;gap:16px;align-items:center">${av(me).replace('class="av"', 'class="av xl"')}<div style="min-width:0;flex:1"><h2 style="margin:0;font-size:1.6rem;color:var(--tx);overflow-wrap:anywhere">${esc(me.nickname)}</h2><span class="tag">${ROLE[me.role]}</span>${btns}</div></div>`;
-    return `<div class="box" style="margin-top:22px">${who}
+    return BM.incomingBox(pend, pendVal, { mt: 22 }) + `<div class="box" style="margin-top:22px">${who}
       <div class="stats" style="margin-top:16px">${tiles}</div>${note}<p class="mute" style="font-size:.85rem;margin:12px 0 0">Statistiche calcolate dai match ufficiali verificati, dalle taglie e dalla Ladder. Dove non ci sono dati compare “n/d”.</p></div>` + await BM.badgeBox(id, true);
   };
   const toAvatar = async file => {
@@ -270,53 +275,101 @@ window.BM_MODULES = function (BM) {
   });
 
   /* =================================== LADDER =================================== */
-  const FMT = ['Advanced', 'Traditional', 'GOAT', 'Edison'];
+  const FMT = ['Advanced', 'Edison'];
+  const KN = { ladder: 'Ladder normale', bounty: 'Per la taglia', both: 'Ladder + taglia' };
+  const KT = { ladder: '', bounty: 'r', both: 'g' };
   const LST = { pending: ['In attesa', ''], accepted: ['Da giocare', 'g'], reported: ['Da confermare', 'g'], disputed: ['Contestato', 'r'], closed: ['Concluso', 'g'], declined: ['Rifiutata', 'r'], cancelled: ['Annullata', 'r'], expired: ['Scaduta', 'r'], voided: ['Annullato', 'r'] };
   const rwS = () => { const S = BM.S || {}; return { on: (S.ladder_reward_enabled ?? 1) === 1, bc: S.ladder_reward_bc ?? 20, day: S.ladder_reward_max_day ?? 3, pair: S.ladder_reward_pair_day ?? 1, wpa: (S.ladder_wpa_matches ?? 1) === 1, hold: S.ladder_claim_hold_hours ?? 24 } };
-  const ldHead = () => { const r = rwS(); return '<h1 class="t">La <em>Ladder</em></h1><p class="sub">Sfide dirette con classifica Elo. Parti da 1000: vincere contro chi è più forte vale di più. Il risultato lo invia uno e lo <b>conferma l\'altro</b>.' + (r.on ? ` Ogni vittoria confermata <b>genera ${r.bc} Black Credits</b> per il vincitore (creati dal sistema, non tolti allo sconfitto)` : '') + (r.wpa ? (r.on ? ' e' : ' Ogni vittoria confermata') + ' diventa un <b>match WPA ufficiale</b>.' : (r.on ? '.' : '')) + '</p>' };
+  /* la migrazione 011 (formati, Elo separati, tipo di sfida) è presente? Si controlla una volta; finché manca, la pagina funziona come prima */
+  let v11 = null;
+  const hasV11 = async () => { if (v11 === true) return true; try { await q(BM.sb.from('ladder_standings_v').select('format').limit(1)); v11 = true } catch (e) { v11 = false } return v11 };
+  BM.hasV11 = hasV11;
+  const kName = m => m.kind ? KN[m.kind] : '';
+  const ldHead = () => { const r = rwS(); return '<h1 class="t">La <em>Ladder</em></h1><p class="sub">Sfide dirette in <b>Advanced</b> ed <b>Edison</b>, con una classifica Elo per ciascun formato: parti da 1000 in entrambi. Il risultato lo invia uno e lo <b>conferma l\'altro</b>.' + (r.on ? ` Ogni vittoria confermata in una sfida di Ladder <b>genera ${r.bc} Black Credits</b> per il vincitore (creati dal sistema, non tolti allo sconfitto)` : '') + (r.wpa ? (r.on ? ' e' : ' Ogni vittoria confermata') + ' diventa un <b>match WPA ufficiale</b>.' : (r.on ? '.' : '')) + '</p>' };
   const outcomeOpts = m => `<option value="challenger|2-0">Vince ${esc(pn(m.challenger_id))} 2-0</option><option value="challenger|2-1">Vince ${esc(pn(m.challenger_id))} 2-1</option><option value="opponent|0-2">Vince ${esc(pn(m.opponent_id))} 2-0</option><option value="opponent|1-2">Vince ${esc(pn(m.opponent_id))} 2-1</option><option value="draw|1-1">Pareggio 1-1</option>`;
   const outcomeText = m => m.reported_result === 'draw' ? 'pareggio 1-1' : `ha vinto ${esc(pn(m.reported_result === 'challenger' ? m.challenger_id : m.opponent_id))} ${m.reported_result === 'challenger' ? m.reported_score : m.reported_score.split('-').reverse().join('-')}`;
   const dlt = n => `<span class="${n >= 0 ? 'pos' : 'neg'}">${n >= 0 ? '+' : ''}${n}</span>`;
-  const lrow = (m, extra) => `<div class="row2"><div class="g">${esc(pn(m.challenger_id))} <span class="mute">vs</span> ${esc(pn(m.opponent_id))}<small>${esc(m.format)} · ${when(m.created_at)}${m.message ? ' · “' + esc(m.message) + '”' : ''}${m.status === 'reported' ? ' · ' + outcomeText(m) : ''}${m.dispute_reason ? ' · contestazione: ' + esc(m.dispute_reason) : ''}</small></div>${tag(LST[m.status][0], LST[m.status][1])}${extra || ''}</div>`;
+  const lrow = (m, extra) => `<div class="row2"><div class="g">${esc(pn(m.challenger_id))} <span class="mute">vs</span> ${esc(pn(m.opponent_id))}<small>${esc(m.format)}${kName(m) ? ' · ' + kName(m) : ''} · ${when(m.created_at)}${m.message ? ' · “' + esc(m.message) + '”' : ''}${m.status === 'reported' ? ' · ' + outcomeText(m) : ''}${m.dispute_reason ? ' · contestazione: ' + esc(m.dispute_reason) : ''}</small></div>${tag(LST[m.status][0], LST[m.status][1])}${extra || ''}</div>`;
+  /* cosa c'è in gioco, spiegato a chi riceve la sfida (value = taglie che ha addosso) */
+  const stake = (m, value) => {
+    const r = rwS(), el = `l'Elo ${esc(m.format)}${r.on ? ' e +' + r.bc + ' BC al vincitore' : ''}`, tg = value > 0 ? `le tue taglie (in tutto ${BC(value)})` : 'le taglie che hai addosso';
+    if (m.kind === 'bounty') return `<b>Solo per la taglia</b>: se perdi, chi ti ha sfidato potrà riscuotere ${tg}. L'Elo non cambia.`;
+    if (m.kind === 'both') return `<b>Ladder + taglia</b>: in gioco ${el}, e se perdi chi ti ha sfidato potrà riscuotere ${tg}.`;
+    if (m.kind === 'ladder') return `<b>Ladder normale</b>: in gioco ${el}. Le taglie che hai addosso non c'entrano.`;
+    return '';
+  };
+  /* pannello "Ti hanno sfidato": usato nella pagina Ladder e in dashboard; i pulsanti restano gli stessi (ldAcc / ldDec) */
+  BM.incomingBox = (incoming, vals, opt) => incoming.length ? `<div class="box" id="ldin" style="margin-top:${(opt && opt.mt) || 18}px;border-color:var(--gold)"><h2 style="margin-top:0">${incoming.length === 1 ? 'Hai 1 sfida da accettare' : 'Hai ' + incoming.length + ' sfide da accettare'}</h2><p class="mute" style="font-size:.9rem;margin-top:0">Puoi accettare o rifiutare. Se non rispondi la sfida scade da sola dopo ${(BM.S && BM.S.ladder_expiry_days) || 7} giorni.</p>${incoming.map(m => `<div class="row2" style="align-items:flex-start"><div class="g"><b>${esc(pn(m.challenger_id))}</b> ti sfida in <b>${esc(m.format)}</b><small style="display:block;color:var(--tx);opacity:.9;margin:3px 0">${stake(m, vals && vals.get(m.opponent_id))}</small><small>${when(m.created_at)}${m.message ? ' · “' + esc(m.message) + '”' : ''}</small></div><div class="row" style="gap:8px;flex:none"><button class="btn gold sm" data-act="ldAcc" data-c="${m.id}">Accetta</button><button class="btn ghost sm" data-act="ldDec" data-c="${m.id}">Rifiuta</button></div></div>`).join('')}</div>` : '';
 
   R.ladder = async () => {
     if (!on('ladder')) return off('La <em>Ladder</em>', 'ladder');
     shell(ldHead() + loading, 'ladder');
     try {
       try { await rpc('ladder_expire', {}) } catch (e) { /* manutenzione */ }
-      const sb = BM.sb, me = BM.me;
-      const [st, ms] = await Promise.all([q(sb.from('ladder_standings_v').select('*').order('rank').limit(100)), q(sb.from('ladder_matches').select('*').order('created_at', { ascending: false }).limit(200))]);
-      const mine = st.find(r => r.user_id === me.id), isMine = m => m.challenger_id === me.id || m.opponent_id === me.id;
+      const sb = BM.sb, me = BM.me, V = await hasV11();
+      const [st, ms, mw, mine0] = await Promise.all([q(sb.from('ladder_standings_v').select('*').order('rank').limit(400)), q(sb.from('ladder_matches').select('*').order('created_at', { ascending: false }).limit(200)),
+        q(sb.from('most_wanted_v').select('id,bounty_value')), q(sb.from('bounties').select('target_id,amount').eq('creator_id', me.id).eq('status', 'active'))]);
+      const isMine = m => m.challenger_id === me.id || m.opponent_id === me.id;
       const incoming = ms.filter(m => m.status === 'pending' && m.opponent_id === me.id);
       const outgoing = ms.filter(m => m.status === 'pending' && m.challenger_id === me.id);
       const toPlay = ms.filter(m => m.status === 'accepted' && isMine(m));
       const toConfirm = ms.filter(m => m.status === 'reported' && isMine(m));
       const disputed = ms.filter(m => m.status === 'disputed' && isMine(m));
-      const closed = ms.filter(m => m.status === 'closed').sort((a, b) => new Date(b.closed_at) - new Date(a.closed_at)).slice(0, 15);
-      const elo = new Map(st.map(r => [r.user_id, r.elo]));
+      const fsel = V ? store.get('ldfmt', FMT[0]) : null, FM = V ? FMT : [null];
+      const stF = f => V ? st.filter(r => r.format === f) : st;
+      const closed = f => ms.filter(m => m.status === 'closed' && (!V || m.format === f)).sort((a, b) => new Date(b.closed_at) - new Date(a.closed_at)).slice(0, 15);
+      const myRow = f => stF(f).find(r => r.user_id === me.id);
+      const eloOf = (f, id) => (stF(f).find(r => r.user_id === id) || {}).elo;
+      const val = new Map(mw.map(r => [r.id, r.bounty_value])), own = new Map();
+      mine0.forEach(b => own.set(b.target_id, (own.get(b.target_id) || 0) + b.amount));
+      const claim = id => Math.max(0, (val.get(id) || 0) - (own.get(id) || 0));      // quanto potrei incassare io (le mie quote mi tornano indietro)
       const cand = [...BM.P.values()].filter(p => p.id !== me.id && !p.suspended).sort((a, b) => a.nickname.localeCompare(b.nickname));
       const rw = rwS(), now = Date.now(), rewardedToday = ms.filter(m => m.status === 'closed' && m.reward_user === me.id && m.reward_amount > 0 && now - new Date(m.closed_at) < 864e5).length;
+      const myVal = new Map([[me.id, val.get(me.id) || 0]]);
+      const eloBox = V ? `<div class="stats" style="margin-top:0">${FMT.map(f => { const r = myRow(f); return `<div class="stat"><b>${r ? r.elo : 1000}</b><span>Elo ${f}${r ? ` · #${r.rank} · ${r.wins}V ${r.draws}P ${r.losses}S` : ' · non ancora classificato'}</span></div>` }).join('')}</div>`
+        : (() => { const r = myRow(null); return `<div class="row" style="gap:16px">${av(me)}<div class="g"><b>${esc(me.nickname)}</b><small class="mute" style="display:block">${r ? `${r.wins}V · ${r.draws}P · ${r.losses}S · ${r.matches} match` : 'Non ancora classificato: gioca il tuo primo match'}</small></div><span class="val">${r ? r.elo : 1000} <small>Elo</small></span></div>` })();
+      const stRows = f => stF(f).map(r => `<div class="row2 ldr" data-n="${esc(r.nickname.toLowerCase())}"><span class="rank">${r.rank}</span>${av(BM.P.get(r.user_id) || { nickname: r.nickname, avatar: r.avatar })}<div class="g"><a href="#/p/${r.user_id}">${esc(r.nickname)}</a><small>${r.wins}V · ${r.draws}P · ${r.losses}S</small></div><span class="val">${r.elo}</span>${r.user_id !== me.id ? `<button class="btn ghost sm" data-act="ldPick" data-u="${r.user_id}"${f ? ` data-f="${f}"` : ''}>Sfida</button>` : ''}</div>`).join('') || empty(V ? `Nessuna partita conclusa in ${f}: la classifica comparirà dopo il primo risultato confermato.` : 'Nessun match concluso: la classifica comparirà dopo il primo risultato confermato.');
+      const resRows = f => closed(f).map(m => { const dr = m.reported_result === 'draw', wn = m.reported_result === 'challenger' ? m.challenger_id : m.opponent_id, ls = wn === m.challenger_id ? m.opponent_id : m.challenger_id, noElo = m.kind === 'bounty';
+        return `<div class="row2"><div class="g">${dr ? esc(pn(m.challenger_id)) + ' e ' + esc(pn(m.opponent_id)) + ' pareggiano' : esc(pn(wn)) + ' ha battuto ' + esc(pn(ls))}<small>${esc(m.format)}${kName(m) ? ' · ' + kName(m) : ''} · ${when(m.closed_at)}${noElo ? ' · nessun Elo in gioco' : ` · ${esc(pn(m.challenger_id))} ${dlt(m.elo_challenger_delta)} · ${esc(pn(m.opponent_id))} ${dlt(m.elo_opponent_delta)}`}${m.reward_amount > 0 ? ` · <span class="pos">+${m.reward_amount} BC a ${esc(pn(m.reward_user))}</span>` : ''}${m.official_match_id ? ' · match WPA' : ''}</small></div></div>` }).join('') || empty(V ? `Ancora nessun risultato in ${f}.` : 'Ancora nessun risultato.');
+      const tabs = V ? seg('ldfmt', fsel, FMT.map(f => [f, f]), 'store') : '';
       shell(`${ldHead()}
-      <div class="box" style="margin-top:18px"><h2 style="margin-top:0">Premi e match WPA</h2><ul class="mute" style="margin:0;padding-left:20px;font-size:.92rem;line-height:1.5">${rw.on ? `<li><b>+${rw.bc} BC</b> per ogni vittoria confermata (pareggi e sconfitte non danno BC). Massimo ${rw.day} vittorie premiate nelle 24 ore e ${rw.pair} per avversario.</li>` : '<li>I premi in BC sono al momento sospesi.</li>'}${rw.wpa ? `<li>La vittoria è registrata come <b>match WPA ufficiale</b>: conta per Hall of Fame, Faction Wars e taglie. Per evitare accordi, una taglia su un match Ladder si riscuote dopo ${rw.hold} ore e conta un solo match ufficiale al giorno per coppia.</li>` : ''}<li>Il pareggio e le partite oltre i limiti contano comunque per l'Elo.</li></ul>${rw.on ? `<p style="margin:10px 0 0"><b>Le tue vittorie premiate nelle ultime 24 ore:</b> ${rewardedToday}/${rw.day}</p>` : ''}</div>
-      <div class="box" style="margin-top:18px"><div class="row" style="gap:16px">${av(me)}<div class="g"><b>${esc(me.nickname)}</b><small class="mute" style="display:block">${mine ? `${mine.wins}V · ${mine.draws}P · ${mine.losses}S · ${mine.matches} match` : 'Non ancora classificato: gioca il tuo primo match'}</small></div><span class="val">${mine ? mine.elo + ' <small>Elo</small>' : '1000 <small>Elo</small>'}</span>${mine ? tag('#' + mine.rank, 'g') : ''}</div></div>
-      <form id="ldnew" class="box row" style="margin-top:14px" data-rq="${crypto.randomUUID()}"><select id="ldo" required aria-label="Avversario" style="flex:1;min-width:170px"><option value="">Sfida un duellante…</option>${cand.map(p => `<option value="${p.id}">${esc(p.nickname)} · ${elo.has(p.id) ? elo.get(p.id) + ' Elo' : 'non classificato'}</option>`).join('')}</select>
-        <select id="ldf" aria-label="Formato">${FMT.map(f => `<option>${f}</option>`).join('')}</select><input id="ldm" maxlength="140" placeholder="Messaggio (facoltativo)" style="flex:2;min-width:170px"><button class="btn gold" type="submit">Lancia la sfida</button></form>
-      ${incoming.length ? `<div class="box" style="margin-top:14px"><h2>Ti hanno sfidato (${incoming.length})</h2>${incoming.map(m => lrow(m, `<button class="btn gold sm" data-act="ldAcc" data-c="${m.id}">Accetta</button><button class="btn ghost sm" data-act="ldDec" data-c="${m.id}">Rifiuta</button>`)).join('')}</div>` : ''}
+      ${BM.incomingBox(incoming, myVal)}
+      <div class="box" style="margin-top:18px"><h2 style="margin-top:0">Il tuo Elo</h2>${eloBox}</div>
+      <form id="ldnew" class="box" style="margin-top:14px;display:grid;gap:10px" data-rq="${crypto.randomUUID()}"><h2 style="margin:0">Lancia una sfida</h2>
+        <div class="row" style="gap:10px;flex-wrap:wrap"><select id="ldo" required aria-label="Avversario" style="flex:2;min-width:180px"><option value="">Scegli il duellante…</option>${cand.map(p => `<option value="${p.id}">${esc(p.nickname)}${V ? '' : ' · ' + (eloOf(null, p.id) ? eloOf(null, p.id) + ' Elo' : 'non classificato')}${claim(p.id) > 0 ? ' · taglia ' + claim(p.id) + ' BC' : ''}</option>`).join('')}</select>
+        ${V ? `<select id="ldf" aria-label="Formato" required style="flex:1;min-width:120px">${FMT.map(f => `<option${f === fsel ? ' selected' : ''}>${f}</option>`).join('')}</select>` : `<input type="hidden" id="ldf" value="Advanced">`}</div>
+        ${V ? `<div><label for="ldk">Tipo di sfida</label><select id="ldk" required style="width:100%"><option value="">Scegli prima il duellante…</option></select><p id="ldkh" class="mute" style="font-size:.88rem;margin:6px 0 0"></p></div>` : '<p class="mute" style="font-size:.88rem;margin:0">Per scegliere il formato e il tipo di sfida un amministratore deve eseguire la migrazione <b>black-market-ladder-formati.sql</b>.</p>'}
+        <input id="ldm" maxlength="140" placeholder="Messaggio (facoltativo)"><button class="btn gold" type="submit">Lancia la sfida</button></form>
       ${toPlay.length ? `<div class="box" style="margin-top:14px"><h2>Da giocare (${toPlay.length})</h2><p class="mute" style="font-size:.9rem;margin-top:0">Dopo il duello, uno dei due invia il risultato; l'altro lo conferma.</p>${toPlay.map(m => lrow(m, `<select id="lr-${m.id}" aria-label="Risultato">${outcomeOpts(m)}</select><button class="btn sm" data-act="ldRep" data-c="${m.id}">Invia risultato</button><button class="btn ghost sm" data-act="ldCan" data-c="${m.id}">Annulla</button>`)).join('')}</div>` : ''}
       ${toConfirm.length ? `<div class="box" style="margin-top:14px"><h2>Risultati da confermare (${toConfirm.length})</h2>${toConfirm.map(m => lrow(m, m.reported_by === me.id ? '<small class="mute">attende la conferma dell\'avversario</small>' : `<button class="btn gold sm" data-act="ldConf" data-c="${m.id}">Conferma</button><button class="btn ghost sm" data-act="ldDisp" data-c="${m.id}">Contesta</button>`)).join('')}</div>` : ''}
       ${disputed.length ? `<div class="box" style="margin-top:14px"><h2>Contestati</h2><p class="mute" style="font-size:.9rem;margin-top:0">Decide un amministratore.</p>${disputed.map(m => lrow(m)).join('')}</div>` : ''}
       ${outgoing.length ? `<div class="box" style="margin-top:14px"><h2>Sfide inviate</h2>${outgoing.map(m => lrow(m, `<button class="btn ghost sm" data-act="ldCan" data-c="${m.id}">Annulla</button>`)).join('')}</div>` : ''}
-      <div class="box" style="margin-top:14px"><h2>Classifica</h2><input id="lds" type="search" placeholder="Cerca giocatore…" aria-label="Cerca giocatore" style="margin-bottom:8px">${st.map(r => `<div class="row2 ldr" data-n="${esc(r.nickname.toLowerCase())}"><span class="rank">${r.rank}</span>${av(BM.P.get(r.user_id) || { nickname: r.nickname, avatar: r.avatar })}<div class="g"><a href="#/p/${r.user_id}">${esc(r.nickname)}</a><small>${r.wins}V · ${r.draws}P · ${r.losses}S</small></div><span class="val">${r.elo}</span>${r.user_id !== me.id ? `<button class="btn ghost sm" data-act="ldPick" data-u="${r.user_id}">Sfida</button>` : ''}</div>`).join('') || empty('Nessun match concluso: la classifica comparirà dopo il primo risultato confermato.')}</div>
-      <div class="box" style="margin-top:14px"><h2>Ultimi risultati</h2>${closed.map(m => { const dr = m.reported_result === 'draw', wn = m.reported_result === 'challenger' ? m.challenger_id : m.opponent_id, ls = wn === m.challenger_id ? m.opponent_id : m.challenger_id; return `<div class="row2"><div class="g">${dr ? esc(pn(m.challenger_id)) + ' e ' + esc(pn(m.opponent_id)) + ' pareggiano' : esc(pn(wn)) + ' ha battuto ' + esc(pn(ls))}<small>${esc(m.format)} · ${when(m.closed_at)} · ${esc(pn(m.challenger_id))} ${dlt(m.elo_challenger_delta)} · ${esc(pn(m.opponent_id))} ${dlt(m.elo_opponent_delta)}${m.reward_amount > 0 ? ` · <span class="pos">+${m.reward_amount} BC a ${esc(pn(m.reward_user))}</span>` : ''}${m.official_match_id ? ' · match WPA' : ''}</small></div></div>` }).join('') || empty('Ancora nessun risultato.')}</div>`, 'ladder');
+      ${tabs}
+      <div class="box" style="margin-top:${V ? 0 : 14}px"><h2 style="margin-top:0">Classifica${V ? ' ' + fsel : ''}</h2><input id="lds" type="search" placeholder="Cerca giocatore…" aria-label="Cerca giocatore" style="margin-bottom:8px">${stRows(V ? fsel : null)}</div>
+      <div class="box" style="margin-top:14px"><h2 style="margin-top:0">Ultimi risultati${V ? ' ' + fsel : ''}</h2>${resRows(V ? fsel : null)}</div>
+      <div class="box" style="margin-top:14px"><h2 style="margin-top:0">Come funzionano premi e taglie</h2><ul class="mute" style="margin:0;padding-left:20px;font-size:.92rem;line-height:1.5">${V ? `<li><b>Ladder normale</b>: conta per l'Elo del formato${rw.on ? ` e dà <b>+${rw.bc} BC</b> al vincitore` : ''}. Le taglie non c'entrano.</li><li><b>Per la taglia</b>: solo il match WPA ufficiale con cui, se vinci, riscuoti la taglia. Nessun Elo e nessun premio Ladder. Disponibile solo se l'avversario ha una taglia che puoi incassare.</li><li><b>Ladder + taglia</b>: tutte e due le cose insieme.</li>` : (rw.on ? `<li><b>+${rw.bc} BC</b> per ogni vittoria confermata (pareggi e sconfitte non danno BC).</li>` : '')}${rw.on ? `<li>Premio Ladder: massimo ${rw.day} vittorie premiate nelle 24 ore e ${rw.pair} per avversario.</li>` : '<li>I premi in BC sono al momento sospesi.</li>'}${rw.wpa ? `<li>La vittoria è registrata come <b>match WPA ufficiale</b>: conta per Hall of Fame e Faction Wars. Per evitare accordi, una taglia vinta con un match Ladder si riscuote dopo ${rw.hold} ore e conta un solo match ufficiale al giorno per coppia.</li>` : ''}<li>Il pareggio e le partite oltre i limiti contano comunque per l'Elo.</li></ul>${rw.on ? `<p style="margin:10px 0 0"><b>Le tue vittorie premiate nelle ultime 24 ore:</b> ${rewardedToday}/${rw.day}</p>` : ''}</div>`, 'ladder');
       const f = document.getElementById('ldnew');
+      /* tipo di sfida: le voci dipendono da quante taglie incassabili ha l'avversario (il database ricontrolla tutto) */
+      const fillKinds = () => {
+        const k = document.getElementById('ldk'); if (!k) return;
+        const id = f.ldo.value, c = id ? claim(id) : 0, keep = k.value, nick = id ? esc(pn(id)) : '';
+        k.innerHTML = !id ? '<option value="">Scegli prima il duellante…</option>' : `<option value="">Scegli il tipo di sfida…</option><option value="ladder">Ladder normale (Elo${rw.on ? ' e +' + rw.bc + ' BC' : ''}, nessuna taglia)</option>` +
+          (c > 0 ? `<option value="bounty">Per la taglia (puoi incassare ${c} BC, nessun Elo)</option><option value="both">Ladder + taglia (Elo e ${c} BC)</option>` : '');
+        if ([...k.options].some(o => o.value === keep)) k.value = keep;
+        const h = document.getElementById('ldkh');
+        if (h) h.innerHTML = !id ? '' : c > 0 ? `${nick} ha addosso ${val.get(id)} BC di taglie${own.get(id) ? `, di cui ${own.get(id)} tuoi (ti tornano indietro, non sono un guadagno)` : ''}: potresti incassarne ${c}.` : `${nick} non ha taglie che tu possa incassare: la sfida può essere solo una Ladder normale.`;
+      };
+      f.ldo.onchange = fillKinds; fillKinds();
       f.onsubmit = async e => { e.preventDefault(); const b = f.querySelector('button[type=submit]'); b.disabled = true;
-        try { await rpc('ladder_challenge', { p_opponent: f.ldo.value, p_format: f.ldf.value, p_message: f.ldm.value || null, p_request_id: f.dataset.rq }); toast('Sfida lanciata.'); BM.route() }
+        try {
+          const a = { p_opponent: f.ldo.value, p_format: f.ldf.value, p_message: f.ldm.value || null, p_request_id: f.dataset.rq };
+          const kn = document.getElementById('ldk'); if (kn) { if (!kn.value) throw new Error('Scegli il tipo di sfida'); a.p_kind = kn.value }
+          await rpc('ladder_challenge', a); toast('Sfida lanciata: l\'avversario riceverà una notifica.'); BM.route() }
         catch (er) { toast(er.message, 1); b.disabled = false } };
       const sInp = document.getElementById('lds');
       sInp.oninput = () => { const t = sInp.value.trim().toLowerCase(); document.querySelectorAll('.ldr').forEach(r => r.hidden = !!t && !r.dataset.n.includes(t)) };
     } catch (er) { fail(er, 'ladder') }
   };
-
 
   /* ============================== FUNZIONI MOD ============================== */
   R.mod = async () => {
@@ -376,7 +429,7 @@ window.BM_MODULES = function (BM) {
     ldRep: async el => { const [r, sc] = document.getElementById('lr-' + el.dataset.c).value.split('|'); await rpc('ladder_report', { p_id: el.dataset.c, p_result: r, p_score: sc }); await done('Risultato inviato: ora deve confermarlo l\'avversario.') },
     ldConf: async el => { const r = await rpc('ladder_confirm', { p_id: el.dataset.c }); await done(`Risultato confermato. Elo: ${r.challenger_delta >= 0 ? '+' : ''}${r.challenger_delta} / ${r.opponent_delta >= 0 ? '+' : ''}${r.opponent_delta}.` + (r.reward > 0 ? ` Il vincitore riceve +${r.reward} BC.` : r.reward_note ? ` Nessun premio in BC: ${r.reward_note}.` : '') + (r.official_match ? ' Registrato come match WPA.' : '')) },
     ldDisp: async el => { const r = ask('Perché contesti il risultato? (almeno 5 caratteri)'); if (!r) return; await rpc('ladder_dispute', { p_id: el.dataset.c, p_reason: r }); await done('Contestazione inviata: deciderà un amministratore.') },
-    ldPick: async el => { const f = document.getElementById('ldo'); if (f) { f.value = el.dataset.u; f.scrollIntoView({ behavior: 'smooth', block: 'center' }); f.focus() } },
+    ldPick: async el => { const f = document.getElementById('ldo'); if (f) { f.value = el.dataset.u; const ff = document.getElementById('ldf'); if (ff && el.dataset.f) ff.value = el.dataset.f; f.dispatchEvent(new Event('change')); f.scrollIntoView({ behavior: 'smooth', block: 'center' }); f.focus() } },
     ldAdmRes: async el => { const sel = document.getElementById('lar-' + el.dataset.c).value.split('|'); const r = ask('Motivazione della decisione:'); if (!r) return; const res = await rpc('admin_ladder_resolve', { p_id: el.dataset.c, p_result: sel[0], p_score: sel[1], p_reason: r }); await done('Match risolto e Elo aggiornato.' + (res.reward > 0 ? ` Premio di ${res.reward} BC al vincitore.` : '') + (res.official_match ? ' Registrato come match WPA.' : '')) },
     ldAdmVoid: async el => { if (!confirm('Annullare il match senza modificare l\'Elo?')) return; const r = ask('Motivazione dell\'annullamento:'); if (!r) return; await rpc('admin_ladder_void', { p_id: el.dataset.c, p_reason: r }); await done('Match annullato.') },
     /* amministrazione */

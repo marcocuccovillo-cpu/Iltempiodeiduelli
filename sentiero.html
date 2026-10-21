@@ -154,11 +154,14 @@ let sb=null,ME=null,ROWS=[],flt='all',last=0;
 function gate(msg){ME=null;ROWS=[];$('main').hidden=true;$('gate').hidden=false;
  $('hero').innerHTML=msg?`<p class="mute" style="margin:0" role="status">${msg}</p>`:'<div class="who"><div class="pic" aria-hidden="true">?</div><div><h2>Nessun profilo attivo</h2><p class="mute" style="margin:4px 0 0">Entra dal Black Market per vedere i tuoi badge.</p></div></div>';
  $('prev').innerHTML=TDB.wall(TDB.preview(),'all')}
+function eloChips(L){/* un Elo per formato (Advanced, Edison); senza la migrazione 011 c'è un solo Elo */
+ const fm=L.some(r=>r.format)?['Advanced','Edison']:[null];
+ return fm.map(f=>{const r=f?L.find(x=>x.format===f):L[0];return `<div><b>${r?r.elo:'n/d'}</b><span>${r?`Elo ${f||'Ladder'} · #${r.rank} · ${r.wins}V ${r.draws}P ${r.losses}S`:`Elo ${f||'Ladder'} · non ancora classificato`}</span></div>`}).join('')}
 function paint(wl,ld,err){
  const sm=ROWS.length?TDB.summary(ROWS):null,n=v=>Number(v||0).toLocaleString('it-IT');
  $('hero').innerHTML=`<div class="who"><div class="pic" aria-hidden="true">${ME.avatar_img?`<img src="${esc(ME.avatar_img)}" alt="">`:esc(ME.avatar||(ME.nickname||'?')[0].toUpperCase())}</div><div style="min-width:0"><h2>${esc(ME.nickname)}</h2><div class="tags"><span class="tag">${ROLE[ME.role]||''}</span>${sm?`<span class="tag g">${esc(sm.grade)}</span>`:''}</div></div></div>`+
   (sm?TDB.sumBox(sm):'')+
-  `<div class="chips"><div><b>${wl?n(wl.balance)+' BC':'n/d'}</b><span>Saldo Black Market</span></div><div><b>${ld?ld.elo:'n/d'}</b><span>${ld?`Elo Ladder · #${ld.rank} · ${ld.wins}V ${ld.draws}P ${ld.losses}S`:'Elo Ladder · non ancora classificato'}</span></div><div><b>${sm?sm.earned+'/'+sm.total:'n/d'}</b><span>Badge ottenuti</span></div><div><b>${sm?n(sm.pts):'n/d'}</b><span>Punti Tempio</span></div></div>`+
+  `<div class="chips"><div><b>${wl?n(wl.balance)+' BC':'n/d'}</b><span>Saldo Black Market</span></div>${eloChips(ld)}<div><b>${sm?sm.earned+'/'+sm.total:'n/d'}</b><span>Badge ottenuti</span></div><div><b>${sm?n(sm.pts):'n/d'}</b><span>Punti Tempio</span></div></div>`+
   `<div class="row"><a class="btn gold sm" href="black-market.html#/p/${ME.id}">Il mio profilo Black Market</a><a class="btn ghost sm" href="black-market.html#/ladder">Ladder</a></div><p class="sync">Un solo profilo: nickname, foto, saldo e Ladder sono quelli del Black Market. Per cambiare la foto, vai nel Black Market.</p>`;
  if(err){$('bnext').innerHTML='';$('bwall').innerHTML=`<p class="warn">${esc(err)}</p>`}
  else{const nu=TDB.nextUp(ROWS,4);$('bnext').innerHTML=nu?`<h2>I più vicini</h2><div class="card">${nu}</div>`:'';$('bwall').innerHTML=TDB.wall(ROWS,flt)}
@@ -172,12 +175,12 @@ async function boot(){
   const{data:{session}}=await sb.auth.getSession();
   if(!session){gate();return}
   const id=session.user.id;
-  const[pr,wl,ld]=await Promise.all([sb.from('profiles').select('id,nickname,avatar,avatar_img,role').eq('id',id).maybeSingle(),sb.from('wallets').select('balance').eq('user_id',id).maybeSingle(),sb.from('ladder_standings_v').select('elo,rank,wins,draws,losses').eq('user_id',id)]);
+  const[pr,wl,ld]=await Promise.all([sb.from('profiles').select('id,nickname,avatar,avatar_img,role').eq('id',id).maybeSingle(),sb.from('wallets').select('balance').eq('user_id',id).maybeSingle(),sb.from('ladder_standings_v').select('*').eq('user_id',id)]);
   if(pr.error)throw new Error(pr.error.message);
   if(!pr.data){gate('Il tuo accesso non ha ancora un profilo Black Market. <a href="black-market.html">Completa la registrazione</a>.');return}
   ME=pr.data;S.nick=ME.nickname;save();
   let err='';try{ROWS=await TDB.load(sb,id)}catch(e){ROWS=[];err=e.message}
-  paint(wl.data,ld.data&&ld.data[0],err)
+  paint(wl.data,ld.data||[],err)
  }catch(e){gate('Errore di collegamento: '+esc(e.message))}}
 TDB.init();
 TDB.bind($('p-bad'),()=>ROWS);TDB.bind($('prev'),()=>TDB.preview());

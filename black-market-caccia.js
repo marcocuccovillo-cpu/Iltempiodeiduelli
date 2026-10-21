@@ -14,7 +14,7 @@ window.BM_HUNT = function (BM) {
   const { R, shell, q, rpc, toast, esc, BC, when, av } = BM;
   const ladderOn = () => BM.S && BM.S.module_ladder == 1;
   const hold = () => (BM.S && BM.S.ladder_claim_hold_hours) ?? 24;
-  const FMT = ['Advanced', 'Traditional', 'GOAT', 'Edison'];
+  const FMT = ['Advanced', 'Edison'];
   const OPEN = ['pending', 'accepted', 'reported', 'disputed'];
   const STAT = { pending: 'in attesa che accetti', accepted: 'accettata: da giocare', reported: 'risultato da confermare', disputed: 'risultato contestato' };
   const num = n => Number(n || 0).toLocaleString('it-IT');
@@ -29,7 +29,7 @@ window.BM_HUNT = function (BM) {
   const off = () => shell(`<h1 class="t">Caccia alle <em>taglie</em></h1><div class="box" style="margin-top:18px"><h2>Ladder non attiva</h2><p>Le sfide per le taglie passano dalla Ladder, che al momento è spenta. Puoi comunque riscuotere una taglia vincendo un match ufficiale in un evento (pagina <a href="#/events">Eventi</a>).</p></div>`, 'wanted');
 
   const steps = () => `<ol class="steps" style="margin:12px 0 0;padding-left:20px;line-height:1.55">
-<li><b>Lancia la sfida</b>: è una normale sfida in Ladder. Lo sfidato riceve una notifica.</li>
+<li><b>Scegli formato e tipo di sfida</b> (Advanced o Edison; «per la taglia» oppure «Ladder + taglia») e lanciala. Lo sfidato riceve una notifica e vede il tipo prima di rispondere.</li>
 <li><b>Se accetta, giocate</b>. Può anche rifiutare o lasciar scadere la sfida: in quel caso la taglia resta lì dov'è.</li>
 <li><b>Uno invia il risultato, l'altro lo conferma</b>. Se vinci, il match diventa un match WPA ufficiale.</li>
 <li><b>Dopo ${hold()} ore riscuoti la taglia</b> da questa pagina (attesa anti-accordi). La parte che hai messo tu ti torna indietro, il resto è tuo.</li></ol>`;
@@ -46,11 +46,13 @@ window.BM_HUNT = function (BM) {
     const w = mw[0] || { bounty_value: 0, active_count: 0 };
     const own = mine.filter(b => b.target_id === id && b.status === 'active').reduce((t, b) => t + b.amount, 0);
     const gain = Math.max(0, w.bounty_value - own);
-    const elo = st.find(r => r.user_id === id), myElo = st.find(r => r.user_id === me.id);
+    const V = BM.hasV11 ? await BM.hasV11() : false;
+    const eloTxt = uid => V ? FMT.map(f => { const r = st.find(x => x.user_id === uid && x.format === f); return r ? `${r.elo} ${f}` : null }).filter(Boolean).join(' · ') : ((st.find(r => r.user_id === uid) || {}).elo || '');
+    const elo = eloTxt(id), myElo = eloTxt(me.id);
     const open = ms.find(m => OPEN.includes(m.status) && ((m.challenger_id === me.id && m.opponent_id === id) || (m.challenger_id === id && m.opponent_id === me.id)));
     const rq = crypto.randomUUID();
     shell(`<h1 class="t">Sfida per la <em>taglia</em></h1><p class="sub">Sfida ${esc(p.nickname)} in Ladder: se lo batti puoi riscuotere le taglie che ha addosso.</p>
-<div class="box" style="margin-top:18px"><div class="row" style="gap:16px;align-items:center">${av(p).replace('class="av"', 'class="av xl"')}<div class="g" style="min-width:0"><a href="#/p/${id}" style="font:700 1.4rem var(--disp);color:var(--tx);text-decoration:none">${esc(p.nickname)}</a><small class="mute" style="display:block">${elo ? `${elo.elo} Elo · ${elo.wins}V ${elo.draws}P ${elo.losses}S` : 'Non ancora classificato in Ladder'}${myElo ? ` · tu: ${myElo.elo} Elo` : ''}</small></div></div>
+<div class="box" style="margin-top:18px"><div class="row" style="gap:16px;align-items:center">${av(p).replace('class="av"', 'class="av xl"')}<div class="g" style="min-width:0"><a href="#/p/${id}" style="font:700 1.4rem var(--disp);color:var(--tx);text-decoration:none">${esc(p.nickname)}</a><small class="mute" style="display:block">${elo ? `Elo: ${elo}` : 'Non ancora classificato in Ladder'}${myElo ? ` · tu: ${myElo}` : ''}</small></div></div>
 <div class="stats" style="margin-top:14px"><div class="stat"><b>${BC(w.bounty_value)}</b><span>Bounty Value (${w.active_count} ${w.active_count == 1 ? 'taglia attiva' : 'taglie attive'})</span></div>
 <div class="stat"><b>${BC(gain)}</b><span>${own ? `che potresti incassare (le tue quote, ${BC(own)}, ti tornano indietro)` : 'che potresti incassare vincendo'}</span></div></div>
 ${w.bounty_value ? '' : '<p class="mute" style="margin:12px 0 0">Al momento non ci sono taglie su questo duellante: sarebbe una normale sfida in Ladder.</p>'}</div>
@@ -58,12 +60,17 @@ ${w.bounty_value ? '' : '<p class="mute" style="margin:12px 0 0">Al momento non 
 ${open ? `<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Sfida già aperta</h2><p style="margin:0 0 10px">Tra voi c'è già una sfida: <b>${STAT[open.status]}</b>${open.challenger_id === id ? ' (ti ha sfidato lui)' : ''}.</p><a class="btn gold" href="#/ladder">Vai alla Ladder</a></div>`
         : `<form id="hf" class="box" style="margin-top:14px;display:grid;gap:10px;max-width:560px" data-rq="${rq}"><h2 style="margin:0">Lancia la sfida</h2>
 <div><label for="hfm">Formato</label><select id="hfm">${FMT.map(f => `<option>${f}</option>`).join('')}</select></div>
+${V ? `<div><label for="hfk">Tipo di sfida</label><select id="hfk" required><option value="">Scegli il tipo di sfida…</option><option value="ladder">Ladder normale (Elo, nessuna taglia)</option>${gain > 0 ? `<option value="bounty">Per la taglia (puoi incassare ${gain} BC, nessun Elo)</option><option value="both">Ladder + taglia (Elo e ${gain} BC)</option>` : ''}</select>
+<p class="mute" style="font-size:.88rem;margin:6px 0 0">${gain > 0 ? '<b>Per la taglia</b>: conta solo il match ufficiale con cui riscuoti. <b>Ladder + taglia</b>: in gioco anche l\'Elo del formato e il premio Ladder. <b>Ladder normale</b>: nessuna taglia in gioco.' : 'Su questo duellante non c\'è niente che tu possa incassare: la sfida può essere solo una Ladder normale.'}</p></div>` : ''}
 <div><label for="hms">Messaggio (facoltativo)</label><input id="hms" maxlength="140" value="${w.bounty_value ? 'Vengo a prendere la tua taglia!' : ''}"></div>
-<button class="btn gold" type="submit">${w.bounty_value ? 'Sfida per la taglia' : 'Lancia la sfida'}</button></form>`}`, 'wanted');
+<button class="btn gold" type="submit">Lancia la sfida</button></form>`}`, 'wanted');
     const f = document.getElementById('hf');
     if (f) f.onsubmit = async e => {
       e.preventDefault(); const b = f.querySelector('button[type=submit]'); b.disabled = true;
-      try { await rpc('ladder_challenge', { p_opponent: id, p_format: document.getElementById('hfm').value, p_message: document.getElementById('hms').value.trim() || null, p_request_id: f.dataset.rq }); toast('Sfida lanciata: ' + p.nickname + ' riceverà una notifica.'); BM.route() }
+      try {
+        const a = { p_opponent: id, p_format: document.getElementById('hfm').value, p_message: document.getElementById('hms').value.trim() || null, p_request_id: f.dataset.rq };
+        const k = document.getElementById('hfk'); if (k) { if (!k.value) throw new Error('Scegli il tipo di sfida'); a.p_kind = k.value }
+        await rpc('ladder_challenge', a); toast('Sfida lanciata: ' + p.nickname + ' riceverà una notifica.'); BM.route() }
       catch (er) { toast(er.message, 1); b.disabled = false }
     };
   }
@@ -73,11 +80,11 @@ ${open ? `<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Sfid
     const me = BM.me, sb = BM.sb;
     const [mw, wins, sett, ms] = await Promise.all([
       q(sb.from('most_wanted_v').select('*').order('bounty_value', { ascending: false })),
-      q(sb.from('matches').select('id,player_a,player_b,winner_id,verified_at,source').eq('source', 'ladder').eq('status', 'verified').eq('winner_id', me.id).order('verified_at', { ascending: false }).limit(40)),
+      q(sb.from('matches').select('*').eq('source', 'ladder').eq('status', 'verified').eq('winner_id', me.id).order('verified_at', { ascending: false }).limit(40)),
       q(sb.from('bounty_settlements').select('match_id').eq('winner_id', me.id)),
       q(sb.from('ladder_matches').select('*').order('created_at', { ascending: false }).limit(200))]);
     const done = new Set(sett.map(s => s.match_id)), val = new Map(mw.map(r => [r.id, r]));
-    const claim = wins.filter(m => !done.has(m.id)).map(m => ({ m, t: m.player_a === me.id ? m.player_b : m.player_a })).filter(x => (val.get(x.t) || {}).bounty_value > 0);
+    const claim = wins.filter(m => !done.has(m.id) && m.bounty_eligible !== false).map(m => ({ m, t: m.player_a === me.id ? m.player_b : m.player_a })).filter(x => (val.get(x.t) || {}).bounty_value > 0);
     const now = Date.now();
     const openWith = id => ms.find(m => OPEN.includes(m.status) && ((m.challenger_id === me.id && m.opponent_id === id) || (m.challenger_id === id && m.opponent_id === me.id)));
     const list = mw.filter(r => r.id !== me.id && !(BM.P.get(r.id) || {}).suspended);

@@ -9,7 +9,7 @@
 window.BM_NOTIF = function (BM) {
   'use strict';
   const { R, shell, q, rpc, toast, esc, when } = BM;
-  const KIND = { bounty_received: ['Taglia', 'r'], ladder_challenge: ['Ladder', 'g'], bounty_challenge: ['Sfida per la taglia', 'g'], test: ['Prova', ''] };
+  const KIND = { bounty_received: ['Taglia', 'r'], ladder_challenge: ['Ladder', 'g'], bounty_challenge: ['Sfida per la taglia', 'g'], ladder_accepted: ['Sfida accettata', 'g'], ladder_declined: ['Sfida rifiutata', 'r'], test: ['Prova', ''] };
   const isAdm = () => BM.me && BM.me.role === 'admin';
   const present = () => BM.S && BM.S.notifications_enabled !== undefined;
   const on = () => present() && BM.S.notifications_enabled === 1;
@@ -85,6 +85,10 @@ window.BM_NOTIF = function (BM) {
     try { [items, prefs, key] = await Promise.all([q(BM.sb.from('notifications').select('*').order('created_at', { ascending: false }).limit(60)), q(BM.sb.from('notification_prefs').select('*').eq('user_id', BM.me.id)), rpc('push_public_key', {})]) }
     catch (er) { shell(`<div class="err" role="alert">Notifiche non disponibili: ${esc(er.message)}. Hai applicato la migrazione <b>black-market-notifiche.sql</b>?</div>`, 'notifiche'); return }
     const pr = prefs[0] || { bounty: true, ladder: true, hunt: true };
+    // sfide ricevute ancora in attesa: si possono accettare o rifiutare direttamente da qui
+    const refs = items.filter(n => (n.kind === 'ladder_challenge' || n.kind === 'bounty_challenge') && n.ref_id).map(n => n.ref_id);
+    let pend = new Set();
+    if (refs.length) { try { (await q(BM.sb.from('ladder_matches').select('id,status,expires_at').in('id', refs).eq('status', 'pending'))).forEach(m => { if (!m.expires_at || new Date(m.expires_at) > Date.now()) pend.add(m.id) }) } catch (e) { /* nessun pulsante: si risponde dalla Ladder */ } }
     const sub = supported() ? await localSub() : null, perm = supported() ? Notification.permission : 'unsupported';
     if (sub && key && perm === 'granted') { try { await rpc('push_subscribe', { p_endpoint: sub.endpoint, p_p256dh: sub.toJSON().keys.p256dh, p_auth: sub.toJSON().keys.auth, p_ua: (navigator.userAgent || '').slice(0, 200) }) } catch (e) { /* già collegato o al limite */ } }   // se sullo stesso telefono entra un altro account, il dispositivo passa a lui
     let st, active = false;
@@ -95,15 +99,15 @@ window.BM_NOTIF = function (BM) {
     else st = '<div class="nf-st"><button class="btn gold" data-act="nfOn">Attiva le notifiche su questo dispositivo</button></div><p class="mute" style="font-size:.88rem;margin:8px 0 0">Il browser chiederà il permesso. Puoi attivarle su più dispositivi (telefono, Chromebook…).</p>';
     const un = items.filter(n => !n.read_at).length, rd = items.length - un;
     const chk = (k, t, last) => `<label style="display:flex;gap:10px;align-items:center;font-weight:600;${last ? '' : 'margin-bottom:8px'}"><input type="checkbox" data-nfp="${k}" ${pr[k] ? 'checked' : ''} style="width:22px;min-height:0"> ${t}</label>`;
-    shell(`<h1 class="t"><em>Notifiche</em></h1><p class="sub">Ti avvisiamo quando ricevi una taglia, una sfida in Ladder o una sfida per riscuotere la taglia che hai addosso.</p>
+    shell(`<h1 class="t"><em>Notifiche</em></h1><p class="sub">Ti avvisiamo quando ricevi una taglia, una sfida in Ladder o una sfida per riscuotere la taglia che hai addosso, e quando qualcuno risponde alla tua sfida. Le sfide ricevute si possono accettare o rifiutare da qui.</p>
 <div class="box" style="margin-top:18px"><div class="row" style="justify-content:space-between;gap:10px;align-items:center"><h2 style="margin:0">Le tue notifiche${un ? ` <span class="tag g">${un} nuove</span>` : ''}</h2><div class="row" style="gap:8px">${un ? '<button class="btn ghost sm" data-act="nfAll">Segna tutte come lette</button>' : ''}${rd ? '<button class="btn ghost sm" data-act="nfDelAll">Elimina le lette</button>' : ''}</div></div>
-${items.map(n => `<div class="row2 nf-item ${n.read_at ? '' : 'un'}"><div class="g"><b>${esc(n.title)}</b><small style="display:block;color:var(--tx);opacity:.85;margin:2px 0">${esc(n.body)}</small><small>${when(n.created_at)}</small></div><span class="tag ${(KIND[n.kind] || [])[1] || ''}">${(KIND[n.kind] || [n.kind])[0]}</span><button class="btn ghost sm" data-act="nfOpen" data-i="${n.id}" data-h="${esc(where(n.url))}">Apri</button>${n.read_at ? `<button class="btn ghost sm" data-act="nfDel" data-i="${n.id}" aria-label="Elimina questa notifica">Elimina</button>` : ''}</div>`).join('') || '<p class="mute">Nessuna notifica per ora. Quando qualcuno ti metterà una taglia o ti sfiderà, la vedrai qui.</p>'}
+${items.map(n => `<div class="row2 nf-item ${n.read_at ? '' : 'un'}"><div class="g"><b>${esc(n.title)}</b><small style="display:block;color:var(--tx);opacity:.85;margin:2px 0">${esc(n.body)}</small><small>${when(n.created_at)}</small></div><span class="tag ${(KIND[n.kind] || [])[1] || ''}">${(KIND[n.kind] || [n.kind])[0]}</span>${pend.has(n.ref_id) ? `<button class="btn gold sm" data-act="nfAcc" data-c="${n.ref_id}" data-i="${n.id}">Accetta</button><button class="btn ghost sm" data-act="nfDec" data-c="${n.ref_id}" data-i="${n.id}">Rifiuta</button>` : ''}<button class="btn ghost sm" data-act="nfOpen" data-i="${n.id}" data-h="${esc(where(n.url))}">Apri</button>${n.read_at ? `<button class="btn ghost sm" data-act="nfDel" data-i="${n.id}" aria-label="Elimina questa notifica">Elimina</button>` : ''}</div>`).join('') || '<p class="mute">Nessuna notifica per ora. Quando qualcuno ti metterà una taglia o ti sfiderà, la vedrai qui.</p>'}
 ${un && rd === 0 ? '<p class="mute" style="font-size:.85rem;margin:10px 0 0">Una notifica si può eliminare dopo averla letta.</p>' : ''}</div>
 ${active ? '' : `<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Notifiche sul dispositivo</h2>${st}</div>`}
 <details class="box" id="nfset" style="margin-top:14px" ${setOpen ? 'open' : ''}><summary>Impostazioni notifiche</summary>
  ${active ? `<h3 style="margin:12px 0 8px">Su questo dispositivo</h3>${st}` : ''}
  <h3 style="margin:${active ? '18px' : '12px'} 0 8px">Cosa vuoi ricevere</h3>
- ${chk('bounty', 'Quando ricevo una taglia')}${chk('ladder', 'Quando qualcuno mi sfida in Ladder')}${chk('hunt', 'Quando qualcuno mi sfida per riscuotere la mia taglia', 1)}
+ ${chk('bounty', 'Quando ricevo una taglia')}${chk('ladder', 'Quando qualcuno mi sfida in Ladder o risponde alla mia sfida')}${chk('hunt', 'Quando qualcuno mi sfida per riscuotere la mia taglia', 1)}
  <p class="mute" style="font-size:.85rem;margin:10px 0 0">Le scelte si salvano subito. La notifica di una taglia non dice mai chi l'ha messa.</p></details>
 ${isAdm() ? `<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Amministratore: invio push</h2><p style="margin:0 0 8px">Chiave pubblica VAPID: ${key ? '<span class="tag g">impostata</span>' : '<span class="tag r">mancante</span>'} <span class="mute" style="font-size:.88rem">— senza chiave le push non si possono attivare. Procedura completa nel README, sezione «Notifiche push».</span></p><div class="row" style="gap:8px"><input id="nfk" placeholder="Incolla qui la chiave pubblica (inizia con B…)" style="flex:1;min-width:200px" aria-label="Chiave pubblica VAPID"><button class="btn sm" data-act="nfKey">Salva chiave</button></div></div>` : ''}`, 'notifiche');
     lastAt = 0; refresh(true);
@@ -115,6 +119,8 @@ ${isAdm() ? `<div class="box" style="margin-top:14px"><h2 style="margin-top:0">A
     nfOn: async el => { el.disabled = true; try { await enablePush(); toast('Notifiche attivate su questo dispositivo.'); } catch (er) { toast(er.message, 1) } BM.route() },
     nfOff: async () => { await disablePush(); toast('Notifiche disattivate su questo dispositivo.'); BM.route() },
     nfTest: async () => { await rpc('push_send_test', {}); toast('Prova inviata: dovrebbe arrivare tra pochi secondi.'); setTimeout(() => BM.route(), 1500) },
+    nfAcc: async el => { await rpc('ladder_respond', { p_id: el.dataset.c, p_accept: true }); try { await rpc('notif_mark_read', { p_id: el.dataset.i }) } catch (e) { /* non blocca */ } toast('Sfida accettata: ora giocate e inviate il risultato dalla Ladder.'); lastAt = 0; BM.route() },
+    nfDec: async el => { if (!confirm('Rifiutare la sfida?')) return; await rpc('ladder_respond', { p_id: el.dataset.c, p_accept: false }); try { await rpc('notif_mark_read', { p_id: el.dataset.i }) } catch (e) { /* non blocca */ } toast('Sfida rifiutata.'); lastAt = 0; BM.route() },
     nfAll: async () => { await rpc('notif_mark_read', {}); BM.route() },
     nfDel: async el => { try { await rpc('notif_delete', { p_id: el.dataset.i }); toast('Notifica eliminata.') } catch (er) { toast(delErr(er), 1) } BM.route() },
     nfDelAll: async () => { if (!confirm('Eliminare tutte le notifiche già lette? Le non lette restano.')) return; try { const n = await rpc('notif_delete', {}); toast(n == 1 ? 'Eliminata 1 notifica.' : `Eliminate ${n} notifiche.`) } catch (er) { toast(delErr(er), 1) } BM.route() },
