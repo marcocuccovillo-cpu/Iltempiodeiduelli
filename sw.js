@@ -1,6 +1,6 @@
 /* Il Tempio Dei Duelli — service worker: guscio offline. Rete per prima (gli aggiornamenti arrivano subito), cache solo se si è offline. Tutti i file stanno nella stessa cartella. */
-const CACHE="tempio-v17";
-const CORE=["index.html","sentiero.html","black-market.html","black-market-moduli.js?v=13","badge.js?v=11","shop-art.js?v=12","black-market-shop.js?v=12","black-market-notifiche.js?v=16","black-market-caccia.js?v=14","gestisci-torneo.html","match-pro.html","deck-analyzer.html","tempio.css?v=8","tempio.js?v=8","tempio.js?v=9","tempio-notifiche.js?v=1","logo1.png","tempio-mark.png","manifest.webmanifest"];
+const CACHE="tempio-v18";
+const CORE=["index.html","sentiero.html","black-market.html","black-market-moduli.js?v=14","badge.js?v=11","shop-art.js?v=12","black-market-shop.js?v=12","black-market-notifiche.js?v=16","black-market-caccia.js?v=14","gestisci-torneo.html","match-pro.html","deck-analyzer.html","tempio.css?v=8","tempio.js?v=8","tempio.js?v=9","tempio-notifiche.js?v=1","logo1.png","tempio-mark.png","manifest.webmanifest"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>Promise.all(CORE.map(u=>c.add(u).catch(()=>{})))));self.skipWaiting()});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))));self.clients.claim()});
 self.addEventListener("fetch",e=>{const r=e.request;if(r.method!=="GET"||new URL(r.url).origin!==location.origin)return;

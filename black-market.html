@@ -28,6 +28,15 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 .row2{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.row2:first-of-type{border-top:0}
 .row2{flex-wrap:wrap}.row2 .g{flex:1 1 150px;min-width:0}.row2 select{max-width:100%}.row2 .tag{flex:none;width:auto}.row2 a{color:var(--tx);text-decoration:none;font-weight:700}.row2 a:hover{color:var(--gold)}
 .row2 small{color:var(--mu);display:block}
+.bm-fold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;min-height:44px}
+.bm-fold>summary::-webkit-details-marker{display:none}
+.bm-fold>summary h2{margin:0;flex:1}
+.bm-fold>summary .cnt{color:var(--mu);font-size:.9rem;white-space:nowrap}
+.bm-fold>summary::after{content:"";width:9px;height:9px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(45deg);margin:-4px 4px 0 6px;transition:transform .15s;flex:none}
+.bm-fold[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
+.bm-fold[open]>summary{margin-bottom:8px}
+.bm-fold>summary:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+.bm-mail{word-break:break-all}
 .val{font:600 1.3rem var(--disp);color:var(--gold);white-space:nowrap}
 .rank{width:26px;font:600 1.1rem var(--disp);color:var(--mu);text-align:center}
 .btn{background:var(--ac);border-color:var(--ac)}.btn:hover{background:#a8243a;border-color:#a8243a}
@@ -47,7 +56,7 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 <main class="pg" id="app"><p class="mute">Caricamento…</p></main><div id="toast" hidden role="status"></div>
 <script src="tempio.js?v=9"></script>
 <script src="badge.js?v=11"></script>
-<script src="black-market-moduli.js?v=13"></script>
+<script src="black-market-moduli.js?v=14"></script>
 <script src="shop-art.js?v=12"></script>
 <script src="black-market-shop.js?v=12"></script>
 <script src="black-market-notifiche.js?v=16"></script>
@@ -100,7 +109,13 @@ const feedRow=f=>f.kind=='bounty'?`<div class="row2"><div class="g">${f.actor_id
 /* ---------- pagine ---------- */
 const R={};
 /* Punto di aggancio per i moduli opzionali (black-market-moduli.js): Hall of Fame, Faction Wars, Underground. Se il file manca, non cambia nulla. */
-const BM={R,shell,q,rpc,toast,esc,BC,when,av,link,pn,route,core,ask:m=>ask(m),get sb(){return sb},get wallet(){return wallet},get me(){return me},get P(){return P},get S(){return S}};
+/* riquadro richiudibile: lo stato (aperto/chiuso) si ricorda nella sessione, così non si richiude a ogni azione */
+const foldGet=id=>{try{return sessionStorage.getItem('bm.fold.'+id)}catch(e){return null}};
+const fold=(id,title,body,o={})=>{const st=foldGet(id),open=st===null?!!o.open:st==='1';return`<details class="box bm-fold" data-fold="${id}" ${open?'open':''} style="${o.style||''}"><summary><h2>${title}</h2>${o.count!=null?`<span class="cnt">${o.count}</span>`:''}</summary>${body}</details>`};
+/* trasforma in riquadri richiudibili i .box già disegnati il cui titolo (h2) inizia con uno dei testi dati: {testo:id}; tutti chiusi finché non si aprono */
+const foldify=(root,map)=>{root.querySelectorAll('.box').forEach(b=>{const h=b.querySelector(':scope>h2');if(!h)return;const k=Object.keys(map).find(t=>h.textContent.trim().startsWith(t));if(!k)return;const id=map[k],st=foldGet(id),d=document.createElement('details'),sm=document.createElement('summary');d.className=b.className+' bm-fold';d.style.cssText=b.style.cssText;d.dataset.fold=id;if(st==='1')d.open=true;sm.appendChild(h);d.appendChild(sm);while(b.firstChild)d.appendChild(b.firstChild);b.replaceWith(d)})};
+document.addEventListener('toggle',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.fold){try{sessionStorage.setItem('bm.fold.'+t.dataset.fold,t.open?'1':'0')}catch(er){}}},true);
+const BM={R,fold,foldify,shell,q,rpc,toast,esc,BC,when,av,link,pn,route,core,ask:m=>ask(m),get sb(){return sb},get wallet(){return wallet},get me(){return me},get P(){return P},get S(){return S}};
 try{if(window.BM_MODULES)window.BM_MODULES(BM)}catch(e){console.error('Moduli aggiuntivi non caricati',e)}
 try{if(window.BM_SHOP)window.BM_SHOP(BM)}catch(e){console.error('Shop non caricato',e)}
 try{if(window.BM_NOTIF)window.BM_NOTIF(BM)}catch(e){console.error('Notifiche non caricate',e)}
@@ -166,16 +181,16 @@ R.e=async id=>{const[evs,ms,sts]=await Promise.all([q(sb.from('events').select('
   ${m.status=='verified'&&(m.player_a==me.id||m.player_b==me.id)?`<button class="btn ghost sm" data-act="dispute" data-m="${m.id}">Contesta</button>`:''}</div>`}).join('')||'<p class="mute">Nessun match registrato.</p>'}</div>`,'events');
  const f=document.getElementById('nm');if(f)f.onsubmit=async x=>{x.preventDefault();try{await rpc('create_match',{p_event:id,p_round:+document.getElementById('mr').value,p_a:document.getElementById('ma').value,p_b:document.getElementById('mb').value});toast('Match aggiunto.');route()}catch(er){toast(er.message,1)}}};
 R.admin=async()=>{if(me.role!='admin'){shell('<div class="err">Area riservata agli amministratori.</div>','');return}
- const[set,bs,ds,au,rc]=await Promise.all([q(sb.from('system_settings').select('*').order('key')),q(sb.from('bounties').select('*').in('status',['active','under_review']).order('created_at',{ascending:false}).limit(60)),q(sb.from('disputes').select('*').eq('status','open').order('created_at')),q(sb.from('audit_logs').select('*').order('id',{ascending:false}).limit(40)),q(sb.from('wallet_reconciliation_v').select('*'))]);
- const bad=rc.filter(r=>!r.ok);const users=[...P.values()].sort((a,b)=>a.nickname.localeCompare(b.nickname));
+ const[set,bs,ds,au,rc,ov]=await Promise.all([q(sb.from('system_settings').select('*').order('key')),q(sb.from('bounties').select('*').in('status',['active','under_review']).order('created_at',{ascending:false}).limit(60)),q(sb.from('disputes').select('*').eq('status','open').order('created_at')),q(sb.from('audit_logs').select('*').order('id',{ascending:false}).limit(40)),q(sb.from('wallet_reconciliation_v').select('*')),rpc('admin_user_overview',{}).catch(()=>null)]);
+ const bad=rc.filter(r=>!r.ok);const users=[...P.values()].sort((a,b)=>a.nickname.localeCompare(b.nickname)),mail=new Map((ov||[]).map(x=>[x.id,x.email]));
  shell(`<h1 class="t">Pannello <em>amministratore</em></h1><p class="sub">Ogni intervento chiede una motivazione e finisce nel registro di audit. Nulla viene cancellato.</p>
  <div class="grid c2" style="margin-top:18px"><div class="box"><h2>Quadratura saldi</h2><p>${bad.length?`<span class="neg"><b>${bad.length}</b> wallet non coincidono con il registro contabile!</span>`:`<span class="pos">Tutti i ${rc.length} saldi coincidono con il registro.</span>`}</p><button class="btn ghost sm" data-act="export">Esporta storico completo (JSON)</button></div>
- <div class="box"><h2>Impostazioni economiche</h2>${set.filter(s=>!s.key.startsWith('module_')).map(s=>`<div class="row2"><div class="g">${esc(s.description||s.key)}<small>${s.key}</small></div><input type="number" min="0" value="${s.value_int}" data-k="${s.key}" style="width:90px"><button class="btn sm" data-act="setting" data-k="${s.key}">Salva</button></div>`).join('')}</div></div>
+ ${fold('econ','Impostazioni economiche',`${set.filter(s=>!s.key.startsWith('module_')).map(s=>`<div class="row2"><div class="g">${esc(s.description||s.key)}<small>${s.key}</small></div><input type="number" min="0" value="${s.value_int}" data-k="${s.key}" style="width:90px"><button class="btn sm" data-act="setting" data-k="${s.key}">Salva</button></div>`).join('')}`,{count:set.filter(s=>!s.key.startsWith('module_')).length+' voci'})}</div>
  <div id="bm-ext"></div>
- <div class="box" style="margin-top:14px"><h2>Utenti</h2>${users.map(u=>`<div class="row2">${av(u)}<div class="g">${link(u.id)}<small>${ROLE[u.role]}${u.suspended?' · SOSPESO':''}</small></div><select data-act="role" data-u="${u.id}" aria-label="Ruolo di ${esc(u.nickname)}">${['user','organizer','moderator','admin'].map(r=>`<option value="${r}" ${u.role==r?'selected':''}>${ROLE[r]}</option>`).join('')}</select><button class="btn ghost sm" data-act="susp" data-u="${u.id}" data-on="${u.suspended?0:1}">${u.suspended?'Riattiva':'Sospendi'}</button><button class="btn ghost sm" data-act="adj" data-u="${u.id}">Rettifica saldo</button></div>`).join('')}</div>
+ ${fold('users','Utenti',`<p class="mute" style="font-size:.88rem;margin:0 0 6px">Visibili solo a te. «Accetta taglie» = ha attivato «Accetto taglie su di me» nel profilo.</p>${ov?'':'<p class="err" style="margin:0 0 8px">Le email non sono disponibili: esegui la migrazione <b>black-market-admin-utenti.sql</b> (012) in Supabase.</p>'}${users.map(u=>`<div class="row2">${av(u)}<div class="g">${link(u.id)}<small>${ROLE[u.role]}${u.suspended?' · SOSPESO':''}</small><small class="bm-mail">${mail.has(u.id)?(mail.get(u.id)?esc(mail.get(u.id)):'email non disponibile'):'email: serve la migrazione 012'}</small></div>${u.wanted_enabled?'<span class="tag g" title="Ha attivato «Accetto taglie su di me»">Accetta taglie</span>':'<span class="tag" title="Non ha attivato «Accetto taglie su di me»">No taglie</span>'}<select data-act="role" data-u="${u.id}" aria-label="Ruolo di ${esc(u.nickname)}">${['user','organizer','moderator','admin'].map(r=>`<option value="${r}" ${u.role==r?'selected':''}>${ROLE[r]}</option>`).join('')}</select><button class="btn ghost sm" data-act="susp" data-u="${u.id}" data-on="${u.suspended?0:1}">${u.suspended?'Riattiva':'Sospendi'}</button><button class="btn ghost sm" data-act="adj" data-u="${u.id}">Rettifica saldo</button></div>`).join('')}`,{count:users.length+' · '+users.filter(u=>u.wanted_enabled).length+' accettano taglie',style:'margin-top:14px'})}
  <div class="grid c2" style="margin-top:14px"><div class="box"><h2>Contestazioni aperte (${ds.length})</h2>${ds.map(d=>`<div class="row2"><div class="g">${esc(d.reason)}<small>${esc(pn(d.opened_by))} · ${when(d.created_at)}</small></div><button class="btn sm" data-act="resolve" data-d="${d.id}">Chiudi</button></div>`).join('')||'<p class="mute">Nessuna contestazione.</p>'}</div>
  <div class="box"><h2>Taglie attive e in revisione</h2>${bs.map(b=>`<div class="row2"><div class="g">${esc(pn(b.creator_id))} → ${esc(pn(b.target_id))}<small>${b.status=='under_review'?'IN REVISIONE · ':''}${when(b.created_at)}</small></div><span class="val">${BC(b.amount)}</span><button class="btn ghost sm" data-act="review" data-b="${b.id}" data-on="${b.status=='active'?1:0}">${b.status=='active'?'Metti in revisione':'Riattiva'}</button><button class="btn ghost sm" data-act="cancelb" data-b="${b.id}">Annulla</button></div>`).join('')||'<p class="mute">Nessuna.</p>'}</div></div>
- <div class="box" style="margin-top:14px"><h2>Registro di audit (ultimi 40)</h2>${au.map(a=>`<div class="row2"><div class="g"><b>${esc(a.action)}</b> · ${esc(pn(a.actor_id))}<small>${when(a.created_at)}${a.reason?' · '+esc(a.reason):''}</small></div></div>`).join('')}</div>`,'admin');if(BM.adminExt)BM.adminExt(document.getElementById('bm-ext'))};
+ ${fold('audit','Registro di audit',`${au.map(a=>`<div class="row2"><div class="g"><b>${esc(a.action)}</b> · ${esc(pn(a.actor_id))}<small>${when(a.created_at)}${a.reason?' · '+esc(a.reason):''}</small></div></div>`).join('')}`,{count:'ultimi '+au.length,style:'margin-top:14px'})}`,'admin');if(BM.adminExt)BM.adminExt(document.getElementById('bm-ext'))};
 /* ---------- azioni ---------- */
 const ask=m=>{const r=prompt(m);return r&&r.trim().length>=5?r.trim():(r!==null&&toast('Motivazione obbligatoria (almeno 5 caratteri).',1),null)};
 async function act(el){const a=el.dataset.act;
