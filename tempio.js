@@ -7,6 +7,7 @@
     ['Black Market', 'black-market.html', '◈', 'bm'],
     ['Ladder', 'black-market.html#/ladder', '⚔', 'bm'],
     ['Black Market Shop', 'black-market.html#/shop', '❖', 'bm'],
+    ['La guerra degli Eroi', 'eroi.html', '⚜', ''],
     ['Gestisci torneo', 'gestisci-torneo.html', '♜', ''],
     ['Match Pro', 'match-pro.html', '⏱', ''],
     ['Deck Analyzer', 'deck-analyzer.html', '▤', '']

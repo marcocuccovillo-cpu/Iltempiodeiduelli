@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La guerra degli Eroi — Il Tempio Dei Duelli</title><meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png?v=2" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tempio.css?v=10">
+<style>
+/* La guerra degli Eroi — stile della pagina (usa le variabili «Ametista» di tempio.css) */
+.er-top{margin-top:18px;display:grid;gap:14px}
+.er-who{display:flex;gap:14px;align-items:center;min-width:0}
+.er-pic{width:64px;height:64px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--raise);border:2px solid var(--ac);font:700 1.7rem var(--disp);color:var(--ac2);box-shadow:0 0 22px rgba(var(--ac-rgb),.3);overflow:hidden}
+.er-who h2{font-size:1.35rem;overflow-wrap:anywhere}
+.er-lv{color:var(--mu);font-size:.92rem;margin-top:2px}
+.er-lv b{color:var(--ac2);font-family:var(--disp)}
+.er-bc{margin-left:auto;text-align:right;flex:none}.er-bc b{display:block;font:700 1.25rem var(--disp);color:var(--gold);font-variant-numeric:tabular-nums}.er-bc span{font-size:.78rem;color:var(--mu)}
+.er-xp{height:10px;border-radius:9px;background:var(--inp);border:1px solid var(--line);overflow:hidden}.er-xp i{display:block;height:100%;background:linear-gradient(90deg,var(--bar-a),var(--ac2))}
+.er-xpt{display:flex;justify-content:space-between;font-size:.8rem;color:var(--mu);margin-top:4px}
+.er-reset{font-size:.88rem;color:var(--mu)}.er-reset b{color:var(--tx);font-variant-numeric:tabular-nums}
+.er-gate{text-align:center;padding:22px 16px}.er-gate h2{font-size:1.3rem;margin-bottom:8px}
+.er-msg{margin:14px 0 0;padding:11px 13px;border-radius:12px;border:1px solid var(--ac);background:rgba(var(--ac-rgb),.12);font-weight:600;overflow-wrap:anywhere}
+.er-msg.bad{border-color:var(--bad);background:rgba(255,84,104,.1);color:#ffb3bd}
+.er-msg.good{border-color:var(--good);background:rgba(74,222,155,.1);color:#b4f5d4}
+.er-h{font-size:1.15rem;margin:26px 0 10px}.er-h:first-child{margin-top:0}
+.er-sub{color:var(--mu);font-size:.92rem;margin:-4px 0 12px}
+/* statistiche */
+.er-st{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.er-st:first-of-type{border-top:0}
+.er-st .nm{font-weight:700}.er-st .nm small{display:block;color:var(--mu);font-weight:400;font-size:.82rem}
+.er-st .val{font:700 1.3rem var(--disp);font-variant-numeric:tabular-nums;text-align:right;color:var(--ac2)}.er-st .val em{font:600 .78rem var(--ui);color:var(--good);font-style:normal;margin-left:4px}
+.er-ctl{grid-column:1/-1;display:flex;align-items:center;gap:10px}
+.er-ctl button{width:48px;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--surf);color:var(--tx);font:700 1.5rem var(--ui);cursor:pointer;flex:none}
+.er-ctl button:disabled{opacity:.3;cursor:not-allowed}
+.er-pts{flex:1;display:flex;gap:3px}.er-pts i{flex:1;height:14px;border-radius:4px;background:var(--inp);border:1px solid var(--line)}.er-pts i.on{background:linear-gradient(180deg,var(--ac2),var(--ac));border-color:var(--ac)}
+.er-ctl b{min-width:30px;text-align:center;font-variant-numeric:tabular-nums}
+.er-left{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}.er-left b{font:700 1.4rem var(--disp);color:var(--gold)}
+.er-note{color:var(--mu);font-size:.88rem;margin:8px 0 0}
+/* equipaggiamento */
+.er-slots{display:grid;gap:10px}@media(min-width:620px){.er-slots{grid-template-columns:1fr 1fr}}
+.er-sl{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--inp);min-width:0}
+.er-ic{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;font-size:1.5rem;background:var(--raise);border:1.5px solid var(--rc,var(--line))}
+.er-sl small{display:block;color:var(--mu);font-size:.76rem;text-transform:uppercase;letter-spacing:.05em}
+.er-nm{font-weight:700;overflow-wrap:anywhere;color:var(--rc,var(--tx))}
+.er-bn{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.er-bn span{font-size:.74rem;font-weight:700;padding:1px 7px;border-radius:99px;border:1px solid var(--line);color:var(--ac2);background:rgba(var(--ac-rgb),.08)}
+.er-bn span.sp{color:var(--gold);border-color:rgba(232,184,74,.45);background:rgba(232,184,74,.08)}
+.r-base{--rc:#9ca3b8}.r-comune{--rc:#c3c8d8}.r-non_comune{--rc:#4ade9b}.r-raro{--rc:#6cb6ff}.r-epico{--rc:#c084fc}.r-leggendario{--rc:#f5b942}.r-mitico{--rc:#ff6b9d}
+.er-rar{font-size:.72rem;font-weight:700;color:var(--rc,var(--mu));text-transform:uppercase;letter-spacing:.05em}
+.er-inv{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.er-inv .btn{min-height:44px;padding:0 14px;font-size:.92rem}
+/* boss */
+.er-boss{display:grid;gap:14px}
+.er-bh{display:flex;gap:14px;align-items:center}
+.er-sig{width:84px;height:84px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:2.8rem;background:radial-gradient(circle at 35% 30%,hsl(var(--h) 70% 40%),hsl(var(--h) 60% 12%) 70%);border:2px solid hsl(var(--h) 80% 65%);box-shadow:0 0 28px hsl(var(--h) 80% 55% / .45)}
+.er-bh h2{font-size:1.35rem;overflow-wrap:anywhere}.er-bh small{color:var(--mu)}
+.er-lore{color:var(--mu);font-size:.95rem;margin:0}.er-trait{margin:0;font-size:.9rem}.er-trait b{color:var(--gold)}
+.er-hp{height:22px;border-radius:99px;background:var(--inp);border:1px solid var(--line);overflow:hidden;position:relative}
+.er-hp i{display:block;height:100%;background:linear-gradient(90deg,#b4233a,var(--bad));transition:width .4s}
+.er-hp span{position:absolute;inset:0;display:grid;place-items:center;font:700 .8rem var(--ui);text-shadow:0 1px 2px #000;font-variant-numeric:tabular-nums}
+.er-hp.me i{background:linear-gradient(90deg,#1f9d63,var(--good))}.er-hp.sm{height:14px}.er-hp.sm span{font-size:.68rem}
+.er-chips{display:flex;flex-wrap:wrap;gap:8px}.er-chips span{padding:3px 10px;border-radius:99px;border:1px solid var(--line);font-size:.85rem;font-weight:600;background:var(--inp)}
+.er-acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.er-acts button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:78px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--surf);color:var(--tx);font:700 1rem var(--ui);text-align:left;cursor:pointer}
+.er-acts button small{font-weight:400;color:var(--mu);font-size:.8rem;line-height:1.25}
+.er-acts button:hover:not(:disabled){border-color:var(--ac);background:rgba(var(--ac-rgb),.08)}
+.er-acts button:disabled{opacity:.4;cursor:not-allowed}
+.er-acts .atk{border-color:rgba(255,84,104,.55)}.er-acts .grd{border-color:rgba(108,182,255,.55)}.er-acts .hel{border-color:rgba(74,222,155,.5)}.er-acts .stu{border-color:rgba(255,209,102,.5)}
+.er-party{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.er-party .av,.er-ar .av,.er-lb .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--raise);border:1px solid var(--line);font:700 .95rem var(--disp);color:var(--ac2)}
+.er-party .l1{display:flex;justify-content:space-between;gap:8px;font-weight:600;margin-bottom:4px;min-width:0}
+.er-party .l1 a,.er-link{color:var(--tx);text-decoration:none;font-weight:700;background:none;border:0;padding:0;font:inherit;cursor:pointer;text-align:left;overflow-wrap:anywhere}
+.er-party .l1 a:hover,.er-link:hover{color:var(--ac2);text-decoration:underline}
+.er-party .l1 small{color:var(--mu);font-weight:400;white-space:nowrap}
+.er-ko{color:var(--bad);font-weight:700}
+.er-log{font-size:.88rem;color:var(--mu);display:grid;gap:3px;margin:0;padding:0;list-style:none}.er-log b{color:var(--tx)}
+.er-sel{display:flex;gap:8px;align-items:center;margin-top:10px}.er-sel select{min-height:44px}
+.er-win{border-color:var(--gold);box-shadow:0 0 26px rgba(232,184,74,.2)}.er-win h3{color:var(--gold);font-size:1.2rem}
+/* arena */
+.er-ar{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.er-ar .btn{min-height:44px;padding:0 14px;font-size:.92rem}
+.er-ar small{display:block;color:var(--mu);font-size:.8rem}
+.er-sw{display:flex;align-items:center;gap:12px;min-height:48px}.er-sw span{flex:1}
+/* mercante */
+.er-shop{display:grid;gap:12px}@media(min-width:620px){.er-shop{grid-template-columns:1fr 1fr}}
+.er-it{display:grid;gap:8px;padding:12px;border:1px solid var(--line);border-left:3px solid var(--rc,var(--line));border-radius:12px;background:var(--surf);min-width:0}
+.er-it .hd{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center}
+.er-pr{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.er-pr b{font:700 1.2rem var(--disp);color:var(--gold);font-variant-numeric:tabular-nums}.er-pr s{color:var(--mu);font-size:.9rem}
+.er-tag{font-size:.72rem;font-weight:700;padding:1px 8px;border-radius:99px;background:var(--bad);color:#1a0509}
+.er-lock{color:var(--bad);font-size:.85rem;font-weight:600}
+/* classifica */
+.er-lb{display:grid;grid-template-columns:38px 34px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.er-lb .rk{font:700 1.1rem var(--disp);color:var(--ac2);text-align:center}.er-lb.me{background:rgba(var(--ac-rgb),.08)}
+.er-lb small{display:block;color:var(--mu);font-size:.8rem}.er-lb .lv{font:700 1.1rem var(--disp);text-align:right}
+/* finestre */
+.er-ov{position:fixed;inset:0;z-index:3000;display:grid;place-items:center;padding:14px;background:rgba(0,0,0,.78);overflow-y:auto}
+.er-md{width:100%;max-width:480px;max-height:92vh;overflow-y:auto;padding:18px;border:1px solid var(--ac);border-radius:14px;background:var(--deep)}
+.er-md h2{font-size:1.25rem;margin-bottom:10px}
+.er-duel{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}.er-duel b{display:block;overflow-wrap:anywhere}.er-duel small{color:var(--mu)}
+.er-dl{max-height:150px;overflow-y:auto;font-size:.85rem;color:var(--mu);display:grid;gap:2px;margin:10px 0;padding:0;list-style:none}.er-dl b{color:var(--tx)}
+.er-big{font:700 1.5rem var(--disp);text-align:center;margin:8px 0}.er-big.w{color:var(--gold)}.er-big.l{color:var(--bad)}
+.p-sheet{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0}.p-sheet div{padding:8px 2px;text-align:center;border:1px solid var(--line);border-radius:10px;background:var(--inp);font-size:.72rem;color:var(--mu)}.p-sheet b{display:block;font:700 1.05rem var(--disp);color:var(--tx)}
+.er-how li{margin-top:6px}
+</style></head><body>
+
+<main class="pg">
+ <header><p class="kicker">Mini gioco di ruolo</p><h1>La guerra degli Eroi</h1>
+ <p class="lead">Ogni duellante è un eroe con il suo nickname. Distribuisci i punti abilità, indossa l’equipaggiamento, sfida gli altri eroi in Arena e unisciti ogni giorno agli altri per abbattere il boss.</p></header>
+
+ <section class="card er-top" id="top" aria-live="polite"><p class="mute" style="margin:0" role="status">Caricamento dell’eroe…</p></section>
+
+ <div id="gate" hidden></div>
+
+ <div id="main" hidden>
+ <div class="tabs" role="tablist"><button role="tab" data-t="hero" aria-selected="true">Eroe</button><button role="tab" data-t="boss" aria-selected="false">Boss</button><button role="tab" data-t="arena" aria-selected="false">Arena</button><button role="tab" data-t="shop" aria-selected="false">Mercante</button><button role="tab" data-t="lb" aria-selected="false">Classifica</button></div>
+ <div id="msg" role="status" aria-live="polite"></div>
+ <section class="tp" id="p-hero"></section>
+ <section class="tp" id="p-boss" hidden></section>
+ <section class="tp" id="p-arena" hidden></section>
+ <section class="tp" id="p-shop" hidden></section>
+ <section class="tp" id="p-lb" hidden></section>
+ </div>
+</main>
+
+<script src="tempio.js?v=11"></script>
+<script src="tempio-notifiche.js?v=2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function(){'use strict';
+const SUPABASE_URL='https://ceujhsmdvbcoszehbhxp.supabase.co/',SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNldWpoc21kdmJjb3N6ZWhiaHhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0MDk4OTMsImV4cCI6MjEwNzk4NTg5M30.b9qzjnHZQJTbZCVY-3xPrQPQd_HdqKqKJALZFlrNUj4'; // dati pubblici del progetto, gli stessi di black-market.html
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>Number(v||0).toLocaleString('it-IT');
+const STATS=[['for','Forza','Più danno a ogni colpo','FOR'],['des','Destrezza','Colpi critici e studio delle debolezze','DES'],['vig','Vigore','Punti vita e potere di difesa','VIG'],['spi','Spirito','Cure agli alleati, recupero nei duelli','SPI'],['frt','Fortezza','Schivare i contraccolpi','FRT']];
+const SLOTS=[['weapon','Arma','⚔️'],['armor','Armatura','🛡️'],['helm','Elmo','⛑️'],['amulet','Amuleto','📿'],['tool','Strumento','🧪']];
+const SL=Object.fromEntries(SLOTS.map(s=>[s[0],s]));
+const RAR={base:'Base',comune:'Comune',non_comune:'Non comune',raro:'Raro',epico:'Epico',leggendario:'Leggendario',mitico:'Mitico'};
+const SRC={start:'Base',shop:'Mercante',boss:'Boss'};
+let sb=null,ST=null,ME=null,BAL=null,tab='hero',draft=null,heal='',LB=null,AR=null,busy=false,last=0,pending=null,flash=null;
+
+/* ---------- utilità ---------- */
+function say(t,kind){flash={t,kind};const m=$('msg');m.innerHTML=t?`<p class="er-msg ${kind||''}">${t}</p>`:'';}
+function clearSay(){flash=null;$('msg').innerHTML=''}
+function rpc(name,args){return sb.rpc(name,args||{}).then(r=>{if(r.error)throw new Error(r.error.message||'Errore');return r.data})}
+function errTxt(e){const m=String(e&&e.message||e);return /Modulo non attivo/i.test(m)?'Il gioco non è attivo al momento.':esc(m)}
+async function run(btn,fn){if(busy)return;busy=true;if(btn)btn.disabled=true;try{await fn()}catch(e){if(/Modulo non attivo/i.test(String(e.message)))await boot();else say(errTxt(e),'bad')}finally{busy=false;if(btn&&btn.isConnected)btn.disabled=false}}
+function pad(n){return String(n).padStart(2,'0')}
+function cd(){const t=ST?new Date(ST.next_reset).getTime()-Date.now():0;if(t<=0)return '00:00:00';const s=Math.floor(t/1000);return pad(Math.floor(s/3600))+':'+pad(Math.floor(s%3600/60))+':'+pad(s%60)}
+function ini(n){return esc((n||'?').trim().charAt(0).toUpperCase())}
+function bonusTags(it){const o=[];STATS.forEach(s=>{const v=it['p_'+s[0]];if(v>0)o.push(`<span>+${v}% ${s[1]}</span>`)});
+ if(it.xp_pct>0)o.push(`<span class="sp">+${it.xp_pct}% XP</span>`);if(it.extra_actions>0)o.push(`<span class="sp">+${it.extra_actions} azione boss/giorno</span>`);if(it.extra_fights>0)o.push(`<span class="sp">+${it.extra_fights} duello/giorno</span>`);
+ return o.length?`<div class="er-bn">${o.join('')}</div>`:''}
+function itemBox(it,extra){const s=SL[it.slot]||['','','•'];return `<div class="er-ic r-${esc(it.rarity)}" aria-hidden="true">${s[2]}</div><div style="min-width:0"><div class="er-rar r-${esc(it.rarity)}">${esc(RAR[it.rarity]||it.rarity)} · ${esc(s[1])}${extra||''}</div><div class="er-nm r-${esc(it.rarity)}">${esc(it.name)}</div>${bonusTags(it)}</div>`}
+function pctSum(k){let t=0;Object.values(ME.equipped||{}).forEach(i=>{t+=Number(i['p_'+k]||0)});return t}
+
+/* ---------- finestre ---------- */
+function modal(html){const o=document.createElement('div');o.className='er-ov';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.innerHTML=`<div class="er-md">${html}</div>`;
+ const close=()=>{o.remove();document.removeEventListener('keydown',k);if(o._t)clearInterval(o._t)};function k(e){if(e.key==='Escape')close()}
+ o.onclick=e=>{if(e.target===o)close()};o.querySelectorAll('[data-close]').forEach(b=>b.onclick=close);document.addEventListener('keydown',k);document.body.appendChild(o);
+ const f=o.querySelector('[data-close]');if(f)f.focus();o.close=close;return o}
+async function heroSheet(uid){
+ try{const h=await rpc('game_hero',{p_user:uid});
+  const eq=SLOTS.map(s=>{const i=(h.equipped||{})[s[0]];return `<div class="er-sl" style="margin-top:8px">${i?itemBox(Object.assign({slot:s[0]},i)):`<div class="er-ic">${s[2]}</div><div class="mute">${s[1]}: vuoto</div>`}</div>`}).join('');
+  modal(`<h2>${esc(h.nickname)} · Lv. ${num(h.level)}</h2><div class="p-sheet">${STATS.map(s=>`<div><b>${num(h.stats[s[0]])}</b>${s[3]}</div>`).join('')}</div>
+   <p class="mute" style="margin:0 0 6px">PV ${num(h.max_hp)} · Duelli vinti ${num(h.duels_won)} · Boss battuti ${num(h.bosses_beaten)}</p>${eq}<button class="btn ghost block" style="margin-top:14px" data-close>Chiudi</button>`)
+ }catch(e){say(errTxt(e),'bad')}}
+
+/* ---------- schermata principale ---------- */
+function paintTop(){
+ const m=ST.me,pct=Math.min(100,Math.round(100*m.xp/m.xp_need));
+ $('top').innerHTML=`<div class="er-who"><div class="er-pic" aria-hidden="true">${ini(m.nickname)}</div><div style="min-width:0"><h2>${esc(m.nickname)}</h2><div class="er-lv">Livello <b>${num(m.level)}</b> · ${num(m.max_hp)} PV</div></div><div class="er-bc"><b>${BAL==null?'—':num(BAL)}</b><span>BC</span></div></div>
+  <div><div class="er-xp" role="progressbar" aria-valuemin="0" aria-valuemax="${m.xp_need}" aria-valuenow="${m.xp}" aria-label="Esperienza"><i style="width:${pct}%"></i></div><div class="er-xpt"><span>${num(m.xp)} / ${num(m.xp_need)} XP</span><span>${m.level>=9999?'Livello massimo':`al livello ${num(m.level+1)}`}</span></div></div>
+  <div class="er-reset">Nuovo boss e nuove offerte del mercante tra <b data-cd>${cd()}</b></div>`}
+
+function gate(html){ST=null;ME=null;$('main').hidden=true;$('gate').hidden=false;$('gate').innerHTML=html}
+function gateLogin(){gate(`<section class="card er-gate" style="margin-top:20px"><h2>Entra dal Black Market</h2><p class="mute" style="max-width:34em;margin:0 auto 14px">La guerra degli Eroi usa il tuo profilo del Black Market: lo stesso nickname e lo stesso saldo di BC. Entra (o crea il profilo) dal Black Market e poi torna qui.</p><a class="btn gold" href="black-market.html">Accedi dal Black Market</a></section>`);
+ $('top').innerHTML='<p class="mute" style="margin:0">Nessun profilo attivo.</p>'}
+function gateOff(){gate(`<section class="card er-gate" style="margin-top:20px"><h2>Il gioco non è attivo</h2><p class="mute" style="max-width:34em;margin:0 auto">La guerra degli Eroi è al momento spenta dagli amministratori. Torna a trovarci più tardi.</p></section>`);
+ $('top').innerHTML='<p class="mute" style="margin:0">Modulo non attivo.</p>'}
+
+/* ---------- scheda Eroe ---------- */
+function renderHero(){
+ const m=ST.me,S=ST.settings;if(!draft)draft=Object.assign({},m.alloc);
+ const used=STATS.reduce((t,s)=>t+draft[s[0]],0),left=S.points-used,changed=STATS.some(s=>draft[s[0]]!==m.alloc[s[0]]);
+ const pays=m.stats_set&&m.fights_total>0&&S.respec_cost>0&&changed;
+ const rows=STATS.map(([k,nm,ds])=>{const base=5+draft[k]*m.level,v=Math.round(base*(100+pctSum(k))/100),cur=m.stats[k];const d=v-cur;
+  const dots=Array.from({length:S.cap},(_,i)=>`<i class="${i<draft[k]?'on':''}"></i>`).join('');
+  return `<div class="er-st"><div class="nm">${nm}<small>${ds}</small></div><div class="val">${num(v)}${d?`<em style="${d<0?'color:var(--bad)':''}">${d>0?'+':''}${num(d)}</em>`:''}</div>
+   <div class="er-ctl"><button data-a="-" data-k="${k}" aria-label="Togli un punto a ${nm}" ${draft[k]<=0?'disabled':''}>−</button><div class="er-pts" aria-hidden="true">${dots}</div><b>${draft[k]}</b><button data-a="+" data-k="${k}" aria-label="Aggiungi un punto a ${nm}" ${(left<=0||draft[k]>=S.cap)?'disabled':''}>+</button></div></div>`}).join('');
+ const hpD=50+12*Math.round((5+draft.vig*m.level)*(100+pctSum('vig'))/100);
+ const eq=SLOTS.map(([k,nm,ic])=>{const i=m.equipped[k];return `<div class="er-sl">${i?itemBox(Object.assign({slot:k},i)):`<div class="er-ic" aria-hidden="true">${ic}</div><div class="mute">${nm}: vuoto</div>`}</div>`}).join('');
+ const inv=SLOTS.map(([k,nm])=>{const L=ST.inventory.filter(i=>i.slot===k);return L.length?`<h3 class="er-h" style="font-size:1rem;margin:16px 0 4px">${nm}</h3>`+L.map(i=>{const lock=m.level<i.min_level;return `<div class="er-inv">${itemBox(i,i.source==='start'?'':' · '+esc(SRC[i.source]||''))}<div>${i.equipped?'<span class="chip s">Indossato</span>':lock?`<span class="er-lock">Liv. ${num(i.min_level)}</span>`:`<button class="btn ghost" data-eq="${esc(i.id)}">Indossa</button>`}</div></div>`}).join(''):''}).join('');
+ $('p-hero').innerHTML=`${!m.stats_set?`<p class="er-msg" style="margin:0 0 16px"><b>Benvenuto, eroe!</b> Per iniziare distribuisci i tuoi ${S.points} punti abilità e salva: poi potrai combattere.</p>`:''}
+ <h2 class="er-h">Punti abilità</h2><p class="er-sub">Hai ${S.points} punti da distribuire (massimo ${S.cap} per statistica). Le statistiche valgono <b>5 + punti × livello</b>: ogni livello che sali le fa crescere.</p>
+ <div class="card"><div class="er-left"><span>Punti da assegnare</span><b>${left}</b></div>${rows}
+  <p class="er-note">PV con questa distribuzione: <b>${num(hpD)}</b>.${pays?` <span style="color:var(--warn)">Cambiare una distribuzione già in uso costa <b>${S.respec_cost} BC</b>.</span>`:m.stats_set&&m.fights_total>0&&S.respec_cost>0?` Ridistribuire i punti, una volta combattuto, costa ${S.respec_cost} BC (se non cambi nulla è gratis).`:' Finché non combatti puoi cambiare idea gratis.'}</p>
+  <div class="row" style="margin-top:12px"><button class="btn" id="stSave" ${(!changed&&m.stats_set)||left<0||(!m.stats_set&&used===0)?'disabled':''}>${pays?`Salva (${S.respec_cost} BC)`:'Salva i punti'}</button><button class="btn ghost" id="stReset" ${changed?'':'disabled'}>Annulla</button></div></div>
+ <h2 class="er-h">Equipaggiamento</h2>${(m.xp_pct||m.extra_actions||m.extra_fights)?`<p class="er-sub">Bonus speciali attivi: ${[m.xp_pct?`+${m.xp_pct}% XP`:'',m.extra_actions?`+${m.extra_actions} azioni boss al giorno`:'',m.extra_fights?`+${m.extra_fights} duelli al giorno`:''].filter(Boolean).join(' · ')}</p>`:'<p class="er-sub">Ogni oggetto aumenta una o due statistiche in percentuale.</p>'}
+ <div class="er-slots">${eq}</div>
+ <h2 class="er-h">Zaino</h2>${inv||'<p class="mute">Lo zaino è vuoto.</p>'}
+ <h2 class="er-h">Come si gioca</h2><details class="card"><summary>Le regole in breve</summary><ul class="mute er-how" style="padding-left:20px;margin:6px 0 0">
+  <li><b>Boss del giorno</b>: ogni giorno compare un boss uguale per tutti. Hai ${S.actions} azioni al giorno (attacca, difendi, cura, studia) e i danni di tutti si sommano. Se lo abbattete, chi ha fatto almeno ${S.min_actions} azioni riceve <b>${S.boss_bc} BC</b>, <b>XP doppia</b> e <b>un oggetto casuale</b>.</li>
+  <li>Se nessuno lo batte, il boss ritorna il giorno dopo. Se lo battete, il giorno dopo arriva uno più forte (ce ne sono ${ST.boss.total}).</li>
+  <li><b>Arena</b>: sfida gli altri eroi, ${S.fights} duelli al giorno e una sola volta per avversario. Vincere dà <b>solo XP</b>, mai BC.</li>
+  <li><b>Mercante</b>: ogni giorno propone oggetti diversi e accetta solo BC.</li>
+  <li>I livelli arrivano fino al <b>9999</b>.</li></ul></details>`;
+}
+
+/* ---------- scheda Boss ---------- */
+function renderBoss(){
+ const b=ST.boss,m=ST.me,S=ST.settings,my=b.my,pct=b.max_hp?Math.max(0,Math.min(100,100*b.hp/b.max_hp)):0,open=b.status==='open';
+ const rw=ST.rewards.find(r=>r.day===ST.today);
+ let why='';
+ if(!m.stats_set)why='Prima assegna i tuoi punti abilità nella scheda <b>Eroe</b>.';
+ else if(!open)why='Il boss di oggi è stato sconfitto: torna domani per il prossimo!';
+ else if(my.hp<=0)why='Sei esausto: un alleato deve curarti per tornare in battaglia.';
+ else if(b.actions_left<=0)why='Hai usato tutte le azioni di oggi: torna domani.';
+ const can=!why;
+ const hurt=b.party.filter(p=>p.hp<p.max_hp);
+ if(!hurt.some(p=>p.user_id===heal))heal=hurt.length?hurt[0].user_id:'';
+ const prev=b.previous?(b.previous.status==='defeated'?`Ieri avete sconfitto ${esc(b.previous.emoji)} <b>${esc(b.previous.boss)}</b>.`:b.previous.status==='escaped'?`Ieri ${esc(b.previous.emoji)} <b>${esc(b.previous.boss)}</b> è fuggito: nessuno l’ha battuto.`:''):'';
+ $('p-boss').innerHTML=`<div class="card er-boss ${open?'':'er-win'}">
+  <div class="er-bh"><div class="er-sig" style="--h:${(b.no*37)%360}" aria-hidden="true">${esc(b.emoji)}</div><div style="min-width:0"><small>Boss ${b.no} di ${b.total}${b.cycle>0?` · giro ${b.cycle+1}`:''}</small><h2>${esc(b.name)}</h2><small>Livello medio ${num(b.level)}</small></div></div>
+  <p class="er-lore">${esc(b.lore)}</p>${b.trait?`<p class="er-trait"><b>Particolarità:</b> ${esc(b.trait)}</p>`:''}
+  <div class="er-hp" role="progressbar" aria-valuemin="0" aria-valuemax="${b.max_hp}" aria-valuenow="${b.hp}" aria-label="Punti vita del boss"><i style="width:${pct}%"></i><span>${num(b.hp)} / ${num(b.max_hp)} PV</span></div>
+  <div class="er-chips">${b.shield>0?`<span>🛡️ Scudo comune ${num(b.shield)}</span>`:''}${b.weak>0?`<span>🔎 Debolezza svelata +${b.weak}%</span>`:''}<span>⏳ ${open?'Resta ':'Prossimo boss tra '}<b data-cd>${cd()}</b></span></div>
+  ${prev?`<p class="mute" style="margin:0;font-size:.9rem">${prev}</p>`:''}
+ </div>
+ ${!open&&rw?`<div class="card er-win" style="margin-top:12px"><h3>🏆 Boss sconfitto! La tua ricompensa</h3><p style="margin:6px 0 0"><b>+${num(rw.bc)} BC</b> · <b>+${num(rw.xp)} XP</b>${rw.levels?` (sei salito di ${rw.levels} livell${rw.levels>1?'i':'o'}!)`:''}${rw.item?` · oggetto: <b class="r-${esc(rw.item_rarity)}" style="color:var(--rc)">${esc(rw.item)}</b>`:''}</p></div>`
+   :!open?`<p class="er-msg" style="margin-top:12px">Il boss è stato sconfitto${my.actions_used<S.min_actions?`, ma servivano almeno ${S.min_actions} azioni per la ricompensa`:''}. Tornate domani!</p>`:''}
+ <h2 class="er-h" style="margin-top:22px">Le tue azioni · ${b.actions_left} su ${b.actions_max}</h2>
+ <div class="er-hp me sm" style="margin-bottom:10px" aria-label="I tuoi punti vita"><i style="width:${my.max_hp?Math.max(0,100*my.hp/my.max_hp):0}%"></i><span>${num(my.hp)} / ${num(my.max_hp)} PV${my.hp<=0?' · KO':''}</span></div>
+ <div class="er-acts">
+  <button class="atk" data-b="attack" ${can?'':'disabled'}>⚔️ Attacca<small>Danni in base alla Forza. Il boss reagisce.</small></button>
+  <button class="grd" data-b="guard" ${can?'':'disabled'}>🛡️ Difendi<small>Alza lo scudo comune che protegge tutti.</small></button>
+  <button class="hel" data-b="heal" ${can&&hurt.length?'':'disabled'}>💚 Cura<small>Rida PV a un alleato (anche KO) in base allo Spirito.</small></button>
+  <button class="stu" data-b="study" ${can&&b.weak<40?'':'disabled'}>🔎 Studia<small>Svela una debolezza: tutti fanno più danni (max +40%).</small></button>
+ </div>
+ ${hurt.length?`<div class="er-sel"><label for="healTo" style="margin:0;flex:none">Cura:</label><select id="healTo">${hurt.map(p=>`<option value="${esc(p.user_id)}" ${p.user_id===heal?'selected':''}>${esc(p.nickname)}${p.hp<=0?' (KO)':''} · ${num(p.hp)}/${num(p.max_hp)}</option>`).join('')}</select></div>`:''}
+ ${why?`<p class="er-note">${why}</p>`:''}
+ <h2 class="er-h">In battaglia oggi · ${b.party.length}</h2>
+ ${b.party.length?b.party.map(p=>`<div class="er-party"><div class="av" aria-hidden="true">${ini(p.nickname)}</div><div style="min-width:0"><div class="l1"><button class="er-link" data-hero="${esc(p.user_id)}">${esc(p.nickname)}${p.user_id===m.user_id?' (tu)':''}</button><small>${p.hp<=0?'<span class="er-ko">KO</span> · ':''}${num(p.dmg)} danni · ${p.actions_used} az.</small></div><div class="er-hp me sm"><i style="width:${p.max_hp?Math.max(0,100*p.hp/p.max_hp):0}%"></i><span>${num(p.hp)}/${num(p.max_hp)}</span></div></div></div>`).join(''):'<p class="mute">Nessuno è ancora sceso in campo. Comincia tu!</p>'}
+ <h2 class="er-h">Cronaca</h2>
+ ${b.log.length?`<ul class="er-log">${b.log.map(l=>`<li>${logLine(l)}</li>`).join('')}</ul>`:'<p class="mute">Ancora nessuna azione oggi.</p>'}`;
+}
+function logLine(l){const n=`<b>${esc(l.nickname)}</b>`,a=num(l.amount);
+ switch(l.action){case 'attack':return `${n} attacca per ${a} danni${l.note==='colpo finale'?' — <b>colpo finale!</b>':l.note==='critico'?' (critico)':l.note==='schivata'?' e schiva il contraccolpo':''}`;
+  case 'guard':return `${n} alza lo scudo di ${a}`;case 'heal':return `${n} cura ${l.target?`<b>${esc(l.target)}</b> `:''}di ${a} PV${l.note==='rianimato'?' e lo <b>rianima</b>':''}`;
+  case 'study':return `${n} studia il boss: debolezza +${a}%`;default:return n}}
+
+async function bossAct(btn,kind){
+ await run(btn,async()=>{
+  const r=await rpc('game_boss_act',{p_action:kind,p_target:kind==='heal'?(heal||null):null});
+  let t='';
+  if(kind==='attack')t=`Hai inflitto <b>${num(r.amount)}</b> danni${r.crit?' (critico!)':''}.${r.dodge?' Hai schivato il contraccolpo.':r.taken>0?` Il boss ti colpisce: −${num(r.taken)} PV.`:r.absorbed>0?` Lo scudo ha assorbito il contraccolpo (${num(r.absorbed)}).`:''}`;
+  else if(kind==='guard')t=`Lo scudo comune cresce di <b>${num(r.amount)}</b>.`;
+  else if(kind==='heal')t=`Hai curato di <b>${num(r.amount)}</b> PV${r.note==='rianimato'?' e rianimato l’alleato!':'.'}`;
+  else t=`Hai svelato una debolezza: <b>+${num(r.amount)}%</b> ai danni di tutti (totale ${r.weak}%).`;
+  if(r.ko)t+=' <b>Sei KO!</b> Servirà una cura.';
+  if(r.defeated){const w=r.reward;t=`<b>🏆 Boss sconfitto!</b> ${t}`+(w?` Ricompensa: <b>+${num(w.bc)} BC</b>, <b>+${num(w.xp)} XP</b>${w.item?`, oggetto <b>${esc(w.item)}</b>`:''}${w.levels?`, <b>+${w.levels} livello!</b>`:''}.`:' (per la ricompensa servono almeno '+ST.settings.min_actions+' azioni).')}
+  say(t,r.defeated?'good':'');
+  await load(true)})}
+
+/* ---------- Arena ---------- */
+async function loadArena(){try{AR=await rpc('game_arena_list')}catch(e){AR=[];say(errTxt(e),'bad')}renderArena()}
+function renderArena(){
+ const m=ST.me,S=ST.settings,d=ST.duels,left=Math.max(0,d.limit-d.used),list=AR||[];
+ $('p-arena').innerHTML=`<h2 class="er-h">Arena</h2><p class="er-sub">Sfida un altro eroe: vince chi ha più PV alla fine. Vincere ti dà <b>solo XP</b> (di più se l’avversario è più forte di te), perdere non costa nulla. Nessun BC in gioco.</p>
+ <div class="card"><div class="row" style="justify-content:space-between"><span>Duelli di oggi</span><b>${d.used} / ${d.limit}</b></div>
+  <div class="er-sw" style="margin-top:6px"><span>Accetto sfide in Arena</span><input type="checkbox" id="arOpen" ${m.arena_open?'checked':''} aria-label="Accetto sfide in Arena"></div></div>
+ ${!m.stats_set?'<p class="er-msg">Assegna prima i tuoi punti abilità nella scheda <b>Eroe</b>.</p>':''}
+ <h2 class="er-h">Avversari</h2>
+ ${AR==null?'<p class="mute">Caricamento…</p>':list.length?list.map(a=>`<div class="er-ar"><div class="av" aria-hidden="true">${ini(a.nickname)}</div>
+   <div style="min-width:0"><button class="er-link" data-hero="${esc(a.user_id)}">${esc(a.nickname)}</button><small>Liv. ${num(a.level)} · potenza ${num(a.power)} · ${num(a.bosses_beaten)} boss</small></div>
+   <button class="btn sm" data-duel="${esc(a.user_id)}" ${(!m.stats_set||left<=0||a.fought_today)?'disabled':''}>${a.fought_today?'Già sfidato':'Sfida'}</button></div>`).join(''):'<p class="mute">Nessun altro eroe è disponibile in Arena, per ora.</p>'}
+ <h2 class="er-h">I tuoi ultimi duelli</h2>
+ ${d.recent.length?d.recent.map(q=>{const mine=q.attacker_id===m.user_id,win=q.winner===(mine?q.attacker:q.defender);return `<div class="it" style="justify-content:flex-start;gap:10px"><span class="chip ${win?'s':'k'}">${win?'Vinto':'Perso'}</span><span style="min-width:0;overflow-wrap:anywhere">${mine?`Hai sfidato <b>${esc(q.defender)}</b>`:`<b>${esc(q.attacker)}</b> ti ha sfidato`}${mine&&q.xp>0?` · +${num(q.xp)} XP`:''}</span></div>`}).join(''):'<p class="mute">Nessun duello ancora.</p>'}`;
+}
+function duelModal(r){
+ const me=ST.me,op=r.opponent,L=r.log||[];let i=0;
+ const o=modal(`<h2>${r.won?'Vittoria!':'Sconfitta'}</h2>
+  <div class="er-duel"><div><b>${esc(me.nickname)}</b><small>Liv. ${num(me.level)}</small><div class="er-hp me sm" style="margin-top:6px"><i id="dA" style="width:100%"></i><span id="dAt">${num(r.max_a)}</span></div></div>
+  <div><b>${esc(op)}</b><small>Liv. ${num(r.opponent_level)}</small><div class="er-hp sm" style="margin-top:6px"><i id="dB" style="width:100%"></i><span id="dBt">${num(r.max_b)}</span></div></div></div>
+  <ul class="er-dl" id="dLog" aria-live="off"></ul><div id="dRes"></div>
+  <div class="row" style="margin-top:12px"><button class="btn ghost" id="dSkip">Salta</button><button class="btn" data-close>Chiudi</button></div>`);
+ const A=o.querySelector('#dA'),B=o.querySelector('#dB'),At=o.querySelector('#dAt'),Bt=o.querySelector('#dBt'),G=o.querySelector('#dLog');
+ const upd=(ha,hb)=>{A.style.width=(100*ha/r.max_a)+'%';B.style.width=(100*hb/r.max_b)+'%';At.textContent=num(ha)+' / '+num(r.max_a);Bt.textContent=num(hb)+' / '+num(r.max_b)};
+ const step=s=>{const w=s.w==='a'?esc(me.nickname):esc(op);G.insertAdjacentHTML('beforeend',`<li><b>${w}</b> ${s.x?'attacca ma viene schivato':`infligge ${num(s.d)} danni${s.c?' (critico!)':''}`}</li>`);G.scrollTop=G.scrollHeight;upd(s.ha,s.hb)};
+ const fin=()=>{if(o._t){clearInterval(o._t);o._t=null}G.innerHTML=L.map(s=>`<li><b>${s.w==='a'?esc(me.nickname):esc(op)}</b> ${s.x?'attacca ma viene schivato':`infligge ${num(s.d)} danni${s.c?' (critico!)':''}`}</li>`).join('');upd(r.hp_a,r.hp_b);
+  o.querySelector('#dRes').innerHTML=`<p class="er-big ${r.won?'w':'l'}">${r.won?`+${num(r.xp)} XP`:'Nessun XP'}</p><p class="mute" style="text-align:center;margin:0">${r.won?(r.levels>0?`Sei salito al livello <b>${num(r.level)}</b>!`:'Solo XP: nessun BC in palio in Arena.'):'Perdere non costa nulla. Riprova con un altro avversario.'}</p>`;o.querySelector('#dSkip').hidden=true};
+ o.querySelector('#dSkip').onclick=fin;
+ if(matchMedia('(prefers-reduced-motion: reduce)').matches||!L.length){fin()}
+ else{o._t=setInterval(()=>{if(i>=L.length){fin();return}step(L[i++])},420)}}
+
+/* ---------- Mercante ---------- */
+function renderShop(){
+ const m=ST.me;
+ $('p-shop').innerHTML=`<h2 class="er-h">Il Mercante</h2><p class="er-sub">Ogni giorno nuove offerte, le stesse per tutti. Accetta solo <b>Black Credits</b>. Hai <b style="color:var(--gold)">${BAL==null?'—':num(BAL)} BC</b>. Nuove offerte tra <b data-cd>${cd()}</b>.</p>
+ ${ST.merchant.length?`<div class="er-shop">${ST.merchant.map(i=>{const lock=m.level<i.min_level,poor=BAL!=null&&BAL<i.price,armed=pending===i.id;
+  return `<div class="er-it r-${esc(i.rarity)}"><div class="hd">${itemBox(i)}</div>
+   <div class="er-pr"><b>${num(i.price)} BC</b>${i.discounted?`<s>${num(i.list_price)}</s><span class="er-tag">OFFERTA</span>`:''}</div>
+   ${i.owned?'<span class="chip s" style="justify-self:start">Già tuo</span>':lock?`<span class="er-lock">Serve il livello ${num(i.min_level)}</span>`:`<button class="btn ${armed?'gold':'ghost'}" data-buy="${esc(i.id)}" ${poor?'disabled':''}>${poor?'BC insufficienti':armed?`Conferma l’acquisto (${num(i.price)} BC)`:'Acquista'}</button>`}</div>`}).join('')}</div>`:'<p class="mute">Oggi il mercante non ha offerte.</p>'}
+ <p class="er-note">Gli oggetti comprati restano tuoi per sempre. I BC spesi qui escono dal gioco: nessun altro li riceve.</p>`}
+
+/* ---------- Classifica ---------- */
+async function loadLb(){try{const{data,error}=await sb.from('game_leaderboard_v').select('*').order('rank',{ascending:true}).order('nickname',{ascending:true}).limit(50);if(error)throw new Error(error.message);LB=data||[]}catch(e){LB=[];say(errTxt(e),'bad')}renderLb()}
+function renderLb(){
+ $('p-lb').innerHTML=`<h2 class="er-h">Classifica degli eroi</h2><p class="er-sub">Ordinata per livello e, a parità, per XP. Compaiono gli eroi che hanno assegnato i loro punti.</p>
+ ${LB==null?'<p class="mute">Caricamento…</p>':LB.length?LB.map(r=>`<div class="er-lb ${r.user_id===ST.me.user_id?'me':''}"><div class="rk">${r.rank}</div><div class="av" aria-hidden="true">${ini(r.nickname)}</div>
+   <div style="min-width:0"><button class="er-link" data-hero="${esc(r.user_id)}">${esc(r.nickname)}</button><small>${num(r.bosses_beaten)} boss · ${num(r.duels_won)} duelli vinti</small></div><div class="lv">Lv. ${num(r.level)}</div></div>`).join(''):'<p class="mute">Nessun eroe in classifica, per ora.</p>'}`}
+
+/* ---------- navigazione e caricamento ---------- */
+function paint(){
+ paintTop();
+ if(tab==='hero')renderHero();else if(tab==='boss')renderBoss();else if(tab==='arena')renderArena();else if(tab==='shop')renderShop();else renderLb();
+}
+function setTab(t,push){
+ tab=t;document.querySelectorAll('.tabs [data-t]').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));
+ ['hero','boss','arena','shop','lb'].forEach(x=>$('p-'+x).hidden=x!==t);
+ if(push!==false)history.replaceState(null,'','#'+t);
+ clearSay();pending=null;
+ if(!ST)return;paint();
+ if(t==='arena')loadArena();if(t==='lb')loadLb();}
+async function load(keepDraft){
+ ST=await rpc('game_state');ME=ST.me;last=Date.now();
+ if(!keepDraft)draft=null;
+ try{const w=await sb.from('wallets').select('balance').eq('user_id',ME.user_id).maybeSingle();BAL=w.data?w.data.balance:null}catch(_){}
+ $('gate').hidden=true;$('main').hidden=false;paint();
+ if(tab==='arena'){AR=await rpc('game_arena_list').catch(()=>AR);renderArena()}}
+async function boot(){
+ if(!window.supabase){gate('<section class="card er-gate" style="margin-top:20px"><h2>Collegamento non riuscito</h2><p class="mute">Impossibile caricare la libreria di accesso. Controlla la connessione e riprova.</p></section>');return}
+ try{
+  if(!sb){sb=window.supabase.createClient(new URL(SUPABASE_URL).origin,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+   sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT')gateLogin()})}
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){gateLogin();return}
+  const pr=await sb.from('profiles').select('id').eq('id',session.user.id).maybeSingle();
+  if(!pr.data){gate('<section class="card er-gate" style="margin-top:20px"><h2>Completa il profilo</h2><p class="mute">Il tuo accesso non ha ancora un profilo Black Market.</p><a class="btn gold" href="black-market.html">Completa la registrazione</a></section>');return}
+  const first=!ST;
+  await load(false);
+  if(first){const h=(location.hash||'').slice(1);setTab(['hero','boss','arena','shop','lb'].includes(h)?h:(ME.stats_set?'boss':'hero'),false)}
+ }catch(e){
+  if(/Modulo non attivo/i.test(String(e.message)))gateOff();
+  else gate(`<section class="card er-gate" style="margin-top:20px"><h2>Errore di collegamento</h2><p class="mute">${errTxt(e)}</p><button class="btn ghost" id="retry">Riprova</button></section>`)}}
+
+/* ---------- eventi ---------- */
+document.querySelector('.tabs').onclick=e=>{const b=e.target.closest('[data-t]');if(b)setTab(b.dataset.t)};
+document.addEventListener('click',e=>{
+ const t=e.target.closest('button,[data-hero]');if(!t)return;
+ if(t.id==='retry'){boot();return}
+ if(t.dataset.hero){heroSheet(t.dataset.hero);return}
+ const a=t.dataset.a;
+ if(a&&draft){const k=t.dataset.k,S=ST.settings;const used=STATS.reduce((s,x)=>s+draft[x[0]],0);
+  if(a==='+'&&used<S.points&&draft[k]<S.cap)draft[k]++;if(a==='-'&&draft[k]>0)draft[k]--;renderHero();
+  const f=document.querySelector(`#p-hero [data-a="${a}"][data-k="${k}"]:not(:disabled)`);if(f)f.focus();return}
+ if(t.id==='stReset'){draft=null;renderHero();return}
+ if(t.id==='stSave'){run(t,async()=>{const d=draft,r=await rpc('game_set_stats',{p_for:d.for,p_des:d.des,p_vig:d.vig,p_spi:d.spi,p_frt:d.frt});
+   say(`Punti salvati${r.paid>0?` (−${num(r.paid)} BC)`:''}. Ora puoi combattere!`,'good');draft=null;await load(false)});return}
+ if(t.dataset.eq){run(t,async()=>{await rpc('game_equip',{p_item:t.dataset.eq});say('Oggetto indossato.','good');await load(true)});return}
+ if(t.dataset.b){bossAct(t,t.dataset.b);return}
+ if(t.dataset.duel){run(t,async()=>{const r=await rpc('game_duel',{p_target:t.dataset.duel});await load(false);duelModal(r)});return}
+ if(t.dataset.buy){const id=t.dataset.buy;
+  if(pending!==id){pending=id;renderShop();setTimeout(()=>{if(pending===id){pending=null;if(tab==='shop')renderShop()}},5000);return}
+  pending=null;run(t,async()=>{const r=await rpc('game_buy',{p_item:id});say(`Hai acquistato <b>${esc(r.item)}</b> per ${num(r.price)} BC. Lo trovi nello zaino: indossalo dalla scheda Eroe.`,'good');BAL=r.balance;await load(true)});return}
+});
+document.addEventListener('change',e=>{
+ if(e.target.id==='healTo'){heal=e.target.value;return}
+ if(e.target.id==='arOpen'){const el=e.target;run(el,async()=>{await rpc('game_set_arena_open',{p_open:el.checked});say(el.checked?'Ora gli altri eroi possono sfidarti.':'Ora nessuno può sfidarti in Arena.','good');await load(false)})}});
+setInterval(()=>{if(!ST)return;document.querySelectorAll('[data-cd]').forEach(e=>e.textContent=cd());
+ if(new Date(ST.next_reset).getTime()<=Date.now()&&Date.now()-last>8000&&!busy&&!document.hidden)load(true).catch(()=>{})},1000);
+setInterval(()=>{if(ST&&!document.hidden&&tab==='boss'&&!busy&&!document.querySelector('.er-ov'))load(true).catch(()=>{})},10000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ST&&Date.now()-last>15000&&!busy)load(true).catch(()=>{})});
+boot();
+})();
+</script></body></html>
