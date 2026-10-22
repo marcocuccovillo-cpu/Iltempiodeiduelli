@@ -13,129 +13,113 @@
   <img src="tempio-logo.svg?v=1" alt="" width="512" height="512">
   <h1 class="brand">Il Tempio <span>Dei Duelli</span></h1>
   <p class="tagline">Yu-Gi-Oh! · Bologna</p>
-  <p class="lead">La community Yu-Gi-Oh! di Bologna: eventi, tornei, sfide a classifica, un mercato di taglie a Black Credits e un gioco di ruolo con eroi, boss e dungeon.</p>
+  <p class="lead">Eventi, sfide a classifica, taglie e un gioco di ruolo con eroi e dungeon.</p>
   <div class="row"><a class="btn" href="#come">Come funziona</a><a class="btn gold" href="black-market.html">Entra nel Black Market</a><a class="btn ghost" href="sentiero.html">Il Sentiero</a></div>
  </header>
 
- <section class="sec" id="taglie" aria-labelledby="tg-h"><div class="card" style="border:2px solid var(--gold);box-shadow:0 0 30px rgba(232,184,74,.22);background:linear-gradient(180deg,rgba(232,184,74,.1),var(--surf) 70%)">
-  <h2 id="tg-h" style="margin-top:0;color:var(--gold)">Come mettere una taglia: leggi qui</h2>
-  <p style="margin:0 0 10px">Non vedi nessun duellante quando provi a mettere una taglia? Non è un errore: <b>si può mettere una taglia solo su chi ha dato il consenso a riceverla</b>. Il consenso parte <b>spento</b> per tutelare la privacy di ciascuno.</p>
-  <ol class="steps">
-   <li><b>Attiva il tuo consenso</b><span>Apri il <a href="black-market.html">Black Market</a>, nella dashboard premi <b>«Il mio profilo e le taglie»</b>, spunta <b>«Accetto taglie su di me»</b> e premi <b>Salva</b>.</span></li>
-   <li><b>Chiedi agli altri di fare lo stesso</b><span>Un duellante compare nell’elenco «Bersaglio» solo dopo aver attivato la stessa spunta nel suo profilo. Se l’elenco è vuoto, nessuno l’ha ancora fatto.</span></li>
-   <li><b>Metti la taglia</b><span>Vai su <b>Metti una taglia</b>, scegli il bersaglio, l’importo (da <b>50 a 500 BC</b>) e conferma. Puoi anche partire dal profilo del duellante col pulsante «Metti una taglia».</span></li>
-  </ol>
-  <div class="row" style="margin-top:12px"><a class="btn gold" href="black-market.html#/new">Metti una taglia</a><a class="btn ghost" href="black-market.html">Apri il mio profilo</a></div>
- </div></section>
+<style>
+.qk{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.qk li{display:flex;gap:10px;align-items:center;padding:9px 11px;border:1px solid var(--line);border-radius:var(--r);background:var(--inp);line-height:1.3}
+.qk i{font-style:normal;font-size:1.3rem;flex:none;width:1.8rem;text-align:center}
+.qk b{color:var(--gold)}
+.qk small{display:block;color:var(--mu);font-size:.85rem}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px;padding:0;list-style:none}
+.flow li{padding:6px 11px;border-radius:99px;border:1px solid var(--ac);background:rgba(var(--ac-rgb),.12);font-weight:700;font-size:.92rem}
+.flow li+li::before{content:"→";margin-right:8px;color:var(--mu);font-weight:400}
+.flow li{display:inline-flex}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0;padding:0;list-style:none}
+.pills li{padding:4px 10px;border-radius:99px;border:1px solid var(--line);font-size:.88rem;font-weight:700}
+.qk.two{grid-template-columns:1fr 1fr;gap:6px}.qk.two li{flex-direction:column;align-items:flex-start;gap:2px;padding:8px 10px;font-size:.93rem}.qk.two i{width:auto;font-size:1.25rem}
+.hm-h{display:flex;align-items:center;gap:8px}
+.hm-more{margin-top:10px;font-size:.92rem;color:var(--mu)}
+.hm-more summary{min-height:40px;color:var(--ac2);font-size:.92rem}
+.hm-more ul{margin:0 0 6px;padding-left:20px;line-height:1.5}
+</style>
 
- <section class="sec" id="come"><h2>Come funziona il sito</h2>
-  <p class="mute" style="margin:0 0 12px">Il Tempio ha due anime: gli strumenti per giocare e organizzare (nessun account necessario) e il <b>Black Market</b>, dove con un profilo gratuito fai sfide, guadagni Black Credits e metti taglie.</p>
-  <ol class="steps">
-   <li><b>Crea il profilo</b><span>Dal <a href="black-market.html">Black Market</a> scegli un nickname, email e password. Entri con <b>1000 BC</b> di benvenuto.</span></li>
-   <li><b>Gioca</b><span>Partecipa agli eventi, sfida un duellante nella <a href="black-market.html#/ladder">Ladder</a>, fai crescere il tuo eroe ne <a href="eroi.html">La guerra degli Eroi</a> e colleziona i badge del <a href="sentiero.html">Sentiero</a>.</span></li>
-   <li><b>Guadagna</b><span>Ogni vittoria in Ladder confermata ti dà Black Credits e vale come match WPA ufficiale.</span></li>
-   <li><b>Sfida e incassa</b><span>Con i BC metti taglie sui rivali. Se li batti in un match ufficiale, incassi il montepremi.</span></li>
-  </ol>
-  <p class="mute" style="margin:10px 0 0;font-size:.92rem">Gestisci torneo, Match Pro e Deck Analyzer funzionano subito, anche senza account; il Sentiero usa il tuo profilo del Black Market, che è l’unico accesso. Dal menu ☰ puoi anche installare il Tempio sulla schermata Home come app.</p>
+ <section class="sec" id="come"><h2>Inizia qui</h2>
+  <ol class="flow"><li>Crea il profilo</li><li>Gioca</li><li>Guadagna BC</li><li>Metti taglie</li></ol>
+  <p style="margin:0">Profilo dal <a href="black-market.html">Black Market</a> con <b>1000 BC</b> di benvenuto. Torneo, Match Pro e Deck Analyzer funzionano anche senza account.</p>
  </section>
 
- <section class="sec" id="blackmarket"><h2>Il Black Market</h2>
+ <section class="sec" id="taglie" aria-labelledby="tg-h"><div class="card" style="border:2px solid var(--gold);box-shadow:0 0 30px rgba(232,184,74,.22);background:linear-gradient(180deg,rgba(232,184,74,.1),var(--surf) 70%)">
+  <h2 id="tg-h" style="margin-top:0;color:var(--gold)">🎯 Come mettere una taglia</h2>
+  <ul class="qk">
+   <li><i>1</i><span><b>Attiva «Accetto taglie su di me»</b><small>Black Market → «Il mio profilo e le taglie» → Salva</small></span></li>
+   <li><i>2</i><span><b>Il bersaglio deve averlo attivato</b><small>Elenco vuoto = nessuno l’ha ancora fatto</small></span></li>
+   <li><i>3</i><span><b>Scegli bersaglio e importo</b><small>Da 50 a 500 BC</small></span></li>
+  </ul>
+  <div class="row" style="margin-top:12px"><a class="btn gold" href="black-market.html#/new">Metti una taglia</a><a class="btn ghost" href="black-market.html">Il mio profilo</a></div>
+ </div></section>
+
+ <section class="sec" id="blackmarket"><h2>💰 Black Market</h2>
   <div class="card bm">
-   <p style="margin:0">Il mercato clandestino dei duellanti. Funziona con i <b>Black Credits (BC)</b>, una valuta <b>solo virtuale</b>: non si comprano, non si convertono in denaro e non si possono trasferire da un utente all’altro.</p>
-   <dl class="facts">
-    <div><dt>Ingresso</dt><dd><b>1000 BC</b> di benvenuto, una sola volta per profilo.</dd></div>
-    <div><dt>Eventi</dt><dd><b>30 BC</b> per ogni evento a cui partecipi, assegnati dall’organizzatore.</dd></div>
-    <div><dt>Taglie</dt><dd>Puoi mettere una taglia da <b>50 a 500 BC</b> su un duellante che ha accettato di riceverle (massimo 5 taglie attive per utente). Le taglie sommate formano il <b>Most Wanted</b>.</dd></div>
-    <div><dt>Riscossione</dt><dd>Chi batte il bersaglio in un <b>match WPA ufficiale</b> incassa le quote messe dagli altri e si vede restituite le proprie. Ogni match paga una sola volta.</dd></div>
-    <div><dt>Trasparenza</dt><dd>Ogni movimento è nel registro del tuo wallet e non si può modificare. Risultati contestati e casi dubbi li decide l’amministrazione, con motivazione registrata.</dd></div>
-   </dl>
+   <ul class="qk two">
+    <li><i>🎁</i><span><b>1000 BC</b> all’ingresso</span></li>
+    <li><i>🏆</i><span><b>+30 BC</b> a evento</span></li>
+    <li><i>🎯</i><span>Taglie <b>50–500 BC</b></span></li>
+    <li><i>💥</i><span>Batti il bersaglio: <b>incassi</b></span></li>
+    <li><i>🔒</i><span>BC <b>solo virtuali</b></span></li>
+    <li><i>📒</i><span>Tutto nel <b>registro</b></span></li>
+   </ul>
    <div class="row" style="margin-top:12px"><a class="btn gold" href="black-market.html">Apri il Black Market</a></div>
   </div>
  </section>
 
- <section class="sec" id="ladder"><h2>La Ladder</h2>
+ <section class="sec" id="ladder"><h2>⚔️ Ladder</h2>
   <div class="card bm">
-   <p style="margin:0">Sfide dirette in <b>Advanced</b> ed <b>Edison</b>, con una classifica <b>Elo per ciascun formato</b>: tutti partono da 1000 in entrambi, e battere chi è più forte vale di più. Giochi quando vuoi, contro chi vuoi.</p>
-   <h3 class="h3">Come si gioca</h3>
-   <ol class="steps compact">
-    <li><b>Sfida</b><span>Scegli un duellante, il formato (Advanced o Edison) e il <b>tipo di sfida</b>: Ladder normale, per la taglia, oppure tutte e due.</span></li>
-    <li><b>Accetta</b><span>L’avversario vede il tipo di sfida e <b>accetta o rifiuta</b> dalla notifica, dalla dashboard o dalla pagina Ladder.</span></li>
-    <li><b>Duellate</b><span><b>Uno solo dei due</b> inserisce com’è finita, scegliendo il risultato dal proprio punto di vista («Ho vinto 2-0», «Ho perso 1-2»…).</span></li>
-    <li><b>Conferma</b><span>L’<b>altro</b> giocatore lo conferma («Tocca a te» nella pagina Ladder): solo allora contano Elo, premio e match WPA. Se non è d’accordo preme «Non è corretto» e decide l’amministrazione. <b>Il risultato si inserisce una volta sola</b>: il match WPA si crea da solo, non va aggiunto a mano negli eventi.</span></li>
-   </ol>
-   <h3 class="h3">Che tipo di sfida?</h3>
-   <div class="scroll"><table class="rw">
-    <thead><tr><th>Tipo</th><th>Elo del formato</th><th>+20 BC</th><th>Taglia sull’avversario</th></tr></thead>
-    <tbody>
-     <tr><td><b>Ladder normale</b></td><td>sì</td><td>sì</td><td>non in gioco</td></tr>
-     <tr><td><b>Per la taglia</b></td><td>no</td><td>no</td><td>se vinci la riscuoti</td></tr>
-     <tr><td><b>Ladder + taglia</b></td><td>sì</td><td>sì</td><td>se vinci la riscuoti</td></tr>
-    </tbody></table></div>
-   <p class="mute" style="margin:8px 0 0">«Per la taglia» e «Ladder + taglia» si possono scegliere solo se l’avversario ha una taglia che puoi incassare (le tue quote ti tornano indietro e non contano).</p>
-   <h3 class="h3">Cosa ottieni</h3>
-   <div class="scroll"><table class="rw">
-    <thead><tr><th>Esito confermato</th><th>Elo</th><th>Black Credits</th><th>Match WPA</th></tr></thead>
-    <tbody>
-     <tr><td><b>Vittoria</b></td><td>sale</td><td><b>+20 BC</b> al vincitore</td><td>sì, ufficiale</td></tr>
-     <tr><td>Pareggio</td><td>si muove poco</td><td>—</td><td>no</td></tr>
-     <tr><td>Sconfitta</td><td>scende</td><td>nessuna perdita</td><td>—</td></tr>
-    </tbody></table></div>
-   <ul class="notes">
-    <li><b>I BC li crea il sistema</b>: il premio non viene tolto allo sconfitto e non si possono scambiare BC tra giocatori.</li>
-    <li><b>Premi limitati</b>: al massimo <b>3 vittorie premiate nelle 24 ore</b> e <b>1 per avversario</b>. Le altre partite contano comunque per l’Elo.</li>
-    <li><b>Punti per gli eventi WPA</b>: ogni vittoria confermata viene registrata come <b>match WPA ufficiale</b> nell’evento «Ladder WPA» del giorno, come un match verificato da un organizzatore. Conta per le taglie e, quando attivi, per Hall of Fame e Faction Wars. Per coppia di giocatori conta un solo match ufficiale ogni 24 ore.</li>
-    <li><b>Taglie sui match Ladder</b>: la taglia si riscuote solo se la sfida era «per la taglia» o «Ladder + taglia», e <b>dopo 24 ore</b> dalla conferma (per evitare accordi tra amici: in quel tempo l’amministrazione può controllare).</li>
-    <li>Importi e limiti sono quelli attuali e possono essere modificati dall’amministrazione.</li>
+   <ol class="flow"><li>Sfida</li><li>Accetta</li><li>Duello</li><li>Conferma</li></ol>
+   <ul class="qk two">
+    <li><i>✍️</i><span><b>1 solo</b> inserisce il risultato</span></li>
+    <li><i>✅</i><span>L’altro <b>conferma</b></span></li>
+    <li><i>🏅</i><span>Vittoria: <b>+20 BC</b> e Elo</span></li>
+    <li><i>📋</i><span>Match WPA <b>automatico</b></span></li>
+    <li><i>🎯</i><span>Normale, <b>taglia</b> o entrambe</span></li>
+    <li><i>⛔</i><span>Max <b>3 premi</b>/giorno</span></li>
    </ul>
    <div class="row" style="margin-top:12px"><a class="btn gold" href="black-market.html#/ladder">Vai alla Ladder</a></div>
   </div>
  </section>
 
- <section class="sec" id="eroi"><h2>La guerra degli Eroi</h2>
+ <section class="sec" id="eroi"><h2>🛡️ La guerra degli Eroi</h2>
   <div class="card bm">
-   <p style="margin:0">Un mini gioco di ruolo dentro il Tempio: ogni duellante ha il suo <b>eroe</b> (livelli da 1 a 9999), lo potenzia con punti abilità, oggetti e abilità del Mercante e lo mette alla prova contro boss, altri eroi e dungeon.</p>
-   <h3 class="h3">Come si gioca</h3>
-   <ol class="steps compact">
-    <li><b>Energia</b><span>Una batteria da <b>100</b> che si ricarica da sola in 8 ore. Ogni duello in Arena costa 5 (vinto) o 8 (perso), ogni dungeon 20. Se è scarica si aspetta.</span></li>
-    <li><b>Punti abilità</b><span>Ricevi <b>3 punti a ogni livello</b>, da spendere in Forza, Destrezza, Vigore, Spirito e Fortezza.</span></li>
-    <li><b>Mercante</b><span>Ogni giorno nuove offerte, solo in Black Credits: abilità permanenti, potenziamenti a tempo ed equipaggiamento.</span></li>
-   </ol>
-   <h3 class="h3">Cosa si può fare</h3>
-   <dl class="facts">
-    <div><dt>Boss del giorno</dt><dd>Un boss nuovo ogni giorno, da battere insieme: serve una lobby con almeno <b>3 eroi</b>. Chi partecipa vince XP e BC.</dd></div>
-    <div><dt>Arena</dt><dd>Sfida gli altri eroi tutte le volte che vuoi: l’unico limite è l’energia. Si vince solo XP, mai BC.</dd></div>
-    <div><dt>Dungeon (nuovo)</dt><dd><b>25 mini dungeon</b> a difficoltà crescente, ognuno con 4-6 stanze e un boss a tema Yu-Gi-Oh!, da affrontare <b>da soli o in gruppo fino a 4</b>: si crea una lobby, ognuno sceglie il ruolo (<b>Tank, Danni, Supporto</b>) e il capo fa partire. Si sbloccano uno dopo l’altro.</dd></div>
-    <div><dt>Premi dei dungeon</dt><dd>Alla prima vittoria <b>BC (da 150 a 2.500)</b>, XP e un <b>oggetto esclusivo</b>; ogni <b>5 dungeon completati</b> l’oggetto è <b>epico</b>. In gruppo i BC crescono. Le repliche danno meno.</dd></div>
-   </dl>
-   <ul class="notes">
-    <li>Boss e dungeon <b>creano</b> BC (non li tolgono a nessuno); i duelli in Arena no.</li>
-    <li>Numeri, costi e limiti sono quelli attuali e possono essere modificati dall’amministrazione.</li>
+   <ul class="qk two">
+    <li><i>⚡</i><span><b>Energia 100</b><small>ricarica in 8 ore</small></span></li>
+    <li><i>🆙</i><span><b>3 punti</b> a livello</span></li>
+    <li><i>🐉</i><span><b>Boss del giorno</b><small>3+ eroi · XP e BC</small></span></li>
+    <li><i>🥊</i><span><b>Arena</b><small>tra eroi · solo XP</small></span></li>
    </ul>
+   <h3 class="h3 hm-h">🏰 25 Dungeon <span class="mute" style="font-size:.85rem;font-weight:400">· 20 energia</span></h3>
+   <ul class="qk two">
+    <li><i>👥</i><span><b>1–4</b> giocatori</span></li>
+    <li><i>💰</i><span><b>150 → 2.500 BC</b></span></li>
+    <li><i>🎖️</i><span><b>Epico</b> ogni 5</span></li>
+    <li><i>🔓</i><span>Sblocco <b>in ordine</b></span></li>
+   </ul>
+   <ul class="pills"><li>🛡️ Tank</li><li>⚔️ Danni</li><li>💚 Supporto</li></ul>
    <div class="row" style="margin-top:12px"><a class="btn gold" href="eroi.html#dng">Vai ai dungeon</a><a class="btn ghost" href="eroi.html">Il mio eroe</a></div>
   </div>
  </section>
 
- <section class="sec" id="badge"><h2>Badge e traguardi</h2>
+ <section class="sec" id="badge"><h2>🎖️ Badge</h2>
   <div class="card bm">
-   <p style="margin:0">Ogni cosa che fai nel Tempio può sbloccare un <b>badge</b>. Sono <b>48 traguardi</b> in quattro livelli — <b>Bronzo, Argento, Oro e Leggenda</b> — più tre badge speciali. Li calcola il sistema sui dati ufficiali, quindi non si comprano e non si assegnano a mano.</p>
-   <dl class="facts">
-    <div><dt>Black Market</dt><dd>Taglie lanciate, taglie riscosse, taglie ricevute sulla tua testa e il bottino più grosso.</dd></div>
-    <div><dt>Match ufficiali</dt><dd>Vittorie verificate, serie di vittorie di fila e presenze agli eventi.</dd></div>
-    <div><dt>Ladder</dt><dd>Vittorie, Elo massimo, furia di vittorie consecutive, avversari battuti, Ammazzagiganti (chi ha 100 Elo più di te) e rivincite.</dd></div>
-    <div><dt>Profilo</dt><dd>I badge compaiono nel tuo profilo del Black Market e nel Sentiero, con un <b>grado</b> che sale coi punti Tempio. Sono solo prestigio: non danno Black Credits.</dd></div>
-   </dl>
+   <ul class="qk two">
+    <li><i>🏅</i><span><b>48</b> traguardi</span></li>
+    <li><i>🥉</i><span>Bronzo → <b>Leggenda</b></span></li>
+    <li><i>🤖</i><span>Assegnati in automatico</span></li>
+    <li><i>🚫</i><span>Niente BC, <b>solo prestigio</b></span></li>
+   </ul>
    <div class="row" style="margin-top:12px"><a class="btn gold" href="sentiero.html">Vai al Sentiero</a></div>
   </div>
  </section>
 
  <section class="sec"><h2>Gli strumenti</h2>
   <div class="tools">
-   <a class="tool" href="sentiero.html"><h3>Il Sentiero</h3><p>I tuoi badge e traguardi del Black Market e della Ladder, più libretto e campionato.</p></a>
-   <a class="tool bm" href="black-market.html"><h3>Black Market</h3><p>Taglie sui rivali con i Black Credits, Most Wanted, Ladder e registro del mercato.</p></a>
-   <a class="tool" href="eroi.html"><h3>La guerra degli Eroi</h3><p>Mini gioco di ruolo: il tuo eroe, il boss del giorno, l’Arena, il mercante e 25 dungeon da soli o in squadra.</p></a>
-   <a class="tool" href="gestisci-torneo.html"><h3>Gestisci torneo</h3><p>Accoppiamenti Swiss, risultati tavolo per tavolo e classifica.</p></a>
-   <a class="tool" href="match-pro.html"><h3>Match Pro</h3><p>Life Points, timer e cronologia del match.</p></a>
-   <a class="tool" href="deck-analyzer.html"><h3>Deck Analyzer</h3><p>Ruoli, probabilità d’apertura e mani simulate.</p></a>
+   <a class="tool" href="sentiero.html"><h3>Il Sentiero</h3><p>Badge, libretto e campionato.</p></a>
+   <a class="tool bm" href="black-market.html"><h3>Black Market</h3><p>Taglie, Most Wanted e Ladder.</p></a>
+   <a class="tool" href="eroi.html"><h3>La guerra degli Eroi</h3><p>Eroe, boss, Arena e 25 dungeon.</p></a>
+   <a class="tool" href="gestisci-torneo.html"><h3>Gestisci torneo</h3><p>Swiss, tavoli e classifica.</p></a>
+   <a class="tool" href="match-pro.html"><h3>Match Pro</h3><p>Life Points e timer.</p></a>
+   <a class="tool" href="deck-analyzer.html"><h3>Deck Analyzer</h3><p>Probabilità e mani simulate.</p></a>
   </div></section>
 </main>
 <script src="tempio.js?v=11"></script>
