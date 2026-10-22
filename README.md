@@ -277,6 +277,10 @@ Solo interfaccia, nessuna regola cambiata: prima il risultato si sceglieva da un
 - **Come applicarla**: pubblica `black-market-moduli.js`, `black-market.html` e `sw.js`. Provata nel browser (87 controlli sul Black Market, compresi i nuovi, e controllo a 390 px senza scorrimento orizzontale).
 - **Non fatto (da decidere)**: un blocco in database che impedisca a un organizzatore di aggiungere un match tra due giocatori che hanno appena registrato una partita di Ladder; l'avrei messo solo come avviso perché potrebbe bloccare un torneo giocato la stessa sera.
 
+### Home aggiornata (24 ottobre 2026, nessuna migrazione)
+
+`index.html` ha una nuova sezione **«La guerra degli Eroi»** (energia, punti abilità, Mercante, boss del giorno, Arena, **25 dungeon** con lobby e ruoli, premi ed epico ogni 5) con i pulsanti «Vai ai dungeon» e «Il mio eroe»; nella sezione Ladder i passi «Duellate» e «Conferma» descrivono il nuovo inserimento (un solo risultato, dal proprio punto di vista; il match WPA si crea da solo); aggiornati anche descrizione, testo di apertura, il passo «Gioca» e la scheda dello strumento. Pubblica `index.html` e `sw.js`.
+
 ## Nuovo logo e palette «Ametista» (21 ottobre 2026)
 - **Logo**: un emblema nuovo ispirato al vecchio (tempio simmetrico con guglie e pagoda, fascio di luce sulla scalinata, due sfere a spirale ai lati, ali di luce, il duellante con il bastone) disegnato a linee luminose su nero, in viola/lilla. È un SVG (`tempio-logo.svg`, nitido a ogni dimensione); le icone PNG (192, 512, maskable, Apple, barra mobile) sono ricavate dallo stesso disegno. Il nome «Il Tempio Dei Duelli» non è più dentro l'immagine: è testo vero (font Cinzel) sotto l'emblema in home e nel menu.
 - **Palette**: fondo sempre nero; superfici viola-nero (`#0d0a18`, `#1b1432`); accento ametista `#a78bfa` / lilla `#c9b8ff`. L'oro dei Black Credits e i colori vittoria/sconfitta/avviso non cambiano. Tutti i colori del sito passano da variabili in `tempio.css`.
