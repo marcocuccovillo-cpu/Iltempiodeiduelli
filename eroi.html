@@ -295,7 +295,7 @@ function renderHero(){
  ${ISADM?`<h2 class="er-h">Strumenti admin</h2><div class="card"><p class="mute" style="margin:0 0 10px">Visibile solo a te (amministratore). Riporta la tua batteria al 100%; l’uso viene registrato nell’audit.</p><button class="btn gold" id="admEn">⚡ Ricarica la mia energia</button></div>`:''}
  <h2 class="er-h">Come si gioca</h2><details class="card"><summary>Le regole in breve</summary><ul class="mute er-how" style="padding-left:20px;margin:6px 0 0">
   <li><b>Boss del giorno</b>: ogni giorno compare un boss, lo stesso per tutti. Ogni eroe ha <b>una lobby al giorno</b>: ne crea una sua (anche da solo) oppure entra in una già aperta. Quando siete pronti uno qualunque dei presenti la fa partire (dopo la partenza non si entra più). I PV del boss si calcolano sugli eroi presenti${S.min_players>1?`, e servono almeno <b>${S.min_players} eroi</b>`:''}.</li>
-  <li>Una volta partito, hai ${S.actions} azioni al giorno (attacca, difendi, cura, studia) e i danni di chi è nella tua lobby si sommano. Se lo abbattete, <b>tutti quelli della lobby</b> ricevono <b>${S.boss_bc} BC</b>, <b>XP doppia</b> e <b>un oggetto casuale</b>.</li>
+  <li>Una volta partito, puoi <b>attaccare quando vuoi</b>, senza limiti: ogni attacco però ti costa PV, perché il boss reagisce, e a 0 PV sei KO finché un alleato non ti cura. Ogni giorno hai inoltre ${S.actions} azioni di supporto (difendi, cura, studia) e i danni di chi è nella tua lobby si sommano. Se lo abbattete, <b>tutti quelli della lobby</b> ricevono <b>${S.boss_bc} BC</b>, <b>XP doppia</b> e <b>un oggetto casuale</b>.</li>
   <li>Ogni lobby ha il suo boss: ognuno può batterlo, anche se un’altra lobby c’è già riuscita. Se almeno una lo batte, il giorno dopo arriva uno più forte (ce ne sono ${ST.boss.total}); se nessuno ci riesce, il boss ritorna.</li>
   <li><b>Arena</b>: sfida gli altri eroi quante volte vuoi, anche lo stesso avversario più volte. Ogni duello consuma <b>energia</b> (la batteria in alto): ${ST.energy.win} se vinci, ${ST.energy.loss} se perdi, e ne servono almeno ${ST.energy.min} per sfidare. La batteria arriva a ${ST.energy.max} e si ricarica da sola in ${Math.round(ST.energy.max/ST.energy.per_hour)} ore circa. Vincere dà <b>solo XP</b>, mai BC. <b>Ogni volta che sali di livello la batteria si ricarica al 100%</b>. Il boss non consuma energia.</li>
   <li><b>Punti abilità</b>: ${S.points} all’inizio e <b>${S.points_per_level} a ogni livello</b>, da mettere nelle statistiche.</li>
@@ -311,23 +311,23 @@ function renderBoss(){
  if(!m.stats_set)why='Prima assegna i tuoi punti abilità nella scheda <b>Eroe</b>.';
  else if(done)why='Hai già sconfitto il boss di oggi con la tua lobby: torna domani per il prossimo!';
  else if(open&&my.hp<=0)why='Sei esausto: un alleato deve curarti per tornare in battaglia.';
- else if(open&&b.actions_left<=0)why='Hai usato tutte le azioni di oggi: torna domani.';
- const can=!why;
+ const can=!why,canS=can&&b.actions_left>0;   // attaccare non consuma azioni: solo Difendi, Cura e Studia
  const hurt=b.party.filter(p=>p.hp<p.max_hp);
  if(!hurt.some(p=>p.user_id===heal))heal=hurt.length?hurt[0].user_id:'';
  const prev=b.previous?(b.previous.status==='defeated'?`Ieri avete sconfitto ${esc(b.previous.emoji)} <b>${esc(b.previous.boss)}</b>.`:b.previous.status==='escaped'?`Ieri ${esc(b.previous.emoji)} <b>${esc(b.previous.boss)}</b> è fuggito: nessuno l’ha battuto.`:''):'';
  const need=Math.max(0,b.min_players-b.party.length),NJ=lobby&&!b.joined;
  const WHY=why?`<p class="er-note">${why}</p>`:'';
- const ACT=` <h2 class="er-h" style="margin-top:22px">Le tue azioni · ${b.actions_left} su ${b.actions_max}</h2>
+ const ACT=` <h2 class="er-h" style="margin-top:22px">Azioni di supporto · ${b.actions_left} su ${b.actions_max}</h2>
  <div class="er-hp me sm" style="margin-bottom:10px" aria-label="I tuoi punti vita"><i style="width:${my.max_hp?Math.max(0,100*my.hp/my.max_hp):0}%"></i><span>${num(my.hp)} / ${num(my.max_hp)} PV${my.hp<=0?' · KO':''}</span></div>
  <div class="er-acts">
-  <button class="atk" data-b="attack" ${can?'':'disabled'}>⚔️ Attacca<small>Danni in base alla Forza. Il boss reagisce.</small></button>
-  <button class="grd" data-b="guard" ${can?'':'disabled'}>🛡️ Difendi<small>Alza lo scudo comune che protegge tutti.</small></button>
-  <button class="hel" data-b="heal" ${can&&hurt.length?'':'disabled'}>💚 Cura<small>Rida PV a un alleato (anche KO) in base allo Spirito.</small></button>
-  <button class="stu" data-b="study" ${can&&b.weak<40?'':'disabled'}>🔎 Studia<small>Svela una debolezza: tutti fanno più danni (max +40%).</small></button>
+  <button class="atk" data-b="attack" ${can?'':'disabled'}>⚔️ Attacca<small>Illimitato, non usa azioni. Il boss ti colpisce a ogni attacco.</small></button>
+  <button class="grd" data-b="guard" ${canS?'':'disabled'}>🛡️ Difendi<small>Alza lo scudo comune che protegge tutti.</small></button>
+  <button class="hel" data-b="heal" ${canS&&hurt.length?'':'disabled'}>💚 Cura<small>Rida PV a un alleato (anche KO) in base allo Spirito.</small></button>
+  <button class="stu" data-b="study" ${canS&&b.weak<40?'':'disabled'}>🔎 Studia<small>Svela una debolezza: tutti fanno più danni (max +40%).</small></button>
  </div>
  ${hurt.length?`<div class="er-sel"><label for="healTo" style="margin:0;flex:none">Cura:</label><select id="healTo">${hurt.map(p=>`<option value="${esc(p.user_id)}" ${p.user_id===heal?'selected':''}>${esc(p.nickname)}${p.hp<=0?' (KO)':''} · ${num(p.hp)}/${num(p.max_hp)}</option>`).join('')}</select></div>`:''}
- ${WHY}`;
+ ${WHY}
+ ${open&&can&&b.actions_left<=0?'<p class="er-note">Hai finito le azioni di supporto di oggi (Difendi, Cura, Studia). Puoi continuare ad attaccare finché hai PV.</p>':''}`;
  const lbl=(b.lobbies||[]).map(q=>`<div class="er-lbrow"><div style="min-width:0"><div class="l1"><b>${esc(q.host||'Lobby')}</b><small>${q.players} ${q.players===1?'eroe':'eroi'}${q.members&&q.members.length?` · ${esc(q.members.join(', '))}${q.players>q.members.length?'…':''}`:''}</small></div></div><button class="btn sm" data-lbjoin="${esc(q.id)}" ${m.stats_set?'':'disabled'}>Entra</button></div>`).join('');
  const LOBBY=!lobby?'':NJ?`<div class="card er-lobby"><h3>🚪 La tua lobby contro il boss</h3>
   <p style="margin:0">Ogni eroe ha <b>una lobby al giorno</b>: creane una tua (anche da solo) oppure entra in una già aperta. Quando il boss viene sconfitto, <b>tutti quelli della lobby</b> ricevono i premi.${b.wins_today>0?` Oggi ${b.wins_today===1?'una lobby ha già battuto':`${b.wins_today} lobby hanno già battuto`} il boss: puoi comunque fare la tua e prenderti i premi!`:''}</p>
