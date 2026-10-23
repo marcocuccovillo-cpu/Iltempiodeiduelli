@@ -150,11 +150,19 @@
 .dg-rm.ko{border-color:var(--bad)}.dg-rm div{padding:0 10px 8px;font-size:.84rem;color:var(--mu)}.dg-rm div b{color:var(--tx)}.dg-rm div small{display:block}
 .dg-itn{color:var(--rc,var(--tx))}.dg-its{list-style:none;margin:6px 0;padding:0;display:grid;gap:4px}
 .dg-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.dg-path{border-color:var(--ac)}
+.dg-sc{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--inp);margin:10px 0}.dg-sc h3{margin:0 0 6px;font-size:1.05rem}.dg-sc p{margin:0;line-height:1.5;overflow-wrap:anywhere;white-space:pre-line}
+.dg-opts{display:grid;gap:8px;margin-top:10px}.dg-opt{display:block;width:100%;text-align:left;min-height:48px;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--inp);color:var(--tx);cursor:pointer;font:600 .95rem/1.3 var(--ui);overflow-wrap:anywhere}
+.dg-opt:hover:not(:disabled){border-color:var(--ac)}.dg-opt:disabled{opacity:.55;cursor:not-allowed}.dg-opt small{display:block;color:var(--mu);font-weight:400;font-size:.8rem;margin-top:2px}
+.dg-flags{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.dg-log{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px;font-size:.88rem;color:var(--mu)}.dg-log b{color:var(--tx)}
+.dg-end{padding:12px;border:1.5px solid var(--ac);border-radius:12px;background:rgba(var(--ac-rgb),.12);margin:8px 0}.dg-end.l{border-color:var(--bad)}.dg-end h3{margin:0 0 4px;font-size:1.05rem}.dg-end p{margin:0;overflow-wrap:anywhere}
+.dg-sep{margin:18px 0 4px}.dg-sep small{display:block;color:var(--mu);font-weight:400;font-size:.86rem}
 </style></head><body>
 
 <main class="pg">
  <header><p class="kicker">Mini gioco di ruolo</p><h1>La guerra degli Eroi</h1>
- <p class="lead">Ogni duellante è un eroe con il suo nickname. Distribuisci i punti abilità, compra le abilità dal Mercante, sfida gli altri eroi in Arena (ogni duello consuma energia), abbatti il boss del giorno da solo o con la tua lobby e affronta i 25 dungeon da solo o in squadra.</p></header>
+ <p class="lead">Ogni duellante è un eroe con il suo nickname. Distribuisci i punti abilità, compra le abilità dal Mercante, sfida gli altri eroi in Arena (ogni duello consuma energia), abbatti il boss del giorno da solo o con la tua lobby e affronta i 55 dungeon, 30 dei quali a scelte, da solo o in squadra.</p></header>
 
  <section class="card er-top" id="top" aria-live="polite"><p class="mute" style="margin:0" role="status">Caricamento dell’eroe…</p></section>
 
@@ -225,6 +233,7 @@ function bonusTags(it){const o=[];STATS.forEach(s=>{const v=it['p_'+s[0]];if(v>0
  if(it.xp_pct>0)o.push(`<span class="sp">+${it.xp_pct}% XP</span>`);if(it.extra_actions>0)o.push(`<span class="sp">+${it.extra_actions} azione boss/giorno</span>`);if(it.extra_fights>0)o.push(`<span class="sp">+${it.extra_fights*25}% ricarica energia</span>`);
  return o.length?`<div class="er-bn">${o.join('')}</div>`:''}
 function itemBox(it,extra){const s=SL[it.slot]||['','','•'];return `<div class="er-ic r-${esc(it.rarity)}" aria-hidden="true">${s[2]}</div><div style="min-width:0"><div class="er-rar r-${esc(it.rarity)}">${esc(RAR[it.rarity]||it.rarity)} · ${esc(s[1])}${extra||''}</div><div class="er-nm r-${esc(it.rarity)}">${esc(it.name)}</div>${bonusTags(it)}</div>`}
+const pw=s=>STATS.reduce((a,x)=>a+Number((s||{})[x[0]]||0),0);   // potenza = somma delle 5 statistiche (la stessa che si vede in Arena)
 function pctSum(k){return Number((ME.bonus||{})[k]||0)}   // bonus totale: oggetti + abilità permanenti + potenziamenti attivi
 
 /* ---------- finestre ---------- */
@@ -236,13 +245,13 @@ async function heroSheet(uid){
  try{const h=await rpc('game_hero',{p_user:uid});
   const eq=SLOTS.map(s=>{const i=(h.equipped||{})[s[0]];return `<div class="er-sl" style="margin-top:8px">${i?itemBox(Object.assign({slot:s[0]},i)):`<div class="er-ic">${s[2]}</div><div class="mute">${s[1]}: vuoto</div>`}</div>`}).join('');
   modal(`<div class="er-avbox" style="margin-bottom:10px"><div class="er-avbig" style="width:64px;height:64px;font-size:1.6rem" aria-hidden="true">${face(h.user_id,h.nickname)}</div><h2 style="margin:0">${esc(h.nickname)} · Lv. ${num(h.level)}</h2></div><div class="p-sheet">${STATS.map(s=>`<div><b>${num(h.stats[s[0]])}</b>${s[3]}</div>`).join('')}</div>
-   <p class="mute" style="margin:0 0 6px">PV ${num(h.max_hp)} · Duelli vinti ${num(h.duels_won)} · Boss battuti ${num(h.bosses_beaten)}</p>${eq}<button class="btn ghost block" style="margin-top:14px" data-close>Chiudi</button>`)
+   <p class="mute" style="margin:0 0 6px">Potenza <b style="color:var(--tx)">${num(pw(h.stats))}</b> · PV ${num(h.max_hp)} · Duelli vinti ${num(h.duels_won)} · Boss battuti ${num(h.bosses_beaten)}</p>${eq}<button class="btn ghost block" style="margin-top:14px" data-close>Chiudi</button>`)
  }catch(e){say(errTxt(e),'bad')}}
 
 /* ---------- schermata principale ---------- */
 function paintTop(){
  const m=ST.me,pct=m.level>=CAP?100:Math.min(100,Math.round(100*m.xp/m.xp_need));
- $('top').innerHTML=`<div class="er-who"><div class="er-pic" aria-hidden="true">${face(m.user_id,m.nickname)}</div><div style="min-width:0"><h2>${esc(m.nickname)}</h2><div class="er-lv">Livello <b>${num(m.level)}</b> · ${num(m.max_hp)} PV</div></div><div class="er-bc"><b>${BAL==null?'—':num(BAL)}</b><span>BC</span></div></div>
+ $('top').innerHTML=`<div class="er-who"><div class="er-pic" aria-hidden="true">${face(m.user_id,m.nickname)}</div><div style="min-width:0"><h2>${esc(m.nickname)}</h2><div class="er-lv">Livello <b>${num(m.level)}</b> · Potenza <b>${num(pw(m.stats))}</b> · ${num(m.max_hp)} PV</div></div><div class="er-bc"><b>${BAL==null?'—':num(BAL)}</b><span>BC</span></div></div>
   <div><div class="er-xp" role="progressbar" aria-valuemin="0" aria-valuemax="${m.xp_need}" aria-valuenow="${m.xp}" aria-label="Esperienza"><i style="width:${pct}%"></i></div><div class="er-xpt"><span>${m.level>=CAP?'XP al massimo':`${num(m.xp)} / ${num(m.xp_need)} XP`}</span><span>${m.level>=CAP?'Livello massimo':`al livello ${num(m.level+1)}`}</span></div></div>
   <div class="er-reset">Nuovo boss e nuove offerte del mercante tra <b data-cd>${cd()}</b></div>
   ${m.stats_set&&m.points_free>0?`<div class="er-reset">✨ Hai <b>${num(m.points_free)}</b> punti abilità da spendere: scheda <b>Eroe</b></div>`:''}`}
@@ -412,23 +421,43 @@ function checkLast(){const lr=DS&&DS.last_result;if(!lr||tab!=='dng'||document.q
 function dngRun(btn,fn){return run(btn,async()=>{try{await fn()}catch(e){loadDng(true).catch(()=>{});throw e}})}
 function dngMem(x,my){return `<div class="dg-mem"><div class="av" aria-hidden="true">${face(x.user_id,x.nickname)}</div><div style="min-width:0"><b>${esc(x.nickname)}</b>${x.user_id===my.leader_id?' <span class="chip s">Capo</span>':''}<small>Livello ${num(x.level)}</small></div><span class="dg-role">${ROLES[x.role][1]} ${ROLES[x.role][0]}</span></div>`}
 function dngCard(d,can,prev){
- const it=d.item,lock=!d.open,done=d.clears>0,m=ST.me,S=DS;
- const chip=lock?'<span class="chip k">🔒 Bloccato</span>':done?`<span class="chip s">✔ Completato${d.clears>1?' ×'+d.clears:''}</span>`:'<span class="chip">Da fare</span>';
+ const it=d.item,lock=!d.open,done=d.clears>0,m=ST.me,S=DS,pth=d.kind==='path';
+ const chip=(pth?'<span class="chip">🔀 A scelte</span> ':'')+(lock?'<span class="chip k">🔒 Bloccato</span>':done?`<span class="chip s">✔ Completato${d.clears>1?' ×'+d.clears:''}</span>`:'<span class="chip">Da fare</span>');
  const rep=done?` <small class="mute">· repliche: ${num(Math.round(d.bc*S.replay_bc_pct/100))} BC, ${num(Math.round(d.xp*S.replay_xp_pct/100))} XP</small>`:'';
  const itx=it?`<div class="dg-rw"><span>Oggetto esclusivo: <b class="dg-itn r-${esc(it.rarity)}">${esc(it.name)}</b> <small class="mute">(${esc(RAR[it.rarity]||it.rarity)}${it.owned?' · già tuo':''})</small></span></div>${bonusTags(it)}`:'';
  let act='';
  if(lock)act=`<p class="er-note" style="margin:0">Completa prima «${esc(prev?prev.name:'il dungeon precedente')}».</p>`;
  else if(!d.level_ok)act=`<p class="er-note" style="margin:0">Serve il livello ${num(d.min_level)} (tu sei al ${num(m.level)}).</p>`;
  else act=`<div class="row"><button class="btn" data-dsolo="${d.no}" ${can?'':'disabled'}>⚔️ Parti da solo</button><button class="btn ghost" data-dnew="${d.no}" ${can?'':'disabled'}>👥 Crea lobby</button></div>`;
- return `<article class="card dg-card ${lock?'lock':''}" aria-label="Dungeon ${d.no}: ${esc(d.name)}">
+ return `<article class="card dg-card ${lock?'lock':''}${pth?' dg-path':''}" aria-label="Dungeon ${d.no}: ${esc(d.name)}">
   <div class="dg-h"><div style="min-width:0"><div class="dg-no">Dungeon ${d.no}</div><h3>${esc(d.emoji)} ${esc(d.name)}</h3></div>${chip}</div>
-  <div class="dg-meta"><span>Livello consigliato <b>${num(d.ref_level)}</b>${d.min_level>1?` · minimo ${num(d.min_level)}`:''}</span><span><b>${d.rooms.length}</b> stanze</span></div>
+  <div class="dg-meta"><span>Livello consigliato <b>${num(d.ref_level)}</b>${d.min_level>1?` · minimo ${num(d.min_level)}`:''}</span>${pth?`<span><b>${d.forks}</b> bivi · finali scoperti <b>${d.endings_found}/${d.endings_total}</b></span>`:`<span><b>${d.rooms.length}</b> stanze</span>`}</div>
   ${lock?'':`<p class="mute" style="margin:0;font-size:.9rem">${esc(d.lore)}</p>`}
   <div class="dg-boss">${esc(d.boss_emoji)} <b>${esc(d.boss_name)}</b>${lock?'':`<small>${esc(d.boss_lore)}</small>`}</div>
-  <div class="dg-rw"><span class="bc">${num(d.bc)} BC</span><span>${num(d.xp)} XP</span>${rep}</div>
+  <div class="dg-rw"><span class="bc">${num(d.bc)} BC</span><span>${num(d.xp)} XP</span>${rep}</div>${pth?'<p class="er-note" style="margin:0">Premi indicati per il finale «normale»: i finali migliori pagano di più, quelli peggiori meno. Le scelte sbagliate possono far fallire la spedizione.</p>':''}
   ${itx}${act}</article>`}
+function pathLog(L){return (L||[]).map(x=>x.k==='c'?`<li>➤ <b>${esc(x.l)}</b>${x.r?`<br>${esc(x.r)}`:''}</li>`:`<li>${x.win?'⚔️ Scontro vinto':'💀 Scontro perso'}: ${esc(x.em||'')} ${esc(x.e)}${x.boss?' · BOSS':''}</li>`).join('')}
+function renderPath(){
+ const S=DS,A=S.active,m=ST.me,d=S.dungeons.find(x=>x.no===A.dungeon_no)||{name:'Dungeon',emoji:'🏰'},leader=A.leader_id===m.user_id,sc=A.scene,ldr=A.members.find(x=>x.user_id===A.leader_id);
+ const mem=A.members.map(x=>`<div class="dg-mem"><div class="av" aria-hidden="true">${face(x.user_id,x.nickname)}</div><div style="min-width:0"><b>${esc(x.nickname)}</b>${x.user_id===A.leader_id?' <span class="chip s">Capo</span>':''}<div class="er-hp me sm" style="margin-top:4px"><i style="width:${x.max_hp?Math.max(0,100*x.hp/x.max_hp):0}%"></i><span>${num(x.hp)} / ${num(x.max_hp)}</span></div></div><span class="dg-role">${ROLES[x.role]?ROLES[x.role][1]+' '+ROLES[x.role][0]:''}</span></div>`).join('');
+ const pw_=A.pow,pwt=pw_>0?'+'+pw_+'%':pw_<0?pw_+'%':'0%';
+ const flags=(A.flags||[]).map(f=>`<span class="chip s">🗝️ ${esc(f.label)}</span>`).join('');
+ const opts=sc?sc.options.map(o=>`<button class="dg-opt" data-dchoose="${esc(o.id)}" ${leader&&!o.locked?'':'disabled'}>${esc(o.label)}${o.locked&&o.hint?`<small>🔒 ${esc(o.hint)}</small>`:''}</button>`).join(''):'';
+ $('p-dng').innerHTML=`<h2 class="er-h">${esc(d.emoji||'')} ${esc(d.name)}</h2><p class="er-sub">Dungeon a scelte · ogni decisione conta, e qualcuna porta dritta al fallimento. Decide il capo gruppo${leader?' (sei tu)':ldr?`: <b>${esc(ldr.nickname)}</b>`:''}.</p>
+  <section class="card dg-path" aria-label="Spedizione in corso">
+   <div class="row" style="justify-content:space-between"><span>Potenza della spedizione</span><b>${pwt}</b></div>
+   ${flags?`<div class="dg-flags" aria-label="Indizi trovati">${flags}</div>`:''}
+   ${mem}
+   ${sc?`<div class="dg-sc" role="group" aria-label="Scena"><h3>${esc(sc.title)}</h3><p>${esc(sc.text)}</p></div>
+   <div class="dg-opts" role="group" aria-label="Le tue scelte">${opts}</div>
+   <p class="er-note">${leader?'Scegli con cura: non si torna indietro. Alcune scelte restano bloccate finché non trovi l’indizio giusto.':`Sta scegliendo ${ldr?esc(ldr.nickname):'il capo gruppo'}: la schermata si aggiorna da sola.`} Se nessuno decide entro <b data-dut="${esc(A.expires_at)}">…</b>, la spedizione viene data per fallita.</p>`:''}
+   ${leader?`<div class="dg-btns"><button class="btn ghost sm" id="dgAbandon">${pending==='abandon'?'Conferma: ritirarsi e fallire':'🏳️ Ritirati'}</button></div>`:''}
+  </section>
+  ${A.log&&A.log.length?`<h2 class="er-h">Cronaca</h2><div class="card"><ul class="dg-log">${pathLog(A.log)}</ul></div>`:''}`;
+ paintDut()}
 function renderDng(){
  if(!DS){$('p-dng').innerHTML='<p class="mute">Caricamento…</p>';return}
+ if(DS.active){renderPath();return}
  const m=ST.me,S=DS,ev=enNow(),canE=ev>=S.cost,my=S.my_run,leader=!!my&&my.leader_id===m.user_id,perHour=ST.energy.per_hour;lastDngCan=canE;
  const dn=no=>S.dungeons.find(x=>x.no===no)||{name:'Dungeon',emoji:'🏰',open:false,level_ok:false,min_level:1};
  const me=my?my.members.find(x=>x.user_id===m.user_id):null,cur=me?me.role:dngRole;
@@ -455,7 +484,7 @@ function renderDng(){
     <div class="dg-btns">${Object.keys(ROLES).map(k=>`<button class="btn sm ghost" data-djoin="${esc(l.run_id)}" data-role="${k}" ${can2&&av(k)?'':'disabled'}>Entra: ${ROLES[k][1]} ${ROLES[k][0]}</button>`).join('')}</div>
     ${!d.open?'<p class="er-note">Per te questo dungeon è ancora bloccato.</p>':!d.level_ok?`<p class="er-note">Serve il livello ${num(d.min_level)}.</p>`:full?'<p class="er-note">Lobby piena.</p>':''}</div>`}).join(''):'<p class="mute">Nessuna lobby aperta in questo momento. Creane una dall’elenco qui sotto!</p>'}`;
  const epic=S.cleared>=S.total?'Hai completato tutti i dungeon!':`Prossimo oggetto <b style="color:#c084fc">epico</b> tra ${S.next_epic_in} ${S.next_epic_in===1?'dungeon completato':'dungeon completati'}.`;
- $('p-dng').innerHTML=`<h2 class="er-h">Dungeon</h2><p class="er-sub">${S.total} dungeon a difficoltà crescente, ognuno con 4–6 stanze e un boss finale. Da soli o in squadra (fino a ${S.max_party}). Ogni partenza costa <b>${S.cost} energie</b> a testa e dà BC, XP e un oggetto esclusivo.</p>
+ $('p-dng').innerHTML=`<h2 class="er-h">Dungeon</h2><p class="er-sub">${S.total} dungeon a difficoltà crescente: ${S.dungeons.filter(x=>x.kind!=='path').length} classici e ${S.dungeons.filter(x=>x.kind==='path').length} <b>a scelte</b>, dove decidi tu la strada. Da soli o in squadra (fino a ${S.max_party}). Ogni partenza costa <b>${S.cost} energie</b> a testa e dà BC, XP e un oggetto esclusivo.</p>
   <div class="card"><div class="row" style="justify-content:space-between"><span>Dungeon completati</span><b>${S.cleared} / ${S.total}</b></div>
    <div class="er-lbar" role="progressbar" aria-valuemin="0" aria-valuemax="${S.total}" aria-valuenow="${S.cleared}" aria-label="Dungeon completati"><i style="width:${pct}%"></i></div>
    <p class="er-note" style="margin:0">${epic}</p></div>
@@ -463,13 +492,14 @@ function renderDng(){
   <h2 class="er-h">${my?'Il tuo ruolo':'Scegli il tuo ruolo'}</h2>${picker}
   ${LOBBY}${my?'':LOBBIES}
   <h2 class="er-h">${my?'I dungeon':'I dungeon'}</h2>
-  ${S.dungeons.map((d,i)=>dngCard(d,can,S.dungeons[i-1])).join('')}
+  ${S.dungeons.map((d,i)=>{const pv=S.dungeons[i-1],hd=(!pv||pv.kind!==d.kind)?(d.kind==='path'?`<h3 class="er-h dg-sep">🔀 Dungeon a scelte<small>Più difficili dei classici. Ogni bivio cambia la storia: dagli indizi alla strada giusta, fino al finale. Ci sono finali migliori (premi più ricchi), finali sul filo e finali di fallimento.</small></h3>`:`<h3 class="er-h dg-sep">⚔️ Dungeon classici<small>Si risolvono in automatico, stanza dopo stanza.</small></h3>`):'';return hd+dngCard(d,can,pv)}).join('')}
   <h2 class="er-h">Come funzionano</h2><details class="card"><summary>Le regole in breve</summary><ul class="mute er-how">
    <li>I dungeon si sbloccano <b>uno dopo l’altro</b>: completa il precedente per aprire il successivo. Alcuni chiedono anche un livello minimo.</li>
    <li>Ogni giocatore spende <b>${S.cost} energie</b> quando il dungeon parte, vinca o perda il gruppo.</li>
    <li>Da soli o in lobby da 2 a ${S.max_party} eroi. Ruoli: <b>1 Tank</b>, <b>1 Supporto</b> e fino a <b>2 Danni</b>. Il capo della lobby fa partire quando vuole; una lobby non avviata scade dopo ${S.lobby_minutes} minuti.</li>
-   <li>Il dungeon si risolve in automatico, stanza dopo stanza, in base a livello, punti abilità, oggetti e ruoli. Tra una stanza e l’altra il gruppo riprende fiato. Se tutti cadono, il dungeon è fallito.</li>
-   <li><b>Prima vittoria</b>: BC pieni (<b>+${S.party_bonus_pct}% per ogni compagno</b> nel gruppo), XP pieni e l’<b>oggetto esclusivo</b> del dungeon, <b>epico</b> ai dungeon 5, 10, 15, 20 e 25. A volte arriva anche un secondo oggetto.</li>
+   <li>I dungeon classici si risolvono in automatico, stanza dopo stanza, in base a livello, punti abilità, oggetti e ruoli. Tra una stanza e l’altra il gruppo riprende fiato. Se tutti cadono, il dungeon è fallito.</li>
+   <li><b>Dungeon a scelte</b> (dal 26): a ogni bivio il <b>capo gruppo</b> sceglie, gli altri guardano e la schermata si aggiorna da sola. Le scelte danno indizi, bonus o malus di potenza e PV, e aprono o chiudono strade: senza l’indizio giusto certe opzioni restano bloccate. Gli scontri si risolvono da soli, in base alla potenza della spedizione. Alcune scelte fanno fallire subito. Esistono più <b>finali</b>: il migliore paga fino al <b>140%</b> dei BC e dell’XP, il più magro l’85%, e ogni finale scoperto resta segnato. Se nessuno decide per ${S.path_minutes} minuti, la spedizione fallisce.</li>
+   <li><b>Prima vittoria</b>: BC pieni (<b>+${S.party_bonus_pct}% per ogni compagno</b> nel gruppo), XP pieni e l’<b>oggetto esclusivo</b> del dungeon, <b>epico</b> ogni 5 dungeon completati. A volte arriva anche un secondo oggetto.</li>
    <li><b>Repliche</b>: ${S.replay_bc_pct}% dei BC, ${S.replay_xp_pct}% dell’XP e, ogni tanto, un oggetto casuale. <b>Sconfitta</b>: nessun BC, un po’ di XP di consolazione.</li>
   </ul></details>`;
  paintDut()}
@@ -489,9 +519,11 @@ function dngModal(res,no){
    +(me.milestone?`<p class="er-msg">🏆 Traguardo raggiunto: ogni 5 dungeon completati ottieni un oggetto <b style="color:#c084fc">epico</b>!</p>`:'')}
  const others=mem.filter(x=>x!==me&&win).map(x=>`${esc(x.nickname)} +${num(x.bc)} BC`).join(' · ');
  const drop=(res.dropped||[]).length?`<p class="er-note">Non sono partiti (energia insufficiente o profilo sospeso): ${(res.dropped).map(esc).join(', ')}.</p>`:'';
- modal(`<h2>${win?'🏆 Dungeon superato!':'💀 Il gruppo è caduto'}</h2><p class="mute" style="margin:0 0 8px">${esc(d.emoji)} ${esc(d.name)} · stanze superate ${num(res.rooms_cleared)} su ${num(res.rooms_total)} · −${num(res.cost)} energie${mem.length>1?' a testa':''}</p>
+ const en=res.ending,endBox=res.path&&en?`<div class="dg-end ${win?'':'l'}"><h3>${win?'🏆':'💀'} ${esc(en.title)}${win&&en.m!==100?` · ${num(en.m)}%`:''}</h3><p>${esc(en.text)}</p>${me&&me.endings_found!=null?`<p class="mute" style="margin-top:6px;font-size:.86rem">Finali scoperti in questo dungeon: <b>${num(me.endings_found)} su ${num(res.endings_total)}</b></p>`:''}</div>`:'';
+ modal(`<h2>${res.path?(win?'🏆 Spedizione riuscita!':'💀 Spedizione fallita'):(win?'🏆 Dungeon superato!':'💀 Il gruppo è caduto')}</h2><p class="mute" style="margin:0 0 8px">${esc(d.emoji)} ${esc(d.name)}${res.path?` · scontri vinti ${num(res.rooms_cleared)} su ${num(res.rooms_total)}`:` · stanze superate ${num(res.rooms_cleared)} su ${num(res.rooms_total)}`} · −${num(res.cost)} energie${mem.length>1?' a testa':''}</p>${endBox}
   ${rw}${others?`<p class="er-note">Compagni: ${others}</p>`:''}${drop}
-  <h3 class="er-h" style="font-size:1rem;margin:14px 0 4px">Com’è andata, stanza per stanza</h3>${rooms}
+  ${rooms?`<h3 class="er-h" style="font-size:1rem;margin:14px 0 4px">Com’è andata, ${res.path?'scontro per scontro':'stanza per stanza'}</h3>${rooms}`:''}
+  ${res.path&&(res.story||[]).length?`<details class="dg-rm"><summary><span>📜 Le tue scelte</span></summary><div><ul class="dg-log">${pathLog(res.story)}</ul></div></details>`:''}
   <button class="btn block" style="margin-top:14px" data-close>Chiudi</button>`)}
 
 /* ---------- Mercante ---------- */
@@ -601,10 +633,15 @@ document.addEventListener('click',e=>{
  if(t.dataset.dsolo){const no=Number(t.dataset.dsolo);
   dngRun(t,async()=>{const c=await rpc('game_dungeon_create',{p_dungeon:no,p_role:dngRole});let r;
    try{r=await rpc('game_dungeon_start',{p_run:c.run_id})}catch(e){try{await rpc('game_dungeon_leave',{p_run:c.run_id})}catch(_){}throw e}
-   seenSet(r.run_id);clearSay();await load(true);await loadDng(true);dngModal(r.result,r.dungeon_no)});return}
+   clearSay();if(r.result)seenSet(r.run_id);await load(true);await loadDng(true);if(r.result)dngModal(r.result,r.dungeon_no)});return}
+ if(t.dataset.dchoose){dngRun(t,async()=>{const r=await rpc('game_dungeon_choose',{p_run:DS.active.run_id,p_option:t.dataset.dchoose});
+   if(r.expired){say('La spedizione è stata data per fallita: nessuno aveva più deciso.','bad')}
+   if(r.result)seenSet(r.run_id);await load(true);await loadDng(true);if(r.result)dngModal(r.result,r.dungeon_no)});return}
+ if(t.id==='dgAbandon'){if(pending!=='abandon'){pending='abandon';renderDng();setTimeout(()=>{if(pending==='abandon'){pending=null;if(tab==='dng')renderDng()}},5000);return}
+  pending=null;dngRun(t,async()=>{const r=await rpc('game_dungeon_abandon',{p_run:DS.active.run_id});seenSet(r.run_id);await load(true);await loadDng(true);dngModal(r.result,r.dungeon_no)});return}
  if(t.dataset.djoin){dngRun(t,async()=>{await rpc('game_dungeon_join',{p_run:t.dataset.djoin,p_role:t.dataset.role});say('Sei nella lobby! Aspetta che il capo faccia partire il dungeon.','good');await loadDng(true)});return}
  if(t.id==='dgLeave'){dngRun(t,async()=>{await rpc('game_dungeon_leave',{p_run:DS.my_run.run_id});say('Sei uscito dalla lobby.');await loadDng(true)});return}
- if(t.id==='dgStart'){dngRun(t,async()=>{const r=await rpc('game_dungeon_start',{p_run:DS.my_run.run_id});seenSet(r.run_id);clearSay();await load(true);await loadDng(true);dngModal(r.result,r.dungeon_no)});return}
+ if(t.id==='dgStart'){dngRun(t,async()=>{const r=await rpc('game_dungeon_start',{p_run:DS.my_run.run_id});clearSay();if(r.result)seenSet(r.run_id);await load(true);await loadDng(true);if(r.result)dngModal(r.result,r.dungeon_no)});return}
  if(t.dataset.duel){run(t,async()=>{const r=await rpc('game_duel',{p_target:t.dataset.duel});await load(false);duelModal(r)});return}
  if(t.dataset.buy){const id=t.dataset.buy;
   if(pending!==id){pending=id;renderShop();setTimeout(()=>{if(pending===id){pending=null;if(tab==='shop')renderShop()}},5000);return}
