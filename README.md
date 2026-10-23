@@ -281,6 +281,15 @@ Solo interfaccia, nessuna regola cambiata: prima il risultato si sceglieva da un
 
 `index.html` è stata riscritta in forma **schematica**: niente più paragrafi, ma una scheda per sezione (Inizia qui, Come mettere una taglia, Black Market, Ladder, La guerra degli Eroi, Badge) con icone e frasi di 2-4 parole, passaggi a pastiglie (Sfida → Accetta → Duello → Conferma) e un pulsante per sezione. Contenuti: Ladder (un solo giocatore inserisce il risultato, l'altro conferma, match WPA automatico, +20 BC, max 3 premi al giorno), Eroi (energia 100 con ricarica in 8 ore, boss del giorno, Arena, 25 dungeon con ruoli Tank/Danni/Supporto, da 150 a 2.500 BC, epico ogni 5). Gli ancoraggi (`#come`, `#taglie`, `#blackmarket`, `#ladder`, `#eroi`, `#badge`) sono rimasti uguali; gli stili nuovi sono dentro la pagina. Le regole dettagliate restano nelle pagine di ciascuna sezione. Pubblica `index.html` e `sw.js` (ora `tempio-v27`).
 
+### Riscossione sempre automatica (migrazione 020, 23 ottobre 2026)
+
+La 019 rendeva immediata la riscossione solo per le sfide Ladder. Ora c'è **una regola sola, nel database**: appena un match valido per la taglia diventa «verificato» con un vincitore — conferma Ladder, decisione dell'amministratore, **verifica dell'organizzatore o del moderatore**, correzione di un risultato — il vincitore incassa le taglie che il perdente aveva addosso in quel momento e gli torna la sua quota. Niente pulsanti, niente attese.
+- Un trigger sui match fa la riscossione; la chiusura Ladder ne legge l'esito per il messaggio («Taglia riscossa: +X BC»).
+- **Taglia in revisione**: la riscossione resta sospesa; appena un amministratore o moderatore toglie la revisione (o la chiude) parte da sola.
+- **Una tantum, nella migrazione**: le vittorie già verificate e mai riscosse vengono riscosse adesso (solo le taglie esistenti al momento di quella vittoria). Nessun BC viene creato: si pagano quote già versate.
+- «Riscuoti» (pulsante e `claim_bounty`) resta come rete di sicurezza e non paga mai due volte. Con un'attesa >0 in `ladder_claim_hold_hours` la riscossione automatica dei match Ladder si ferma.
+- Testi di Eventi aggiornati. File: `black-market-taglie-automatiche.sql`, `-test.sql` (7 scenari, solo su DB di prova **vuoto**), `-down.sql`; front-end `black-market.html`, `sw.js` (`tempio-v30`).
+
 ### Taglia riscossa subito (migrazione 019, 23 ottobre 2026)
 
 Prima, dopo aver battuto in Ladder un duellante con una taglia, il vincitore doveva aspettare **24 ore** e poi premere «Riscuoti» da un'altra pagina: molti pensavano di non aver ricevuto nulla. Ora, nelle sfide **«per la taglia»** e **«Ladder + taglia»**, quando l'altro giocatore **conferma il risultato** (o lo decide un amministratore) la taglia viene **riscossa nello stesso istante**: il vincitore riceve le quote messe dagli altri, gli torna la sua parte e le taglie diventano «riscosse». In «Ladder + taglia» cambiano anche **Elo** e premio Ladder come prima; in «solo per la taglia» l'Elo non cambia. Se vince il bersaglio, se è un pareggio o se la sfida è «Ladder normale», non si riscuote nulla.
