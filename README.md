@@ -277,11 +277,12 @@ Solo interfaccia, nessuna regola cambiata: prima il risultato si sceglieva da un
 - **Come applicarla**: pubblica `black-market-moduli.js`, `black-market.html` e `sw.js`. Provata nel browser (87 controlli sul Black Market, compresi i nuovi, e controllo a 390 px senza scorrimento orizzontale).
 - **Non fatto (da decidere)**: un blocco in database che impedisca a un organizzatore di aggiungere un match tra due giocatori che hanno appena registrato una partita di Ladder; l'avrei messo solo come avviso perché potrebbe bloccare un torneo giocato la stessa sera.
 
-### Deck Analyzer: carte a pile (24 ottobre 2026, nessuna migrazione)
-- Nella scheda **Deck** le carte si vedono ora come **pile**: una pila per carta, con le copie sovrapposte (massimo 3 visibili, badge «×2», «×3»; in rosso se sono più di 3), **5 pile per riga** sul telefono e 6 su schermi larghi. Si tocca una pila per aprire il dettaglio con nome, tipo e i pulsanti − / + per le copie; se togli l'ultima copia la carta sparisce.
-- Il pulsante **Lista** riporta la vista di prima; la scelta viene ricordata su questo dispositivo.
-- Le carte restano **nell'ordine del file .ydk** (prima venivano riordinate per numero di carta).
-- Provato nel browser (telefono e schermo largo, con immagini finte): colonne per riga, pile da 3, dettaglio, − / +, rimozione, Esc, memoria della vista, Extra Deck.
+### Deck Analyzer: carte in griglia, spostabili (24 ottobre 2026, nessuna migrazione)
+- Nella scheda **Deck** ogni copia è una carta a sé, **stesa in una griglia senza sovrapposizioni**: 5 per riga sul telefono, 6 su schermi larghi. Il pulsante **Lista** riporta la vista di prima; la scelta resta salvata sul dispositivo.
+- **Spostare le carte**: col dito si tiene premuta una carta (circa un quarto di secondo) e la si trascina dove si vuole; col mouse basta trascinare. La pagina scorre da sola se si arriva al bordo. Scorrere normalmente con il dito non sposta nulla. Si sposta dentro lo stesso gruppo (Main, Extra o Side).
+- **Dettaglio**: toccando una carta si apre un pannello con nome, tipo, posizione e copie (− / +, massimo 3), più i pulsanti **Prima** e **Dopo** per spostarla di una posizione senza trascinare (comodo con la tastiera o con poca precisione).
+- L'ordine scelto viene **salvato** insieme al deck. Un deck importato parte nell'**ordine del file .ydk**; una nuova copia aggiunta dalla ricerca si mette accanto alle altre. Ruoli, analisi e simulazione delle mani non cambiano. Più di 3 copie di una carta nello stesso gruppo vengono evidenziate con un bordo rosso.
+- Provato nel browser (telefono e schermo largo, immagini finte perché il sandbox non raggiunge ygoprodeck): nessuna sovrapposizione, carte per riga, spostamento con mouse e con pressione lunga via tocco simulato, scorrimento che non sposta, Prima/Dopo, copie, ricaricamento, lista, analisi. **Non** provato su un telefono vero.
 
 ### Boss del giorno: attacco libero e rappresaglia vera (migrazione 027, 24 ottobre 2026)
 - **Il problema**: le 3 azioni al giorno valevano anche per l'attacco, e i PV del boss erano tarati su ~3 attacchi a testa. Il boss reagiva col 10% dei PV per attacco, e un solo scudo bastava ad assorbirlo: in pratica nessuno perdeva PV.
