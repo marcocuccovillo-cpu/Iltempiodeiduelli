@@ -4,7 +4,7 @@
    Non introduce regole nuove: usa la Ladder e la riscossione che esistono già.
      1. «Sfida» (Most Wanted, dashboard, profilo) → pagina #/hunt/<duellante> → sfida in Ladder (ladder_challenge)
      2. lo sfidato accetta, si gioca, uno invia il risultato e l'altro lo conferma (Ladder)
-     3. la vittoria è un match WPA ufficiale: dopo l'attesa anti-accordi (24 ore) la taglia si riscuote (claim_bounty)
+     3. la vittoria è un match WPA ufficiale e, alla conferma, la taglia si riscuote subito da sola (dalla migrazione 019; con un'attesa impostata resta a mano con claim_bounty)
    La pagina #/hunt (senza nome) elenca i ricercati e le taglie pronte da riscuotere.
    Il database decide tutto: qui si mostra e si chiede, nessun importo si calcola o si scrive dal browser.
    Serve il modulo Ladder acceso.
@@ -32,7 +32,7 @@ window.BM_HUNT = function (BM) {
 <li><b>Scegli formato e tipo di sfida</b> (Advanced o Edison; «per la taglia» oppure «Ladder + taglia») e lanciala. Lo sfidato riceve una notifica e vede il tipo prima di rispondere.</li>
 <li><b>Se accetta, giocate</b>. Può anche rifiutare o lasciar scadere la sfida: in quel caso la taglia resta lì dov'è.</li>
 <li><b>Uno invia il risultato, l'altro lo conferma</b>. Se vinci, il match diventa un match WPA ufficiale.</li>
-<li><b>Dopo ${hold()} ore riscuoti la taglia</b> da questa pagina (attesa anti-accordi). La parte che hai messo tu ti torna indietro, il resto è tuo.</li></ol>`;
+${hold() > 0 ? `<li><b>Dopo ${hold()} ore riscuoti la taglia</b> da questa pagina (attesa anti-accordi). La parte che hai messo tu ti torna indietro, il resto è tuo.</li>` : `<li><b>Se vinci, la taglia è tua subito</b>: appena l'altro conferma il risultato viene riscossa da sola. La parte che hai messo tu ti torna indietro, il resto è tuo.</li>`}</ol>`;
 
   /* ---------- #/hunt/<id>: sfida un ricercato ---------- */
   async function target(id) {
@@ -88,12 +88,12 @@ ${V ? `<div><label for="hfk">Tipo di sfida</label><select id="hfk" required><opt
     const now = Date.now();
     const openWith = id => ms.find(m => OPEN.includes(m.status) && ((m.challenger_id === me.id && m.opponent_id === id) || (m.challenger_id === id && m.opponent_id === me.id)));
     const list = mw.filter(r => r.id !== me.id && !(BM.P.get(r.id) || {}).suspended);
-    shell(`<h1 class="t">Caccia alle <em>taglie</em></h1><p class="sub">Sfida chi ha una taglia addosso. Se vinci in Ladder, dopo ${hold()} ore puoi riscuoterla.</p>
+    shell(`<h1 class="t">Caccia alle <em>taglie</em></h1><p class="sub">Sfida chi ha una taglia addosso. ${hold() > 0 ? `Se vinci in Ladder, dopo ${hold()} ore puoi riscuoterla.` : 'Se vinci in Ladder, la taglia è tua subito, appena l\'avversario conferma il risultato.'}</p>
 <div class="box" style="margin-top:18px"><h2 style="margin-top:0">Come funziona</h2>${steps()}</div>
 <div class="box" style="margin-top:14px"><h2 style="margin-top:0">Taglie da riscuotere${claim.length ? ` (${claim.length})` : ''}</h2>${claim.map(({ m, t }) => {
       const at = new Date(m.verified_at).getTime() + hold() * 3600000, ready = now >= at, r = val.get(t);
       return `<div class="row2"><div class="g">Hai battuto <a href="#/p/${t}">${esc(BM.pn(t))}</a><small>${when(m.verified_at)} · ora ha ${BC(r.bounty_value)} di taglie${ready ? '' : ` · disponibile tra ${left(at - now)}`}</small></div>${ready ? `<button class="btn gold sm" data-act="claim" data-m="${m.id}">Riscuoti</button>` : '<span class="tag">in attesa</span>'}</div>`;
-    }).join('') || '<p class="mute" style="margin:0">Niente da riscuotere. Quando batti in Ladder un duellante con una taglia, la trovi qui.</p>'}</div>
+    }).join('') || `<p class="mute" style="margin:0">Niente da riscuotere.${hold() > 0 ? ' Quando batti in Ladder un duellante con una taglia, la trovi qui.' : ' Le taglie vinte in Ladder si riscuotono da sole alla conferma; qui compaiono solo quelle rimaste in sospeso (per esempio se la taglia era in revisione).'}</p>`}</div>
 <div class="box" style="margin-top:14px"><h2 style="margin-top:0">Ricercati (${list.length})</h2>${list.map((r, i) => { const o = openWith(r.id); return `<div class="row2"><span class="rank">${i + 1}</span>${av(BM.P.get(r.id))}<div class="g"><a href="#/p/${r.id}">${esc(r.nickname)}</a><small>${r.active_count} ${r.active_count == 1 ? 'taglia attiva' : 'taglie attive'}</small></div><span class="val">${BC(r.bounty_value)}</span>${o ? '<a class="btn ghost sm" href="#/ladder">Sfida aperta</a>' : BM.huntBtn(r.id, 'Sfida')}</div>` }).join('') || '<p class="mute" style="margin:0">Nessun ricercato al momento: metti una taglia da «Metti una taglia».</p>'}</div>`, 'wanted');
   }
 

@@ -290,7 +290,7 @@ begin
   perform pg_temp.fin(mb, 'Marco', 'Luca', 'challenger', '2-0');
   select official_match_id into off from public.ladder_matches where id = mb;
   assert off is not null and (select bounty_eligible from public.matches where id = off), 'C8: match ufficiale valido per la taglia';
-  perform pg_temp.claim('Marco', off);
+  perform pg_temp.claim('Marco', off);   -- dalla 019 è già riscossa alla conferma: restituisce «già riscossa»
   mo := pg_temp.money(); sn := pg_temp.snap('Advanced'); select * into x from public.ladder_matches where id = mb;
   e := pg_temp.err_as('Admin', format('select public.admin_ladder_correct(%L, ''opponent'', ''0-2'', ''prova di correzione'')', mb));
   assert e like '%già stata riscossa una taglia%', 'C8: ' || coalesce(e, 'riuscita');
@@ -307,6 +307,7 @@ end $$;
 do $$
 declare mt uuid; off uuid; sn text; r jsonb; mo text;
 begin
+  perform pg_temp.set_('ladder_claim_hold_hours', 24);   -- con l'attesa la taglia non si riscuote da sola alla conferma (dalla 019 è immediata)
   perform pg_temp.bnt('Luca', 'Marco', 50);
   mt := pg_temp.cc('Paolo', 'Marco', 'Advanced', 'bounty'); insert into ids values ('mt', mt);
   perform pg_temp.fin(mt, 'Paolo', 'Marco', 'challenger', '2-0');
@@ -316,6 +317,7 @@ begin
   r := pg_temp.corr(mt, 'opponent', '0-2', 'ha vinto Marco');
   assert sn = pg_temp.snap('Advanced') and mo = pg_temp.money() and not (r->>'elo_recalculated')::boolean, 'C9: né Elo né BC';
   assert (select winner_id from public.matches where id = off) = pg_temp.uid('Marco') and (select reported_result from public.ladder_matches where id = mt) = 'opponent', 'C9: match ufficiale al nuovo vincitore';
+  perform pg_temp.set_('ladder_claim_hold_hours', 0);
   insert into t_log (msg) values ('OK C9 — sfida per la taglia corretta: solo match ufficiale');
 end $$;
 
