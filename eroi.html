@@ -189,7 +189,7 @@ const RAR={base:'Base',comune:'Comune',non_comune:'Non comune',raro:'Raro',epico
 const SRC={start:'Base',shop:'Mercante',boss:'Boss',dungeon:'Dungeon'};
 const API='https://db.ygoprodeck.com/api/v7/cardinfo.php',CROP='https://images.ygoprodeck.com/images/cards_cropped/';
 let AVOK=false,AV={},avOpen=false,avQ='',avRes=null,avBusy=false;
-let lastDngCan=true,lastCan=true,sb=null,ST=null,ME=null,BAL=null,tab='hero',draft=null,heal='',LB=null,AR=null,busy=false,last=0,pending=null,flash=null;
+let lastDngCan=true,lastCan=true,sb=null,ST=null,ME=null,BAL=null,tab='hero',draft=null,heal='',LB=null,AR=null,busy=false,last=0,pending=null,flash=null,ISADM=null;
 
 /* ---------- utilità ---------- */
 function say(t,kind){flash={t,kind};const m=$('msg');m.innerHTML=t?`<p class="er-msg ${kind||''}">${t}</p>`:'';}
@@ -282,6 +282,7 @@ function renderHero(){
  <div class="card"><b>Permanenti</b>${m.perm_skills.length?`<div class="er-chipl">${m.perm_skills.map(n=>`<span>${esc(n)}</span>`).join('')}</div>`:'<p class="mute" style="margin:4px 0 0">Nessuna, per ora.</p>'}
   <div style="margin-top:12px"><b>Potenziamenti attivi</b></div>${m.temp_skills.length?m.temp_skills.map(t=>`<div class="er-sk"><div class="nmk">${esc(t.name)} <small class="mute">· ${esc((SL[t.slot]||[0,t.slot])[1])}</small></div><div class="mute">ancora <b data-ut="${esc(t.until)}">${lf(new Date(t.until).getTime()-Date.now())}</b></div></div>`).join(''):'<p class="mute" style="margin:4px 0 0">Nessuno attivo.</p>'}</div>
  <h2 class="er-h">Zaino</h2>${inv||'<p class="mute">Lo zaino è vuoto.</p>'}
+ ${ISADM?`<h2 class="er-h">Strumenti admin</h2><div class="card"><p class="mute" style="margin:0 0 10px">Visibile solo a te (amministratore). Riporta la tua batteria al 100%; l’uso viene registrato nell’audit.</p><button class="btn gold" id="admEn">⚡ Ricarica la mia energia</button></div>`:''}
  <h2 class="er-h">Come si gioca</h2><details class="card"><summary>Le regole in breve</summary><ul class="mute er-how" style="padding-left:20px;margin:6px 0 0">
   <li><b>Boss del giorno</b>: ogni giorno compare un boss, lo stesso per tutti. Ogni eroe ha <b>una lobby al giorno</b>: ne crea una sua (anche da solo) oppure entra in una già aperta. Quando siete pronti uno qualunque dei presenti la fa partire (dopo la partenza non si entra più). I PV del boss si calcolano sugli eroi presenti${S.min_players>1?`, e servono almeno <b>${S.min_players} eroi</b>`:''}.</li>
   <li>Una volta partito, hai ${S.actions} azioni al giorno (attacca, difendi, cura, studia) e i danni di chi è nella tua lobby si sommano. Se lo abbattete, <b>tutti quelli della lobby</b> ricevono <b>${S.boss_bc} BC</b>, <b>XP doppia</b> e <b>un oggetto casuale</b>.</li>
@@ -543,6 +544,7 @@ function setTab(t,push){
  if(t==='arena')loadArena();if(t==='lb')loadLb();if(t==='dng')loadDng(true);}
 async function load(keepDraft){
  ST=await rpc('game_state');ME=ST.me;last=Date.now();
+ if(ISADM===null){try{ISADM=(await rpc('is_admin'))===true}catch(_){ISADM=false}}      // la voce admin si vede solo a chi è davvero amministratore (il database lo ricontrolla comunque)
  if(!keepDraft)draft=null;
  await loadAvatars();
  try{const w=await sb.from('wallets').select('balance').eq('user_id',ME.user_id).maybeSingle();BAL=w.data?w.data.balance:null}catch(_){}
@@ -578,6 +580,7 @@ document.addEventListener('click',e=>{
  if(t.id==='avGo'){avQ=($('avQ')||{}).value||avQ;searchCards();return}
  if(t.id==='avClear'){run(t,async()=>{await rpc('game_set_avatar',{p_card:null,p_name:null});say('Avatar rimosso.','good');await load(true)});return}
  if(t.dataset.avpick){const id=Number(t.dataset.avpick),nm=t.dataset.avname;run(t,async()=>{await rpc('game_set_avatar',{p_card:id,p_name:nm});avOpen=false;avRes=null;say(`Avatar impostato: <b>${esc(nm)}</b>.`,'good');await load(true)});return}
+ if(t.id==='admEn'){run(t,async()=>{await rpc('game_admin_refill_energy');say('Energia ricaricata al <b>100%</b>.','good');await load(true)});return}
  if(t.id==='lbJoin'){run(t,async()=>{await rpc('game_boss_join');say('Hai creato la tua lobby! Invita gli amici o avvia il boss.','good');await load(true)});return}
  if(t.dataset.lbjoin){run(t,async()=>{await rpc('game_boss_join',{p_lobby:Number(t.dataset.lbjoin)});say('Sei nella lobby! Aspetta che qualcuno avvii il boss.','good');await load(true)});return}
  if(t.id==='lbLeave'){run(t,async()=>{await rpc('game_boss_leave');say('Sei uscito dalla lobby.');await load(true)});return}
