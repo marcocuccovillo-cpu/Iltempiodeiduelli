@@ -286,7 +286,7 @@ function renderHero(){
   <li><b>Boss del giorno</b>: ogni giorno compare un boss, lo stesso per tutti. Ogni eroe ha <b>una lobby al giorno</b>: ne crea una sua (anche da solo) oppure entra in una già aperta. Quando siete pronti uno qualunque dei presenti la fa partire (dopo la partenza non si entra più). I PV del boss si calcolano sugli eroi presenti${S.min_players>1?`, e servono almeno <b>${S.min_players} eroi</b>`:''}.</li>
   <li>Una volta partito, hai ${S.actions} azioni al giorno (attacca, difendi, cura, studia) e i danni di chi è nella tua lobby si sommano. Se lo abbattete, <b>tutti quelli della lobby</b> ricevono <b>${S.boss_bc} BC</b>, <b>XP doppia</b> e <b>un oggetto casuale</b>.</li>
   <li>Ogni lobby ha il suo boss: ognuno può batterlo, anche se un’altra lobby c’è già riuscita. Se almeno una lo batte, il giorno dopo arriva uno più forte (ce ne sono ${ST.boss.total}); se nessuno ci riesce, il boss ritorna.</li>
-  <li><b>Arena</b>: sfida gli altri eroi quante volte vuoi, anche lo stesso avversario più volte. Ogni duello consuma <b>energia</b> (la batteria in alto): ${ST.energy.win} se vinci, ${ST.energy.loss} se perdi, e ne servono almeno ${ST.energy.min} per sfidare. La batteria arriva a ${ST.energy.max} e si ricarica da sola in ${Math.round(ST.energy.max/ST.energy.per_hour)} ore circa. Vincere dà <b>solo XP</b>, mai BC. Il boss non consuma energia.</li>
+  <li><b>Arena</b>: sfida gli altri eroi quante volte vuoi, anche lo stesso avversario più volte. Ogni duello consuma <b>energia</b> (la batteria in alto): ${ST.energy.win} se vinci, ${ST.energy.loss} se perdi, e ne servono almeno ${ST.energy.min} per sfidare. La batteria arriva a ${ST.energy.max} e si ricarica da sola in ${Math.round(ST.energy.max/ST.energy.per_hour)} ore circa. Vincere dà <b>solo XP</b>, mai BC. <b>Ogni volta che sali di livello la batteria si ricarica al 100%</b>. Il boss non consuma energia.</li>
   <li><b>Punti abilità</b>: ${S.points} all’inizio e <b>${S.points_per_level} a ogni livello</b>, da mettere nelle statistiche.</li>
   <li><b>Mercante</b>: ogni giorno propone oggetti diversi; vende anche <b>abilità permanenti</b> (+% a una statistica, per sempre) e <b>potenziamenti temporanei</b> (+% per ${S.temp_hours} ore su un equipaggiamento). Accetta solo BC.</li>
   <li>I livelli arrivano fino al <b>9999</b>.</li></ul></details>`;
@@ -335,7 +335,7 @@ function renderBoss(){
   <div class="er-chips">${b.shield>0?`<span>🛡️ Scudo comune ${num(b.shield)}</span>`:''}${b.weak>0?`<span>🔎 Debolezza svelata +${b.weak}%</span>`:''}<span>⏳ ${lobby?'Il boss scappa tra ':open?'Resta ':'Prossimo boss tra '}<b data-cd>${cd()}</b></span></div>
   ${prev?`<p class="mute" style="margin:0;font-size:.9rem">${prev}</p>`:''}
  </div>
- ${lobby?LOBBY:done&&rw?`<div class="card er-win" style="margin-top:12px"><h3>🏆 Boss sconfitto! La tua ricompensa</h3><p style="margin:6px 0 0"><b>+${num(rw.bc)} BC</b> · <b>+${num(rw.xp)} XP</b>${rw.levels?` (sei salito di ${rw.levels} livell${rw.levels>1?'i':'o'}!)`:''}${rw.item?` · oggetto: <b class="r-${esc(rw.item_rarity)}" style="color:var(--rc)">${esc(rw.item)}</b>`:''}</p></div>`
+ ${lobby?LOBBY:done&&rw?`<div class="card er-win" style="margin-top:12px"><h3>🏆 Boss sconfitto! La tua ricompensa</h3><p style="margin:6px 0 0"><b>+${num(rw.bc)} BC</b> · <b>+${num(rw.xp)} XP</b>${rw.levels?` (sei salito di ${rw.levels} livell${rw.levels>1?'i':'o'}: energia al 100%!)`:''}${rw.item?` · oggetto: <b class="r-${esc(rw.item_rarity)}" style="color:var(--rc)">${esc(rw.item)}</b>`:''}</p></div>`
    :done?`<p class="er-msg" style="margin-top:12px">La tua lobby ha sconfitto il boss. Tornate domani!</p>`:''}
  ${lobby?WHY:ACT}
  ${NJ?'':`<h2 class="er-h">${lobby?'Nella lobby':'In battaglia oggi'} · ${b.party.length}</h2>`}
@@ -357,7 +357,7 @@ async function bossAct(btn,kind){
   else if(kind==='heal')t=`Hai curato di <b>${num(r.amount)}</b> PV${r.note==='rianimato'?' e rianimato l’alleato!':'.'}`;
   else t=`Hai svelato una debolezza: <b>+${num(r.amount)}%</b> ai danni di tutti (totale ${r.weak}%).`;
   if(r.ko)t+=' <b>Sei KO!</b> Servirà una cura.';
-  if(r.defeated){const w=r.reward;t=`<b>🏆 Boss sconfitto!</b> ${t}`+(w?` Ricompensa: <b>+${num(w.bc)} BC</b>, <b>+${num(w.xp)} XP</b>${w.item?`, oggetto <b>${esc(w.item)}</b>`:''}${w.levels?`, <b>+${w.levels} livello!</b>`:''}.`:'')}
+  if(r.defeated){const w=r.reward;t=`<b>🏆 Boss sconfitto!</b> ${t}`+(w?` Ricompensa: <b>+${num(w.bc)} BC</b>, <b>+${num(w.xp)} XP</b>${w.item?`, oggetto <b>${esc(w.item)}</b>`:''}${w.levels?`, <b>+${w.levels} livello!</b> Energia al 100%`:''}.`:'')}
   say(t,r.defeated?'good':'');
   await load(true)})}
 
@@ -388,7 +388,7 @@ function duelModal(r){
  const upd=(ha,hb)=>{A.style.width=(100*ha/r.max_a)+'%';B.style.width=(100*hb/r.max_b)+'%';At.textContent=num(ha)+' / '+num(r.max_a);Bt.textContent=num(hb)+' / '+num(r.max_b)};
  const step=s=>{const w=s.w==='a'?esc(me.nickname):esc(op);G.insertAdjacentHTML('beforeend',`<li><b>${w}</b> ${s.x?'attacca ma viene schivato':`infligge ${num(s.d)} danni${s.c?' (critico!)':''}`}</li>`);G.scrollTop=G.scrollHeight;upd(s.ha,s.hb)};
  const fin=()=>{if(o._t){clearInterval(o._t);o._t=null}G.innerHTML=L.map(s=>`<li><b>${s.w==='a'?esc(me.nickname):esc(op)}</b> ${s.x?'attacca ma viene schivato':`infligge ${num(s.d)} danni${s.c?' (critico!)':''}`}</li>`).join('');upd(r.hp_a,r.hp_b);
-  o.querySelector('#dRes').innerHTML=`<p class="er-big ${r.won?'w':'l'}">${r.won?`+${num(r.xp)} XP`:'Nessun XP'}</p><p class="mute" style="text-align:center;margin:0">${r.won?(r.levels>0?`Sei salito al livello <b>${num(r.level)}</b>! `:'Solo XP: nessun BC in palio in Arena. ')+`Energia −${r.energy_cost}.`:`Hai perso: energia −${r.energy_cost}. Riprova con un altro avversario quando la batteria si è ricaricata.`}</p>`;o.querySelector('#dSkip').hidden=true};
+  o.querySelector('#dRes').innerHTML=`<p class="er-big ${r.won?'w':'l'}">${r.won?`+${num(r.xp)} XP`:'Nessun XP'}</p><p class="mute" style="text-align:center;margin:0">${r.won?(r.levels>0?`Sei salito al livello <b>${num(r.level)}</b>! `:'Solo XP: nessun BC in palio in Arena. ')+(r.energy_full?'Energia ricaricata al <b>100%</b>!':`Energia −${r.energy_cost}.`):`Hai perso: energia −${r.energy_cost}. Riprova con un altro avversario quando la batteria si è ricaricata.`}</p>`;o.querySelector('#dSkip').hidden=true};
  o.querySelector('#dSkip').onclick=fin;
  if(matchMedia('(prefers-reduced-motion: reduce)').matches||!L.length){fin()}
  else{o._t=setInterval(()=>{if(i>=L.length){fin();return}step(L[i++])},420)}}
@@ -482,7 +482,7 @@ function dngModal(res,no){
   rw=(win?`<p class="er-big w">+${num(me.bc)} BC · +${num(me.xp)} XP</p>`:`<p class="er-big l">+${num(me.xp)} XP di consolazione</p>`)
    +(win&&!me.first?`<p class="mute" style="text-align:center;margin:0">Replica: premi ridotti (${S.replay_bc_pct||25}% dei BC, ${S.replay_xp_pct||50}% dell’XP).</p>`:'')
    +(res.party_bonus>0&&win&&me.first?`<p class="mute" style="text-align:center;margin:0">Bonus gruppo sui BC: +${num(res.party_bonus)}%.</p>`:'')
-   +(me.levels>0?`<p class="er-msg">⬆️ Sei salito al livello <b>${num(me.level)}</b>! Hai nuovi punti abilità nella scheda Eroe.</p>`:'')
+   +(me.levels>0?`<p class="er-msg">⬆️ Sei salito al livello <b>${num(me.level)}</b>! Hai nuovi punti abilità nella scheda Eroe e l’energia è tornata al <b>100%</b>.</p>`:'')
    +(its?`<h3 class="er-h" style="font-size:1rem;margin:12px 0 2px">Oggetti ottenuti</h3><ul class="dg-its">${its}</ul><p class="mute" style="margin:0;font-size:.84rem">Li trovi nello zaino: indossali dalla scheda Eroe.</p>`:'')
    +(me.milestone?`<p class="er-msg">🏆 Traguardo raggiunto: ogni 5 dungeon completati ottieni un oggetto <b style="color:#c084fc">epico</b>!</p>`:'')}
  const others=mem.filter(x=>x!==me&&win).map(x=>`${esc(x.nickname)} +${num(x.bc)} BC`).join(' · ');
