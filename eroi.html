@@ -189,7 +189,7 @@ const RAR={base:'Base',comune:'Comune',non_comune:'Non comune',raro:'Raro',epico
 const SRC={start:'Base',shop:'Mercante',boss:'Boss',dungeon:'Dungeon'};
 const API='https://db.ygoprodeck.com/api/v7/cardinfo.php',CROP='https://images.ygoprodeck.com/images/cards_cropped/';
 let AVOK=false,AV={},avOpen=false,avQ='',avRes=null,avBusy=false;
-let lastDngCan=true,lastCan=true,sb=null,ST=null,ME=null,BAL=null,tab='hero',draft=null,heal='',LB=null,AR=null,busy=false,last=0,pending=null,flash=null,ISADM=null;
+let lastDngCan=true,lastCan=true,sb=null,ST=null,ME=null,BAL=null,CAP=9999,tab='hero',draft=null,heal='',LB=null,AR=null,busy=false,last=0,pending=null,flash=null,ISADM=null;
 
 /* ---------- utilità ---------- */
 function say(t,kind){flash={t,kind};const m=$('msg');m.innerHTML=t?`<p class="er-msg ${kind||''}">${t}</p>`:'';}
@@ -214,6 +214,7 @@ async function searchCards(){
  avBusy=false;renderHero()}
 function fmtDur(s){s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h>0?`${h} h ${pad(m)} min`:m>0?`${m} min`:'meno di 1 min'}
 function lf(ms){const s=Math.max(0,Math.floor(ms/1000));return pad(Math.floor(s/3600))+':'+pad(Math.floor(s%3600/60))+':'+pad(s%60)}
+function m_over(){return ME&&ME.level>CAP?` (il tuo eroe, già al livello ${num(ME.level)}, resta lì ma non sale più)`:''}
 function capNow(){return ST.settings.cap+ST.settings.points_per_level*(ST.me.level-1)}
 function enNow(){const e=ST&&ST.energy;if(!e)return 0;return Math.min(e.max,Number(e.value)+Number(e.per_hour)*(Date.now()-last)/3600000)}
 function paintBat(){
@@ -240,9 +241,9 @@ async function heroSheet(uid){
 
 /* ---------- schermata principale ---------- */
 function paintTop(){
- const m=ST.me,pct=Math.min(100,Math.round(100*m.xp/m.xp_need));
+ const m=ST.me,pct=m.level>=CAP?100:Math.min(100,Math.round(100*m.xp/m.xp_need));
  $('top').innerHTML=`<div class="er-who"><div class="er-pic" aria-hidden="true">${face(m.user_id,m.nickname)}</div><div style="min-width:0"><h2>${esc(m.nickname)}</h2><div class="er-lv">Livello <b>${num(m.level)}</b> · ${num(m.max_hp)} PV</div></div><div class="er-bc"><b>${BAL==null?'—':num(BAL)}</b><span>BC</span></div></div>
-  <div><div class="er-xp" role="progressbar" aria-valuemin="0" aria-valuemax="${m.xp_need}" aria-valuenow="${m.xp}" aria-label="Esperienza"><i style="width:${pct}%"></i></div><div class="er-xpt"><span>${num(m.xp)} / ${num(m.xp_need)} XP</span><span>${m.level>=9999?'Livello massimo':`al livello ${num(m.level+1)}`}</span></div></div>
+  <div><div class="er-xp" role="progressbar" aria-valuemin="0" aria-valuemax="${m.xp_need}" aria-valuenow="${m.xp}" aria-label="Esperienza"><i style="width:${pct}%"></i></div><div class="er-xpt"><span>${m.level>=CAP?'XP al massimo':`${num(m.xp)} / ${num(m.xp_need)} XP`}</span><span>${m.level>=CAP?'Livello massimo':`al livello ${num(m.level+1)}`}</span></div></div>
   <div class="er-reset">Nuovo boss e nuove offerte del mercante tra <b data-cd>${cd()}</b></div>
   ${m.stats_set&&m.points_free>0?`<div class="er-reset">✨ Hai <b>${num(m.points_free)}</b> punti abilità da spendere: scheda <b>Eroe</b></div>`:''}`}
 
@@ -290,7 +291,7 @@ function renderHero(){
   <li><b>Arena</b>: sfida gli altri eroi quante volte vuoi, anche lo stesso avversario più volte. Ogni duello consuma <b>energia</b> (la batteria in alto): ${ST.energy.win} se vinci, ${ST.energy.loss} se perdi, e ne servono almeno ${ST.energy.min} per sfidare. La batteria arriva a ${ST.energy.max} e si ricarica da sola in ${Math.round(ST.energy.max/ST.energy.per_hour)} ore circa. Vincere dà <b>solo XP</b>, mai BC. <b>Ogni volta che sali di livello la batteria si ricarica al 100%</b>. Il boss non consuma energia.</li>
   <li><b>Punti abilità</b>: ${S.points} all’inizio e <b>${S.points_per_level} a ogni livello</b>, da mettere nelle statistiche.</li>
   <li><b>Mercante</b>: ogni giorno propone oggetti diversi; vende anche <b>abilità permanenti</b> (+% a una statistica, per sempre) e <b>potenziamenti temporanei</b> (+% per ${S.temp_hours} ore su un equipaggiamento). Accetta solo BC.</li>
-  <li>I livelli arrivano fino al <b>9999</b>.</li></ul></details>`;
+  <li>I livelli arrivano fino al <b>${num(CAP)}</b>${m_over()}.</li></ul></details>`;
 }
 
 /* ---------- scheda Boss ---------- */
@@ -547,6 +548,7 @@ async function load(keepDraft){
  if(ISADM===null){try{ISADM=(await rpc('is_admin'))===true}catch(_){ISADM=false}}      // la voce admin si vede solo a chi è davvero amministratore (il database lo ricontrolla comunque)
  if(!keepDraft)draft=null;
  await loadAvatars();
+ try{const c=await sb.from('system_settings').select('value_int').eq('key','game_level_cap').maybeSingle();const n=c&&c.data?Number(c.data.value_int):9999;CAP=n>=100&&n<=9999?n:9999}catch(_){CAP=9999}
  try{const w=await sb.from('wallets').select('balance').eq('user_id',ME.user_id).maybeSingle();BAL=w.data?w.data.balance:null}catch(_){}
  $('gate').hidden=true;$('main').hidden=false;paint();
  if(tab==='arena'){AR=await rpc('game_arena_list').catch(()=>AR);renderArena()}}

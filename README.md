@@ -277,6 +277,13 @@ Solo interfaccia, nessuna regola cambiata: prima il risultato si sceglieva da un
 - **Come applicarla**: pubblica `black-market-moduli.js`, `black-market.html` e `sw.js`. Provata nel browser (87 controlli sul Black Market, compresi i nuovi, e controllo a 390 px senza scorrimento orizzontale).
 - **Non fatto (da decidere)**: un blocco in database che impedisca a un organizzatore di aggiungere un match tra due giocatori che hanno appena registrato una partita di Ladder; l'avrei messo solo come avviso perché potrebbe bloccare un torneo giocato la stessa sera.
 
+### Limite di livello degli eroi (migrazione 025, 23 ottobre 2026)
+- **Dove**: Admin › *Impostazioni economiche* › **Livello massimo degli eroi** (la prima riga, evidenziata). Valore intero da **100 a 9999**; predefinito **9999**, quindi senza toccare nulla il gioco funziona come prima. Serve la motivazione e finisce nell'audit (da quanto a quanto, chi).
+- **Controllo anche nel database**: un valore fuori da 100…9999 viene rifiutato da qualsiasi via (pannello, funzione, SQL manuale), non solo dal modulo della pagina.
+- **Cosa succede arrivati al limite**: l'eroe non sale più, la barra XP resta piena con «Livello massimo», l'XP in eccesso si perde (il totale XP continua a contare). Vale per ogni fonte di XP: duelli, boss, dungeon.
+- **Abbassare il limite non toglie livelli a nessuno**: chi è già oltre resta al suo livello (statistiche intatte) ma non sale più, e la pagina lo segnala. **Rialzando** il limite tutti riprendono a salire da dove erano.
+- Nessun BC coinvolto. Annullamento: `black-market-eroi-limite-livello-down.sql` (torna il 9999 fisso). Test: `black-market-eroi-limite-livello-test.sql` (11 scenari).
+
 ### Ricarica dell'energia solo per l'amministratore (migrazione 024, 23 ottobre 2026)
 Nella scheda **Eroe**, sezione «Strumenti admin», il pulsante «Ricarica la mia energia» porta la tua batteria al 100% (`game_admin_refill_energy`). **Solo amministratori attivi**: moderatori, organizzatori, duellanti e amministratori sospesi ricevono un errore dal database e nella pagina la voce non compare neppure. Ogni uso è nell'audit (energia prima e dopo). Annullamento: `black-market-eroi-admin-energia-down.sql`.
 - **Provato** (PostgreSQL 16 locale): 2 scenari in `black-market-eroi-admin-energia-test.sql` (moderatore, organizzatore, duellante e anonimo rifiutati senza tracce; admin ricaricato e registrato; sospeso e modulo spento rifiutati; nessun BC toccato) e, nel browser, la voce assente per duellante, organizzatore e moderatore e presente per l'admin.
