@@ -6,28 +6,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tempio.css?v=10">
-<style>
-.da-vw{margin-top:12px}
-.da-pg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px 6px;margin:12px 0 4px}
-@media(min-width:520px){.da-pg{grid-template-columns:repeat(6,minmax(0,1fr))}}
-.da-card{position:relative;display:block;width:100%;padding:0;border:0;background:none;border-radius:5px;cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
-.da-card img{display:block;width:100%;aspect-ratio:168/246;object-fit:cover;border-radius:4%;background:#000;box-shadow:0 1px 4px rgba(0,0,0,.7);pointer-events:none;-webkit-user-drag:none}
-.da-card:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
-.da-card.x::after{content:"";position:absolute;inset:0;border:2px solid var(--bad);border-radius:4%;pointer-events:none}
-.da-card.src{opacity:.28}
-.da-card.tl{box-shadow:-5px 0 0 0 var(--ac)}.da-card.tr{box-shadow:5px 0 0 0 var(--ac)}
-.da-ghost{position:fixed;z-index:80;left:0;top:0;pointer-events:none;opacity:.92;transform-origin:50% 50%;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7))}
-.da-ghost img{width:100%;display:block;aspect-ratio:168/246;object-fit:cover;border-radius:4%}
-body.da-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
-.da-hint{margin:8px 0 0;color:var(--mu);font-size:.86rem}
-.da-sh .mv{display:flex;gap:8px;margin-top:12px}.da-sh .mv .btn{flex:1;min-height:44px;padding:0 6px;font-size:.9rem}
-.da-sheet{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);display:flex;align-items:flex-end}.da-sheet[hidden]{display:none}
-.da-shc{width:100%;max-width:560px;margin:0 auto;background:var(--surf);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
-.da-sh{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:start;margin-bottom:14px}
-.da-sh img{width:96px;aspect-ratio:168/246;object-fit:cover;border-radius:6px;background:#000}
-.da-sh .nn{font-weight:700;font-size:1.05rem;line-height:1.3;overflow-wrap:anywhere}.da-sh .nn small{display:block;color:var(--mu);font-weight:400;font-size:.88rem;margin-top:2px}
-.da-sh .da-q{margin-top:12px;justify-content:flex-start;gap:6px}.da-sh .da-q b{min-width:34px;font-size:1.3rem}
-</style>
 </head><body>
 <main class="pg">
  <header><p class="kicker">Strumento</p><h1>Deck Analyzer</h1><p class="lead">Importa un deck, assegna i ruoli alle carte e scopri quanto è consistente.</p></header>
@@ -43,8 +21,10 @@ body.da-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
   <div class="da-imp">
    <label class="btn" style="margin:0">Importa .ydk<input id="file" type="file" accept=".ydk,.txt" hidden></label>
    <button class="btn ghost" id="clear" type="button">Svuota deck</button>
+   <button class="btn gold" id="saveSim" type="button" style="grid-column:1/-1">Salva nel profilo</button>
   </div>
   <p class="da-name" id="dname"></p>
+  <p class="mute" id="simOut" role="status" style="margin:6px 0 0"></p>
   <details class="card" style="margin-top:12px;padding:0 14px"><summary>Incolla un file .ydk</summary>
    <div style="padding-bottom:14px"><textarea id="paste" rows="4" placeholder="#main&#10;14558127&#10;..." aria-label="Contenuto del file .ydk"></textarea>
    <button class="btn block" id="loadPaste" type="button" style="margin-top:8px">Carica deck</button></div></details>
@@ -55,8 +35,6 @@ body.da-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
    <div class="da-sr" id="results"></div></div>
 
   <div class="warn" id="warn" hidden></div>
-  <div class="seg da-vw" id="vw" role="group" aria-label="Come vedere le carte"><button data-v="pile" aria-pressed="true" type="button">▦ Carte</button><button data-v="list" aria-pressed="false" type="button">☰ Lista</button></div>
-  <p class="da-hint" id="dhint">Tieni premuta una carta e trascinala per spostarla. Tocca una carta per i dettagli.</p>
   <div id="deckView" style="margin-top:6px"></div>
  </section>
 
@@ -87,23 +65,15 @@ body.da-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
   <div id="hands" style="margin-top:12px"></div>
  </section>
 </main>
-<div class="da-sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-label="Dettaglio carta"><div class="da-shc"><div id="shBody"></div><button class="btn ghost block" id="shClose" type="button">Chiudi</button></div></div>
 <script src="tempio.js?v=10"></script>
 <script src="tempio-notifiche.js?v=2"></script>
 <script>
 (function(){
-const API='https://db.ygoprodeck.com/api/v7/cardinfo.php',IMG='https://images.ygoprodeck.com/images/cards_small/',KC='tempio.cards.v1',KD='tempio.deck.v1',KR='tempio.roles.';
+const API='https://db.ygoprodeck.com/api/v7/cardinfo.php',IMG='https://images.ygoprodeck.com/images/cards_small/',KC='tempio.cards.v1',KD='tempio.deck.v1',KSIM='tempio.deck.simid',KR='tempio.roles.';
 const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let VIEW='pile',sel=null;try{if(localStorage.getItem('tempio.deckview')==='list')VIEW='list'}catch(e){}
 let C={},R={},H=5,deck={name:'Deck',main:[],extra:[],side:[]},csvT='',over=false;const openG=new Set(['main']);
 try{C=JSON.parse(localStorage.getItem(KC)||'{}')}catch(e){}
 try{const d=JSON.parse(localStorage.getItem(KD));if(d&&d.main)deck=d}catch(e){}
-const SEC=['main','extra','side'];
-const expand=a=>a.flatMap(c=>Array(c.qty).fill(c.id));
-function regroup(o){const m=new Map();o.forEach(id=>m.set(id,(m.get(id)||0)+1));return[...m].map(([id,qty])=>({id:+id,qty}))}   // [{id,qty}] nell’ordine di prima comparsa
-function sameBag(o,a){const x=o.slice().sort().join(),y=expand(a).sort().join();return x===y}
-function normOrd(){if(!deck.ord)deck.ord={};SEC.forEach(k=>{if(!deck[k])deck[k]=[];if(!Array.isArray(deck.ord[k])||!sameBag(deck.ord[k],deck[k]))deck.ord[k]=expand(deck[k])})}
-normOrd();
 try{R=JSON.parse(localStorage.getItem(KR+deck.name)||'{}')}catch(e){}
 const msg=t=>$('msg').textContent=t||'';
 const saveC=()=>{try{localStorage.setItem(KC,JSON.stringify(C))}catch(e){C={};try{localStorage.removeItem(KC)}catch(_){}}};
@@ -118,68 +88,47 @@ document.querySelector('.tabs').onclick=e=>{const b=e.target.closest('button');i
 function keep(c){const i={n:c.name,t:c.type,d:(c.desc||'').slice(0,600),l:c.level||0};C[c.id]=i;(c.card_images||[]).forEach(x=>C[x.id]=i)}
 async function need(ids){const miss=[...new Set(ids)].filter(i=>!C[i]);if(!miss.length)return;msg('Scarico i dati delle carte…');
  for(let i=0;i<miss.length;i+=40){try{const r=await fetch(API+'?id='+miss.slice(i,i+40).join(','));if(!r.ok)throw 0;(await r.json()).data.forEach(keep)}catch(e){msg('Alcune carte non sono state scaricate: serve la connessione. Riprova.');saveC();return}}saveC();msg('')}
-function parse(txt){const out={main:[],extra:[],side:[]};let sec='main';
- txt.split(/\r?\n/).forEach(r=>{const l=r.trim();if(!l)return;if(l=='#main'){sec='main';return}if(l=='#extra'){sec='extra';return}if(l=='!side'){sec='side';return}if(l[0]=='#'||l[0]=='!')return;const id=+l;if(id>0)out[sec].push(id)});   // l’ordine del file .ydk resta quello delle carte
- return{main:regroup(out.main),extra:regroup(out.extra),side:regroup(out.side),ord:out}}
-async function setDeck(d,name){deck={name,...d};try{R=JSON.parse(localStorage.getItem(KR+name)||'{}')}catch(e){R={}}saveD();await need([...d.main,...d.extra,...d.side].map(c=>c.id));render()}
+function parse(txt){const out={main:{},extra:{},side:{}};let sec='main';
+ txt.split(/\r?\n/).forEach(r=>{const l=r.trim();if(!l)return;if(l=='#main'){sec='main';return}if(l=='#extra'){sec='extra';return}if(l=='!side'){sec='side';return}if(l[0]=='#'||l[0]=='!')return;const id=+l;if(id>0)out[sec][id]=(out[sec][id]||0)+1});
+ const f=o=>Object.entries(o).map(([id,qty])=>({id:+id,qty}));return{main:f(out.main),extra:f(out.extra),side:f(out.side)}}
+async function setDeck(d,name){try{localStorage.removeItem(KSIM)}catch(e){}deck={name,...d};try{R=JSON.parse(localStorage.getItem(KR+name)||'{}')}catch(e){R={}}saveD();await need([...d.main,...d.extra,...d.side].map(c=>c.id));render()}
 $('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;await setDeck(parse(await f.text()),f.name.replace(/\.(ydk|txt)$/i,''));e.target.value=''};
 $('loadPaste').onclick=async()=>{const t=$('paste').value;if(!t.trim())return;await setDeck(parse(t),'Deck incollato');$('paste').value='';$('paste').closest('details').open=false};
-$('clear').onclick=()=>{if(deck.main.length+deck.extra.length+deck.side.length&&!confirm('Svuotare il deck?'))return;deck={name:'Deck',main:[],extra:[],side:[],ord:{main:[],extra:[],side:[]}};R={};saveD();render()};
+$('clear').onclick=()=>{if(deck.main.length+deck.extra.length+deck.side.length&&!confirm('Svuotare il deck?'))return;try{localStorage.removeItem(KSIM)}catch(e){}deck={name:'Deck',main:[],extra:[],side:[]};R={};saveD();render()};
+
+/* salva nella libreria del Duel Simulator (profilo Black Market): il browser parla solo con la funzione sim_deck_save */
+const SB_URL='https://ceujhsmdvbcoszehbhxp.supabase.co/',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNldWpoc21kdmJjb3N6ZWhiaHhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0MDk4OTMsImV4cCI6MjEwNzk4NTg5M30.b9qzjnHZQJTbZCVY-3xPrQPQd_HdqKqKJALZFlrNUj4';
+let sbc=null;
+function loadSb(){return new Promise((ok,ko)=>{if(window.supabase)return ok();const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';s.onload=()=>ok();s.onerror=()=>ko(new Error('lib'));document.head.appendChild(s)})}
+const simMsg=(t,ok)=>{const o=$('simOut');o.textContent='';o.style.color=ok?'var(--ac2)':'';o.textContent=t||''};
+const flat=a=>{const o=[];a.forEach(c=>{for(let i=0;i<c.qty;i++)o.push(+c.id)});return o};
+$('saveSim').onclick=async()=>{const b=$('saveSim');
+ if(!deck.main.length&&!deck.extra.length){simMsg('Il deck è vuoto: caricane uno prima di salvarlo.');return}
+ b.disabled=true;simMsg('Salvo…');
+ try{await loadSb();if(!sbc)sbc=window.supabase.createClient(new URL(SB_URL).origin,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+  const{data:{session}}=await sbc.auth.getSession();
+  if(!session){simMsg('Per salvare il deck devi essere collegato: accedi dal Black Market e poi torna qui.');return}
+  let id=null;try{id=localStorage.getItem(KSIM)||null}catch(e){}
+  const args=nid=>({p_id:nid,p_name:(deck.name||'Deck').slice(0,40),p_main:flat(deck.main),p_extra:flat(deck.extra),p_side:flat(deck.side),p_temp:false});
+  let r=await sbc.rpc('sim_deck_save',args(id));
+  if(r.error&&id&&/non trovat|inesistent/i.test(r.error.message||'')){id=null;r=await sbc.rpc('sim_deck_save',args(null))}
+  if(r.error){simMsg(/Modulo non attivo/i.test(r.error.message||'')?'Il Duel Simulator è disattivato in questo momento.':(r.error.message||'Salvataggio non riuscito.')+(/stesso nome|questo nome/i.test(r.error.message||'')?' Cambia il nome del file .ydk oppure elimina il vecchio deck dal Duel Simulator.':''));return}
+  try{localStorage.setItem(KSIM,r.data)}catch(e){}
+  simMsg('Deck salvato nel tuo profilo. Lo trovi nel Duel Simulator.',true);
+  const a=document.createElement('a');a.href='duel-simulator.html';a.textContent=' Apri il Duel Simulator →';a.style.marginLeft='6px';$('simOut').appendChild(a)
+ }catch(e){simMsg('Collegamento non riuscito: controlla la connessione e riprova.')}finally{b.disabled=false}};
 
 $('search').onclick=async()=>{const q=$('q').value.trim();if(q.length<3){msg('Scrivi almeno 3 lettere.');return}msg('Cerco…');
  try{const r=await fetch(API+'?fname='+encodeURIComponent(q));if(!r.ok)throw 0;const j=await r.json();j.data.forEach(keep);saveC();msg('');
   $('results').innerHTML=j.data.slice(0,24).map(c=>{const x=isExtra(c.type);return`<div class="it2"><img src="${IMG}${c.id}.jpg" alt="" loading="lazy"><div><div class="nn">${esc(c.name)}<small>${esc(c.type)}</small></div><div class="acts"><button class="btn sm" type="button" data-add="${c.id}" data-s="${x?'extra':'main'}">+ ${x?'Extra':'Main'}</button><button class="btn ghost sm" type="button" data-add="${c.id}" data-s="side">+ Side</button></div></div></div>`}).join('')||'<p class="empty">Nessun risultato.</p>'}catch(e){msg('Ricerca non riuscita: serve la connessione.')}};
 $('q').onkeydown=e=>{if(e.key=='Enter')$('search').click()};
-$('results').onclick=e=>{const b=e.target.closest('[data-add]');if(b){b.textContent=add(+b.dataset.add,b.dataset.s)?'Aggiunta ✓':'Già 3 copie'}};
-function setOrd(sec,o){deck.ord[sec]=o;deck[sec]=regroup(o);saveD()}
-function insAfter(sec,id,at){const o=deck.ord[sec].slice();let i=at;if(i==null||i<0){i=o.lastIndexOf(id)}o.splice(i+1,0,id);return o}   // la nuova copia si mette accanto alle altre
-function add(id,sec){id=+id;const n=deck.ord[sec].filter(x=>x==id).length;if(n>=3)return false;setOrd(sec,insAfter(sec,id));render(true);return true}
-function chg(sec,id,d){id=+id;if(d>0){add(id,sec);return}const o=deck.ord[sec].slice(),i=o.lastIndexOf(id);if(i<0)return;o.splice(i,1);setOrd(sec,o);render(true)}
-$('deckView').onclick=e=>{if(noClick)return;const p=e.target.closest('.da-card');if(p){sel={sec:p.dataset.sec,i:+p.dataset.i};sheet();return}
- const b=e.target.closest('[data-q]');if(!b)return;const[sec,id,d]=b.dataset.q.split(':');chg(sec,id,+d)};
-$('vw').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;VIEW=b.dataset.v;try{localStorage.setItem('tempio.deckview',VIEW)}catch(_){}render()};
-const closeSheet=()=>{sel=null;$('sheet').hidden=true};
-$('shClose').onclick=closeSheet;$('sheet').onclick=e=>{if(e.target.id==='sheet')closeSheet()};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('sheet').hidden)closeSheet()});
-$('shBody').onclick=e=>{const b=e.target.closest('[data-sq],[data-mv]');if(!b||!sel)return;const o=deck.ord[sel.sec];if(!o||o[sel.i]==null)return;const id=o[sel.i];
- if(b.dataset.mv){const t=sel.i+(+b.dataset.mv);if(t<0||t>=o.length)return;const n=o.slice();[n[sel.i],n[t]]=[n[t],n[sel.i]];setOrd(sel.sec,n);sel.i=t;render(true);return}
- if(+b.dataset.sq>0){if(o.filter(x=>x==id).length>=3)return;setOrd(sel.sec,insAfter(sel.sec,id,sel.i));render(true);return}
- const n=o.slice();n.splice(sel.i,1);setOrd(sel.sec,n);let j=-1,bd=1e9;n.forEach((x,k)=>{if(x==id&&Math.abs(k-sel.i)<bd){bd=Math.abs(k-sel.i);j=k}});sel=j<0?null:{sec:sel.sec,i:j};render(true)};
-function sheet(){const s=$('sheet');if(!sel){s.hidden=true;return}const o=deck.ord[sel.sec]||[],id=o[sel.i];if(id==null){closeSheet();return}
- const was=s.hidden,q=o.filter(x=>x==id).length;s.hidden=false;
- $('shBody').innerHTML=`<div class="da-sh"><img src="${IMG}${id}.jpg" alt=""><div><div class="nn">${esc(nm(id))}<small>${esc(C[id]?C[id].t:'')}</small></div><div class="mute" style="font-size:.86rem;margin-top:4px">Posizione ${sel.i+1} di ${o.length}</div>
-  <div class="da-q" role="group" aria-label="Copie"><button type="button" data-sq="-1" aria-label="Togli questa copia">−</button><b aria-live="polite">${q}</b><button type="button" data-sq="1" aria-label="Aggiungi una copia" ${q>=3?'disabled':''}>+</button></div>
-  <div class="mv"><button class="btn ghost" type="button" data-mv="-1" ${sel.i<=0?'disabled':''}>◀ Prima</button><button class="btn ghost" type="button" data-mv="1" ${sel.i>=o.length-1?'disabled':''}>Dopo ▶</button></div></div></div>`;
- if(was)$('shClose').focus()}
-
-/* trascinamento: pressione lunga (dito) o movimento (mouse) */
-let drag=null,noClick=false;
-function cards(sec){return[...document.querySelectorAll('#deckView .da-card[data-sec="'+sec+'"]')]}
-function pick(d,x,y){const cs=cards(d.sec);let best=-1,bd=1e9;cs.forEach((c,i)=>{const r=c.getBoundingClientRect(),dx=x-(r.left+r.width/2),dy=y-(r.top+r.height/2),k=dx*dx+dy*dy*1.4;if(k<bd){bd=k;best=i}});return best}
-function mark(d){cards(d.sec).forEach((c,i)=>{c.classList.toggle('src',i===d.idx);c.classList.toggle('tl',d.t!=null&&d.t!==d.idx&&i===d.t&&d.t<d.idx);c.classList.toggle('tr',d.t!=null&&d.t!==d.idx&&i===d.t&&d.t>d.idx)})}
-function place(d){if(!d.g)return;d.g.style.transform='translate('+(d.x-d.w/2)+'px,'+(d.y-d.h/2)+'px) scale(1.08)'}
-function begin(d){if(!drag||drag!==d||d.on)return;d.on=true;const r=d.c.getBoundingClientRect();d.w=r.width;d.h=r.height;
- const g=document.createElement('div');g.className='da-ghost';g.style.width=r.width+'px';g.innerHTML=d.c.innerHTML;document.body.appendChild(g);d.g=g;
- document.body.classList.add('da-dragging');try{d.c.setPointerCapture(d.pid)}catch(_){}try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}
- d.t=d.idx;mark(d);place(d);
- const tick=()=>{if(!drag||drag!==d)return;const m=70;if(d.y<m)scrollBy(0,-Math.min(18,(m-d.y)/3+4));else if(d.y>innerHeight-m)scrollBy(0,Math.min(18,(d.y-innerHeight+m)/3+4));d.t=pick(d,d.x,d.y);mark(d);d.raf=requestAnimationFrame(tick)};d.raf=requestAnimationFrame(tick)}
-function endDrag(commit){const d=drag;if(!d)return;drag=null;clearTimeout(d.timer);cancelAnimationFrame(d.raf);
- if(d.on){noClick=true;setTimeout(()=>noClick=false,350);if(d.g)d.g.remove();document.body.classList.remove('da-dragging');cards(d.sec).forEach(c=>c.classList.remove('src','tl','tr'));
-  if(commit&&d.t!=null&&d.t!==d.idx){const o=deck.ord[d.sec].slice(),[x]=o.splice(d.idx,1);o.splice(d.t,0,x);setOrd(d.sec,o);if(sel&&sel.sec===d.sec)sel=null;render(true);$('sheet').hidden=true}}}
-$('deckView').addEventListener('pointerdown',e=>{const c=e.target.closest('.da-card');if(!c||(e.pointerType==='mouse'&&e.button!==0))return;
- const d={c,sec:c.dataset.sec,idx:+c.dataset.i,x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY,pid:e.pointerId,touch:e.pointerType!=='mouse',on:false};drag=d;
- if(d.touch)d.timer=setTimeout(()=>begin(d),280)});
-document.addEventListener('pointermove',e=>{const d=drag;if(!d||e.pointerId!==d.pid)return;d.x=e.clientX;d.y=e.clientY;
- if(!d.on){if(Math.hypot(e.clientX-d.sx,e.clientY-d.sy)>(d.touch?10:6)){if(d.touch)endDrag(false);else begin(d)}return}
- place(d)});
-document.addEventListener('pointerup',e=>{if(drag&&e.pointerId===drag.pid)endDrag(true)});
-document.addEventListener('pointercancel',e=>{if(drag&&e.pointerId===drag.pid)endDrag(false)});
-document.addEventListener('touchmove',e=>{if(drag&&drag.on)e.preventDefault()},{passive:false});
-$('deckView').addEventListener('contextmenu',e=>{if(e.target.closest('.da-card'))e.preventDefault()});
+$('results').onclick=e=>{const b=e.target.closest('[data-add]');if(b){add(+b.dataset.add,b.dataset.s);b.textContent='Aggiunta ✓'}};
+function add(id,sec){const a=deck[sec],x=a.find(c=>c.id==id);if(x)x.qty=Math.min(3,x.qty+1);else a.push({id,qty:1});saveD();render(true)}
+$('deckView').onclick=e=>{const b=e.target.closest('[data-q]');if(!b)return;const[sec,id,d]=b.dataset.q.split(':'),a=deck[sec],i=a.findIndex(c=>c.id==id);if(i<0)return;a[i].qty+=+d;if(a[i].qty<=0)a.splice(i,1);saveD();render(true)};
 $('deckView').addEventListener('toggle',e=>{const d=e.target.closest('details[data-g]');if(!d)return;d.open?openG.add(d.dataset.g):openG.delete(d.dataset.g)},true);
 const nm=id=>C[id]?C[id].n:'Carta '+id;
 const cnt=a=>a.reduce((t,c)=>t+c.qty,0);
-function card(sec,id,i,over){return `<button type="button" class="da-card${over?' x':''}" data-sec="${sec}" data-i="${i}" aria-label="${esc(nm(id))}, posizione ${i+1}"><img src="${IMG}${id}.jpg" alt="" loading="lazy" draggable="false"></button>`}
-function group(sec,label){const a=deck[sec];return`<details class="da-grp" data-g="${sec}" ${openG.has(sec)?'open':''}><summary>${label}&nbsp;<b>${cnt(a)}</b></summary>`+(a.length&&VIEW==='pile'?`<div class="da-pg">${deck.ord[sec].map((id,i)=>card(sec,id,i,deck.ord[sec].slice(0,i).filter(x=>x==id).length>=3)).join('')}</div>`:a.length?a.map(c=>`<div class="da-cr"><img src="${IMG}${c.id}.jpg" alt="" loading="lazy"><div class="nn">${esc(nm(c.id))}<small>${esc(C[c.id]?C[c.id].t:'')}</small></div><div class="da-q"><button type="button" data-q="${sec}:${c.id}:-1" aria-label="Rimuovi una copia di ${esc(nm(c.id))}">−</button><b>${c.qty}</b><button type="button" data-q="${sec}:${c.id}:1" aria-label="Aggiungi una copia di ${esc(nm(c.id))}">+</button></div></div>`).join(''):'<p class="empty">Vuoto. Importa un .ydk o cerca una carta.</p>')+'</details>'}
+function group(sec,label){const a=deck[sec];return`<details class="da-grp" data-g="${sec}" ${openG.has(sec)?'open':''}><summary>${label}&nbsp;<b>${cnt(a)}</b></summary>`+(a.length?a.map(c=>`<div class="da-cr"><img src="${IMG}${c.id}.jpg" alt="" loading="lazy"><div class="nn">${esc(nm(c.id))}<small>${esc(C[c.id]?C[c.id].t:'')}</small></div><div class="da-q"><button type="button" data-q="${sec}:${c.id}:-1" aria-label="Rimuovi una copia di ${esc(nm(c.id))}">−</button><b>${c.qty}</b><button type="button" data-q="${sec}:${c.id}:1" aria-label="Aggiungi una copia di ${esc(nm(c.id))}">+</button></div></div>`).join(''):'<p class="empty">Vuoto. Importa un .ydk o cerca una carta.</p>')+'</details>'}
 
 const PRE=new Set(['Ash Blossom & Joyous Spring','Maxx "C"','Effect Veiler','Droll & Lock Bird','Ghost Ogre & Snow Rabbit','Infinite Impermanence','Nibiru, the Primal Being','PSY-Framegear Gamma','Ghost Belle & Haunted Mansion','Dimension Shifter','Skull Meister','Contact "C"','D.D. Crow','Herald of Orange Light','Ghost Mourner & Moonlit Chill']);
 const has=(t,...a)=>{t=t.toLowerCase();return a.some(s=>t.includes(s))};
@@ -223,13 +172,12 @@ $('sim').onclick=()=>{const n=Math.min(100,Math.max(1,+$('simN').value||12)),P=p
 $('csv').onclick=()=>{if(!csvT){$('sim').click()}if(!csvT)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csvT],{type:'text/csv'}));a.download='mani-simulate.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 
 function render(keepScroll){$('dname').textContent=deck.main.length?'Deck caricato: '+deck.name:'';
- [...$('vw').children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===VIEW));
  $('deckView').innerHTML=group('main','Main Deck')+group('extra','Extra Deck')+group('side','Side Deck');
  const w=[],m=cnt(deck.main),e=cnt(deck.extra),s=cnt(deck.side);if(m&&(m<40||m>60))w.push(`Il Main ha ${m} carte (consentite da 40 a 60).`);if(e>15)w.push(`L’Extra ha ${e} carte (massimo 15).`);if(s>15)w.push(`Il Side ha ${s} carte (massimo 15).`);
  const tot={};[...deck.main,...deck.extra,...deck.side].forEach(c=>tot[c.id]=(tot[c.id]||0)+c.qty);Object.entries(tot).forEach(([id,q])=>{if(q>3)w.push(`${nm(id)}: ${q} copie in totale (massimo 3).`)});
  $('warn').hidden=!w.length;$('warn').innerHTML=w.map(esc).join('<br>');
  $('roles').innerHTML=deck.main.length?deck.main.map(c=>{const r=R[c.id]||{};return`<div class="da-role"><div class="hd"><span>${esc(nm(c.id))}</span><small>x${c.qty}</small></div><div class="da-tg">${['s','h','k','b'].map(k=>`<button type="button" class="${k}" data-r="${c.id}:${k}" aria-pressed="${r[k]?'true':'false'}">${LAB[k]}</button>`).join('')}</div></div>`}).join(''):'<p class="empty">Carica un deck per assegnare i ruoli.</p>';
- $('dhint').hidden=VIEW!=='pile'||!deck.main.length;sheet();metrics()}
+ metrics()}
 render();need([...deck.main,...deck.extra,...deck.side].map(c=>c.id)).then(render);
 })();
 </script></body></html>
