@@ -73,6 +73,7 @@
 .er-acts button:disabled{opacity:.4;cursor:not-allowed}
 .er-acts .atk{border-color:rgba(255,84,104,.55)}.er-acts .grd{border-color:rgba(108,182,255,.55)}.er-acts .hel{border-color:rgba(74,222,155,.5)}.er-acts .stu{border-color:rgba(255,209,102,.5)}
 .er-party{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.er-lbrow{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:9px 0;border-top:1px solid var(--line)}.er-lbrow .l1{display:flex;flex-direction:column;gap:2px}.er-lbrow small{color:var(--mu);overflow-wrap:anywhere}
 .er-party .av,.er-ar .av,.er-lb .av,.dg-mem .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--raise);border:1px solid var(--line);font:700 .95rem var(--disp);color:var(--ac2)}
 .er-party .l1{display:flex;justify-content:space-between;gap:8px;font-weight:600;margin-bottom:4px;min-width:0}
 .er-party .l1 a,.er-link{color:var(--tx);text-decoration:none;font-weight:700;background:none;border:0;padding:0;font:inherit;cursor:pointer;text-align:left;overflow-wrap:anywhere}
@@ -153,7 +154,7 @@
 
 <main class="pg">
  <header><p class="kicker">Mini gioco di ruolo</p><h1>La guerra degli Eroi</h1>
- <p class="lead">Ogni duellante è un eroe con il suo nickname. Distribuisci i punti abilità, compra le abilità dal Mercante, sfida gli altri eroi in Arena (ogni duello consuma energia) radunati ogni giorno con almeno altri due eroi per abbattere il boss e affronta i 25 dungeon da solo o in squadra.</p></header>
+ <p class="lead">Ogni duellante è un eroe con il suo nickname. Distribuisci i punti abilità, compra le abilità dal Mercante, sfida gli altri eroi in Arena (ogni duello consuma energia), abbatti il boss del giorno da solo o con la tua lobby e affronta i 25 dungeon da solo o in squadra.</p></header>
 
  <section class="card er-top" id="top" aria-live="polite"><p class="mute" style="margin:0" role="status">Caricamento dell’eroe…</p></section>
 
@@ -282,9 +283,9 @@ function renderHero(){
   <div style="margin-top:12px"><b>Potenziamenti attivi</b></div>${m.temp_skills.length?m.temp_skills.map(t=>`<div class="er-sk"><div class="nmk">${esc(t.name)} <small class="mute">· ${esc((SL[t.slot]||[0,t.slot])[1])}</small></div><div class="mute">ancora <b data-ut="${esc(t.until)}">${lf(new Date(t.until).getTime()-Date.now())}</b></div></div>`).join(''):'<p class="mute" style="margin:4px 0 0">Nessuno attivo.</p>'}</div>
  <h2 class="er-h">Zaino</h2>${inv||'<p class="mute">Lo zaino è vuoto.</p>'}
  <h2 class="er-h">Come si gioca</h2><details class="card"><summary>Le regole in breve</summary><ul class="mute er-how" style="padding-left:20px;margin:6px 0 0">
-  <li><b>Boss del giorno</b>: ogni giorno compare un boss uguale per tutti. Servono almeno <b>${S.min_players} eroi</b>: chi vuole sfidarlo entra nella <b>lobby</b>, e quando c’è il numero minimo uno qualunque dei presenti lo fa partire (dopo la partenza non si entra più). I PV del boss si calcolano sugli eroi presenti.</li>
-  <li>Una volta partito, hai ${S.actions} azioni al giorno (attacca, difendi, cura, studia) e i danni di tutti si sommano. Se lo abbattete, chi ha fatto almeno ${S.min_actions} azioni riceve <b>${S.boss_bc} BC</b>, <b>XP doppia</b> e <b>un oggetto casuale</b>.</li>
-  <li>Se nessuno lo batte, il boss ritorna il giorno dopo. Se lo battete, il giorno dopo arriva uno più forte (ce ne sono ${ST.boss.total}).</li>
+  <li><b>Boss del giorno</b>: ogni giorno compare un boss, lo stesso per tutti. Ogni eroe ha <b>una lobby al giorno</b>: ne crea una sua (anche da solo) oppure entra in una già aperta. Quando siete pronti uno qualunque dei presenti la fa partire (dopo la partenza non si entra più). I PV del boss si calcolano sugli eroi presenti${S.min_players>1?`, e servono almeno <b>${S.min_players} eroi</b>`:''}.</li>
+  <li>Una volta partito, hai ${S.actions} azioni al giorno (attacca, difendi, cura, studia) e i danni di chi è nella tua lobby si sommano. Se lo abbattete, <b>tutti quelli della lobby</b> ricevono <b>${S.boss_bc} BC</b>, <b>XP doppia</b> e <b>un oggetto casuale</b>.</li>
+  <li>Ogni lobby ha il suo boss: ognuno può batterlo, anche se un’altra lobby c’è già riuscita. Se almeno una lo batte, il giorno dopo arriva uno più forte (ce ne sono ${ST.boss.total}); se nessuno ci riesce, il boss ritorna.</li>
   <li><b>Arena</b>: sfida gli altri eroi quante volte vuoi, anche lo stesso avversario più volte. Ogni duello consuma <b>energia</b> (la batteria in alto): ${ST.energy.win} se vinci, ${ST.energy.loss} se perdi, e ne servono almeno ${ST.energy.min} per sfidare. La batteria arriva a ${ST.energy.max} e si ricarica da sola in ${Math.round(ST.energy.max/ST.energy.per_hour)} ore circa. Vincere dà <b>solo XP</b>, mai BC. Il boss non consuma energia.</li>
   <li><b>Punti abilità</b>: ${S.points} all’inizio e <b>${S.points_per_level} a ogni livello</b>, da mettere nelle statistiche.</li>
   <li><b>Mercante</b>: ogni giorno propone oggetti diversi; vende anche <b>abilità permanenti</b> (+% a una statistica, per sempre) e <b>potenziamenti temporanei</b> (+% per ${S.temp_hours} ore su un equipaggiamento). Accetta solo BC.</li>
@@ -297,15 +298,14 @@ function renderBoss(){
  const rw=ST.rewards.find(r=>r.day===ST.today);
  let why='';
  if(!m.stats_set)why='Prima assegna i tuoi punti abilità nella scheda <b>Eroe</b>.';
- else if(done)why='Il boss di oggi è stato sconfitto: torna domani per il prossimo!';
- else if(open&&!b.joined)why='Il boss è partito senza di te: oggi non puoi combattere. Domani entra nella lobby per tempo!';
+ else if(done)why='Hai già sconfitto il boss di oggi con la tua lobby: torna domani per il prossimo!';
  else if(open&&my.hp<=0)why='Sei esausto: un alleato deve curarti per tornare in battaglia.';
  else if(open&&b.actions_left<=0)why='Hai usato tutte le azioni di oggi: torna domani.';
  const can=!why;
  const hurt=b.party.filter(p=>p.hp<p.max_hp);
  if(!hurt.some(p=>p.user_id===heal))heal=hurt.length?hurt[0].user_id:'';
  const prev=b.previous?(b.previous.status==='defeated'?`Ieri avete sconfitto ${esc(b.previous.emoji)} <b>${esc(b.previous.boss)}</b>.`:b.previous.status==='escaped'?`Ieri ${esc(b.previous.emoji)} <b>${esc(b.previous.boss)}</b> è fuggito: nessuno l’ha battuto.`:''):'';
- const need=Math.max(0,b.min_players-b.party.length);
+ const need=Math.max(0,b.min_players-b.party.length),NJ=lobby&&!b.joined;
  const WHY=why?`<p class="er-note">${why}</p>`:'';
  const ACT=` <h2 class="er-h" style="margin-top:22px">Le tue azioni · ${b.actions_left} su ${b.actions_max}</h2>
  <div class="er-hp me sm" style="margin-bottom:10px" aria-label="I tuoi punti vita"><i style="width:${my.max_hp?Math.max(0,100*my.hp/my.max_hp):0}%"></i><span>${num(my.hp)} / ${num(my.max_hp)} PV${my.hp<=0?' · KO':''}</span></div>
@@ -317,11 +317,17 @@ function renderBoss(){
  </div>
  ${hurt.length?`<div class="er-sel"><label for="healTo" style="margin:0;flex:none">Cura:</label><select id="healTo">${hurt.map(p=>`<option value="${esc(p.user_id)}" ${p.user_id===heal?'selected':''}>${esc(p.nickname)}${p.hp<=0?' (KO)':''} · ${num(p.hp)}/${num(p.max_hp)}</option>`).join('')}</select></div>`:''}
  ${WHY}`;
- const LOBBY=lobby?`<div class="card er-lobby"><h3>🚪 Lobby del boss · ${b.party.length} / ${b.min_players}</h3>
-  <div class="er-lbar" role="progressbar" aria-valuemin="0" aria-valuemax="${b.min_players}" aria-valuenow="${Math.min(b.party.length,b.min_players)}" aria-label="Giocatori nella lobby"><i style="width:${Math.min(100,100*b.party.length/b.min_players)}%"></i></div>
-  <p style="margin:0">${need>0?`${need===1?'Serve ancora <b>1 giocatore</b>':`Servono ancora <b>${need} giocatori</b>`} per far partire il boss.`:'Siete in numero sufficiente: uno di voi può far partire il boss.'} Dopo la partenza non si può più entrare, e i PV del boss si calcolano sugli eroi presenti.</p>
-  <div class="row">${b.joined?`<button class="btn" id="lbStart" ${need>0?'disabled':''}>⚔️ Avvia il boss</button><button class="btn ghost" id="lbLeave">Esci dalla lobby</button>`:`<button class="btn" id="lbJoin" ${m.stats_set?'':'disabled'}>🚪 Entra nella lobby</button>`}</div>
-  ${!m.stats_set?'<p class="er-note">Prima assegna i tuoi punti abilità nella scheda <b>Eroe</b>.</p>':b.joined&&need>0?'<p class="er-note">Invita altri eroi: appena sono dentro, il pulsante si accende.</p>':''}</div>`:'';
+ const lbl=(b.lobbies||[]).map(q=>`<div class="er-lbrow"><div style="min-width:0"><div class="l1"><b>${esc(q.host||'Lobby')}</b><small>${q.players} ${q.players===1?'eroe':'eroi'}${q.members&&q.members.length?` · ${esc(q.members.join(', '))}${q.players>q.members.length?'…':''}`:''}</small></div></div><button class="btn sm" data-lbjoin="${esc(q.id)}" ${m.stats_set?'':'disabled'}>Entra</button></div>`).join('');
+ const LOBBY=!lobby?'':NJ?`<div class="card er-lobby"><h3>🚪 La tua lobby contro il boss</h3>
+  <p style="margin:0">Ogni eroe ha <b>una lobby al giorno</b>: creane una tua (anche da solo) oppure entra in una già aperta. Quando il boss viene sconfitto, <b>tutti quelli della lobby</b> ricevono i premi.${b.wins_today>0?` Oggi ${b.wins_today===1?'una lobby ha già battuto':`${b.wins_today} lobby hanno già battuto`} il boss: puoi comunque fare la tua e prenderti i premi!`:''}</p>
+  <div class="row"><button class="btn" id="lbJoin" ${m.stats_set?'':'disabled'}>🚪 Crea la tua lobby</button></div>
+  ${!m.stats_set?'<p class="er-note">Prima assegna i tuoi punti abilità nella scheda <b>Eroe</b>.</p>':''}
+  ${lbl?`<h2 class="er-h" style="margin-top:18px">Lobby aperte · ${(b.lobbies||[]).length}</h2>${lbl}`:'<p class="er-note">Non ci sono lobby aperte: creane una e invita gli amici a entrare.</p>'}</div>`
+  :`<div class="card er-lobby"><h3>🚪 La tua lobby · ${b.party.length} ${b.party.length===1?'eroe':'eroi'}</h3>
+  ${b.min_players>1?`<div class="er-lbar" role="progressbar" aria-valuemin="0" aria-valuemax="${b.min_players}" aria-valuenow="${Math.min(b.party.length,b.min_players)}" aria-label="Giocatori nella lobby"><i style="width:${Math.min(100,100*b.party.length/b.min_players)}%"></i></div>`:''}
+  <p style="margin:0">${need>0?`${need===1?'Serve ancora <b>1 giocatore</b>':`Servono ancora <b>${need} giocatori</b>`} per far partire il boss.`:'Quando siete pronti, uno di voi può far partire il boss.'} Dopo la partenza non si può più entrare, e i PV del boss si calcolano sugli eroi presenti. I premi vanno a <b>tutti</b> quelli della lobby.</p>
+  <div class="row"><button class="btn" id="lbStart" ${need>0?'disabled':''}>⚔️ Avvia il boss</button><button class="btn ghost" id="lbLeave">Esci dalla lobby</button></div>
+  ${need>0?'<p class="er-note">Invita altri eroi a entrare nella tua lobby: appena sono abbastanza, il pulsante si accende.</p>':'<p class="er-note">Più eroi entrano, più PV avrà il boss (e più danni farete insieme).</p>'}</div>`;
  $('p-boss').innerHTML=`<div class="card er-boss ${done?'er-win':''}">
   <div class="er-bh"><div class="er-sig" style="--h:${(b.no*37)%360}" aria-hidden="true">${esc(b.emoji)}</div><div style="min-width:0"><small>Boss ${b.no} di ${b.total}${b.cycle>0?` · giro ${b.cycle+1}`:''}</small><h2>${esc(b.name)}</h2><small>Livello medio ${num(b.level)}</small></div></div>
   <p class="er-lore">${esc(b.lore)}</p>${b.trait?`<p class="er-trait"><b>Particolarità:</b> ${esc(b.trait)}</p>`:''}
@@ -330,12 +336,12 @@ function renderBoss(){
   ${prev?`<p class="mute" style="margin:0;font-size:.9rem">${prev}</p>`:''}
  </div>
  ${lobby?LOBBY:done&&rw?`<div class="card er-win" style="margin-top:12px"><h3>🏆 Boss sconfitto! La tua ricompensa</h3><p style="margin:6px 0 0"><b>+${num(rw.bc)} BC</b> · <b>+${num(rw.xp)} XP</b>${rw.levels?` (sei salito di ${rw.levels} livell${rw.levels>1?'i':'o'}!)`:''}${rw.item?` · oggetto: <b class="r-${esc(rw.item_rarity)}" style="color:var(--rc)">${esc(rw.item)}</b>`:''}</p></div>`
-   :done?`<p class="er-msg" style="margin-top:12px">Il boss è stato sconfitto${my.actions_used<S.min_actions?`, ma servivano almeno ${S.min_actions} azioni per la ricompensa`:''}. Tornate domani!</p>`:''}
+   :done?`<p class="er-msg" style="margin-top:12px">La tua lobby ha sconfitto il boss. Tornate domani!</p>`:''}
  ${lobby?WHY:ACT}
- <h2 class="er-h">${lobby?'Nella lobby':'In battaglia oggi'} · ${b.party.length}</h2>
- ${b.party.length?b.party.map(p=>`<div class="er-party"><div class="av" aria-hidden="true">${face(p.user_id,p.nickname)}</div><div style="min-width:0"><div class="l1"><button class="er-link" data-hero="${esc(p.user_id)}">${esc(p.nickname)}${p.user_id===m.user_id?' (tu)':''}</button><small>${lobby?`${num(p.max_hp)} PV`:`${p.hp<=0?'<span class="er-ko">KO</span> · ':''}${num(p.dmg)} danni · ${p.actions_used} az.`}</small></div><div class="er-hp me sm"><i style="width:${p.max_hp?Math.max(0,100*p.hp/p.max_hp):0}%"></i><span>${num(p.hp)}/${num(p.max_hp)}</span></div></div></div>`).join(''):`<p class="mute">${lobby?'Nessuno è ancora nella lobby. Entra per primo!':'Nessuno è sceso in campo.'}</p>`}
- <h2 class="er-h">Cronaca</h2>
- ${b.log.length?`<ul class="er-log">${b.log.map(l=>`<li>${logLine(l)}</li>`).join('')}</ul>`:'<p class="mute">Ancora nessuna azione oggi.</p>'}`;
+ ${NJ?'':`<h2 class="er-h">${lobby?'Nella lobby':'In battaglia oggi'} · ${b.party.length}</h2>`}
+ ${NJ?'':b.party.length?b.party.map(p=>`<div class="er-party"><div class="av" aria-hidden="true">${face(p.user_id,p.nickname)}</div><div style="min-width:0"><div class="l1"><button class="er-link" data-hero="${esc(p.user_id)}">${esc(p.nickname)}${p.user_id===m.user_id?' (tu)':''}</button><small>${lobby?`${num(p.max_hp)} PV`:`${p.hp<=0?'<span class="er-ko">KO</span> · ':''}${num(p.dmg)} danni · ${p.actions_used} az.`}</small></div><div class="er-hp me sm"><i style="width:${p.max_hp?Math.max(0,100*p.hp/p.max_hp):0}%"></i><span>${num(p.hp)}/${num(p.max_hp)}</span></div></div></div>`).join(''):`<p class="mute">${lobby?'Nessuno è ancora nella lobby. Entra per primo!':'Nessuno è sceso in campo.'}</p>`}
+ ${NJ?'':`<h2 class="er-h">Cronaca</h2>`}
+ ${NJ?'':b.log.length?`<ul class="er-log">${b.log.map(l=>`<li>${logLine(l)}</li>`).join('')}</ul>`:'<p class="mute">Ancora nessuna azione oggi.</p>'}`;
 }
 function logLine(l){const n=`<b>${esc(l.nickname)}</b>`,a=num(l.amount);
  switch(l.action){case 'attack':return `${n} attacca per ${a} danni${l.note==='colpo finale'?' — <b>colpo finale!</b>':l.note==='critico'?' (critico)':l.note==='schivata'?' e schiva il contraccolpo':''}`;
@@ -351,7 +357,7 @@ async function bossAct(btn,kind){
   else if(kind==='heal')t=`Hai curato di <b>${num(r.amount)}</b> PV${r.note==='rianimato'?' e rianimato l’alleato!':'.'}`;
   else t=`Hai svelato una debolezza: <b>+${num(r.amount)}%</b> ai danni di tutti (totale ${r.weak}%).`;
   if(r.ko)t+=' <b>Sei KO!</b> Servirà una cura.';
-  if(r.defeated){const w=r.reward;t=`<b>🏆 Boss sconfitto!</b> ${t}`+(w?` Ricompensa: <b>+${num(w.bc)} BC</b>, <b>+${num(w.xp)} XP</b>${w.item?`, oggetto <b>${esc(w.item)}</b>`:''}${w.levels?`, <b>+${w.levels} livello!</b>`:''}.`:' (per la ricompensa servono almeno '+ST.settings.min_actions+' azioni).')}
+  if(r.defeated){const w=r.reward;t=`<b>🏆 Boss sconfitto!</b> ${t}`+(w?` Ricompensa: <b>+${num(w.bc)} BC</b>, <b>+${num(w.xp)} XP</b>${w.item?`, oggetto <b>${esc(w.item)}</b>`:''}${w.levels?`, <b>+${w.levels} livello!</b>`:''}.`:'')}
   say(t,r.defeated?'good':'');
   await load(true)})}
 
@@ -572,7 +578,8 @@ document.addEventListener('click',e=>{
  if(t.id==='avGo'){avQ=($('avQ')||{}).value||avQ;searchCards();return}
  if(t.id==='avClear'){run(t,async()=>{await rpc('game_set_avatar',{p_card:null,p_name:null});say('Avatar rimosso.','good');await load(true)});return}
  if(t.dataset.avpick){const id=Number(t.dataset.avpick),nm=t.dataset.avname;run(t,async()=>{await rpc('game_set_avatar',{p_card:id,p_name:nm});avOpen=false;avRes=null;say(`Avatar impostato: <b>${esc(nm)}</b>.`,'good');await load(true)});return}
- if(t.id==='lbJoin'){run(t,async()=>{await rpc('game_boss_join');say('Sei nella lobby del boss!','good');await load(true)});return}
+ if(t.id==='lbJoin'){run(t,async()=>{await rpc('game_boss_join');say('Hai creato la tua lobby! Invita gli amici o avvia il boss.','good');await load(true)});return}
+ if(t.dataset.lbjoin){run(t,async()=>{await rpc('game_boss_join',{p_lobby:Number(t.dataset.lbjoin)});say('Sei nella lobby! Aspetta che qualcuno avvii il boss.','good');await load(true)});return}
  if(t.id==='lbLeave'){run(t,async()=>{await rpc('game_boss_leave');say('Sei uscito dalla lobby.');await load(true)});return}
  if(t.id==='lbStart'){run(t,async()=>{const r=await rpc('game_boss_start');say(`Il boss è partito con <b>${r.players}</b> eroi! I suoi PV sono <b>${num(r.boss_hp)}</b>. All’attacco!`,'good');await load(true)});return}
  if(t.dataset.skill){const id=t.dataset.skill;
