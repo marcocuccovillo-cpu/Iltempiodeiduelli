@@ -277,6 +277,12 @@ Solo interfaccia, nessuna regola cambiata: prima il risultato si sceglieva da un
 - **Come applicarla**: pubblica `black-market-moduli.js`, `black-market.html` e `sw.js`. Provata nel browser (87 controlli sul Black Market, compresi i nuovi, e controllo a 390 px senza scorrimento orizzontale).
 - **Non fatto (da decidere)**: un blocco in database che impedisca a un organizzatore di aggiungere un match tra due giocatori che hanno appena registrato una partita di Ladder; l'avrei messo solo come avviso perché potrebbe bloccare un torneo giocato la stessa sera.
 
+### Deck Analyzer: carte a pile (24 ottobre 2026, nessuna migrazione)
+- Nella scheda **Deck** le carte si vedono ora come **pile**: una pila per carta, con le copie sovrapposte (massimo 3 visibili, badge «×2», «×3»; in rosso se sono più di 3), **5 pile per riga** sul telefono e 6 su schermi larghi. Si tocca una pila per aprire il dettaglio con nome, tipo e i pulsanti − / + per le copie; se togli l'ultima copia la carta sparisce.
+- Il pulsante **Lista** riporta la vista di prima; la scelta viene ricordata su questo dispositivo.
+- Le carte restano **nell'ordine del file .ydk** (prima venivano riordinate per numero di carta).
+- Provato nel browser (telefono e schermo largo, con immagini finte): colonne per riga, pile da 3, dettaglio, − / +, rimozione, Esc, memoria della vista, Extra Deck.
+
 ### Boss del giorno: attacco libero e rappresaglia vera (migrazione 027, 24 ottobre 2026)
 - **Il problema**: le 3 azioni al giorno valevano anche per l'attacco, e i PV del boss erano tarati su ~3 attacchi a testa. Il boss reagiva col 10% dei PV per attacco, e un solo scudo bastava ad assorbirlo: in pratica nessuno perdeva PV.
 - **Attaccare non conta più come azione giornaliera**: è illimitato. Le azioni giornaliere (3 + oggetti) valgono solo per **Difendi, Cura e Studia** (la scheda ora dice «Azioni di supporto»). Il freno agli attacchi è la salute: ogni attacco costa PV (rappresaglia del boss, ridotta da scudo e schivata) e a 0 PV sei **KO** finché un alleato non ti cura.

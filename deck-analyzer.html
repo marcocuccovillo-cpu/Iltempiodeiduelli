@@ -6,6 +6,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tempio.css?v=10">
+<style>
+.da-vw{margin-top:12px}
+.da-pg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px 8px;margin:12px 0 4px;align-items:start}
+@media(min-width:520px){.da-pg{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.da-pile{position:relative;display:block;width:100%;padding:0;border:0;background:none;cursor:pointer;border-radius:6px;-webkit-tap-highlight-color:transparent}
+.da-pile img{position:absolute;left:0;width:100%;aspect-ratio:168/246;height:auto;object-fit:cover;border-radius:4%;background:#000;box-shadow:0 1px 4px rgba(0,0,0,.7)}
+.da-pile:focus-visible{outline:2px solid var(--ac);outline-offset:3px}
+.da-pile:active img{filter:brightness(1.15)}
+.da-n{position:absolute;right:3px;bottom:3px;min-width:24px;padding:1px 5px;border-radius:99px;background:rgba(0,0,0,.82);border:1px solid var(--ac);color:var(--tx);font:700 .78rem/1.35 var(--ui);text-align:center}
+.da-n.x{border-color:var(--bad);color:var(--bad)}
+.da-sheet{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);display:flex;align-items:flex-end}.da-sheet[hidden]{display:none}
+.da-shc{width:100%;max-width:560px;margin:0 auto;background:var(--surf);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.da-sh{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:start;margin-bottom:14px}
+.da-sh img{width:96px;aspect-ratio:168/246;object-fit:cover;border-radius:6px;background:#000}
+.da-sh .nn{font-weight:700;font-size:1.05rem;line-height:1.3;overflow-wrap:anywhere}.da-sh .nn small{display:block;color:var(--mu);font-weight:400;font-size:.88rem;margin-top:2px}
+.da-sh .da-q{margin-top:12px;justify-content:flex-start;gap:6px}.da-sh .da-q b{min-width:34px;font-size:1.3rem}
+</style>
 </head><body>
 <main class="pg">
  <header><p class="kicker">Strumento</p><h1>Deck Analyzer</h1><p class="lead">Importa un deck, assegna i ruoli alle carte e scopri quanto è consistente.</p></header>
@@ -33,6 +50,7 @@
    <div class="da-sr" id="results"></div></div>
 
   <div class="warn" id="warn" hidden></div>
+  <div class="seg da-vw" id="vw" role="group" aria-label="Come vedere le carte"><button data-v="pile" aria-pressed="true" type="button">▦ Pile</button><button data-v="list" aria-pressed="false" type="button">☰ Lista</button></div>
   <div id="deckView" style="margin-top:6px"></div>
  </section>
 
@@ -63,12 +81,14 @@
   <div id="hands" style="margin-top:12px"></div>
  </section>
 </main>
+<div class="da-sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-label="Dettaglio carta"><div class="da-shc"><div id="shBody"></div><button class="btn ghost block" id="shClose" type="button">Chiudi</button></div></div>
 <script src="tempio.js?v=10"></script>
 <script src="tempio-notifiche.js?v=2"></script>
 <script>
 (function(){
 const API='https://db.ygoprodeck.com/api/v7/cardinfo.php',IMG='https://images.ygoprodeck.com/images/cards_small/',KC='tempio.cards.v1',KD='tempio.deck.v1',KR='tempio.roles.';
 const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let VIEW='pile',sel=null;try{if(localStorage.getItem('tempio.deckview')==='list')VIEW='list'}catch(e){}
 let C={},R={},H=5,deck={name:'Deck',main:[],extra:[],side:[]},csvT='',over=false;const openG=new Set(['main']);
 try{C=JSON.parse(localStorage.getItem(KC)||'{}')}catch(e){}
 try{const d=JSON.parse(localStorage.getItem(KD));if(d&&d.main)deck=d}catch(e){}
@@ -86,9 +106,9 @@ document.querySelector('.tabs').onclick=e=>{const b=e.target.closest('button');i
 function keep(c){const i={n:c.name,t:c.type,d:(c.desc||'').slice(0,600),l:c.level||0};C[c.id]=i;(c.card_images||[]).forEach(x=>C[x.id]=i)}
 async function need(ids){const miss=[...new Set(ids)].filter(i=>!C[i]);if(!miss.length)return;msg('Scarico i dati delle carte…');
  for(let i=0;i<miss.length;i+=40){try{const r=await fetch(API+'?id='+miss.slice(i,i+40).join(','));if(!r.ok)throw 0;(await r.json()).data.forEach(keep)}catch(e){msg('Alcune carte non sono state scaricate: serve la connessione. Riprova.');saveC();return}}saveC();msg('')}
-function parse(txt){const out={main:{},extra:{},side:{}};let sec='main';
- txt.split(/\r?\n/).forEach(r=>{const l=r.trim();if(!l)return;if(l=='#main'){sec='main';return}if(l=='#extra'){sec='extra';return}if(l=='!side'){sec='side';return}if(l[0]=='#'||l[0]=='!')return;const id=+l;if(id>0)out[sec][id]=(out[sec][id]||0)+1});
- const f=o=>Object.entries(o).map(([id,qty])=>({id:+id,qty}));return{main:f(out.main),extra:f(out.extra),side:f(out.side)}}
+function parse(txt){const out={main:new Map(),extra:new Map(),side:new Map()};let sec='main';
+ txt.split(/\r?\n/).forEach(r=>{const l=r.trim();if(!l)return;if(l=='#main'){sec='main';return}if(l=='#extra'){sec='extra';return}if(l=='!side'){sec='side';return}if(l[0]=='#'||l[0]=='!')return;const id=+l;if(id>0)out[sec].set(id,(out[sec].get(id)||0)+1)});   // Map: si mantiene l’ordine del file .ydk
+ const f=o=>[...o].map(([id,qty])=>({id:+id,qty}));return{main:f(out.main),extra:f(out.extra),side:f(out.side)}}
 async function setDeck(d,name){deck={name,...d};try{R=JSON.parse(localStorage.getItem(KR+name)||'{}')}catch(e){R={}}saveD();await need([...d.main,...d.extra,...d.side].map(c=>c.id));render()}
 $('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;await setDeck(parse(await f.text()),f.name.replace(/\.(ydk|txt)$/i,''));e.target.value=''};
 $('loadPaste').onclick=async()=>{const t=$('paste').value;if(!t.trim())return;await setDeck(parse(t),'Deck incollato');$('paste').value='';$('paste').closest('details').open=false};
@@ -100,11 +120,23 @@ $('search').onclick=async()=>{const q=$('q').value.trim();if(q.length<3){msg('Sc
 $('q').onkeydown=e=>{if(e.key=='Enter')$('search').click()};
 $('results').onclick=e=>{const b=e.target.closest('[data-add]');if(b){add(+b.dataset.add,b.dataset.s);b.textContent='Aggiunta ✓'}};
 function add(id,sec){const a=deck[sec],x=a.find(c=>c.id==id);if(x)x.qty=Math.min(3,x.qty+1);else a.push({id,qty:1});saveD();render(true)}
-$('deckView').onclick=e=>{const b=e.target.closest('[data-q]');if(!b)return;const[sec,id,d]=b.dataset.q.split(':'),a=deck[sec],i=a.findIndex(c=>c.id==id);if(i<0)return;a[i].qty+=+d;if(a[i].qty<=0)a.splice(i,1);saveD();render(true)};
+function chg(sec,id,d){const a=deck[sec],i=a.findIndex(c=>c.id==id);if(i<0)return;a[i].qty+=d;if(a[i].qty<=0)a.splice(i,1);saveD();render(true)}
+$('deckView').onclick=e=>{const p=e.target.closest('[data-pile]');if(p){const[sec,id]=p.dataset.pile.split(':');sel={sec,id};sheet();return}
+ const b=e.target.closest('[data-q]');if(!b)return;const[sec,id,d]=b.dataset.q.split(':');chg(sec,id,+d)};
+$('vw').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;VIEW=b.dataset.v;try{localStorage.setItem('tempio.deckview',VIEW)}catch(_){}render()};
+const closeSheet=()=>{sel=null;$('sheet').hidden=true};
+$('shClose').onclick=closeSheet;$('sheet').onclick=e=>{if(e.target.id==='sheet')closeSheet()};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('sheet').hidden)closeSheet()});
+$('shBody').onclick=e=>{const b=e.target.closest('[data-sq]');if(b&&sel)chg(sel.sec,sel.id,+b.dataset.sq)};
+function sheet(){const s=$('sheet');if(!sel){s.hidden=true;return}const c=(deck[sel.sec]||[]).find(x=>x.id==sel.id);if(!c){closeSheet();return}
+ const was=s.hidden;s.hidden=false;
+ $('shBody').innerHTML=`<div class="da-sh"><img src="${IMG}${c.id}.jpg" alt=""><div><div class="nn">${esc(nm(c.id))}<small>${esc(C[c.id]?C[c.id].t:'')}</small></div><div class="da-q"><button type="button" data-sq="-1" aria-label="Togli una copia">−</button><b aria-live="polite">${c.qty}</b><button type="button" data-sq="1" aria-label="Aggiungi una copia">+</button></div></div></div>`;
+ if(was)$('shClose').focus()}
 $('deckView').addEventListener('toggle',e=>{const d=e.target.closest('details[data-g]');if(!d)return;d.open?openG.add(d.dataset.g):openG.delete(d.dataset.g)},true);
 const nm=id=>C[id]?C[id].n:'Carta '+id;
 const cnt=a=>a.reduce((t,c)=>t+c.qty,0);
-function group(sec,label){const a=deck[sec];return`<details class="da-grp" data-g="${sec}" ${openG.has(sec)?'open':''}><summary>${label}&nbsp;<b>${cnt(a)}</b></summary>`+(a.length?a.map(c=>`<div class="da-cr"><img src="${IMG}${c.id}.jpg" alt="" loading="lazy"><div class="nn">${esc(nm(c.id))}<small>${esc(C[c.id]?C[c.id].t:'')}</small></div><div class="da-q"><button type="button" data-q="${sec}:${c.id}:-1" aria-label="Rimuovi una copia di ${esc(nm(c.id))}">−</button><b>${c.qty}</b><button type="button" data-q="${sec}:${c.id}:1" aria-label="Aggiungi una copia di ${esc(nm(c.id))}">+</button></div></div>`).join(''):'<p class="empty">Vuoto. Importa un .ydk o cerca una carta.</p>')+'</details>'}
+function pile(sec,c){const n=Math.min(3,Math.max(1,c.qty)),off=.2,tot=1.465+off*(n-1);
+ return `<button type="button" class="da-pile" data-pile="${sec}:${c.id}" style="aspect-ratio:1/${tot.toFixed(3)}" aria-label="${esc(nm(c.id))}, ${c.qty} ${c.qty==1?'copia':'copie'}">${Array.from({length:n},(_,i)=>`<img src="${IMG}${c.id}.jpg" alt="" loading="lazy" style="top:${(i*off/tot*100).toFixed(2)}%">`).join('')}${c.qty>1?`<b class="da-n${c.qty>3?' x':''}">×${c.qty}</b>`:''}</button>`}
+function group(sec,label){const a=deck[sec];return`<details class="da-grp" data-g="${sec}" ${openG.has(sec)?'open':''}><summary>${label}&nbsp;<b>${cnt(a)}</b></summary>`+(a.length&&VIEW==='pile'?`<div class="da-pg">${a.map(c=>pile(sec,c)).join('')}</div>`:a.length?a.map(c=>`<div class="da-cr"><img src="${IMG}${c.id}.jpg" alt="" loading="lazy"><div class="nn">${esc(nm(c.id))}<small>${esc(C[c.id]?C[c.id].t:'')}</small></div><div class="da-q"><button type="button" data-q="${sec}:${c.id}:-1" aria-label="Rimuovi una copia di ${esc(nm(c.id))}">−</button><b>${c.qty}</b><button type="button" data-q="${sec}:${c.id}:1" aria-label="Aggiungi una copia di ${esc(nm(c.id))}">+</button></div></div>`).join(''):'<p class="empty">Vuoto. Importa un .ydk o cerca una carta.</p>')+'</details>'}
 
 const PRE=new Set(['Ash Blossom & Joyous Spring','Maxx "C"','Effect Veiler','Droll & Lock Bird','Ghost Ogre & Snow Rabbit','Infinite Impermanence','Nibiru, the Primal Being','PSY-Framegear Gamma','Ghost Belle & Haunted Mansion','Dimension Shifter','Skull Meister','Contact "C"','D.D. Crow','Herald of Orange Light','Ghost Mourner & Moonlit Chill']);
 const has=(t,...a)=>{t=t.toLowerCase();return a.some(s=>t.includes(s))};
@@ -148,12 +180,13 @@ $('sim').onclick=()=>{const n=Math.min(100,Math.max(1,+$('simN').value||12)),P=p
 $('csv').onclick=()=>{if(!csvT){$('sim').click()}if(!csvT)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csvT],{type:'text/csv'}));a.download='mani-simulate.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 
 function render(keepScroll){$('dname').textContent=deck.main.length?'Deck caricato: '+deck.name:'';
+ [...$('vw').children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===VIEW));
  $('deckView').innerHTML=group('main','Main Deck')+group('extra','Extra Deck')+group('side','Side Deck');
  const w=[],m=cnt(deck.main),e=cnt(deck.extra),s=cnt(deck.side);if(m&&(m<40||m>60))w.push(`Il Main ha ${m} carte (consentite da 40 a 60).`);if(e>15)w.push(`L’Extra ha ${e} carte (massimo 15).`);if(s>15)w.push(`Il Side ha ${s} carte (massimo 15).`);
  const tot={};[...deck.main,...deck.extra,...deck.side].forEach(c=>tot[c.id]=(tot[c.id]||0)+c.qty);Object.entries(tot).forEach(([id,q])=>{if(q>3)w.push(`${nm(id)}: ${q} copie in totale (massimo 3).`)});
  $('warn').hidden=!w.length;$('warn').innerHTML=w.map(esc).join('<br>');
  $('roles').innerHTML=deck.main.length?deck.main.map(c=>{const r=R[c.id]||{};return`<div class="da-role"><div class="hd"><span>${esc(nm(c.id))}</span><small>x${c.qty}</small></div><div class="da-tg">${['s','h','k','b'].map(k=>`<button type="button" class="${k}" data-r="${c.id}:${k}" aria-pressed="${r[k]?'true':'false'}">${LAB[k]}</button>`).join('')}</div></div>`}).join(''):'<p class="empty">Carica un deck per assegnare i ruoli.</p>';
- metrics()}
+ sheet();metrics()}
 render();need([...deck.main,...deck.extra,...deck.side].map(c=>c.id)).then(render);
 })();
 </script></body></html>
