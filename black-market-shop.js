@@ -15,15 +15,17 @@ window.BM_SHOP = function (BM) {
   const num = n => Number(n || 0).toLocaleString('it-IT');
   const day = d => new Date(d).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
   const loading = '<p class="mute" role="status">Caricamento…</p>';
-  const RANGE = { common: [2, 49], rare: [50, 149], epic: [150, 349], legendary: [350, 699], mythic: [700, 1000] };
+  const RANGE = { common: [2, 49], rare: [50, 149], epic: [150, 349], legendary: [350, 699], mythic: [700, 1000], divine: [1001, 5000] };
   const rname = r => (T.RAR[r] || [r])[0], rcol = r => (T.RAR[r] || [0, '#9aa4b2'])[1];
   const rord = r => T.RARS.indexOf(r);
+  /* cursore del prezzo: scala logaritmica da 2 a 5000 BC (sarebbe impossibile scegliere 50 BC su una scala lineare fino a 5000) */
+  const s2p = v => Math.round(2 * Math.pow(2500, Math.min(1000, Math.max(0, v)) / 1000)), p2s = p => Math.round(Math.log(Math.max(2, p) / 2) / Math.log(2500) * 1000);
 
   /* ---------- stato dei filtri (solo comodità: si perde senza conseguenze) ---------- */
-  const DEF = { tab: 'cat', cat: 'all', rar: 'all', max: 1000, sort: 'price', buy: false };
+  const DEF = { tab: 'cat', cat: 'all', rar: 'all', max: 5000, sort: 'price', buy: false };
   let st = { ...DEF };
-  try { Object.assign(st, JSON.parse(sessionStorage.getItem('bm.shop') || '{}')) } catch (e) { }
-  const save = () => { try { sessionStorage.setItem('bm.shop', JSON.stringify(st)) } catch (e) { } };
+  try { Object.assign(st, JSON.parse(sessionStorage.getItem('bm.shop2') || '{}')) } catch (e) { }
+  const save = () => { try { sessionStorage.setItem('bm.shop2', JSON.stringify(st)) } catch (e) { } };
 
   /* ---------- stile ---------- */
   const css = document.createElement('style');
@@ -41,6 +43,8 @@ window.BM_SHOP = function (BM) {
 .sh-card.r-legendary{box-shadow:0 0 0 1px rgba(255,176,46,.22),0 8px 28px -12px rgba(255,176,46,.7)}
 .sh-card.r-mythic{box-shadow:0 0 0 1px rgba(255,61,110,.35),0 10px 36px -10px rgba(255,61,110,.85),0 0 40px -18px rgba(124,58,237,.9);background:linear-gradient(180deg,#1a0d18,var(--surf) 55%)}
 .sh-card.r-mythic .sh-pv{background:radial-gradient(90% 100% at 50% 20%,rgba(255,46,99,.22),rgba(5,1,12,.85))}
+.sh-card.r-divine{box-shadow:0 0 0 1px rgba(94,234,212,.4),0 10px 38px -10px rgba(34,211,238,.8),0 0 46px -16px rgba(167,139,250,.95);background:linear-gradient(160deg,#0b1a2c,#1a1030 45%,var(--surf));border-top-color:#5eead4}
+.sh-card.r-divine .sh-pv{background:radial-gradient(90% 100% at 50% 20%,rgba(94,234,212,.22),rgba(124,58,237,.18) 55%,rgba(5,1,12,.85))}
 .sh-card.off{opacity:.55;filter:saturate(.6)}
 .sh-meta{display:flex;gap:6px;flex-wrap:wrap}.sh-meta .tag{flex:none}
 .sh-foot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:space-between;margin-top:4px}
@@ -129,7 +133,7 @@ ${mode === 'own' && p ? `<small class="mute">Acquistato il ${day(p.created_at)} 
     list = [...list].sort((a, b) => (a.active === b.active ? 0 : a.active ? -1 : 1) || rk(a, b));
     return `<div class="sh-filters"><div class="row">${seg('cat', st.cat, [['all', 'Tutte'], ...T.CATS])}</div>
 <div class="row"><label>Rarità <select data-shf="rar" aria-label="Filtra per rarità"><option value="all">Tutte</option>${T.RARS.map(r => `<option value="${r}" ${st.rar === r ? 'selected' : ''}>${rname(r)} (${RANGE[r][0]}–${RANGE[r][1]} BC)</option>`).join('')}</select></label>
-<label>Prezzo fino a <b id="sh-maxv" style="color:var(--gold)">${num(st.max)} BC</b> <input type="range" min="2" max="1000" step="1" value="${st.max}" data-shf="max" aria-label="Prezzo massimo"></label>
+<label>Prezzo fino a <b id="sh-maxv" style="color:var(--gold)">${num(st.max)} BC</b> <input type="range" min="0" max="1000" step="1" value="${p2s(st.max)}" data-shf="max" aria-label="Prezzo massimo"></label>
 <label>Ordina <select data-shf="sort" aria-label="Ordina"><option value="price" ${st.sort === 'price' ? 'selected' : ''}>Prezzo crescente</option><option value="priced" ${st.sort === 'priced' ? 'selected' : ''}>Prezzo decrescente</option><option value="rar" ${st.sort === 'rar' ? 'selected' : ''}>Rarità</option><option value="name" ${st.sort === 'name' ? 'selected' : ''}>Nome</option></select></label>
 <label style="color:var(--tx)"><input type="checkbox" data-shf="buy" ${st.buy ? 'checked' : ''} style="width:22px;min-height:0"> Solo acquistabili ora</label>
 <button class="btn ghost sm" data-act="shReset">Azzera filtri</button></div></div>
@@ -230,7 +234,7 @@ ${sections || '<div class="box" style="margin-top:14px"><h2>La tua collezione è
 <label>Nome<input name="name" value="${esc(v.name)}" required minlength="2" maxlength="40"></label>
 <label>Categoria<select name="category" ${e ? 'disabled' : ''}>${T.CATS.map(([c, l]) => `<option value="${c}" ${v.category === c ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
 <label>Rarità<select name="rarity">${T.RARS.map(r => `<option value="${r}" ${v.rarity === r ? 'selected' : ''}>${rname(r)} (${RANGE[r][0]}–${RANGE[r][1]} BC)</option>`).join('')}</select></label>
-<label>Prezzo in BC<input name="price" type="number" min="2" max="1000" value="${v.price}" required></label>
+<label>Prezzo in BC<input name="price" type="number" min="2" max="5000" value="${v.price}" required></label>
 <label>Asset grafico<select name="asset">${assetOpts(v.category, v.asset)}${v.asset && !(T.ASSETS[v.category] || []).includes(v.asset) ? `<option value="${esc(v.asset)}" selected>${esc(v.asset)}</option>` : ''}</select></label>
 <label>Ordine<input name="sort" type="number" min="0" max="9999" value="${v.sort}"></label>
 <label style="display:flex;gap:8px;align-items:center;color:var(--tx)"><input name="active" type="checkbox" ${v.active ? 'checked' : ''} style="width:22px;min-height:0">In vendita</label>
@@ -274,7 +278,7 @@ ${sections || '<div class="box" style="margin-top:14px"><h2>La tua collezione è
   const onF = e => {
     const t = e.target, k = t && t.dataset && t.dataset.shf; if (!k) return;
     if (e.type === 'input' && k !== 'max') return;
-    if (k === 'max') { st.max = parseInt(t.value, 10) || 1000; const l = document.getElementById('sh-maxv'); if (l) l.textContent = num(st.max) + ' BC'; if (e.type === 'input') return }
+    if (k === 'max') { st.max = s2p(parseInt(t.value, 10) || 0); const l = document.getElementById('sh-maxv'); if (l) l.textContent = num(st.max) + ' BC'; if (e.type === 'input') return }
     else if (k === 'buy') st.buy = t.checked; else st[k] = t.value;
     save(); BM.route();
   };

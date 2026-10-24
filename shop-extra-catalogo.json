@@ -124,7 +124,7 @@
   "categoria": "Cornici",
   "rarita": "raro",
   "prezzo_bc": 89,
-  "nome": "Cornice Runica",
+  "nome": "Cornice delle Rune Antiche",
   "descrizione": "Un anello di rune d’argento che si accendono una dopo l’altra."
  },
  {
@@ -355,7 +355,7 @@
   "key": "xt_cacciatore",
   "categoria": "Titoli",
   "rarita": "comune",
-  "prezzo_bc": 35,
+  "prezzo_bc": 36,
   "nome": "Cacciatore di Draghi",
   "descrizione": "Il titolo di chi ha già affrontato qualcosa di più grosso di lui."
  },

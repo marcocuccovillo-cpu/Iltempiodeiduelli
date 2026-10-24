@@ -65,7 +65,7 @@
   add('xp_ouroboros', 'pet', 'divino', 2500, 'Ouroboros Cosmico', 'Il drago che morde la propria coda: un anello infinito di stelle, il companion più raro del Tempio.');
   /* CORNICI */
   add('xf_rovi', 'frame', 'comune', 29, 'Cornice di Rovi e Spine', 'Rovi neri con spine e boccioli cremisi attorno al tuo avatar.');
-  add('xf_rune', 'frame', 'raro', 89, 'Cornice Runica', 'Un anello di rune d’argento che si accendono una dopo l’altra.');
+  add('xf_rune', 'frame', 'raro', 89, 'Cornice delle Rune Antiche', 'Un anello di rune d’argento che si accendono una dopo l’altra.');
   add('xf_ghiaccio', 'frame', 'raro', 129, 'Cornice di Ghiaccio Eterno', 'Cristalli di ghiaccio azzurro che non si sciolgono mai.');
   add('xf_drago', 'frame', 'epico', 199, 'Cornice Draconica', 'Scaglie di drago bronzo con quattro artigli che stringono l’avatar.');
   add('xf_fulmini', 'frame', 'epico', 279, 'Cornice di Fulmini', 'Un anello di archi elettrici che scoccano lungo il bordo.');
@@ -97,7 +97,7 @@
   add('xe_drago', 'emblem', 'mitico', 719, 'Sigillo del Drago Antico', 'Un drago che si avvolge su sé stesso dentro un cerchio di rune.');
   add('xe_infinito', 'emblem', 'mitico', 899, 'Emblema dell’Infinito', 'Il segno dell’infinito, luminoso e senza fine, su un disco di notte.');
   /* TITOLI */
-  add('xt_cacciatore', 'title', 'comune', 35, 'Cacciatore di Draghi', 'Il titolo di chi ha già affrontato qualcosa di più grosso di lui.', { a: '#ffb36b', b: '#ff6b35', g: 'rgba(255,120,50,.45)' });
+  add('xt_cacciatore', 'title', 'comune', 36, 'Cacciatore di Draghi', 'Il titolo di chi ha già affrontato qualcosa di più grosso di lui.', { a: '#ffb36b', b: '#ff6b35', g: 'rgba(255,120,50,.45)' });
   add('xt_custode', 'title', 'raro', 79, 'Custode delle Rune', 'Per chi conosce i segni antichi e li protegge.', { a: '#cfe3ff', b: '#8fb4ff', g: 'rgba(140,180,255,.5)' });
   add('xt_stregone', 'title', 'raro', 109, 'Stregone Errante', 'Nessuna dimora, mille incantesimi.', { a: '#d9a8ff', b: '#8b5cf6', g: 'rgba(170,110,255,.5)' });
   add('xt_signore', 'title', 'epico', 179, 'Signore del Mazzo', 'Ogni carta al suo posto, ogni mano sotto controllo.', { a: '#fff2b0', b: '#f1bf2f', g: 'rgba(241,191,47,.5)' });

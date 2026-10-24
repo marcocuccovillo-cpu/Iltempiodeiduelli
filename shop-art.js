@@ -4,15 +4,23 @@
    Le creature sono originali. Le animazioni sono leggere e si spengono da sole con "riduci movimento"
    o con il pulsante «Animazioni» dello Shop (versione statica per i dispositivi meno potenti).
    I prezzi, i nomi e la proprietà dei premi NON stanno qui: arrivano dal database (migrazione 008).
+   I 60 premi aggiuntivi (chiavi xp_/xf_/xa_/xe_/xt_/xx_) si disegnano con shop-art-extra.js, che qui viene solo richiamato.
    ===================================================================== */
 (function () {
   'use strict';
-  const RAR = { common: ['Comune', '#9aa4b2'], rare: ['Raro', '#4aa3ff'], epic: ['Epico', '#b46bff'], legendary: ['Leggendario', '#ffb02e'], mythic: ['Mitico', '#ff3d6e'] };
-  const RARS = ['common', 'rare', 'epic', 'legendary', 'mythic'];
+  const RAR = { common: ['Comune', '#9aa4b2'], rare: ['Raro', '#4aa3ff'], epic: ['Epico', '#b46bff'], legendary: ['Leggendario', '#ffb02e'], mythic: ['Mitico', '#ff3d6e'], divine: ['Divino', '#5eead4'] };
+  const RARS = ['common', 'rare', 'epic', 'legendary', 'mythic', 'divine'];
   const CATS = [['pet', 'Pet'], ['title', 'Titoli'], ['frame', 'Cornici'], ['aura', 'Aure'], ['emblem', 'Emblemi'], ['effect', 'Effetti']];
   const CATN = { pet: 'Pet', title: 'Titolo', frame: 'Cornice', aura: 'Aura', emblem: 'Emblema', effect: 'Effetto' };
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   let K = 0;
+
+  /* ---------- premi aggiuntivi (shop-art-extra.js) ---------- */
+  const X = () => window.SHOP_EXTRA || null;
+  const isX = a => !!X() && /^x[pfaetx]_[a-z0-9_]+$/.test(a || '');
+  const xsvg = a => { try { return X().svg(a, { anim: fxOn() }) } catch (e) { return '' } };
+  /* colore dominante di ogni aura aggiuntiva (R,G,B): tinge lo sfondo dell'intestazione attorno al disegno */
+  const AUR = { xa_braci: '251,146,60', xa_druidica: '74,222,128', xa_gelida: '103,232,249', xa_tempesta: '129,140,248', xa_sacra: '253,224,120', xa_infernale: '225,29,116', xa_astrale: '147,130,255', xa_caos: '217,70,239', xa_galattica: '99,102,241', xa_singolarita: '245,158,11' };
 
   /* ---------- piccoli attrezzi SVG ---------- */
   const stops = a => a.map(([o, c, op]) => `<stop offset="${o}" stop-color="${c}"${op != null ? ` stop-opacity="${op}"` : ''}/>`).join('');
@@ -227,6 +235,7 @@ ${embers}`, 'sa-boss', '-10 -16 440 252');
     emblema_corona: ['#ffbf3a', '<path d="M5 29l3-16 7 7 5-11 5 11 7-7 3 16Z" fill="currentColor" fill-opacity=".3"/><path d="M5 33h30"/><circle cx="8" cy="13" r="2" fill="currentColor"/><circle cx="20" cy="9" r="2" fill="currentColor"/><circle cx="32" cy="13" r="2" fill="currentColor"/>']
   };
   function emblem(asset, rar) {
+    if (isX(asset)) return `<span class="tde xe ${rar || ''}" role="img" aria-hidden="true">${xsvg(asset)}</span>`;
     const e = EMB[asset] || ['#c8d0dc', '<circle cx="20" cy="20" r="10"/>'], g = 'g' + ++K;
     return `<svg class="tde ${rar || ''}" viewBox="0 0 40 40" role="img" aria-hidden="true" focusable="false"><defs>${lin(g, [[0, '#fff'], [1, e[0]]])}</defs><g color="${e[0]}" fill="none" stroke="url(#${g})" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${e[1]}</g></svg>`;
   }
@@ -249,7 +258,7 @@ ${embers}`, 'sa-boss', '-10 -16 440 252');
   const BIG = { pet_drago_apocalittico: 1 };
   const pet = (asset, px) => {
     const f = ART[asset];
-    return `<span class="tds-petbox${BIG[asset] ? ' boss' : ''}" style="--ps:${px || 110}px">${f ? f() : ''}</span>`;
+    return `<span class="tds-petbox${BIG[asset] ? ' boss' : ''}" style="--ps:${px || 110}px">${f ? f() : isX(asset) ? xsvg(asset) : ''}</span>`;
   };
 
   /* =============================== CSS =============================== */
@@ -311,6 +320,20 @@ ${embers}`, 'sa-boss', '-10 -16 440 252');
 .fx-fx_luce_pulsante::after{background:radial-gradient(70% 90% at 50% 50%,rgba(125,249,255,.22),transparent 70%);animation:tdspulse 3.2s ease-in-out infinite;box-shadow:inset 0 0 30px rgba(0,229,255,.25)}
 .fx-fx_braci::after{background-image:radial-gradient(2.4px 2.4px at 8% 96%,#ff7a30 50%,transparent 52%),radial-gradient(2px 2px at 24% 100%,#ffb347 50%,transparent 52%),radial-gradient(2.6px 2.6px at 44% 94%,#ff4d2e 50%,transparent 52%),radial-gradient(2px 2px at 62% 100%,#ffcf6a 50%,transparent 52%),radial-gradient(2.4px 2.4px at 80% 96%,#ff6a2a 50%,transparent 52%),radial-gradient(2px 2px at 94% 100%,#ffb347 50%,transparent 52%);background-size:100% 150px;background-repeat:repeat-y;animation:tdsrise2 4s linear infinite;filter:drop-shadow(0 0 4px rgba(255,90,40,.8))}
 
+/* premi aggiuntivi: cornici, aure, effetti (disegni 120×120 posti sopra/sotto l'avatar o sull'intestazione) */
+.tde.xe{display:inline-block}.tde.xe .xa{width:100%;height:100%}
+.tds-av.fr-x{margin:26px}.tds-xf{position:absolute;inset:-21%;pointer-events:none;z-index:2}.tds-xa{position:absolute;inset:-85%;pointer-events:none;z-index:-1}
+.sh-avw{position:relative;display:inline-block;flex:none}
+.au-x{overflow:hidden;background:radial-gradient(120% 120% at 20% 0%,rgba(var(--aur,255,255,255),.15),transparent 60%);box-shadow:0 0 26px rgba(var(--aur,255,255,255),.38),inset 0 0 22px rgba(var(--aur,255,255,255),.12);outline:1px solid rgba(var(--aur,255,255,255),.4)}
+.au-xa_singolarita{outline-color:rgba(245,158,11,.75);box-shadow:0 0 34px rgba(245,158,11,.5),0 0 60px rgba(126,34,206,.4),inset 0 0 26px rgba(126,34,206,.25)}
+.tds-xfx{position:absolute;inset:0;z-index:2;overflow:hidden;border-radius:inherit;pointer-events:none;display:flex;justify-content:space-around}
+.tds-xfx span{flex:0 0 auto;height:100%;aspect-ratio:1/1;display:block}.tds-xfx span:nth-child(even){transform:scaleX(-1)}
+.tds-title.tds-xt{text-transform:none;letter-spacing:0}
+.tt-divine{background:linear-gradient(90deg,#22d3ee,#a78bfa,#f472b6,#fde68a,#22d3ee);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:tdsshine 3s linear infinite;filter:drop-shadow(0 0 8px rgba(125,249,255,.6))}
+[data-fx=off] .tt-divine,[data-fx=off] .xt{animation:none!important}
+[data-fx=off] .xa,[data-fx=off] .xa *{animation:none!important}[data-fx=off] .xa .tw{opacity:.8;transform:none}
+[data-fx=off] .xa .fall:nth-child(3n+1){transform:translateY(26px)}[data-fx=off] .xa .fall:nth-child(3n+2){transform:translateY(64px)}[data-fx=off] .xa .fall:nth-child(3n){transform:translateY(100px)}
+
 /* emblemi e anteprime nello Shop */
 .sh-pv{display:grid;place-items:center;min-height:150px;border-radius:12px;background:radial-gradient(90% 90% at 50% 30%,rgba(255,255,255,.07),rgba(0,0,0,.35));border:1px solid rgba(255,255,255,.06);position:relative;overflow:hidden;padding:12px}
 .sh-pv .tds-petbox{--ps:118px}.sh-pv .tde{width:76px;height:76px}.sh-pv .tds-title{font-size:1.15rem;margin:0}
@@ -322,6 +345,10 @@ ${embers}`, 'sa-boss', '-10 -16 440 252');
   function init() {
     if (document.getElementById('tdsCss')) return;
     const s = document.createElement('style'); s.id = 'tdsCss'; s.textContent = CSS; document.head.appendChild(s);
+    if (X()) {
+      try { X().init() } catch (e) { }
+      X().items.forEach(it => { const a = ASSETS[it.cat]; if (a && a.indexOf(it.key) < 0) a.push(it.key) });
+    }
     let fx = 'on'; try { fx = localStorage.getItem('tempio.fx') || 'on'; } catch (e) { }
     document.documentElement.setAttribute('data-fx', fx);
   }
@@ -336,23 +363,31 @@ ${embers}`, 'sa-boss', '-10 -16 440 252');
   function head(p, eq, o) {
     o = o || {}; eq = eq || {};
     const h = o.h || 'h2', ps = o.petSize || 104;
-    const cls = ['tds-head', eq.aura ? 'has-au au-' + eq.aura.asset : '', eq.effect ? 'has-fx fx-' + eq.effect.asset : ''].join(' ');
-    const title = eq.title ? `<div><span class="tds-title tt-${eq.title.rarity} tt-${eq.title.asset}" title="${esc(eq.title.name)}">${esc(eq.title.name)}</span></div>` : '';
+    const ax = !!(eq.aura && isX(eq.aura.asset)), fx = !!(eq.effect && isX(eq.effect.asset)), frx = !!(eq.frame && isX(eq.frame.asset));
+    const cls = ['tds-head', eq.aura ? 'has-au au-' + eq.aura.asset + (ax ? ' au-x' : '') : '', eq.effect ? 'has-fx fx-' + eq.effect.asset + (fx ? ' fx-x' : '') : ''].join(' ');
+    const style = ax ? ` style="--aur:${AUR[eq.aura.asset] || '255,255,255'}"` : '';
+    const title = eq.title ? (isX(eq.title.asset)
+      ? `<div><span class="tds-title tds-xt" title="${esc(eq.title.name)}">${X().title(eq.title.asset, eq.title.name)}</span></div>`
+      : `<div><span class="tds-title tt-${eq.title.rarity} tt-${eq.title.asset}" title="${esc(eq.title.name)}">${esc(eq.title.name)}</span></div>`) : '';
     const emb = eq.emblem ? emblem(eq.emblem.asset, eq.emblem.rarity) : '';
-    return `<div class="${cls}"><div class="tds-av ${eq.frame ? 'fr-' + eq.frame.asset : ''}">${o.avatar || ''}</div>
-<div class="tds-id"><${h} class="${o.hcls || ''}"><span>${esc(p.nickname)}</span>${emb}</${h}>${title}<div class="tds-tags">${o.tag || ''}</div>${o.extra || ''}</div>${eq.pet ? `<div class="tds-pet" title="${esc(eq.pet.name)}">${pet(eq.pet.asset, ps)}</div>` : ''}</div>`;
+    const avIn = `${ax ? `<span class="tds-xa" aria-hidden="true">${xsvg(eq.aura.asset)}</span>` : ''}${o.avatar || ''}${frx ? `<span class="tds-xf" aria-hidden="true">${xsvg(eq.frame.asset)}</span>` : ''}`;
+    return `<div class="${cls}"${style}><div class="tds-av ${eq.frame ? 'fr-' + eq.frame.asset : ''}${frx ? ' fr-x' : ''}">${avIn}</div>
+<div class="tds-id"><${h} class="${o.hcls || ''}"><span>${esc(p.nickname)}</span>${emb}</${h}>${title}<div class="tds-tags">${o.tag || ''}</div>${o.extra || ''}</div>${eq.pet ? `<div class="tds-pet" title="${esc(eq.pet.name)}">${pet(eq.pet.asset, ps)}</div>` : ''}${fx ? fxLayer(eq.effect.asset) : ''}</div>`;
   }
+  const fxLayer = a => `<div class="tds-xfx" aria-hidden="true">${[0, 1, 2, 3, 4].map(() => `<span>${xsvg(a)}</span>`).join('')}</div>`;
 
   /* Anteprima di un premio del catalogo */
   function preview(it) {
-    const a = it.asset, c = it.category;
+    const a = it.asset, c = it.category, x = isX(a);
     if (c === 'pet') return `<div class="sh-pv">${pet(a, 118)}</div>`;
     if (c === 'emblem') return `<div class="sh-pv">${emblem(a, it.rarity)}</div>`;
-    if (c === 'title') return `<div class="sh-pv"><span class="tds-title tt-${it.rarity} tt-${a}">${esc(it.name)}</span></div>`;
+    if (c === 'title') return x ? `<div class="sh-pv"><span class="tds-title tds-xt">${X().title(a, it.name)}</span></div>` : `<div class="sh-pv"><span class="tds-title tt-${it.rarity} tt-${a}">${esc(it.name)}</span></div>`;
     const av = '<div class="sh-av">M</div>';
-    if (c === 'frame') return `<div class="sh-pv"><div class="tds-av fr-${a}" style="margin:14px">${av}</div></div>`;
-    if (c === 'aura') return `<div class="sh-pv"><div class="sh-mini au-${a}">${av}<span class="sh-nick">Marco</span></div></div>`;
-    return `<div class="sh-pv"><div class="sh-mini fx-${a}" style="background:rgba(255,255,255,.03)">${av}<span class="sh-nick">Marco</span></div></div>`;
+    if (c === 'frame') return `<div class="sh-pv"><div class="tds-av fr-${a}${x ? ' fr-x' : ''}" style="margin:${x ? 26 : 14}px">${av}${x ? `<span class="tds-xf" aria-hidden="true">${xsvg(a)}</span>` : ''}</div></div>`;
+    if (c === 'aura') return x
+      ? `<div class="sh-pv"><div class="sh-mini au-x au-${a}" style="--aur:${AUR[a] || '255,255,255'}"><span class="sh-avw"><span class="tds-xa" aria-hidden="true">${xsvg(a)}</span>${av}</span><span class="sh-nick">Marco</span></div></div>`
+      : `<div class="sh-pv"><div class="sh-mini au-${a}">${av}<span class="sh-nick">Marco</span></div></div>`;
+    return `<div class="sh-pv"><div class="sh-mini fx-${a}${x ? ' fx-x' : ''}" style="background:rgba(255,255,255,.03)">${av}<span class="sh-nick">Marco</span>${x ? fxLayer(a) : ''}</div></div>`;
   }
 
   window.TDS = { init, setFx, fxOn, RAR, RARS, CATS, CATN, ASSETS, pet, emblem, head, preview, eqMap };
