@@ -63,6 +63,7 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 <script src="black-market-shop.js?v=12"></script>
 <script src="black-market-notifiche.js?v=16"></script>
 <script src="black-market-caccia.js?v=15"></script>
+<script src="black-market-scommesse.js?v=2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 /* ============ CONFIGURAZIONE: incolla qui i due valori di Supabase (Project Settings > API) ============ */
@@ -74,7 +75,7 @@ const $app=document.getElementById('app'),$t=document.getElementById('toast');
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const BC=n=>Number(n||0).toLocaleString('it-IT')+' BC';
 const when=d=>new Date(d).toLocaleString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-const KIND={initial_bonus:'Bonus iniziale',bounty_stake:'Taglia pubblicata',bounty_payout:'Ricompensa riscossa',bounty_refund:'Quota restituita',participation_reward:'Partecipazione a evento',admin_adjustment:'Rettifica amministrativa',ladder_reward:'Vittoria in Ladder',shop_purchase:'Acquisto nello Shop'};
+const KIND={initial_bonus:'Bonus iniziale',bounty_stake:'Taglia pubblicata',bounty_payout:'Ricompensa riscossa',bounty_refund:'Quota restituita',participation_reward:'Partecipazione a evento',admin_adjustment:'Rettifica amministrativa',ladder_reward:'Vittoria in Ladder',shop_purchase:'Acquisto nello Shop',bet_stake:'Scommessa piazzata',bet_payout:'Scommessa vinta',bet_refund:'Puntata restituita',bet_reversal:'Scommessa ricalcolata'};
 const ROLE={user:'Duellante',organizer:'Organizzatore',moderator:'Moderatore',admin:'Amministratore'};
 let sb,me=null,wallet=0,P=new Map(),S={},tt;
 const SET_RANGE={game_level_cap:[100,9999]};   // impostazioni con un intervallo imposto (il database lo ricontrolla)
@@ -123,6 +124,7 @@ try{if(window.BM_MODULES)window.BM_MODULES(BM)}catch(e){console.error('Moduli ag
 try{if(window.BM_SHOP)window.BM_SHOP(BM)}catch(e){console.error('Shop non caricato',e)}
 try{if(window.BM_NOTIF)window.BM_NOTIF(BM)}catch(e){console.error('Notifiche non caricate',e)}
 try{if(window.BM_HUNT)window.BM_HUNT(BM)}catch(e){console.error('Caccia alle taglie non caricata',e)}
+try{if(window.BM_BETS)window.BM_BETS(BM)}catch(e){console.error('Scommesse non caricate',e)}
 R['']=async()=>{const[mw,fd,hero]=await Promise.all([q(sb.from('most_wanted_v').select('*').order('bounty_value',{ascending:false}).limit(5)),q(sb.from('market_feed_v').select('*').order('at',{ascending:false}).limit(24)),BM.dashHero?BM.dashHero():''/* profilo e statistiche (black-market-moduli.js) */]);
  const bn=fd.filter(f=>f.kind=='bounty').slice(0,6),cl=fd.filter(f=>f.kind=='claim').slice(0,5);
  shell(`<h1 class="t">Black <em>Market</em></h1><p class="sub">Metti una taglia sui tuoi rivali. Chi li sconfigge in un match ufficiale verificato riscuote il montepremi.</p>${hero}
