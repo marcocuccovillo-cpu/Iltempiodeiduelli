@@ -194,7 +194,7 @@ body.sm-tbl-on .pg{padding:4px 2px 8px;max-width:600px}
 .sm-last.chain{display:flex;gap:6px;align-items:center;padding:0 3px 0 10px;cursor:default;line-height:normal;border-color:var(--bad);background:rgba(255,84,104,.13)}
 .sm-last.chain .ct{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;font-weight:700;line-height:30px}
 .sm-last.chain button{flex:none;height:28px;min-width:88px;border-radius:9px;border:1.5px solid var(--bad);background:rgba(255,84,104,.28);color:#fff;font:700 .8rem var(--ui);cursor:pointer;padding:0 10px}
-.sm-badge.ch{left:-3px;bottom:-3px;background:var(--bad);color:#fff;font-size:9px}
+.sm-badge.fu{left:-3px;top:-3px;background:#ffe27a;color:#3a2600}.sm-badge.ch{left:-3px;bottom:-3px;background:var(--bad);color:#fff;font-size:9px}
 .sm-ch{display:grid;gap:5px;margin:8px 0 2px}
 .sm-ch>div{display:grid;grid-template-columns:36px 1fr auto;gap:8px;align-items:center;padding:5px 7px;border:1px solid var(--line);border-radius:10px;background:var(--surf);font-size:.86rem}
 .sm-ch>div.top{border-color:var(--bad);background:rgba(255,84,104,.12)}
@@ -506,7 +506,7 @@ function zoneBtn(B,side,zone,slot,label){const key=zone+':'+(zone==='emz'?0:side
  return `<button class="sm-z${pk?' pick':''}${pz}" data-zone="${zone}" data-side="${side}" data-slot="${slot}" aria-label="${esc(ZN[zone])} ${slot}${side===S.me.seat?'':' avversario'}${c?': '+(c.x!=null?ci(c.x).n:'carta coperta'):' libera'}">${c?cdHtml(c,B):label}</button>`}
 function pileBtn(B,side,kind){let inner='',n=0;const cnt=(S.counts[side]||{});
  if(kind==='deck'){n=cnt.deck||0;inner=n?`<span class="sm-cd sm-back"></span><span class="sm-badge c">${n}</span>`:'DECK'}
- else if(kind==='extra'){n=cnt.extra||0;inner=n?`<span class="sm-cd sm-back"></span><span class="sm-badge c">${n}</span>`:'EX'}
+ else if(kind==='extra'){n=cnt.extra||0;const fu=B.pile.extra[side].filter(x=>x.f===true).length;inner=n?`<span class="sm-cd sm-back"></span><span class="sm-badge c">${n}</span>`+(fu?`<span class="sm-badge fu" title="Carte scoperte nell’Extra Deck">👁${fu}</span>`:''):'EX'}
  else if(kind==='gy'){const a=B.pile.gy[side];n=a.length;inner=n?cdHtml(a[a.length-1],null,n)+(a.some(x=>isTg(x.i))&&!isTg(a[a.length-1].i)?'<span class="sm-badge tg" title="Bersaglio">🎯</span>':''):'GY'}
  return `<button class="sm-z" data-pile="${kind}" data-side="${side}" aria-label="${kind==='deck'?'Deck':kind==='extra'?'Extra Deck':'Cimitero'}${side===S.me.seat?'':' avversario'}: ${n} carte">${inner}</button>`}
 function rowMonsters(B,side){const me=side===S.me.seat,cells=[zoneBtn(B,side,'fz',1,'FZ'),...[1,2,3,4,5].map(i=>zoneBtn(B,side,'mz',i,'MZ')),pileBtn(B,side,'gy')];return `<div class="sm-row">${(me?cells:cells.reverse()).join('')}</div>`}
@@ -667,7 +667,7 @@ function openCard(c,back,quiet){
  const leave=()=>{add('☠ Cimitero',sendTo('gy'));add('🚫 Rimuovi',sendTo('banish',{face:true}));add('🂠 Rimuovi cop.',sendTo('banish',{face:false}))};
  if(c.z==='hand'&&mineCtrl){
   if(mon&&c.x!==0)fx(fxLbl(false));
-  if(mon){monRow('mz',true);if(c.x!=null&&isPend(info))add('🔱 Scala',()=>startPick('st','Tocca la Zona Magia/Trappola (le Scale sono le due estreme)',sl=>doMove(c.i,'st',{slot:sl,face:true})))}
+  if(mon){monRow('mz',true);if(c.x!=null&&isPend(info)){add('🔱 Scala',()=>startPick('st','Tocca la Zona Magia/Trappola (le Scale sono le due estreme)',sl=>doMove(c.i,'st',{slot:sl,face:true})));add('🔱 Extra scoperto',sendTo('extra',{face:true}))}}
   if(st&&!(unk&&mon))spellRow();
   leave();
   add('⬆ Cima deck',sendTo('deck',{top:true}));add('⬇ Fondo deck',sendTo('deck',{top:false}));add('🔀 Nel deck',sendTo('deck',{top:true,shuffle:true}));
@@ -691,10 +691,12 @@ function openCard(c,back,quiet){
   add('＋1 segnalino',async()=>{await call('sim_counter',{p_card:c.i,p_delta:1})},'ghost');add('−1 segnalino',async()=>{await call('sim_counter',{p_card:c.i,p_delta:-1})},'ghost');
   head('Lascia il campo');leave();
   add(exT?'⮌ Nell’Extra':'✋ In mano',sendTo(exT?'extra':'hand'));
+  if(c.x!=null&&isPend(info))add('🔱 Extra scoperto',sendTo('extra',{face:true}));
   if(!exT){add('⬆ Cima deck',sendTo('deck',{top:true}));add('⬇ Fondo deck',sendTo('deck',{top:false}))}}
  else if(fldz){
   head('Carta dell’avversario');tgt();leave();
   add('↩ In mano all’avv.',sendTo(exT?'extra':'hand'));
+  if(c.x!=null&&isPend(info))add('🔱 Extra scoperto dell’avv.',sendTo('extra',{face:true}));
   add('🎯 Prendi il controllo…',()=>startPick(c.z==='st'?'st':c.z==='fz'?'fz':'mz','Tocca la tua zona libera',sl=>doMove(c.i,c.z==='emz'?'mz':c.z,{slot:sl})),'ghost w2')}
  else if(c.z==='gy'||c.z==='banish'){
   if(own&&c.x!=null&&c.x!==0)fx(fxLbl(false));
@@ -703,6 +705,7 @@ function openCard(c,back,quiet){
   if(st&&!(unk&&mon)&&c.x!==0)spellRow();
   head('Altro');add('✋ In mano',sendTo('hand'));add('⬆ Cima deck',sendTo('deck',{top:true}));add('⬇ Fondo deck',sendTo('deck',{top:false}));
   if(exT)add('⮌ Nell’Extra',sendTo('extra'));
+  if(c.x!=null&&isPend(info))add('🔱 Extra scoperto',sendTo('extra',{face:true}));
   if(c.z==='gy')add('🚫 Rimuovi',sendTo('banish',{face:true}));else add('☠ Cimitero',sendTo('gy'));
   if(c.z==='banish'&&own)add(c.f?'🂠 Gira coperta':'👁 Gira scoperta',async()=>{await call('sim_set',{p_card:c.i,p_pos:null,p_face:!c.f});closeSheet()})}
  else if(c.z==='ovl'){
@@ -731,7 +734,7 @@ function deckCardSheet(e,back,afterMove){const c={i:e.i,o:S.me.seat,c:S.me.seat,
 function openPile(kind,side,quiet){const B=board(),me=S.me.seat,arr=B.pile[kind][side].slice().reverse(),cnt=(S.counts[side]||{})[kind];
  const title=`${kind==='gy'?'Cimitero':kind==='banish'?'Rimosse dal gioco':'Extra Deck'} di ${side===me?'te':nick(side)}`;
  const hidden=kind==='extra'&&side!==me?Math.max(0,(cnt||0)-arr.length):0;
- const nfd=kind==='banish'&&side===me?arr.filter(c=>c.f===false&&c.x!=null).length:0;
+ const nfd=(kind==='banish'||kind==='extra')&&side===me?arr.filter(c=>c.f===false&&c.x!=null).length:0;
  const sh=sheet(`${xBtn()}<h3>${esc(title)} <span class="mute">(${kind==='extra'&&side!==me?cnt:arr.length}${nfd?` · ${nfd} copert${nfd===1?'a':'e'}`:''})</span></h3>
   ${kind==='banish'?'<p class="sm-sub" style="margin:0;font-size:.76rem">Scoperte: le vedono entrambi · Coperte: solo il proprietario</p>':''}
   ${arr.length?`<div class="sm-grid c6">${arr.map(c=>`<button data-open="${c.i}" title="${esc(c.x!=null?ci(c.x).n:'carta coperta')}" aria-label="${esc(c.x!=null?ci(c.x).n:'carta coperta')}${c.f===false&&c.x!=null?' (coperta, la vedi solo tu)':''}"><span class="sm-cd${c.x==null?' sm-back':''}${c.f===false&&c.x!=null?' mine-fd':''}${isTg(c.i)?' tgt':''}">${c.x!=null?cardImg(c.x):''}</span>${isTg(c.i)?'<span class="sm-badge tg">🎯</span>':''}</button>`).join('')}</div>`:'<p class="empty" style="margin:8px 0">Nessuna carta.</p>'}
