@@ -240,6 +240,18 @@ body.sm-tbl-on .pg{padding:4px 2px 8px;max-width:600px}
 .sm-av img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
 .sm-av.xs{display:inline-grid;vertical-align:middle;width:30px;height:30px;font-size:.9rem;border-width:1.5px;margin-right:7px}
 .sm-av.s{width:40px;height:40px;font-size:1rem;margin:0 auto 4px}
+.sm-ck{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surf);cursor:pointer;font-size:.9rem;box-sizing:border-box}
+.sm-ck input{width:20px;height:20px;margin:0;accent-color:var(--ac);flex:none}
+.sm-ck.on{border-color:var(--ac)}
+.sm-ck.wide{display:flex;margin:6px 0}
+.sm-spr{padding:10px;border:1px solid var(--line);border-radius:12px;margin:6px 0;background:var(--inp)}
+.sm-spr .top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.sm-spr .cks{display:flex;flex-wrap:wrap;gap:6px}
+.sm-cl .m.sp small::before{content:"👁 "}
+.sm-ul{margin:0 0 10px;padding-left:18px;line-height:1.5}
+.sm-toast{pointer-events:none}
+.sm-tools button{min-width:0}
+@media(max-width:380px){.sm-tools{gap:4px}.sm-tools button{padding:0 2px;font-size:.74rem}}
 </style></head><body>
 
 <main class="pg">
@@ -266,6 +278,13 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 const num=v=>Number(v||0).toLocaleString('it-IT');
 function tblMode(on){document.documentElement.classList.toggle('sm-tbl-on',on);document.body.classList.toggle('sm-tbl-on',on);if(!on)LASTH=''}
 let LASTH='';
+let VS=1;   /* spettatore: il giocatore che vedo in basso */
+const SPEC=()=>!!(S&&S.me&&S.me.spec);
+const mineMsg=m=>SPEC()?(m.seat===0&&m.uid===S.me.user_id):(m.seat===S.me.seat);
+const chatName=m=>m.seat===0?(m.u||'Spettatore'):((S.players.find(x=>x.seat===m.seat)||{}).nickname||'?');
+const MASKS=[[1,'Mano'],[2,'Campo coperto'],[4,'Deck']];
+const maskTxt=m=>[m&1?'la sua mano':'',m&2?'le sue carte coperte sul campo':'',m&4?'il suo deck e l’Extra Deck':''].filter(Boolean).join(', ');
+const fixS=st=>{if(st&&st.me&&st.me.spec)st.me.seat=VS;return st};
 let sb=null,ME=null,HOME=null,LID=null,S=null,busy=false,view='',tmr=null,pollBusy=false,flash=null;
 
 /* ---------- dati carte (YGOPRODeck), in cache sul dispositivo ---------- */
@@ -341,12 +360,16 @@ async function impSave(temp){const d=IMP.d,name=(($('impName')||{}).value||d.nam
 
 /* ---------- pagina iniziale ---------- */
 async function loadHome(){HOME=await rpc('sim_home');if(HOME.mine&&!LID){LID=HOME.mine;await loadState();return}
+ if(HOME.watching&&!LID){LID=HOME.watching;await loadState();return}
  if(!LID){view='';renderHome()}}
 function deckRow(d,mode){
  return `<div class="sm-deck${mode&&mode.sel===d.id?' sel':''}"><div><b>${esc(d.name)}</b><small>Main ${d.main.length} · Extra ${d.extra.length} · Side ${d.side.length}${d.main.length<40?' · <span class="sm-bad">Main sotto le 40 carte</span>':''}</small></div>
  ${mode&&mode.pick?`<button class="btn sm${mode.sel===d.id?'':' ghost'}" data-pick="${d.id}" aria-pressed="${mode.sel===d.id}">${mode.sel===d.id?'Scelto ✓':'Usa'}</button>`:''}
  ${mode&&mode.manage?`<div class="acts"><button class="btn ghost" data-dren="${d.id}">Rinomina</button><button class="btn ghost" data-dan="${d.id}">Apri nel Deck Analyzer</button><button class="btn danger" data-ddel="${d.id}">Elimina</button></div>`:''}</div>`}
 function homeLobbies(){const L=HOME.lobbies;return L.length?L.map(l=>`<div class="sm-lob"><div><b>${esc(l.nickname)}</b>${l.title?` · ${esc(l.title)}`:''}<small>aspetta uno sfidante</small></div><button class="btn sm" data-join="${l.id}">Entra</button></div>`).join(''):'<p class="empty" style="margin:0">Nessuna lobby aperta. Creane una tu!</p>'}
+function homeLive(){const L=HOME.live||[];return L.length?L.map(l=>{const p=l.players||[],a=(p[0]||{}).nickname||'?',b=(p[1]||{}).nickname||'?';
+  const st=l.status==='siding'?'side deck':`duello ${l.game_no}/3`;
+  return `<div class="sm-lob"><div><b>${esc(a)}</b> contro <b>${esc(b)}</b>${l.title?` · ${esc(l.title)}`:''}<small>${st} · ${l.wins_1}–${l.wins_2} · 👁 ${l.watchers}</small></div><button class="btn sm ghost" data-watch="${l.id}">Guarda</button></div>`}).join(''):'<p class="empty" style="margin:0">Nessuna partita in corso da guardare.</p>'}
 function homeDecks(){return HOME.decks.length?HOME.decks.map(d=>deckRow(d,{manage:true})).join(''):'<p class="empty" style="margin:0">Non hai ancora deck. Importa una lista .ydk o apri un deck dal Deck Analyzer.</p>'}
 function homeRecent(){return HOME.recent.length?HOME.recent.map(r=>{const me=r.my_seat,w=r.winner_seat,res=r.end_reason==='forfeit'||r.end_reason==='abbandonata'?` · ${esc(r.end_reason==='forfeit'?'abbandono':'inattività')}`:'';
   const t=w==null?'Pareggio':(w===me?'Vittoria':'Sconfitta');return `<div class="sm-recent"><span><b>${t}</b> contro ${esc(r.opponent||'—')}${res}</span><span>${r.my_seat===1?r.wins_1:r.wins_2}–${r.my_seat===1?r.wins_2:r.wins_1}</span></div>`}).join(''):'<p class="empty" style="margin:0">Ancora nessun incontro.</p>'}
@@ -355,11 +378,12 @@ function renderHome(){view='home';tblMode(false);$('main').hidden=false;$('gate'
  if(v.dataset.k!=='home'){v.dataset.k='home';
   v.innerHTML=`<section class="card" style="margin-top:18px"><h2 class="sm-h">Gioca</h2>
   <div class="row"><input id="newT" maxlength="30" placeholder="Titolo della lobby (facoltativo)" style="flex:1;min-width:180px"><button class="btn" id="newL">Crea lobby</button></div>
-  <h3 class="sm-h" style="font-size:1rem">Lobby aperte</h3><div id="hL"></div></section>
+  <h3 class="sm-h" style="font-size:1rem">Lobby aperte</h3><div id="hL"></div>
+  <h3 class="sm-h" style="font-size:1rem;margin-top:16px">Partite da guardare</h3><div id="hW"></div></section>
   <section class="card" style="margin-top:12px"><h2 class="sm-h">I miei deck</h2><p class="sm-sub">La libreria è legata al tuo profilo: la ritrovi da qualsiasi dispositivo.</p><div id="hD" class="sm-list"></div></section>
   ${impUi('home')}
   <section class="card" style="margin-top:12px"><h2 class="sm-h">Ultimi incontri</h2><div id="hR"></div></section>`}
- $('hL').innerHTML=homeLobbies();$('hD').innerHTML=homeDecks();$('hR').innerHTML=homeRecent();
+ $('hL').innerHTML=homeLobbies();$('hW').innerHTML=homeLive();$('hD').innerHTML=homeDecks();$('hR').innerHTML=homeRecent();
  if(IMP)impPreview();
  const an=readAnalyzer();const b=$('impAn');if(b)b.hidden=!an;
  startPoll();if(flash)say(flash.t,flash.kind)}
@@ -373,7 +397,7 @@ function renderLobby(){view='lobby';tblMode(false);$('main').hidden=false;$('gat
   v.innerHTML=`<section class="card" style="margin-top:18px"><p class="kicker" id="lbT"></p><div id="lbP"></div>
   <p class="sm-sub" style="margin:10px 0 0">Si gioca al <b>meglio di 3</b>, con possibilità di fare side tra un duello e l’altro. Ognuno sceglie il suo deck e si segna <b>PRONTO</b>: poi l’host avvia la partita.</p></section>
   <section class="card" style="margin-top:12px"><h2 class="sm-h">Il tuo deck</h2><div id="lbD" class="sm-list"></div></section>
-  <div id="lbB" class="sm-big"></div>${impUi('lobby')}`}
+  <div id="lbS"></div><div id="lbB" class="sm-big"></div>${impUi('lobby')}`}
  if(IMP)impPreview();
  const me=myP(),op=oppP(),host=S.lobby.host_id===S.me.user_id;
  $('lbT').textContent=S.lobby.title?`Lobby · ${S.lobby.title}`:'Lobby';
@@ -386,6 +410,7 @@ function renderLobby(){view='lobby';tblMode(false);$('main').hidden=false;$('gat
   ${host?`<button class="btn" id="lbStart" ${both?'':'disabled'}>Avvia la partita</button>${op?'<button class="btn ghost" id="lbKick">Rimuovi lo sfidante</button>':''}`:`<p class="mute" style="text-align:center;margin:0">${both?'Aspetta che l’host avvii la partita…':'Quando siete entrambi PRONTI l’host può avviare.'}</p>`}
   <button class="btn danger" id="lbLeave">${host?'Chiudi la lobby':'Esci dalla lobby'}</button>`;
  if(!op)$('lbB').querySelector('#lbReady').title='Serve uno sfidante';
+ if(S.spec)$('lbS').innerHTML=`<section class="card" style="margin-top:12px"><label class="sm-ck wide${S.spec.open?' on':''}"><input type="checkbox" id="lbSpec" ${S.spec.open?'checked':''}><span>Consenti agli altri di guardare la partita</span></label><p class="sm-sub" style="margin:6px 0 0">Gli spettatori vedono solo il tavolo. Le tue carte nascoste le mostri soltanto a chi scegli tu, e puoi toglierlo quando vuoi.</p></section>`;
  startPoll();if(flash)say(flash.t,flash.kind)}
 
 /* ---------- scelta di chi inizia ---------- */
@@ -437,13 +462,15 @@ function renderEnd(){view='end';tblMode(false);$('main').hidden=false;$('gate').
  $('v').dataset.k='end';$('v').innerHTML=`<section class="card sm-res" style="margin-top:18px">${h}<div class="sm-big"><button class="btn gold" id="backHome">Torna alle lobby</button></div></section>`;stopPoll()}
 
 /* ---------- caricamento stato e polling ---------- */
-function codesOf(st){const c=[];(st.cards||[]).forEach(x=>{if(x.x>0)c.push(x.x)});(st.chain||[]).forEach(k=>{if(k.x>0)c.push(k.x)});(st.log||[]).forEach(e=>{const d=e.data||{};if(d.x>0)c.push(d.x);if(d.tx>0)c.push(d.tx);(d.codes||[]).forEach(x=>{if(x>0)c.push(x)})});return c}
-function applyState(st){if(!st||st.same)return false;const first=!S;S=st;needThen(codesOf(st));return true}
-async function loadState(){const st=await rpc('sim_state',{p_lobby:LID,p_since:null});S=st;needThen(codesOf(st));if(HOME===null||st.lobby.status==='lobby')await refreshHomeQuiet();render()}
+function codesOf(st){const c=[];(st.cards||[]).forEach(x=>{if(x.x>0)c.push(x.x)});(st.chain||[]).forEach(k=>{if(k.x>0)c.push(k.x)});Object.values(st.deckv||{}).forEach(a=>a.forEach(x=>{if(x>0)c.push(x)}));(st.log||[]).forEach(e=>{const d=e.data||{};if(d.x>0)c.push(d.x);if(d.tx>0)c.push(d.tx);(d.codes||[]).forEach(x=>{if(x>0)c.push(x)})});return c}
+function applyState(st){if(!st||st.same)return false;const first=!S;S=fixS(st);needThen(codesOf(st));return true}
+async function loadState(){const st=await rpc('sim_state',{p_lobby:LID,p_since:null});S=fixS(st);needThen(codesOf(st));if(HOME===null||st.lobby.status==='lobby')await refreshHomeQuiet();render()}
 async function refreshHomeQuiet(){try{HOME=await rpc('sim_home')}catch(_){}}
 function render(){
  if(!S){renderHome();updateFab();return}
  chatSync();sigSync();loadAv();
+ if(SPEC()){const s0=S.lobby.status,g0=S.game;if(s0==='playing'&&g0&&g0.status==='playing')renderTable();else renderWatchInfo();updateFab();return}
+ specNote();
  const st=S.lobby.status,g=S.game;
  if(st==='lobby')renderLobby();
  else if(st==='playing'&&g&&g.status==='choosing')renderChoose();
@@ -459,8 +486,8 @@ async function poll(){
  if(document.hidden||pollBusy||busy)return;pollBusy=true;
  try{
   if(LID){const st=await rpc('sim_state',{p_lobby:LID,p_since:S?S.v:null});if(applyState(st)){if(S.lobby.status==='lobby')await refreshHomeQuiet();render()}}
-  else{const h=await rpc('sim_home');const ch=JSON.stringify(h.lobbies)+JSON.stringify(h.recent);const old=HOME?JSON.stringify(HOME.lobbies)+JSON.stringify(HOME.recent):'';HOME=h;if(h.mine){LID=h.mine;await loadState();return}if(ch!==old&&view==='home'){$('hL').innerHTML=homeLobbies();$('hR').innerHTML=homeRecent()}}
- }catch(e){if(/Modulo non attivo/i.test(String(e.message)))gateOff();else if(/Non partecipi/.test(String(e.message))){LID=null;S=null;SDkey='';say('Non fai più parte di quella lobby.');await loadHome()}}
+  else{const h=await rpc('sim_home');const ch=JSON.stringify(h.lobbies)+JSON.stringify(h.recent)+JSON.stringify(h.live);const old=HOME?JSON.stringify(HOME.lobbies)+JSON.stringify(HOME.recent)+JSON.stringify(HOME.live):'';HOME=h;if(h.mine){LID=h.mine;await loadState();return}if(h.watching){LID=h.watching;await loadState();return}if(ch!==old&&view==='home'){$('hL').innerHTML=homeLobbies();$('hW').innerHTML=homeLive();$('hR').innerHTML=homeRecent()}}
+ }catch(e){if(/Modulo non attivo/i.test(String(e.message)))gateOff();else if(/Non partecipi/.test(String(e.message))){const was=SPEC();LID=null;S=null;SDkey='';SHOWN=null;closeSheet();tblMode(false);$('v').dataset.k='';say(was?'Non stai più guardando quella partita.':'Non fai più parte di quella lobby.');await loadHome()}}
  finally{pollBusy=false}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){clearInterval(tmr);tmr=null;poll();if(view)startPoll()}});
 
@@ -505,7 +532,7 @@ function zoneBtn(B,side,zone,slot,label){const key=zone+':'+(zone==='emz'?0:side
  const pz=zone==='st'&&(slot===1||slot===5)?' pz':'';
  return `<button class="sm-z${pk?' pick':''}${pz}" data-zone="${zone}" data-side="${side}" data-slot="${slot}" aria-label="${esc(ZN[zone])} ${slot}${side===S.me.seat?'':' avversario'}${c?': '+(c.x!=null?ci(c.x).n:'carta coperta'):' libera'}">${c?cdHtml(c,B):label}</button>`}
 function pileBtn(B,side,kind){let inner='',n=0;const cnt=(S.counts[side]||{});
- if(kind==='deck'){n=cnt.deck||0;inner=n?`<span class="sm-cd sm-back"></span><span class="sm-badge c">${n}</span>`:'DECK'}
+ if(kind==='deck'){n=cnt.deck||0;inner=n?`<span class="sm-cd sm-back"></span><span class="sm-badge c">${n}</span>`+(SPEC()&&(S.deckv||{})[side]?'<span class="sm-badge fu" title="Deck visibile">👁</span>':''):'DECK'}
  else if(kind==='extra'){n=cnt.extra||0;const fu=B.pile.extra[side].filter(x=>x.f===true).length;inner=n?`<span class="sm-cd sm-back"></span><span class="sm-badge c">${n}</span>`+(fu?`<span class="sm-badge fu" title="Carte scoperte nell’Extra Deck">👁${fu}</span>`:''):'EX'}
  else if(kind==='gy'){const a=B.pile.gy[side];n=a.length;inner=n?cdHtml(a[a.length-1],null,n)+(a.some(x=>isTg(x.i))&&!isTg(a[a.length-1].i)?'<span class="sm-badge tg" title="Bersaglio">🎯</span>':''):'GY'}
  return `<button class="sm-z" data-pile="${kind}" data-side="${side}" aria-label="${kind==='deck'?'Deck':kind==='extra'?'Extra Deck':'Cimitero'}${side===S.me.seat?'':' avversario'}: ${n} carte">${inner}</button>`}
@@ -515,10 +542,10 @@ function rowEmz(B){const me=S.me.seat,a=zoneBtn(B,0,'emz',1,'EMZ'),b=zoneBtn(B,0
  return `<div class="sm-row">${sp}${sp}${me===1?a:b}${sp}${me===1?b:a}${sp}${sp}</div>`}
 function barHtml(side,B){const me=side===S.me.seat,p=S.players.find(x=>x.seat===side)||{},cnt=S.counts[side]||{},g=S.game,lp=g.lp[side-1],turn=g.turn_seat===side;
  const bn=B.pile.banish[side].length,opn=esc(((oppP()||{}).nickname)||'l’avversario'),ms=sigNow(S.me.seat);
- const sg=me?`<div class="sm-sg"><button class="sm-sb${ms==='think'?' on':''}" data-a="sigThink" aria-pressed="${ms==='think'}" aria-label="Penso: avvisa ${opn} che stai pensando (tocca di nuovo per spegnere)" title="Penso"><i>🤔</i><b>Penso</b></button><button class="sm-sb ok${ms==='ok'?' on':''}" data-a="sigOk" aria-label="OK: avvisa ${opn} che puoi procedere" title="OK"><i>👍</i><b>OK</b></button></div>`
+ const sg=me&&!SPEC()?`<div class="sm-sg"><button class="sm-sb${ms==='think'?' on':''}" data-a="sigThink" aria-pressed="${ms==='think'}" aria-label="Penso: avvisa ${opn} che stai pensando (tocca di nuovo per spegnere)" title="Penso"><i>🤔</i><b>Penso</b></button><button class="sm-sb ok${ms==='ok'?' on':''}" data-a="sigOk" aria-label="OK: avvisa ${opn} che puoi procedere" title="OK"><i>👍</i><b>OK</b></button></div>`
   :`<div class="sm-sg" data-sigbox="${side}">${pillHtml(side)}</div>`;
- return `<div class="sm-bar${turn?' turn':''}"><div class="who">${avHtml(p,'xs')}${esc(p.nickname)}${me?'<small>tu</small>':''}${turn?'<small>● turno</small>':''}</div>${sg}
- <button class="sm-lp${lp<=2000?' low':''}" data-lp="${side}" aria-label="Punti vita di ${esc(p.nickname)}: ${lp}. Tocca per modificarli">${num(lp)}</button>
+ return `<div class="sm-bar${turn?' turn':''}"><div class="who">${avHtml(p,'xs')}${esc(p.nickname)}${me&&!SPEC()?'<small>tu</small>':''}${turn?'<small>● turno</small>':''}</div>${sg}
+ <button class="sm-lp${lp<=2000?' low':''}" data-lp="${side}" aria-label="Punti vita di ${esc(p.nickname)}: ${lp}${SPEC()?'':'. Tocca per modificarli'}">${num(lp)}</button>
  <div class="cnt"><span>Mano ${cnt.hand||0}</span><button data-pile="banish" data-side="${side}">Rimosse ${bn}${B.pile.banish[side].some(x=>isTg(x.i))?' 🎯':''}</button>${me?'':`<button data-pile="extra" data-side="${side}">Extra ${cnt.extra||0}</button>`}</div></div>`}
 function oppHand(B){const o=3-S.me.seat,n=(S.counts[o]||{}).hand||0,rev=S.cards.filter(c=>c.z==='hand'&&c.o===o);let h='';
  const show=Math.min(n,14);for(let i=0;i<show;i++){const r=rev[i];h+=r&&r.x!=null?`<span class="mc sm-cd" style="position:relative;width:18px;height:26px;display:block"><img src="${imgSrc(r.x)}" alt="" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover"></span>`:'<span class="mc sm-cd sm-back" style="position:relative;display:block"></span>'}
@@ -561,10 +588,12 @@ function logLine(e){const d=e.data||{},who=`<b>${esc(nick(e.seat))}</b>`,z=k=>ZN
   case 'target':{const hid=d.x==null?'una carta coperta':cardName(d.x),own=d.o!==e.seat?` (di ${esc(nick(d.o))})`:'';
    return d.on?`${who} sceglie come <b>bersaglio</b> ${hid}${own} — ${z(d.z)}.`:`${who} toglie il bersaglio da ${hid}${own}.`}
   case 'target_clear':return `${who} toglie tutti i bersagli.`;
+  case 'spec':{const w=d.all?'tutti gli spettatori':`<b>${esc(d.n||'uno spettatore')}</b>`;return d.m?`${who} permette a ${w} di vedere ${maskTxt(d.m)}.`:`${who} toglie a ${w} il permesso di vedere le sue carte nascoste.`}
   default:return esc(e.kind)}}
 function lastLog(){const l=S.log;return l.length?l[l.length-1]:null}
 
 function renderTable(){
+ if(SPEC())return renderWatchTable();
  view='table';tblMode(true);$('main').hidden=false;$('gate').hidden=true;
  const g=S.game,me=S.me.seat,op=3-me,B=board(),mine=g.turn_seat===me,hand=S.cards.filter(c=>c.z==='hand'&&c.o===me).sort((a,b)=>a.k-b.k),pe=g.pending_end,pr=g.proposal;
  const old=document.querySelector('.sm-hand');if(old)lastHandScroll=old.scrollLeft;
@@ -583,7 +612,7 @@ function renderTable(){
  <div class="sm-mid"><span>Duello ${g.no}/3 · ${num(sc[me-1])}–${num(sc[op-1])} · Turno ${g.turn_no} · ${mine?'<b style="color:var(--ac2)">tocca a te</b>':`tocca a ${esc(nick(op))}`}</span></div>
  ${lastH}
  <div class="sm-dock">${pick}<div class="sm-ph" role="group" aria-label="Fasi del turno">${PH.map(p=>`<button data-ph="${p[0]}" class="${g.phase===p[0]?'on':''}" ${mine?'':'disabled'} aria-label="${p[2]}" aria-pressed="${g.phase===p[0]}">${p[1]}</button>`).join('')}<button class="end" data-a="endTurn" ${mine?'':'disabled'}>Fine turno</button></div>
- <div class="sm-tools"><button data-a="draw1">Pesca</button><button data-a="deckMenu">Deck…</button><button data-a="shuffleHand" aria-label="Mischia la tua mano" title="Mischia la tua mano">🔀 Mano</button><button data-a="chat" aria-label="Chat con ${esc(nick(op))}${un?`, ${un} non lett${un===1?'o':'i'}`:''}">💬 Chat${un?`<em class="sm-bdg">${un>9?'9+':un}</em>`:''}</button><button data-a="more">Altro…</button></div>
+ <div class="sm-tools"><button data-a="draw1">Pesca</button><button data-a="deckMenu">Deck…</button><button data-a="shuffleHand" aria-label="Mischia la tua mano" title="Mischia la tua mano">🔀 Mano</button><button data-a="chat" aria-label="Chat con ${esc(nick(op))}${un?`, ${un} non lett${un===1?'o':'i'}`:''}">💬 Chat${un?`<em class="sm-bdg">${un>9?'9+':un}</em>`:''}</button>${S.spec&&S.spec.list.length?`<button data-a="spec" aria-label="Spettatori: ${S.spec.list.length}" title="Spettatori">👁 ${S.spec.list.length}</button>`:''}<button data-a="more">Altro…</button></div>
  <div class="sm-hand" id="hand" aria-label="La tua mano">${hand.length?hand.map(c=>`<button class="sm-hc${c.r?' rev':''}" data-hand="${c.i}" aria-label="${esc(ci(c.x).n)}">${cdHtml(c,null)}</button>`).join(''):'<span class="mute" style="padding:18px 8px">Mano vuota</span>'}</div></div>${ban}</div>`;
  const v=$('v');
  if(v.dataset.k!=='table'||LASTH!==html){v.dataset.k='table';LASTH=html;v.innerHTML=html;const hd=$('hand');if(hd)hd.scrollLeft=lastHandScroll;fitTable()}
@@ -610,7 +639,123 @@ function reopen2(s){
  if(s.kind==='card'){const c=S.cards.find(x=>x.i===s.id);if(c)openCard(c,s.back,true);else closeSheet()}
  else if(s.kind==='pile'){openPile(s.pile,s.side,true)}
  else if(s.kind==='log')openLog(true)
+ else if(s.kind==='spec'){SPEC()?specInfoSheet():specSheet()}
+ else if(s.kind==='deckro')deckRO(s.side,true)
  else if(s.kind==='chain')chainSheet()}
+
+/* =====================================================================
+   SPETTATORI
+   ===================================================================== */
+let SPECSEEN=null;
+/* ai giocatori avviso quando qualcuno comincia a guardare (nessuno guarda di nascosto) */
+function specNote(){if(!S||SPEC()||!S.spec){SPECSEEN=null;return}
+ const ids=S.spec.list.map(s=>s.u);
+ if(SPECSEEN&&SPECSEEN.lid===LID)S.spec.list.filter(s=>!SPECSEEN.ids.includes(s.u)).forEach(s=>toast(`👁 ${s.nickname} sta guardando la partita`,true));
+ SPECSEEN={lid:LID,ids}}
+async function leaveWatch(){const l=LID;try{await rpc('sim_watch_leave',{p_lobby:l})}catch(_){}say('Hai smesso di guardare la partita.');await goHome()}
+
+/* schermata dello spettatore quando non c'è un duello da mostrare (scelta di chi inizia, side deck, fine incontro) */
+function renderWatchInfo(){view='watchinfo';tblMode(false);$('main').hidden=false;$('gate').hidden=true;
+ const l=S.lobby,g=S.game,nm=s=>esc((S.players.find(x=>x.seat===s)||{}).nickname||'?'),fin=l.status==='finished'||l.status==='cancelled';
+ let msg;
+ if(l.status==='playing'&&g&&g.status==='choosing')msg=`<b>${nm(g.chooser)}</b> sta scegliendo chi inizia il duello ${g.no}.`;
+ else if(l.status==='siding')msg=`I giocatori stanno preparando il side deck per il duello ${l.game_no+1}.`;
+ else if(fin)msg=l.winner!=null?`Incontro concluso: vince <b>${nm(l.winner)}</b>.`:'Incontro concluso.';
+ else msg='La partita sta per cominciare.';
+ const v=$('v');v.dataset.k='watchinfo';
+ v.innerHTML=`<section class="card" style="margin-top:18px"><p class="kicker">Stai guardando</p><h2 class="sm-h" style="overflow-wrap:anywhere">${nm(1)} <span class="mute">contro</span> ${nm(2)}</h2>
+  <p style="font-size:1.4rem;margin:6px 0"><b>${l.wins[0]}–${l.wins[1]}</b></p><p style="margin:0 0 8px">${msg}</p>
+  <p class="sm-sub" style="margin:0">Vedi il tavolo come lo vedrebbe chi guarda da fuori. I giocatori possono darti il permesso di vedere le loro carte nascoste. Puoi scrivere nella chat (il pulsante 💬).</p></section>
+  <div class="sm-big"><button class="btn ghost" id="wInfoB">👁 Spettatori e permessi</button><button class="btn danger" id="wLeave">${fin?'Torna alla home':'Smetti di guardare'}</button></div>`;
+ startPoll();if(flash)say(flash.t,flash.kind)}
+
+/* il tavolo visto da spettatore: stesse caselle dei giocatori, ma solo lettura */
+function renderWatchTable(){
+ view='table';tblMode(true);$('main').hidden=false;$('gate').hidden=true;
+ const g=S.game,me=S.me.seat,op=3-me,B=board(),pe=g.pending_end,pr=g.proposal,sc=S.lobby.wins,mk=S.me.mk||[0,0];
+ const old=document.querySelector('.sm-hand');if(old)lastHandScroll=old.scrollLeft;
+ const ll=lastLog();
+ let ban='';
+ if(pe)ban+=`<div class="sm-ban"><div><b>${pe.reason==='lp'?'Punti vita a zero':'Mazzo vuoto'}</b> — ${pe.loser===0?'pareggio':`${esc(nick(pe.loser))} perde il duello`}. I giocatori devono confermare.</div></div>`;
+ if(pr)ban+=`<div class="sm-ban"><div><b>${esc(nick(pr.by))}</b> propone ${pr.kind==='draw'?'il <b>pareggio</b>':'di <b>vincere per effetto di una carta</b>'}${pr.reason?`: «${esc(pr.reason)}»`:''}.</div></div>`;
+ const un=chatUnread(),ns=(S.spec&&S.spec.list.length)||0;
+ const chn=S.chain||[],topc=chn.filter(k=>!k.res).pop();
+ const lastH=topc?`<div class="sm-last chain" role="group" aria-label="Catena in corso"><span class="ct" data-a="chain" role="button" tabindex="0">⛓ <b>Catena ${chn.length}</b> · ${cardName(topc.x)}${chn.some(k=>k.res)?` <small>(${chn.filter(k=>k.res).length} risolt${chn.filter(k=>k.res).length===1?'o':'i'})</small>`:''}</span></div>`
+  :`<div class="sm-last" data-a="openLog" role="button" tabindex="0" aria-label="Apri il registro del duello">📜 ${ll?logLine(ll):'—'}</div>`;
+ const n=(S.counts[me]||{}).hand||0,known=S.cards.filter(c=>c.z==='hand'&&c.o===me).sort((a,b)=>a.k-b.k);
+ let hh=known.map(c=>`<button class="sm-hc${c.r?' rev':''}" data-hand="${c.i}" aria-label="${esc(c.x!=null?ci(c.x).n:'carta')}">${cdHtml(c,null)}</button>`).join('');
+ for(let i=known.length;i<n;i++)hh+=`<span class="sm-hc" aria-hidden="true" style="cursor:default"><span class="sm-cd sm-back"></span></span>`;
+ if(!n)hh='<span class="mute" style="padding:18px 8px">Mano vuota</span>';
+ const html=`<div class="sm-t sm-w">
+ ${barHtml(op,B)}${oppHand(B)}<div class="sm-board">${rowSpells(B,op)}${rowMonsters(B,op)}${rowEmz(B)}${rowMonsters(B,me)}${rowSpells(B,me)}</div>${barHtml(me,B)}
+ <div class="sm-mid"><span>Duello ${g.no}/3 · ${num(sc[me-1])}–${num(sc[op-1])} · Turno ${g.turn_no} · tocca a <b style="color:var(--ac2)">${esc(nick(g.turn_seat))}</b>${mk[0]||mk[1]?' · <b title="Hai il permesso di vedere carte nascoste">🔓</b>':''}</span></div>
+ ${lastH}
+ <div class="sm-dock"><div class="sm-ph" role="group" aria-label="Fasi del turno">${PH.map(p=>`<button disabled class="${g.phase===p[0]?'on':''}" aria-label="${p[2]}" aria-pressed="${g.phase===p[0]}">${p[1]}</button>`).join('')}<button class="end" disabled>Turno ${g.turn_no}</button></div>
+ <div class="sm-tools"><button data-a="openLog" aria-label="Registro del duello" title="Registro">Registro</button><button data-a="chat" aria-label="Chat della partita${un?`, ${un} non lett${un===1?'o':'i'}`:''}">💬 Chat${un?`<em class="sm-bdg">${un>9?'9+':un}</em>`:''}</button><button data-a="flip" aria-label="Gira il tavolo: guarda dalla parte di ${esc(nick(op))}" title="Gira il tavolo">🔄 Gira</button><button data-a="wInfo" aria-label="Spettatori e permessi: ${ns}" title="Spettatori">👁 ${ns}</button><button data-a="wLeave" aria-label="Smetti di guardare" title="Esci">Esci</button></div>
+ <div class="sm-hand" id="hand" aria-label="Mano di ${esc(nick(me))}">${hh}</div></div>${ban}</div>`;
+ const v=$('v');
+ if(v.dataset.k!=='table'||LASTH!==html){v.dataset.k='table';LASTH=html;v.innerHTML=html;const hd=$('hand');if(hd)hd.scrollLeft=lastHandScroll;fitTable()}
+ restartPoll();
+ sigTick();
+ fxSync();
+ if(SHOWN)reopen()}
+function watchClick(t){
+ const z=t.closest('[data-zone]');
+ if(z){const zone=z.dataset.zone,c=board().M[zone+':'+(zone==='emz'?0:+z.dataset.side)+':'+z.dataset.slot];if(c)openCardRO(c);return}
+ const p=t.closest('[data-pile]');
+ if(p){const kind=p.dataset.pile,side=+p.dataset.side;if(kind==='deck')deckRO(side);else openPile(kind,side);return}
+ const h=t.closest('[data-hand]');if(h){const c=S.cards.find(x=>x.i===+h.dataset.hand);if(c)openCardRO(c);return}
+ const a=t.closest('[data-a]');if(a){const k=a.dataset.a;
+  if(k==='openLog')openLog();
+  else if(k==='chat')openChat();
+  else if(k==='chain')chainSheet();
+  else if(k==='flip'){VS=3-VS;S.me.seat=VS;LASTH='';closeSheet();render()}
+  else if(k==='wInfo')specInfoSheet();
+  else if(k==='wLeave')act(a,leaveWatch)}}
+function openCardRO(c,back){const x=c.x;
+ const where=`${ZN[c.z]||c.z} di ${esc(nick(c.c))}`+(c.o!==c.c?` (carta di ${esc(nick(c.o))})`:'');
+ const st=[];
+ if(c.z==='mz'||c.z==='emz')st.push(c.f?(c.p==='def'?'in difesa':'in attacco'):'coperta in difesa');
+ else if(c.z==='st'||c.z==='fz')st.push(c.f?'scoperta':'coperta');
+ else if(c.f===false&&c.z!=='hand'&&c.z!=='deck')st.push('coperta');
+ if(c.n>0)st.push(`${c.n} segnalini`);
+ const body=x==null?`<div class="sm-cinfo"><span class="sm-cd sm-back ph" style="position:relative;display:block"></span><div><p>Carta coperta: la vede solo il suo giocatore, a meno che non ti abbia dato il permesso.</p></div></div>`:infoBlock(x);
+ sheet(`${xBtn(back)}<h3>${x==null?'Carta coperta':x===0?'Segnalino':esc(ci(x).n)}</h3>${body}<p class="sm-sub" style="margin:8px 0 0">${where}${st.length?' · '+st.join(' · '):''}</p>`,{label:'Carta'});
+ SHOWN={kind:'card',id:c.i,back}}
+/* il deck di un giocatore, solo se ha dato il permesso: dalla cima al fondo */
+function deckRO(side,quiet){const d=(S.deckv||{})[side];
+ if(!d){toast(`${nick(side)} ha ${(S.counts[side]||{}).deck||0} carte nel deck`,true);return}
+ const sh=sheet(`${xBtn()}<h3>Deck di ${esc(nick(side))} <span class="mute">(${d.length})</span></h3><p class="sm-sub" style="margin:0 0 8px;font-size:.8rem">Dalla cima al fondo. Te lo ha mostrato il giocatore.</p>
+  <div class="sm-grid c6">${d.map((x,i)=>`<button data-dk="${i}" title="${esc(ci(x).n)}" aria-label="${i+1}ª carta: ${esc(ci(x).n)}"><span class="sm-cd">${cardImg(x)}</span><span class="sm-badge c">${i+1}</span></button>`).join('')}</div>`,{label:'Deck'});
+ SHOWN={kind:'deckro',side};
+ sh.querySelectorAll('[data-dk]').forEach(b=>b.onclick=()=>openCardRO({i:-1,x:d[+b.dataset.dk],z:'deck',c:side,o:side,f:false,n:0},()=>deckRO(side)))}
+/* spettatore: chi guarda e cosa posso vedere */
+function specInfoSheet(){const sp=S.spec,mk=S.me.mk||[0,0];
+ const per=[1,2].map(s=>`<li><b>${esc(nick(s))}</b>: ${mk[s-1]?esc(maskTxt(mk[s-1])):'solo il tavolo'}</li>`).join('');
+ sheet(`${xBtn()}<h3>👁 Spettatori (${sp.list.length})</h3>
+  <p class="sm-sub" style="margin:0 0 4px">Cosa puoi vedere di nascosto:</p><ul class="sm-ul">${per}</ul>
+  <p class="sm-sub" style="margin:0 0 10px">Sono i giocatori a decidere. Se vuoi vedere di più, chiediglielo in chat.</p>
+  <h4 style="margin:0 0 4px">Chi sta guardando</h4><ul class="sm-ul">${sp.list.map(s=>`<li>${esc(s.nickname)}${s.u===S.me.user_id?' <span class="chip">Tu</span>':''}${(s.g[0]||s.g[1]||sp.all[0]||sp.all[1])?' <small class="mute">🔓 ha permessi</small>':''}</li>`).join('')}</ul>`,{label:'Spettatori'});
+ SHOWN={kind:'spec'}}
+/* giocatore: chi guarda e cosa gli mostro */
+function specSheet(){const sp=S.spec,me=S.me.seat,allm=sp.all[me-1];
+ const ck=(who,bit,cur,inh)=>{const on=((cur|inh)&bit)!==0;return `<label class="sm-ck${on?' on':''}"><input type="checkbox" data-gs="${who}" data-bit="${bit}" ${on?'checked':''} ${(inh&bit)?'disabled':''}><span>${MASKS.find(m=>m[0]===bit)[1]}</span></label>`};
+ const row=s=>`<div class="sm-spr"><div class="top"><b style="overflow-wrap:anywhere">${esc(s.nickname)}</b><button class="btn sm danger" data-kick="${s.u}" aria-label="Allontana ${esc(s.nickname)}">Allontana</button></div><div class="cks">${MASKS.map(m=>ck(s.u,m[0],s.g[me-1],allm)).join('')}</div></div>`;
+ const sh=sheet(`${xBtn()}<h3>👁 Spettatori (${sp.list.length})</h3>
+  <p class="sm-sub" style="margin:0 0 8px">Chi guarda vede solo il tavolo. Qui decidi se mostrare le TUE carte nascoste: mano, carte coperte sul campo e nei cimiteri, deck ed Extra Deck. Puoi togliere il permesso quando vuoi e tutti vedono chi lo ha.</p>
+  <label class="sm-ck wide${sp.open?' on':''}"><input type="checkbox" id="spOpen" ${sp.open?'checked':''}><span>Partita aperta agli spettatori</span></label>
+  <h4 style="margin:12px 0 4px">Tutti gli spettatori</h4><div class="sm-spr"><div class="cks">${MASKS.map(m=>ck('all',m[0],allm,0)).join('')}</div></div>
+  <h4 style="margin:12px 0 4px">Singoli spettatori</h4>${sp.list.length?sp.list.map(row).join(''):'<p class="empty" style="margin:0">Nessuno sta guardando.</p>'}
+  <p class="sm-sub" style="margin:10px 0 0;font-size:.8rem">Attenzione: chi vede la tua mano potrebbe riferirla all’avversario scrivendo in chat.</p>`,{label:'Spettatori'});
+ SHOWN={kind:'spec'};
+ sh.querySelectorAll('[data-gs]').forEach(i=>i.onchange=()=>act(null,async()=>{const who=i.dataset.gs,bit=+i.dataset.bit,
+   cur=who==='all'?allm:((sp.list.find(s=>s.u===who)||{g:[0,0]}).g[me-1]),nm=i.checked?(cur|bit):(cur&~bit);
+   try{const st=await rpc('sim_spec_grant',{p_lobby:LID,p_spectator:who==='all'?null:who,p_mask:nm});applyState(st);render();specSheet()}
+   catch(er){specSheet();throw er}}));
+ sh.querySelectorAll('[data-kick]').forEach(b=>b.onclick=()=>{const s=sp.list.find(x=>x.u===b.dataset.kick);if(!s)return;
+  confirmSheet('Allontanare lo spettatore?',`<b>${esc(s.nickname)}</b> non potrà più guardare questa partita.`,'Allontana',async()=>{try{const st=await rpc('sim_spec_kick',{p_lobby:LID,p_spectator:s.u});applyState(st);render()}finally{specSheet()}})});
+ $('spOpen').onchange=e=>{const on=e.target.checked,go=async()=>{try{const st=await rpc('sim_spec_open',{p_lobby:LID,p_open:on});applyState(st);render()}finally{specSheet()}};
+  if(!on&&sp.list.length){e.target.checked=true;confirmSheet('Chiudere agli spettatori?','Chi sta guardando uscirà dalla partita e i permessi concessi decadranno.','Chiudi',go)}else act(null,go)}}
 
 /* ---------- pesca, fasi, fine turno ---------- */
 async function call(fn,args,quiet){const st=await rpc(fn,Object.assign({p_lobby:LID},args||{}));if(st&&st.lobby){applyState(st);render()}return st}
@@ -637,6 +782,7 @@ function atkPick(c){const me=S.me.seat,ok=x=>(x.z==='mz'||x.z==='emz')&&x.c!==me
 const freeEmz=B=>[1,2].some(n=>!B.M['emz:0:'+n]);
 async function declare(c){FXHINT=c.i;closeSheet();await call('sim_activate',{p_card:c.i})}
 function openCard(c,back,quiet){
+ if(SPEC())return openCardRO(c,back);
  const me=S.me.seat,info=c.x!=null?ci(c.x):{t:'Effect Monster',r:'',n:''},unk=!!info.u,mon=isMon(info)||c.x==null||c.x===0||unk,st=isSpell(info)||isTrap(info)||c.x==null||unk,mineCtrl=c.c===me,fldz=['mz','emz','st','fz'].includes(c.z);
  const items=[];const add=(l,fn,o)=>items.push(B_(l,fn,o));const head=h=>items.push({h});
  const B=board(),mats=B.ovl[c.i]||[],exT=c.x!=null&&isExtraT(info),nm=c.x!=null?ci(c.x).n:'la carta',own=c.o===me;
@@ -732,12 +878,12 @@ function deckCardSheet(e,back,afterMove){const c={i:e.i,o:S.me.seat,c:S.me.seat,
 
 /* ---------- pile: cimitero, rimosse, extra ---------- */
 function openPile(kind,side,quiet){const B=board(),me=S.me.seat,arr=B.pile[kind][side].slice().reverse(),cnt=(S.counts[side]||{})[kind];
- const title=`${kind==='gy'?'Cimitero':kind==='banish'?'Rimosse dal gioco':'Extra Deck'} di ${side===me?'te':nick(side)}`;
- const hidden=kind==='extra'&&side!==me?Math.max(0,(cnt||0)-arr.length):0;
- const nfd=(kind==='banish'||kind==='extra')&&side===me?arr.filter(c=>c.f===false&&c.x!=null).length:0;
- const sh=sheet(`${xBtn()}<h3>${esc(title)} <span class="mute">(${kind==='extra'&&side!==me?cnt:arr.length}${nfd?` · ${nfd} copert${nfd===1?'a':'e'}`:''})</span></h3>
+ const own=side===me&&!SPEC(),title=`${kind==='gy'?'Cimitero':kind==='banish'?'Rimosse dal gioco':'Extra Deck'} di ${own?'te':nick(side)}`;
+ const hidden=kind==='extra'&&!own?Math.max(0,(cnt||0)-arr.length):0;
+ const nfd=(kind==='banish'||kind==='extra')&&(own||SPEC())?arr.filter(c=>c.f===false&&c.x!=null).length:0;
+ const sh=sheet(`${xBtn()}<h3>${esc(title)} <span class="mute">(${kind==='extra'&&!own?cnt:arr.length}${nfd?` · ${nfd} copert${nfd===1?'a':'e'}`:''})</span></h3>
   ${kind==='banish'?'<p class="sm-sub" style="margin:0;font-size:.76rem">Scoperte: le vedono entrambi · Coperte: solo il proprietario</p>':''}
-  ${arr.length?`<div class="sm-grid c6">${arr.map(c=>`<button data-open="${c.i}" title="${esc(c.x!=null?ci(c.x).n:'carta coperta')}" aria-label="${esc(c.x!=null?ci(c.x).n:'carta coperta')}${c.f===false&&c.x!=null?' (coperta, la vedi solo tu)':''}"><span class="sm-cd${c.x==null?' sm-back':''}${c.f===false&&c.x!=null?' mine-fd':''}${isTg(c.i)?' tgt':''}">${c.x!=null?cardImg(c.x):''}</span>${isTg(c.i)?'<span class="sm-badge tg">🎯</span>':''}</button>`).join('')}</div>`:'<p class="empty" style="margin:8px 0">Nessuna carta.</p>'}
+  ${arr.length?`<div class="sm-grid c6">${arr.map(c=>`<button data-open="${c.i}" title="${esc(c.x!=null?ci(c.x).n:'carta coperta')}" aria-label="${esc(c.x!=null?ci(c.x).n:'carta coperta')}${c.f===false&&c.x!=null?(SPEC()?' (coperta, hai il permesso di vederla)':' (coperta, la vedi solo tu)'):''}"><span class="sm-cd${c.x==null?' sm-back':''}${c.f===false&&c.x!=null?' mine-fd':''}${isTg(c.i)?' tgt':''}">${c.x!=null?cardImg(c.x):''}</span>${isTg(c.i)?'<span class="sm-badge tg">🎯</span>':''}</button>`).join('')}</div>`:'<p class="empty" style="margin:8px 0">Nessuna carta.</p>'}
   ${hidden?`<p class="mute" style="font-size:.8rem;margin:6px 0 0">Altre ${hidden} carte coperte che non puoi vedere.</p>`:''}`,{label:title});
  SHOWN={kind:'pile',pile:kind,side};
  sh.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const c=S.cards.find(x=>x.i===+b.dataset.open);if(c)openCard(c,()=>openPile(kind,side))})}
@@ -789,11 +935,11 @@ function lpSheet(side){const p=S.players.find(x=>x.seat===side),cur=S.game.lp[si
 
 /* ---------- registro e annunci ---------- */
 function openLog(quiet){const log=S.log.slice().reverse();
- const sh=sheet(`${xBtn()}<h3>Registro del duello</h3><div class="sm-say"><input id="sayT" maxlength="140" placeholder="Annuncia (es. «Attivo Raigeki»)" enterkeyhint="send"><button class="btn" id="sayB">Invia</button></div>
+ const sh=sheet(`${xBtn()}<h3>Registro del duello</h3>${SPEC()?'':'<div class="sm-say"><input id="sayT" maxlength="140" placeholder="Annuncia (es. «Attivo Raigeki»)" enterkeyhint="send"><button class="btn" id="sayB">Invia</button></div>'}
   <div class="sm-log">${log.map(e=>`<div>${logLine(e)}</div>`).join('')||'<p class="empty">Ancora nulla.</p>'}</div>`,{label:'Registro'});
  SHOWN={kind:'log'};
  const send=()=>{const t=$('sayT').value.trim();if(!t)return;act($('sayB'),async()=>{$('sayT').value='';await call('sim_say',{p_text:t});openLog(true)})};
- $('sayB').onclick=send;$('sayT').onkeydown=e=>{if(e.key==='Enter')send()}}
+ if($('sayB')){$('sayB').onclick=send;$('sayT').onkeydown=e=>{if(e.key==='Enter')send()}}}
 
 /* ---------- altro ---------- */
 function moreSheet(){const g=S.game;
@@ -801,12 +947,14 @@ function moreSheet(){const g=S.game;
   <button class="btn ghost" data-m="coin:1">🪙 Moneta</button><button class="btn ghost" data-m="coin:3">🪙 3 monete</button><button class="btn ghost" data-m="dice:1">🎲 Dado</button>
   <button class="btn ghost" data-m="dice:2">🎲 2 dadi</button><button class="btn ghost" data-m="token">◯ Segnalino</button><button class="btn ghost" data-m="tokenx">◯ Segn. Extra</button>
   <button class="btn ghost full" data-m="tclear" ${(S.targets||[]).length?'':'disabled'}>🎯 Togli tutti i bersagli${(S.targets||[]).length?` (${S.targets.length})`:''}</button>
+  <button class="btn ghost full" data-m="spec">👁 Spettatori${S.spec&&S.spec.list.length?` (${S.spec.list.length})`:''}…</button>
   <button class="btn ghost full" data-m="snd">${SOUND?'🔔 Suoni e vibrazione: accesi':'🔕 Suoni e vibrazione: spenti'}</button>
   <h4>Fine del duello</h4>
   <button class="btn ghost" data-m="draw">Pareggio</button><button class="btn ghost w2" data-m="win">Vittoria per effetto…</button>
   <button class="btn danger" data-m="concede">Arrenditi</button><button class="btn danger w2" data-m="leave">Abbandona l’incontro</button></div>`,{label:'Altro'});
  sh.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>act(b,async()=>{const[k,v]=b.dataset.m.split(':');
   if(k==='snd'){SOUND=!SOUND;try{localStorage.setItem('tempio.sim.sound',SOUND?'1':'0')}catch(_){}closeSheet();toast(SOUND?'Suoni accesi':'Suoni spenti',true)}
+  else if(k==='spec'){specSheet()}
   else if(k==='tclear'){closeSheet();await call('sim_target_clear')}
   else if(k==='coin'){closeSheet();await call('sim_coin',{p_n:+v})}
   else if(k==='dice'){closeSheet();await call('sim_dice',{p_n:+v})}
@@ -843,6 +991,7 @@ function deckPlace(list,zone,slot){
 
 /* ---------- eventi del tavolo ---------- */
 function tableClick(t){
+ if(SPEC())return watchClick(t);
  const z=t.closest('[data-zone]');
  if(z){const zone=z.dataset.zone,side=+z.dataset.side,slot=+z.dataset.slot,B=board(),c=B.M[zone+':'+(zone==='emz'?0:side)+':'+slot];
   if(PICK){if(pickOk(zone,side,slot,c)){const p=PICK;PICK=null;act(null,async()=>{await p.cb(p.kind==='host'||p.kind==='card'?c.i:slot)})}return}
@@ -860,6 +1009,7 @@ function tableClick(t){
   else if(k==='deckMenu')deckMenu();
   else if(k==='openLog')openLog();
   else if(k==='more')moreSheet();
+  else if(k==='spec')specSheet();
   else if(k==='chat')openChat();
   else if(k==='chain')chainSheet();
   else if(k==='chainRes')act(a,async()=>{await call('sim_chain_resolve')});
@@ -881,10 +1031,11 @@ function chainSheet(){const ch=S.chain||[],me=S.me.seat;
  if(!ch.length){closeSheet();return}
  const top=ch.filter(k=>!k.res).pop();
  if(!top){closeSheet();return}
- const rows=ch.slice().reverse().map(k=>`<div class="${k.res?'res':k===top?'top':''}">${k.x>0?cardImg(k.x):'<span></span>'}<span><b>Catena ${k.n}</b> · ${esc(ci(k.x).n)}<small>di ${esc(k.seat===me?'te':nick(k.seat))}${k.res?' · risolto':k===top?' · si risolve per primo':''}</small></span><span>${k.res?'✔':''}</span></div>`).join('');
+ const rows=ch.slice().reverse().map(k=>`<div class="${k.res?'res':k===top?'top':''}">${k.x>0?cardImg(k.x):'<span></span>'}<span><b>Catena ${k.n}</b> · ${esc(ci(k.x).n)}<small>di ${esc(k.seat===me&&!SPEC()?'te':nick(k.seat))}${k.res?' · risolto':k===top?' · si risolve per primo':''}</small></span><span>${k.res?'✔':''}</span></div>`).join('');
  const sh=sheet(`${xBtn()}<h3>⛓ Catena · ${ch.length} ${ch.length===1?'anello':'anelli'}</h3><p class="sm-sub" style="margin:0;font-size:.8rem">Si risolve al contrario: l’ultimo dichiarato per primo. Per aggiungere un anello tocca una carta e scegli ⚡.</p>
   <div class="sm-ch">${rows}</div><div class="sm-ac3"><button class="btn full" data-ch="res">▶ Risolvi la Catena ${top.n}</button><button class="btn danger full" data-ch="clr">✕ Annulla tutta la catena</button></div>`,{label:'Catena'});
  SHOWN={kind:'chain'};
+ if(SPEC()){sh.querySelectorAll('.sm-ac3,.sm-sub').forEach(e=>e.remove());return}
  sh.querySelector('[data-ch=res]').onclick=function(){act(this,async()=>{await call('sim_chain_resolve')})};
  sh.querySelector('[data-ch=clr]').onclick=()=>{confirmSheet('Annullare la catena?','Tutti gli anelli vengono cancellati. Usalo se hai dichiarato per sbaglio.','Sì, annulla',async()=>{await call('sim_chain_clear')})}}
 
@@ -964,39 +1115,39 @@ let CHATLID=null,CHATN=0,CHATNOT=0;
 const chatKey=()=>'tempio.sim.chat.'+LID;
 function chatList(){return(S&&S.chat)||[]}
 function chatOpen(){return !!(SHOWN&&SHOWN.kind==='chat')}
-function chatUnread(){if(!S||!S.me)return 0;return chatList().filter(m=>m.n>CHATN&&m.seat!==S.me.seat).length}
+function chatUnread(){if(!S||!S.me)return 0;return chatList().filter(m=>m.n>CHATN&&!mineMsg(m)).length}
 function chatSave(){try{localStorage.setItem(chatKey(),String(CHATN))}catch(_){}}
 function chatSync(){if(!S||!S.me||!LID)return;
  const m=chatList(),mx=m.length?m[m.length-1].n:0;
  if(CHATLID!==LID){CHATLID=LID;let v=null;try{v=localStorage.getItem(chatKey())}catch(_){}
   CHATN=v==null?mx:Math.min(+v||0,mx);CHATNOT=mx;chatSave()}
  if(chatOpen()){CHATN=mx;CHATNOT=mx;chatSave();chatRefresh();return}
- const fresh=m.filter(x=>x.n>CHATNOT&&x.seat!==S.me.seat);
+ const fresh=m.filter(x=>x.n>CHATNOT&&!mineMsg(x));
  CHATNOT=Math.max(CHATNOT,mx);
  if(fresh.length){const f=fresh[fresh.length-1];
-  note('💬',`<b>${esc(nick(f.seat))}</b><small>${esc(f.t.length>90?f.t.slice(0,90)+'…':f.t)}</small>`,'chat',openChat);ping(660);buzz()}}
+  note('💬',`<b>${esc(chatName(f))}</b><small>${esc(f.t.length>90?f.t.slice(0,90)+'…':f.t)}</small>`,'chat',openChat);ping(660);buzz()}}
 function updateFab(){const f=$('chatFab');if(!f)return;
- const show=!!(S&&S.me&&LID&&(view==='lobby'||view==='choose'||view==='siding'));
+ const show=!!(S&&S.me&&LID&&(view==='lobby'||view==='choose'||view==='siding'||view==='watchinfo'));
  f.hidden=!show;const b=f.querySelector('.sm-bdg'),u=show?chatUnread():0;b.hidden=!u;b.textContent=u>9?'9+':u}
 function hhmm(ts){const d=new Date(ts*1000);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
 function chatScroll(){const go=()=>{const l=$('chatL');if(!l)return;l.scrollTop=l.scrollHeight;const sh=l.closest('.sm-sh');if(sh)sh.scrollTop=sh.scrollHeight};
  go();requestAnimationFrame(go);setTimeout(go,120);setTimeout(go,420)}
 function chatRefresh(force){const l=$('chatL');if(!l)return;
- const m=chatList(),me=S.me.seat;
- const html=m.length?m.map(x=>`<div class="m${x.seat===me?' me':''}"><small>${x.seat===me?'Tu':esc(nick(x.seat))} · ${hhmm(x.ts)}</small>${esc(x.t)}</div>`).join(''):'<p class="e">Nessun messaggio.<br>Scrivi tu per primo!</p>';
+ const m=chatList();
+ const html=m.length?m.map(x=>{const mn=mineMsg(x);return `<div class="m${mn?' me':''}${x.seat===0?' sp':''}"><small>${mn?'Tu':esc(chatName(x))} · ${hhmm(x.ts)}</small>${esc(x.t)}</div>`}).join(''):'<p class="e">Nessun messaggio.<br>Scrivi tu per primo!</p>';
  const changed=l.dataset.h!==html;
  if(changed){l.dataset.h=html;l.innerHTML=html}
  if(changed||force)chatScroll()}
 function openChat(){if(!S||!S.me)return;
- const opn=(oppP()||{}).nickname||'l’avversario';
- sheet(`${xBtn()}<h3>Chat con ${esc(opn)}</h3><div class="sm-chat"><div class="sm-cl" id="chatL" role="log" aria-live="polite"></div><p class="sm-cerr" id="chatE" hidden></p>
+ const opn=(oppP()||{}).nickname||'l’avversario',ns=(S.spec&&S.spec.list.length)||0;
+ sheet(`${xBtn()}<h3>${SPEC()?'Chat della partita':`Chat con ${esc(opn)}${ns?` e ${ns} spettator${ns===1?'e':'i'}`:''}`}</h3><div class="sm-chat"><div class="sm-cl" id="chatL" role="log" aria-live="polite"></div><p class="sm-cerr" id="chatE" hidden></p>
   <div class="sm-cin"><input id="chatT" maxlength="200" placeholder="Scrivi un messaggio" enterkeyhint="send" autocomplete="off" aria-label="Messaggio"><button class="btn" id="chatB" type="button">Invia</button></div></div>`,{label:'Chat'});
  SHOWN={kind:'chat'};const m=chatList();CHATN=m.length?m[m.length-1].n:0;CHATNOT=CHATN;chatSave();
  chatRefresh(true);updateFab();
  if(view==='table'){LASTH='';render()}
  const send=()=>{const i=$('chatT'),t=i.value.trim();if(!t)return;
   act($('chatB'),async()=>{const e=$('chatE');e.hidden=true;
-   try{i.value='';await call('sim_chat_send',{p_text:t})}catch(er){i.value=t;e.textContent=String(er.message||er);e.hidden=false}
+   try{i.value='';await call(SPEC()?'sim_watch_say':'sim_chat_send',{p_text:t})}catch(er){i.value=t;e.textContent=String(er.message||er);e.hidden=false}
    const c=$('chatT');if(c)c.focus()})};
  $('chatB').onclick=send;$('chatT').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();send()}};
  $('chatT').addEventListener('focus',()=>{chatScroll()});
@@ -1014,7 +1165,7 @@ function confirmSheet(title,msg,okLabel,fn){const sh=sheet(`${xBtn()}<h3>${esc(t
 function leaveFlow(btn){const st=S&&S.lobby.status;
  if(st==='playing'||st==='siding'){confirmSheet('Abbandonare l’incontro?','Perderai l’intero incontro e uscirai dalla partita.','Sì, abbandono',async()=>{await rpc('sim_lobby_leave',{p_lobby:LID});await loadState()});return}
  act(btn,async()=>{await rpc('sim_lobby_leave',{p_lobby:LID});LID=null;S=null;SDkey='';say('Sei uscito dalla lobby.');await loadHome()})}
-async function goHome(){LID=null;S=null;SDkey='';PICK=null;SHOWN=null;closeSheet();tblMode(false);SIGSEEN={};SIGDL={};SIGLID=null;CHATLID=null;$('v').dataset.k='';await loadHome()}
+async function goHome(){VS=1;LID=null;S=null;SDkey='';PICK=null;SHOWN=null;closeSheet();tblMode(false);SIGSEEN={};SIGDL={};SIGLID=null;CHATLID=null;$('v').dataset.k='';await loadHome()}
 function renameSheet(d){const sh=sheet(`${xBtn()}<h3>Rinomina il deck</h3><label for="rnN">Nome</label><input id="rnN" maxlength="40" value="${esc(d.name)}"><button class="btn block" id="rnGo" style="margin-top:10px">Salva</button>`,{label:'Rinomina'});
  $('rnGo').onclick=()=>act($('rnGo'),async()=>{await rpc('sim_deck_save',{p_id:d.id,p_name:$('rnN').value,p_main:d.main,p_extra:d.extra,p_side:d.side,p_temp:false});closeSheet();say('Deck rinominato.','good');await loadHome();if(LID)await loadState()})}
 
@@ -1028,6 +1179,9 @@ document.addEventListener('click',e=>{
  const b=t.closest('button,label');if(!b)return;
  const id=b.id;
  if(id==='retry'){boot();return}
+ if(id==='wLeave'){act(b,leaveWatch);return}
+ if(id==='wInfoB'){specInfoSheet();return}
+ if(b.dataset.watch){act(b,async()=>{const l=+b.dataset.watch;VS=1;S=null;await rpc('sim_watch_join',{p_lobby:l});LID=l;say('');await loadState()});return}
  if(id==='newL'){act(b,async()=>{LID=await rpc('sim_lobby_create',{p_title:($('newT').value||'').trim()||null});say('');await loadState()});return}
  if(b.dataset.join){act(b,async()=>{const l=+b.dataset.join;await rpc('sim_lobby_join',{p_lobby:l});LID=l;say('');await loadState()});return}
  if(b.dataset.dren){const d=HOME.decks.find(x=>x.id===b.dataset.dren);if(d)renameSheet(d);return}
@@ -1049,7 +1203,7 @@ document.addEventListener('click',e=>{
  if(id==='sdApply'){act(b,async()=>{S=await rpc('sim_side',{p_lobby:LID,p_main:SD.main,p_extra:SD.extra,p_side:SD.side});SDkey='';say('Side applicato.','good');render()});return}
  if(id==='backHome'){goHome();return}
 });
-document.addEventListener('change',e=>{const f=e.target;if(f&&f.id==='impFile'&&f.files&&f.files[0]){const file=f.files[0];file.text().then(txt=>{const d=parseYdk(txt);if(d.main.length+d.extra.length+d.side.length===0){say('Il file non contiene carte: serve un .ydk valido.','bad');return}d.name=file.name.replace(/\.(ydk|txt)$/i,'')||'Deck';impStart(d)});f.value=''}});
+document.addEventListener('change',e=>{const f=e.target;if(f&&f.id==='lbSpec'){act(null,async()=>{try{const st=await rpc('sim_spec_open',{p_lobby:LID,p_open:f.checked});applyState(st);render()}catch(er){f.checked=!f.checked;throw er}});return}if(f&&f.id==='impFile'&&f.files&&f.files[0]){const file=f.files[0];file.text().then(txt=>{const d=parseYdk(txt);if(d.main.length+d.extra.length+d.side.length===0){say('Il file non contiene carte: serve un .ydk valido.','bad');return}d.name=file.name.replace(/\.(ydk|txt)$/i,'')||'Deck';impStart(d)});f.value=''}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sheetOpen())closeSheet();if((e.key==='Enter'||e.key===' ')&&e.target&&e.target.classList&&e.target.classList.contains('sm-last')){e.preventDefault();openLog()}if((e.key==='Enter'||e.key===' ')&&e.target&&e.target.classList&&e.target.classList.contains('ct')){e.preventDefault();chainSheet()}});
 let rsT=null;window.addEventListener('resize',()=>{clearTimeout(rsT);rsT=setTimeout(()=>{if(view==='table'&&S){LASTH='';render()}},120)});
 
