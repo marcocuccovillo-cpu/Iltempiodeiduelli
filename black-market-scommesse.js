@@ -38,6 +38,7 @@ window.BM_BETS = function (BM) {
 ${row('Win rate Ladder', 'bet_w_winrate', 100, wr, qd.l_winrate || 0)}${row('Taglie (bounty value)', 'bet_w_bounty', 30, bo, qd.l_bounty || 0)}${row('Scommesse già presenti', 'bet_w_pool', 40, po, qd.l_bets || 0)}
 </tbody></table><p class="mute" style="font-size:.8rem;margin:6px 0 0">I tre effetti si sommano. Poi si toglie il margine della casa (${qd.margin_pct ?? 10}%). Più BC vengono puntati su uno, più la sua quota scende.</p></details>`;
   };
+  const MS = { pending: 'in attesa che accetti', accepted: 'accettata', reported: 'risultato inviato', closed: 'chiusa', declined: 'rifiutata', cancelled: 'annullata', expired: 'scaduta', voided: 'annullata dall\'admin', disputed: 'contestata' };
   const missing = er => /could not find the function|schema cache|does not exist/i.test(er.message || '');
   const reqIds = new Map();                                         // stessa richiesta se si riprova: nessun doppio addebito
   const reqId = k => { if (!reqIds.has(k)) reqIds.set(k, (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2)) + '-bet'); return reqIds.get(k); };
@@ -84,12 +85,32 @@ ${row('Win rate Ladder', 'bet_w_winrate', 100, wr, qd.l_winrate || 0)}${row('Tag
 
   /* ---------- una mia scommessa ---------- */
   const mine = b => {
-    const st = { open: ['In corso', ''], won: ['Vinta', 'pos'], lost: ['Persa', 'neg'], refunded: ['Restituita', ''] }[b.status] || [b.status, ''];
-    const res = b.status === 'won' ? ` · incassati <b class="pos">${BC(b.returned)}</b>` : b.status === 'refunded' ? ` · tornati ${BC(b.returned)}` : b.status === 'lost' ? ` · persi ${BC(b.stake)}` : ` · vincita possibile ${BC(Math.floor(b.stake * b.quota / 100))}`;
+    const st = { open: ['In corso', ''], won: ['Vinta', 'pos'], lost: ['Persa', 'neg'], refunded: ['Restituita', ''], revoked: ['Revocata', 'neg'] }[b.status] || [b.status, ''];
+    const res = b.status === 'revoked' ? ` · pagamento revocato dall'amministratore${b.returned > 0 ? `, ti restano ${BC(b.returned)} (puntata restituita)` : ''}` : b.status === 'won' ? ` · incassati <b class="pos">${BC(b.returned)}</b>` : b.status === 'refunded' ? ` · tornati ${BC(b.returned)}` : b.status === 'lost' ? ` · persi ${BC(b.stake)}` : ` · vincita possibile ${BC(Math.floor(b.stake * b.quota / 100))}`;
     const note = b.written_off > 0 ? `<br><small class="mute">Dopo una correzione del risultato ${BC(b.written_off)} non sono stati recuperati perché già spesi.</small>` : '';
     return `<div class="row2"><div class="g"><b>${esc(b.challenger_name)}</b> <span class="mute">vs</span> <b>${esc(b.opponent_name)}</b><small>${esc(b.format)} · ${KN[b.kind] || ''} · ${when(b.created_at)}</small>
       Su <b>${esc(b.pick_name)}</b> · ${BC(b.stake)} a quota ${qt(b.quota)}${res}${note}</div><span class="tag ${st[1]}">${st[0]}</span></div>`;
   };
+
+  /* ---------- solo admin: scommesse da pagare e pagate, con la revoca ---------- */
+  const admMeta = b => `<small>${esc(b.challenger_name)} vs ${esc(b.opponent_name)} · ${esc(b.format)} · ${KN[b.kind] || ''} · sfida ${MS[b.match_status] || esc(b.match_status)} · ${when(b.created_at)}</small>`;
+  const admOpen = b => `<div class="row2"><div class="g"><b>${esc(b.user_name)}</b> ha puntato <b>${BC(b.stake)}</b> su <b>${esc(b.pick_name)}</b> a quota ${qt(b.quota)}${admMeta(b)}Vincita possibile <b>${BC(Math.floor(b.stake * b.quota / 100))}</b></div><span class="tag">Da pagare</span></div>`;
+  const admPaid = b => {
+    const st = { won: ['Vinta', 'pos'], lost: ['Persa', 'neg'], refunded: ['Restituita', ''], revoked: ['Revocata', 'neg'] }[b.status] || [b.status, ''];
+    let info, btns = '';
+    if (b.status === 'revoked') info = `Pagamento revocato${b.revoked_at ? ' il ' + when(b.revoked_at) : ''}${b.revoke_reason ? ': «' + esc(b.revoke_reason) + '»' : ''}${b.returned > 0 ? ` · restano ${BC(b.returned)} (puntata)` : ''}`;
+    else if (b.status === 'won') info = `${BC(b.stake)} → pagati <b class="pos">${BC(b.returned)}</b>`;
+    else if (b.status === 'refunded') info = `puntata restituita ${BC(b.returned)}`;
+    else info = `puntati ${BC(b.stake)}, nessun pagamento`;
+    if (b.status === 'won' || b.status === 'refunded') {
+      const mk = (mode, label, amt) => `<button class="btn ghost sm" data-act="betRevoke" data-id="${b.id}" data-mode="${mode}" data-amt="${amt}" data-who="${esc(b.user_name)}">${label}</button>`;
+      btns = `<div class="row" style="gap:8px;margin-top:8px;flex-wrap:wrap">${mk('full', b.status === 'won' ? 'Revoca vincita' : 'Revoca rimborso', b.returned)}${b.status === 'won' && b.returned > b.stake ? mk('refund', 'Annulla e rimborsa puntata', b.returned - b.stake) : ''}</div><small class="mute">Saldo attuale di ${esc(b.user_name)}: ${BC(b.balance)}</small>`;
+    }
+    const wo = b.written_off > 0 ? `<br><small class="mute">${BC(b.written_off)} non recuperati perché già spesi.</small>` : '';
+    return `<div class="row2"><div class="g"><b>${esc(b.user_name)}</b> · su <b>${esc(b.pick_name)}</b> a quota ${qt(b.quota)}${admMeta(b)}${info}${wo}${btns}</div><span class="tag ${st[1]}">${st[0]}</span></div>`;
+  };
+  const admBox = al => `<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Solo admin: scommesse da pagare (${al.open_count})</h2>${al.open.map(admOpen).join('') || '<p class="mute" style="margin:0">Nessuna scommessa in attesa di pagamento.</p>'}${al.open_count > al.open.length ? `<p class="mute">Mostrate le prime ${al.open.length}.</p>` : ''}</div>
+${BM.fold('bets-adm-paid', 'Solo admin: scommesse pagate', (al.settled.map(admPaid).join('') || '<p class="mute" style="margin:0">Ancora nessuna scommessa liquidata.</p>') + (al.settled_count > al.settled.length ? `<p class="mute">Mostrate le ultime ${al.settled.length}.</p>` : ''), { style: 'margin-top:14px', count: al.settled_count })}`;
 
   R.bets = async () => {
     if (!ladderOn()) return off(['Ladder non attiva', 'Le scommesse riguardano le sfide Ladder, che al momento sono spente.']);
@@ -98,7 +119,8 @@ ${row('Win rate Ladder', 'bet_w_winrate', 100, wr, qd.l_winrate || 0)}${row('Tag
     shell(head + '<p class="mute" role="status">Caricamento…</p>', 'bets');
     try {
       try { await rpc('bet_sync', {}) } catch (e) { /* rete di sicurezza: non blocca la pagina */ }
-      const [ms, my, adm] = await Promise.all([rpc('bet_markets', {}), rpc('bet_mine', {}), BM.me.role === 'admin' ? rpc('bet_admin_stats', {}).catch(() => null) : null]);
+      const isAdm = BM.me.role === 'admin';
+      const [ms, my, adm, al] = await Promise.all([rpc('bet_markets', {}), rpc('bet_mine', {}), isAdm ? rpc('bet_admin_stats', {}).catch(() => null) : null, isAdm ? rpc('bet_admin_list', {}).catch(() => null) : null]);
       const open = my.filter(b => b.status === 'open'), done = my.filter(b => b.status !== 'open');
       const won = done.filter(b => b.status === 'won').reduce((t, b) => t + b.returned - b.stake, 0), lost = done.filter(b => b.status === 'lost').reduce((t, b) => t - b.stake, 0);
       shell(`${head}
@@ -107,7 +129,8 @@ ${how()}
 <div class="box" style="margin-top:14px"><div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Sfide su cui puntare (${ms.length})</h2><button class="btn ghost sm" data-act="betReload">Aggiorna</button></div>
 ${ms.map(market).join('') || '<p class="mute" style="margin:10px 0 0">Nessuna sfida aperta al momento. Quando qualcuno lancia una sfida in Ladder compare qui.</p>'}</div>
 <div class="box" style="margin-top:14px"><h2 style="margin-top:0">Le mie scommesse (${my.length})</h2>${my.map(mine).join('') || '<p class="mute" style="margin:0">Non hai ancora scommesso.</p>'}</div>
-${adm ? `<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Solo admin: quanto circola</h2><p style="margin:0">${adm.bets_total} scommesse · puntati in totale ${BC(adm.staked_total)} · restituiti ${BC(adm.returned_total)} · <b>risultato per la casa ${BC(adm.house_net)}</b> (le liquidate) · aperte ${adm.open_count} (${BC(adm.open_stake)} bloccati)${adm.written_off ? ` · non recuperati dopo correzioni ${BC(adm.written_off)}` : ''}.<br><small class="mute">I BC vinti sono creati dal sistema: un risultato per la casa molto negativo significa quote troppo generose; si alza «bet_margin_pct» in Admin → Impostazioni.</small></p></div>` : ''}`, 'bets');
+${adm ? `<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Solo admin: quanto circola</h2><p style="margin:0">${adm.bets_total} scommesse · puntati in totale ${BC(adm.staked_total)} · restituiti ${BC(adm.returned_total)} · <b>risultato per la casa ${BC(adm.house_net)}</b> (le liquidate) · aperte ${adm.open_count} (${BC(adm.open_stake)} bloccati)${adm.revoked_count ? ` · pagamenti revocati ${adm.revoked_count}` : ''}${adm.written_off ? ` · non recuperati ${BC(adm.written_off)}` : ''}.<br><small class="mute">I BC vinti sono creati dal sistema: un risultato per la casa molto negativo significa quote troppo generose; si alza «bet_margin_pct» in Admin → Impostazioni.</small></p></div>` : ''}
+${al ? admBox(al) : ''}`, 'bets');
     } catch (er) {
       shell(head + `<div class="err" role="alert">${missing(er) ? 'Manca la migrazione «scommesse»: un amministratore deve eseguire black-market-scommesse.sql in Supabase.' : 'Qualcosa è andato storto: ' + esc(er.message)}</div>`, 'bets');
     }
@@ -130,6 +153,15 @@ ${adm ? `<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Solo 
     },
     betCancel: async el => { const p = panel(el.dataset.m); if (p) p.hidden = true },
     betReload: async () => { BM.route() },
+    betRevoke: async el => {
+      const refund = el.dataset.mode === 'refund', amt = +el.dataset.amt, who = el.dataset.who;
+      const why = prompt(refund ? `Annulla la vincita di ${who} (la puntata resta restituita). Motivazione (min. 5 caratteri):` : `Revoca il pagamento a ${who}: i BC vengono ripresi dal suo wallet. Motivazione (min. 5 caratteri):`);
+      if (why === null) return;
+      if (why.trim().length < 5) throw new Error('Motivazione obbligatoria (almeno 5 caratteri).');
+      if (!confirm(`Riprendere ${num(amt)} BC da ${who}?\nSe ne ha già speso una parte, si riprende solo ciò che c'è (il resto resta scritto come «non recuperato»). L'operazione non si ripete e la scommessa non verrà più pagata.`)) return;
+      const r = await rpc('bet_admin_revoke', { p_bet: el.dataset.id, p_reason: why.trim(), p_refund_stake: refund });
+      await done(r.not_recovered > 0 ? `Revocato: ripresi ${num(r.recovered)} BC, ${num(r.not_recovered)} BC non recuperabili (già spesi).` : `Revocato: ripresi ${num(r.recovered)} BC.`);
+    },
     betGo: async el => {
       const p = panel(el.dataset.m); if (!p || !p.dataset.p) throw new Error('Scegli prima su chi puntare.');
       const st = parseInt(p.querySelector('.bet-stake').value, 10);

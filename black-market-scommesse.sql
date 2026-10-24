@@ -29,6 +29,11 @@
 --    e si toglie ciò che era stato pagato di troppo, ma solo fino al saldo disponibile (come per i premi Ladder: niente saldi negativi).
 --  * La liquidazione avviene dentro la chiusura della sfida (trigger), senza toccare le funzioni della Ladder. Se per qualunque motivo
 --    fallisse, la sfida si chiude lo stesso e bet_sync() (chiamata dalla pagina Scommesse) liquida dopo.
+--  * L'ADMIN vede tutte le scommesse (bet_admin_list): quelle ancora da pagare e, a parte, quelle già liquidate. Può REVOCARE un pagamento
+--    quando vuole (bet_admin_revoke, con motivazione): i BC pagati vengono ripresi dal wallet dello scommettitore, ma solo fino al saldo
+--    disponibile (niente saldi negativi: il resto resta scritto come «non recuperato»). Due modi: togliere tutto il pagamento (la puntata
+--    resta persa) oppure «annulla e rimborsa» (si toglie solo la vincita e la puntata torna). Una scommessa revocata resta revocata:
+--    nemmeno una successiva correzione del risultato la ripaga. Solo per scommesse già pagate (vinte o rimborsate), una volta sola.
 --  * Ogni movimento di BC passa dal registro contabile (puntata, vincita, rimborso, correzione) e dall'audit.
 --  Impostazioni (Admin → Impostazioni): bet_enabled, bet_margin_pct, bet_min_stake, bet_max_stake, bet_max_open, bet_min_games,
 --  bet_bounty_smooth, bet_pool_smooth, bet_close_minutes, bet_w_winrate, bet_w_bounty, bet_w_pool. Nessun dato esistente cambia.
@@ -94,7 +99,7 @@ create table if not exists public.bets (
   quota integer not null check (quota >= 100),                   -- quota decimale per 100 (235 = 2,35), fissata alla puntata
   basis text not null check (basis in ('winrate','bounty','bets','even')),
   prob_pct numeric(5,2) not null,                                -- probabilità stimata al momento della puntata
-  status text not null default 'open' check (status in ('open','won','lost','refunded')),
+  status text not null default 'open' check (status in ('open','won','lost','refunded','revoked')),
   returned integer not null default 0 check (returned >= 0),     -- BC restituiti finora (vincita o rimborso)
   written_off integer not null default 0 check (written_off >= 0), -- BC non recuperabili in una correzione (saldo già speso)
   settle_seq integer not null default 0,
@@ -108,6 +113,12 @@ create table if not exists public.bets (
 alter table public.bets drop constraint if exists bets_basis_check;
 alter table public.bets add constraint bets_basis_check check (basis in ('winrate','bounty','bets','even','mix'));
 alter table public.bets add column if not exists detail jsonb;                                   -- segnali e pesi usati per la quota di questa puntata
+-- versioni precedenti: ammette lo stato «revoked» e aggiunge i dati della revoca
+alter table public.bets drop constraint if exists bets_status_check;
+alter table public.bets add constraint bets_status_check check (status in ('open','won','lost','refunded','revoked'));
+alter table public.bets add column if not exists revoked_at timestamptz;
+alter table public.bets add column if not exists revoked_by uuid references public.profiles(id);
+alter table public.bets add column if not exists revoke_reason text;
 create index if not exists bets_match_idx on public.bets (match_id);
 create index if not exists bets_user_idx on public.bets (user_id, created_at desc);
 
@@ -207,6 +218,7 @@ begin
     return 0;                                                                                                       -- sfida ancora aperta
   end if;
   for b in select * from public.bets where match_id = p_match order by user_id for update loop                     -- ordine fisso: niente blocchi incrociati
+    if b.status = 'revoked' then continue; end if;                                                                  -- pagamento revocato dall'admin: non si ripaga mai
     if m.status = 'closed' and w is not null then
       if b.pick = w then v_state := 'won'; v_ret := floor(b.stake * b.quota / 100.0)::integer; else v_state := 'lost'; v_ret := 0; end if;
     else
@@ -313,7 +325,7 @@ begin
   select coalesce(jsonb_agg(s.x order by s.ts desc), '[]'::jsonb) into r from (
     select b.created_at as ts, jsonb_build_object(
       'id', b.id, 'match', b.match_id, 'status', b.status, 'stake', b.stake, 'quota', b.quota, 'basis', b.basis, 'prob_pct', b.prob_pct,
-      'returned', b.returned, 'written_off', b.written_off, 'detail', b.detail, 'created_at', b.created_at, 'settled_at', b.settled_at,
+      'returned', b.returned, 'written_off', b.written_off, 'detail', b.detail, 'revoked_at', b.revoked_at, 'created_at', b.created_at, 'settled_at', b.settled_at,
       'pick', b.pick, 'pick_name', pp.nickname, 'challenger_name', pc.nickname, 'opponent_name', po.nickname,
       'match_status', m.status, 'result', m.reported_result, 'format', m.format, 'kind', m.kind) as x
     from public.bets b join public.ladder_matches m on m.id = b.match_id
@@ -341,14 +353,69 @@ begin
   return (select jsonb_build_object(
     'open_count', count(*) filter (where status = 'open'), 'open_stake', coalesce(sum(stake) filter (where status = 'open'), 0),
     'bets_total', count(*), 'staked_total', coalesce(sum(stake), 0), 'returned_total', coalesce(sum(returned), 0),
-    'house_net', coalesce(sum(stake) filter (where status <> 'open'), 0) - coalesce(sum(returned), 0), 'written_off', coalesce(sum(written_off), 0))
+    'house_net', coalesce(sum(stake) filter (where status <> 'open'), 0) - coalesce(sum(returned), 0), 'written_off', coalesce(sum(written_off), 0),
+    'revoked_count', count(*) filter (where status = 'revoked'))
     from public.bets);
 end $$;
 
+-- ---------- admin: tutte le scommesse (da pagare / liquidate) ----------
+create or replace function public.bet_admin_list() returns jsonb language plpgsql security definer set search_path = public as $$
+declare v uuid := public._need_role(array['admin']::public.app_role[]); r_open jsonb; r_done jsonb; n_open integer; n_done integer;
+begin
+  select count(*) filter (where status = 'open'), count(*) filter (where status <> 'open') into n_open, n_done from public.bets;
+  select coalesce(jsonb_agg(s.x order by s.ts), '[]'::jsonb) into r_open from (
+    select b.created_at as ts, public._bet_admin_row(b) as x from public.bets b where b.status = 'open' order by b.created_at limit 500) s;
+  select coalesce(jsonb_agg(s.x order by s.ts desc), '[]'::jsonb) into r_done from (
+    select coalesce(b.settled_at, b.created_at) as ts, public._bet_admin_row(b) as x from public.bets b where b.status <> 'open'
+      order by coalesce(b.settled_at, b.created_at) desc limit 300) s;
+  return jsonb_build_object('open', r_open, 'settled', r_done, 'open_count', n_open, 'settled_count', n_done);
+end $$;
+
+create or replace function public._bet_admin_row(b public.bets) returns jsonb language sql stable security definer set search_path = public as $$
+  select jsonb_build_object(
+    'id', b.id, 'user_id', b.user_id, 'user_name', pu.nickname, 'balance', coalesce(w.balance, 0), 'status', b.status, 'stake', b.stake, 'quota', b.quota,
+    'returned', b.returned, 'written_off', b.written_off, 'created_at', b.created_at, 'settled_at', b.settled_at, 'revoked_at', b.revoked_at, 'revoke_reason', b.revoke_reason,
+    'pick', b.pick, 'pick_name', pp.nickname, 'challenger_name', pc.nickname, 'opponent_name', po.nickname, 'match', b.match_id,
+    'match_status', m.status, 'result', m.reported_result, 'format', m.format, 'kind', m.kind)
+  from public.ladder_matches m join public.profiles pu on pu.id = b.user_id join public.profiles pp on pp.id = b.pick
+    join public.profiles pc on pc.id = m.challenger_id join public.profiles po on po.id = m.opponent_id
+    left join public.wallets w on w.user_id = b.user_id
+  where m.id = b.match_id $$;
+
+-- ---------- admin: revoca di un pagamento ----------
+-- p_refund_stake = false: si toglie tutto ciò che è stato pagato (la puntata resta persa);
+-- p_refund_stake = true : si toglie solo la vincita e la puntata resta restituita («annulla la scommessa»).
+create or replace function public.bet_admin_revoke(p_bet uuid, p_reason text, p_refund_stake boolean default false) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare v uuid := public._need_role(array['admin']::public.app_role[]); b public.bets%rowtype; v_target integer; v_need integer; v_bal integer; v_c integer := 0;
+begin
+  if p_reason is null or char_length(btrim(p_reason)) < 5 then raise exception 'Motivazione obbligatoria'; end if;
+  select * into b from public.bets where id = p_bet for update;
+  if not found then raise exception 'Scommessa non trovata'; end if;
+  if b.status = 'revoked' then raise exception 'Pagamento già revocato'; end if;
+  if b.status = 'open' then raise exception 'Scommessa non ancora pagata: non c''è niente da revocare'; end if;
+  if b.returned <= 0 then raise exception 'Questa scommessa non ha pagato nulla: non c''è niente da revocare'; end if;
+  v_target := case when coalesce(p_refund_stake, false) then b.stake else 0 end;
+  v_need := b.returned - v_target;
+  if v_need <= 0 then raise exception 'Con la puntata restituita non c''è nulla da togliere'; end if;
+  select balance into v_bal from public.wallets where user_id = b.user_id for update;
+  v_c := least(v_need, coalesce(v_bal, 0));
+  if v_c > 0 then
+    perform public._ledger_move(b.user_id, -v_c, 'bet_reversal', 'bet', b.id, 'betrev:' || b.id,
+      case when coalesce(p_refund_stake, false) then 'Vincita della scommessa revocata dall''amministratore' else 'Pagamento della scommessa revocato dall''amministratore' end);
+  end if;
+  update public.bets set status = 'revoked', returned = v_target, written_off = written_off + (v_need - v_c), settle_seq = settle_seq + 1,
+    revoked_at = clock_timestamp(), revoked_by = v, revoke_reason = btrim(p_reason) where id = b.id;
+  perform public._audit(v, 'bet_revoke', 'bet', b.id::text, jsonb_build_object('status', b.status, 'returned', b.returned),
+    jsonb_build_object('status', 'revoked', 'returned', v_target, 'recovered', v_c, 'not_recovered', v_need - v_c, 'refund_stake', coalesce(p_refund_stake, false)), btrim(p_reason));
+  return jsonb_build_object('bet_id', b.id, 'recovered', v_c, 'not_recovered', v_need - v_c, 'returned', v_target);
+end $$;
+
 revoke all on function public._bet_quote(public.ladder_matches), public._bet_closes_at(public.ladder_matches), public._bet_is_open(public.ladder_matches),
-  public._bet_reconcile(uuid), public._bet_trg() from public, anon, authenticated;
-revoke all on function public.place_bet(uuid, uuid, integer, integer, text), public.bet_markets(), public.bet_mine(), public.bet_sync(), public.bet_admin_stats()
-  from public, anon, authenticated;
-grant execute on function public.place_bet(uuid, uuid, integer, integer, text), public.bet_markets(), public.bet_mine(), public.bet_sync(), public.bet_admin_stats() to authenticated;
+  public._bet_reconcile(uuid), public._bet_trg(), public._bet_admin_row(public.bets) from public, anon, authenticated;
+revoke all on function public.place_bet(uuid, uuid, integer, integer, text), public.bet_markets(), public.bet_mine(), public.bet_sync(), public.bet_admin_stats(),
+  public.bet_admin_list(), public.bet_admin_revoke(uuid, text, boolean) from public, anon, authenticated;
+grant execute on function public.place_bet(uuid, uuid, integer, integer, text), public.bet_markets(), public.bet_mine(), public.bet_sync(), public.bet_admin_stats(),
+  public.bet_admin_list(), public.bet_admin_revoke(uuid, text, boolean) to authenticated;
 
 commit;

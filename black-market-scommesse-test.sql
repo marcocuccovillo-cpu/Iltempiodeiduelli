@@ -654,5 +654,108 @@ begin
   insert into t_log (msg) values ('OK S12 — i tre segnali insieme: spinte che si sommano, pesi, ognuno spegnibile, tutto a zero = alla pari, monotonia, dettaglio salvato');
 end $$;
 
+-- ---------------------------------------------------------------- S13 admin: elenco di tutte le scommesse e revoca dei pagamenti
+create function pg_temp.adm(q text) returns jsonb language plpgsql as $$
+declare r jsonb;
+begin perform pg_temp.as_('Admin'); execute q into r; return r; end $$;
+create function pg_temp.rev(bid uuid, why text default 'prova di revoca', refund boolean default false) returns jsonb language plpgsql as $$
+begin perform pg_temp.as_('Admin'); return public.bet_admin_revoke(bid, why, refund); end $$;
+create function pg_temp.reve(bid uuid, why text default 'prova di revoca', refund boolean default false) returns text language plpgsql as $$
+begin perform pg_temp.as_('Admin'); perform public.bet_admin_revoke(bid, why, refund); return null; exception when others then return sqlerrm; end $$;
+create function pg_temp.bid(u text, m uuid) returns uuid language sql as $$ select id from public.bets where user_id = pg_temp.uid(u) and match_id = m $$;
+do $$
+declare m1 uuid; m2 uuid; m3 uuid; m4 uuid; m5 uuid; l jsonb; x jsonb; r jsonb; cy0 integer; di0 integer; ev0 integer; ret integer; lg integer; nopen integer; nset integer;
+begin
+  perform pg_temp.addr('Fay', 0, 0, 0); perform pg_temp.addr('Gus', 0, 0, 0);
+  perform pg_temp.fund('Cyr', 1000); perform pg_temp.fund('Dia', 1000); perform pg_temp.fund('Eve', 1000);
+  m1 := pg_temp.mk('Fay', 'Gus', 'accepted', 'Edison');
+  perform pg_temp.bet('Cyr', m1, 'Fay', 100); perform pg_temp.bet('Dia', m1, 'Gus', 100);
+  perform pg_temp.mst(m1, 'closed', 'challenger');                                  -- Cyr vince, Dia perde
+  m2 := pg_temp.mk('Fay', 'Gus', 'accepted', 'Edison');
+  perform pg_temp.bet('Eve', m2, 'Fay', 60); perform pg_temp.mst(m2, 'cancelled');   -- Eve: puntata restituita
+  m3 := pg_temp.mk('Fay', 'Gus', 'pending', 'Edison');
+  perform pg_temp.bet('Cyr', m3, 'Gus', 50); perform pg_temp.bet('Dia', m3, 'Fay', 50);   -- due scommesse ancora da pagare
+  assert pg_temp.bst('Cyr', m1) = 'won' and pg_temp.bst('Dia', m1) = 'lost' and pg_temp.bst('Eve', m2) = 'refunded' and pg_temp.bst('Cyr', m3) = 'open', 'S13: preparazione';
+  -- permessi: solo l'admin
+  assert pg_temp.err_as('Cyr', 'select public.bet_admin_list()') = 'Permessi insufficienti', 'S13: l''elenco admin è solo per l''admin';
+  assert pg_temp.err_as('Cyr', format('select public.bet_admin_revoke(%L, ''prova di revoca'', false)', pg_temp.bid('Cyr', m1))) = 'Permessi insufficienti', 'S13: la revoca è solo per l''admin';
+  assert not has_function_privilege('anon', 'public.bet_admin_list()', 'execute') and not has_function_privilege('anon', 'public.bet_admin_revoke(uuid,text,boolean)', 'execute')
+     and not has_function_privilege('authenticated', 'public._bet_admin_row(public.bets)', 'execute'), 'S13: nessun accesso da anonimi né alla funzione interna';
+  assert pg_temp.bst('Cyr', m1) = 'won', 'S13: il rifiuto non cambia nulla';
+  -- elenco: tutte le scommesse esistenti, da pagare e liquidate, di tutti gli utenti
+  l := pg_temp.adm('select public.bet_admin_list()');
+  select count(*) filter (where status = 'open'), count(*) filter (where status <> 'open') into nopen, nset from public.bets;
+  assert jsonb_array_length(l->'open') = nopen and (l->>'open_count')::int = nopen and jsonb_array_length(l->'settled') = nset and (l->>'settled_count')::int = nset, 'S13: l''elenco contiene tutte le scommesse (' || nopen || ' da pagare, ' || nset || ' liquidate)';
+  assert not exists (select 1 from jsonb_array_elements(l->'open') e where e->>'status' <> 'open') and not exists (select 1 from jsonb_array_elements(l->'settled') e where e->>'status' = 'open'), 'S13: da pagare e liquidate separate';
+  assert exists (select 1 from jsonb_array_elements(l->'open') e where e->>'user_name' = 'Cyr' and e->>'pick_name' = 'Gus' and (e->>'stake')::int = 50)
+     and exists (select 1 from jsonb_array_elements(l->'open') e where e->>'user_name' = 'Dia' and e->>'pick_name' = 'Fay'), 'S13: si vede chi ha scommesso e su chi';
+  x := (select e from jsonb_array_elements(l->'settled') e where e->>'user_name' = 'Cyr' and e->>'match' = m1::text);
+  assert x->>'status' = 'won' and (x->>'returned')::int = (select returned from public.bets where id = pg_temp.bid('Cyr', m1)) and x->>'challenger_name' = 'Fay' and (x->>'balance')::int = pg_temp.bal('Cyr'), 'S13: riga liquidata con importo pagato e saldo: ' || coalesce(x::text, 'null');
+  -- errori della revoca
+  assert pg_temp.reve(pg_temp.bid('Cyr', m1), 'ok') = 'Motivazione obbligatoria' and pg_temp.reve(pg_temp.bid('Cyr', m1), null) = 'Motivazione obbligatoria', 'S13: motivazione obbligatoria';
+  assert pg_temp.reve(gen_random_uuid()) = 'Scommessa non trovata', 'S13: scommessa inesistente';
+  assert pg_temp.reve(pg_temp.bid('Cyr', m3)) like 'Scommessa non ancora pagata%', 'S13: una scommessa aperta non si revoca';
+  assert pg_temp.reve(pg_temp.bid('Dia', m1)) like '%non ha pagato nulla%', 'S13: una scommessa persa non ha niente da revocare';
+  assert pg_temp.bst('Cyr', m1) = 'won' and pg_temp.inv() = 0, 'S13: gli errori non cambiano nulla';
+  -- revoca di una vincita: tutto il pagamento viene ripreso, la puntata resta persa
+  cy0 := pg_temp.bal('Cyr'); ret := pg_temp.bret('Cyr', m1); lg := (select count(*) from public.ledger_entries);
+  r := pg_temp.rev(pg_temp.bid('Cyr', m1), 'vincita non dovuta');
+  assert (r->>'recovered')::int = ret and (r->>'not_recovered')::int = 0 and pg_temp.bal('Cyr') = cy0 - ret, 'S13: ripresi i BC pagati: ' || r::text;
+  assert pg_temp.bst('Cyr', m1) = 'revoked' and pg_temp.bret('Cyr', m1) = 0 and (select revoke_reason from public.bets where id = pg_temp.bid('Cyr', m1)) = 'vincita non dovuta'
+     and (select revoked_at is not null and revoked_by = pg_temp.uid('Admin') from public.bets where id = pg_temp.bid('Cyr', m1)), 'S13: stato revocata, motivo e autore';
+  assert (select count(*) from public.ledger_entries) = lg + 1 and (select amount from public.ledger_entries where kind = 'bet_reversal' and ref_id = pg_temp.bid('Cyr', m1)) = -ret, 'S13: una riga di registro con l''importo ripreso';
+  assert (select count(*) from public.audit_logs where action = 'bet_revoke' and entity_id = pg_temp.bid('Cyr', m1)::text and reason = 'vincita non dovuta') = 1, 'S13: audit della revoca';
+  assert pg_temp.reve(pg_temp.bid('Cyr', m1)) = 'Pagamento già revocato' and pg_temp.bal('Cyr') = cy0 - ret, 'S13: una sola revoca';
+  -- una correzione successiva del risultato non ripaga la scommessa revocata
+  di0 := pg_temp.bal('Dia');
+  perform pg_temp.mst(m1, 'closed', 'opponent');                                    -- ora vincerebbe Gus: Dia viene pagata, Cyr no
+  assert pg_temp.bst('Cyr', m1) = 'revoked' and pg_temp.bal('Cyr') = cy0 - ret and pg_temp.bst('Dia', m1) = 'won' and pg_temp.bal('Dia') > di0, 'S13: la correzione paga Dia ma non rimette in pagamento Cyr';
+  perform pg_temp.mst(m1, 'closed', 'challenger');
+  assert pg_temp.bst('Cyr', m1) = 'revoked' and pg_temp.bal('Cyr') = cy0 - ret and pg_temp.bst('Dia', m1) = 'lost' and pg_temp.bal('Dia') = di0, 'S13: tornati al risultato iniziale: Cyr resta revocata, Dia come prima';
+  perform pg_temp.mst(m1, 'voided');
+  assert pg_temp.bst('Cyr', m1) = 'revoked' and pg_temp.bret('Cyr', m1) = 0 and pg_temp.bal('Cyr') = cy0 - ret, 'S13: nemmeno l''annullamento della sfida restituisce la puntata revocata';
+  perform pg_temp.as_('Cyr'); assert public.bet_sync() = 0, 'S13: bet_sync non tocca le revocate';
+  assert pg_temp.inv() = 0, 'S13: saldi = registro';
+  -- «annulla e rimborsa»: si toglie solo la vincita, la puntata resta a chi ha puntato
+  m4 := pg_temp.mk('Fay', 'Gus', 'accepted', 'Edison');
+  perform pg_temp.bet('Eve', m4, 'Gus', 100); perform pg_temp.mst(m4, 'closed', 'opponent');
+  ev0 := pg_temp.bal('Eve'); ret := pg_temp.bret('Eve', m4);
+  assert pg_temp.bst('Eve', m4) = 'won' and ret > 100, 'S13: Eve ha vinto più della puntata';
+  r := pg_temp.rev(pg_temp.bid('Eve', m4), 'rimborso della sola puntata', true);
+  assert (r->>'recovered')::int = ret - 100 and pg_temp.bal('Eve') = ev0 - (ret - 100) and pg_temp.bst('Eve', m4) = 'revoked' and pg_temp.bret('Eve', m4) = 100, 'S13: tolta la sola vincita, la puntata resta: ' || r::text;
+  -- un rimborso (sfida annullata): «annulla e rimborsa» non ha senso, la revoca piena riprende la puntata
+  ev0 := pg_temp.bal('Eve');
+  assert pg_temp.reve(pg_temp.bid('Eve', m2), 'prova', true) = 'Con la puntata restituita non c''è nulla da togliere', 'S13: rimborso + puntata restituita = niente da togliere';
+  r := pg_temp.rev(pg_temp.bid('Eve', m2), 'rimborso non dovuto');
+  assert (r->>'recovered')::int = 60 and pg_temp.bal('Eve') = ev0 - 60 and pg_temp.bst('Eve', m2) = 'revoked', 'S13: revocato anche un rimborso';
+  -- saldo già speso: si riprende solo ciò che c'è, il resto è «non recuperato», mai saldi negativi
+  m5 := pg_temp.mk('Fay', 'Gus', 'accepted', 'Edison');
+  perform pg_temp.bet('Dia', m5, 'Gus', 100); perform pg_temp.mst(m5, 'closed', 'opponent');
+  ret := pg_temp.bret('Dia', m5);
+  perform pg_temp.fund('Dia', 30);                                                     -- Dia ha speso quasi tutto
+  r := pg_temp.rev(pg_temp.bid('Dia', m5), 'prova con saldo già speso');
+  assert (r->>'recovered')::int = 30 and (r->>'not_recovered')::int = ret - 30 and pg_temp.bal('Dia') = 0, 'S13: ripresi solo i 30 disponibili: ' || r::text;
+  assert (select written_off from public.bets where id = pg_temp.bid('Dia', m5)) = ret - 30 and pg_temp.bst('Dia', m5) = 'revoked', 'S13: il resto è scritto come non recuperato';
+  assert not exists (select 1 from public.wallets where balance < 0) and pg_temp.inv() = 0, 'S13: nessun saldo negativo, saldi = registro';
+  -- saldo zero: la revoca si registra ma non muove nulla
+  m5 := pg_temp.mk('Fay', 'Gus', 'accepted', 'Edison'); perform pg_temp.fund('Dia', 200);
+  perform pg_temp.bet('Dia', m5, 'Gus', 100); perform pg_temp.mst(m5, 'closed', 'opponent'); ret := pg_temp.bret('Dia', m5);
+  lg := (select count(*) from public.ledger_entries); perform pg_temp.fund('Dia', 0);
+  lg := (select count(*) from public.ledger_entries);
+  r := pg_temp.rev(pg_temp.bid('Dia', m5), 'saldo a zero');
+  assert (r->>'recovered')::int = 0 and (r->>'not_recovered')::int = ret and (select count(*) from public.ledger_entries) = lg and pg_temp.bst('Dia', m5) = 'revoked', 'S13: saldo a zero: segnata, nessun movimento: ' || r::text;
+  -- riepilogo e pagina «le mie scommesse»
+  x := pg_temp.adm('select public.bet_admin_stats()');
+  assert (x->>'revoked_count')::int = 5, 'S13: il riepilogo conta le revocate: ' || x::text;
+  l := pg_temp.adm('select public.bet_admin_list()');
+  assert exists (select 1 from jsonb_array_elements(l->'settled') e where e->>'status' = 'revoked' and e->>'revoke_reason' = 'vincita non dovuta' and e->>'revoked_at' is not null), 'S13: l''elenco mostra le revocate con il motivo';
+  perform pg_temp.as_('Cyr');
+  x := (select e from jsonb_array_elements(public.bet_mine()) e where e->>'match' = m1::text);
+  assert x->>'status' = 'revoked' and x->>'revoked_at' is not null and (x->>'returned')::int = 0, 'S13: lo scommettitore vede «revocata»: ' || coalesce(x::text, 'null');
+  assert pg_temp.bst('Cyr', m3) = 'open' and pg_temp.bst('Dia', m3) = 'open', 'S13: le scommesse da pagare non sono toccate';
+  assert pg_temp.inv() = 0, 'S13: saldi = registro';
+  insert into t_log (msg) values ('OK S13 — admin: elenco da pagare/liquidate, revoca (piena, solo vincita, rimborso), saldo già speso, nessuna ripetizione, nemmeno dopo correzioni');
+end $$;
+
 select n, msg from t_log order by n;
 rollback;
