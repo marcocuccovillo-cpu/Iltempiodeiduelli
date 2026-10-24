@@ -1,0 +1,482 @@
+[
+ {
+  "key": "xp_pipistrello",
+  "categoria": "Pet",
+  "rarita": "comune",
+  "prezzo_bc": 39,
+  "nome": "Pipistrello Runico",
+  "descrizione": "Un pipistrello notturno con una runa che pulsa sul petto: ti segue ovunque sul profilo."
+ },
+ {
+  "key": "xp_golem",
+  "categoria": "Pet",
+  "rarita": "comune",
+  "prezzo_bc": 47,
+  "nome": "Golem di Cristallo",
+  "descrizione": "Un piccolo golem di cristallo azzurro, testardo e brillante. Non cade mai."
+ },
+ {
+  "key": "xp_volpe",
+  "categoria": "Pet",
+  "rarita": "raro",
+  "prezzo_bc": 117,
+  "nome": "Volpe delle Nove Code",
+  "descrizione": "Nove code di fuoco fatuo e un sorriso furbo: la compagna dei duellanti più astuti."
+ },
+ {
+  "key": "xp_cavaliere",
+  "categoria": "Pet",
+  "rarita": "raro",
+  "prezzo_bc": 131,
+  "nome": "Cavaliere d’Argento",
+  "descrizione": "Un minuscolo cavaliere in armatura d’argento che veglia sul tuo profilo con la spada sguainata."
+ },
+ {
+  "key": "xp_lupo",
+  "categoria": "Pet",
+  "rarita": "raro",
+  "prezzo_bc": 143,
+  "nome": "Lupo delle Tempeste",
+  "descrizione": "Il pelo carico di elettricità e gli occhi di ghiaccio: ulula quando arriva il temporale."
+ },
+ {
+  "key": "xp_grifone",
+  "categoria": "Pet",
+  "rarita": "epico",
+  "prezzo_bc": 227,
+  "nome": "Grifone d’Oro",
+  "descrizione": "Testa d’aquila, corpo di leone e ali di luce dorata. Un guardiano fiero e leale."
+ },
+ {
+  "key": "xp_sfinge",
+  "categoria": "Pet",
+  "rarita": "epico",
+  "prezzo_bc": 263,
+  "nome": "Sfinge del Deserto Eterno",
+  "descrizione": "Custodisce enigmi vecchi di mille anni: chi non li risolve resta fuori dal tempio."
+ },
+ {
+  "key": "xp_idra",
+  "categoria": "Pet",
+  "rarita": "epico",
+  "prezzo_bc": 319,
+  "nome": "Idra a Tre Teste",
+  "descrizione": "Tre teste, tre sguardi, nessuna pietà. Tagliane una e il tuo profilo ne guadagna altre due."
+ },
+ {
+  "key": "xp_drago_cremisi",
+  "categoria": "Pet",
+  "rarita": "leggendario",
+  "prezzo_bc": 489,
+  "nome": "Drago dell’Alba Cremisi",
+  "descrizione": "Un drago rosso come il cielo prima della battaglia, con ali di brace e artigli d’ossidiana."
+ },
+ {
+  "key": "xp_cerbero",
+  "categoria": "Pet",
+  "rarita": "leggendario",
+  "prezzo_bc": 566,
+  "nome": "Cerbero degli Inferi",
+  "descrizione": "Tre teste e tre criniere di fiamma viola: sorveglia le porte del Tempio più oscuro."
+ },
+ {
+  "key": "xp_leviatano",
+  "categoria": "Pet",
+  "rarita": "leggendario",
+  "prezzo_bc": 649,
+  "nome": "Leviatano Etereo",
+  "descrizione": "Un serpente marino di luce e nebbia che nuota nell’aria sopra il tuo nome."
+ },
+ {
+  "key": "xp_arcidemone",
+  "categoria": "Pet",
+  "rarita": "mitico",
+  "prezzo_bc": 799,
+  "nome": "Arcidemone Cornuto",
+  "descrizione": "Corna d’ebano, ali di pipistrello e occhi d’oro fuso: un signore del caos in miniatura."
+ },
+ {
+  "key": "xp_drago_cosmico",
+  "categoria": "Pet",
+  "rarita": "mitico",
+  "prezzo_bc": 949,
+  "nome": "Drago Cosmico del Vuoto",
+  "descrizione": "Il suo corpo è un pezzo di notte stellata. Dove passa, le costellazioni si spostano."
+ },
+ {
+  "key": "xp_ouroboros",
+  "categoria": "Pet",
+  "rarita": "divino",
+  "prezzo_bc": 2500,
+  "nome": "Ouroboros Cosmico",
+  "descrizione": "Il drago che morde la propria coda: un anello infinito di stelle, il companion più raro del Tempio."
+ },
+ {
+  "key": "xf_rovi",
+  "categoria": "Cornici",
+  "rarita": "comune",
+  "prezzo_bc": 29,
+  "nome": "Cornice di Rovi e Spine",
+  "descrizione": "Rovi neri con spine e boccioli cremisi attorno al tuo avatar."
+ },
+ {
+  "key": "xf_rune",
+  "categoria": "Cornici",
+  "rarita": "raro",
+  "prezzo_bc": 89,
+  "nome": "Cornice Runica",
+  "descrizione": "Un anello di rune d’argento che si accendono una dopo l’altra."
+ },
+ {
+  "key": "xf_ghiaccio",
+  "categoria": "Cornici",
+  "rarita": "raro",
+  "prezzo_bc": 129,
+  "nome": "Cornice di Ghiaccio Eterno",
+  "descrizione": "Cristalli di ghiaccio azzurro che non si sciolgono mai."
+ },
+ {
+  "key": "xf_drago",
+  "categoria": "Cornici",
+  "rarita": "epico",
+  "prezzo_bc": 199,
+  "nome": "Cornice Draconica",
+  "descrizione": "Scaglie di drago bronzo con quattro artigli che stringono l’avatar."
+ },
+ {
+  "key": "xf_fulmini",
+  "categoria": "Cornici",
+  "rarita": "epico",
+  "prezzo_bc": 279,
+  "nome": "Cornice di Fulmini",
+  "descrizione": "Un anello di archi elettrici che scoccano lungo il bordo."
+ },
+ {
+  "key": "xf_millennio",
+  "categoria": "Cornici",
+  "rarita": "leggendario",
+  "prezzo_bc": 459,
+  "nome": "Cornice del Millennio Dorato",
+  "descrizione": "Oro massiccio, gemme e un occhio ornamentale in alto: la cornice dei collezionisti."
+ },
+ {
+  "key": "xf_infernale",
+  "categoria": "Cornici",
+  "rarita": "leggendario",
+  "prezzo_bc": 599,
+  "nome": "Cornice delle Fiamme Infere",
+  "descrizione": "Fiamme rosso-viola che salgono lungo l’anello e non si spengono."
+ },
+ {
+  "key": "xf_siderale",
+  "categoria": "Cornici",
+  "rarita": "mitico",
+  "prezzo_bc": 849,
+  "nome": "Cornice Siderale",
+  "descrizione": "Un anello di stelle e pianeti in orbita attorno al tuo avatar."
+ },
+ {
+  "key": "xf_vuoto",
+  "categoria": "Cornici",
+  "rarita": "mitico",
+  "prezzo_bc": 979,
+  "nome": "Cornice del Vuoto",
+  "descrizione": "Una crepa nello spazio: il bordo del tuo avatar si piega verso il nulla."
+ },
+ {
+  "key": "xf_eclissi",
+  "categoria": "Cornici",
+  "rarita": "divino",
+  "prezzo_bc": 1800,
+  "nome": "Cornice dell’Eclissi Divina",
+  "descrizione": "Un’eclissi totale con corona di luce e raggi dorati: la cornice più prestigiosa del Tempio."
+ },
+ {
+  "key": "xa_braci",
+  "categoria": "Aure",
+  "rarita": "comune",
+  "prezzo_bc": 44,
+  "nome": "Aura di Braci",
+  "descrizione": "Piccole braci calde che salgono lente attorno al profilo."
+ },
+ {
+  "key": "xa_druidica",
+  "categoria": "Aure",
+  "rarita": "raro",
+  "prezzo_bc": 99,
+  "nome": "Aura Druidica",
+  "descrizione": "Foglie e luci verdi che danzano come in una foresta antica."
+ },
+ {
+  "key": "xa_gelida",
+  "categoria": "Aure",
+  "rarita": "raro",
+  "prezzo_bc": 139,
+  "nome": "Aura Gelida",
+  "descrizione": "Un respiro di gelo azzurro con cristalli che ruotano piano."
+ },
+ {
+  "key": "xa_tempesta",
+  "categoria": "Aure",
+  "rarita": "epico",
+  "prezzo_bc": 189,
+  "nome": "Aura Tempestosa",
+  "descrizione": "Nubi scure e lampi viola attorno a te: la tempesta ti appartiene."
+ },
+ {
+  "key": "xa_sacra",
+  "categoria": "Aure",
+  "rarita": "epico",
+  "prezzo_bc": 299,
+  "nome": "Aura Sacra",
+  "descrizione": "Un alone dorato con raggi di luce che ruotano come un’aureola."
+ },
+ {
+  "key": "xa_infernale",
+  "categoria": "Aure",
+  "rarita": "leggendario",
+  "prezzo_bc": 419,
+  "nome": "Aura Infernale",
+  "descrizione": "Un anello di fiamme rosso-viola che ruggisce attorno al profilo."
+ },
+ {
+  "key": "xa_astrale",
+  "categoria": "Aure",
+  "rarita": "leggendario",
+  "prezzo_bc": 679,
+  "nome": "Aura Astrale",
+  "descrizione": "Un velo di aurora boreale e stelle cadenti, in tutti i colori della notte."
+ },
+ {
+  "key": "xa_caos",
+  "categoria": "Aure",
+  "rarita": "mitico",
+  "prezzo_bc": 739,
+  "nome": "Aura del Caos",
+  "descrizione": "Vortici magenta e turchesi che si inseguono senza regole."
+ },
+ {
+  "key": "xa_galattica",
+  "categoria": "Aure",
+  "rarita": "mitico",
+  "prezzo_bc": 989,
+  "nome": "Aura Galattica",
+  "descrizione": "Una piccola galassia a spirale ruota attorno al tuo profilo."
+ },
+ {
+  "key": "xa_singolarita",
+  "categoria": "Aure",
+  "rarita": "divino",
+  "prezzo_bc": 2200,
+  "nome": "Aura della Singolarità",
+  "descrizione": "Un buco nero con disco di accrescimento e luce piegata: l’aura definitiva."
+ },
+ {
+  "key": "xe_guardiano",
+  "categoria": "Emblemi",
+  "rarita": "comune",
+  "prezzo_bc": 19,
+  "nome": "Rune del Guardiano",
+  "descrizione": "Lo scudo con tre rune: il simbolo di chi difende il Tempio."
+ },
+ {
+  "key": "xe_mago",
+  "categoria": "Emblemi",
+  "rarita": "comune",
+  "prezzo_bc": 33,
+  "nome": "Sigillo del Mago",
+  "descrizione": "Un esagramma d’argento con una gemma al centro."
+ },
+ {
+  "key": "xe_spada",
+  "categoria": "Emblemi",
+  "rarita": "raro",
+  "prezzo_bc": 69,
+  "nome": "Spada e Scudo",
+  "descrizione": "Una spada incrociata a uno scudo: l’emblema di chi non arretra."
+ },
+ {
+  "key": "xe_occhio",
+  "categoria": "Emblemi",
+  "rarita": "raro",
+  "prezzo_bc": 119,
+  "nome": "Occhio Ierofante",
+  "descrizione": "Un occhio dorato in un triangolo, simbolo dei veggenti."
+ },
+ {
+  "key": "xe_stella",
+  "categoria": "Emblemi",
+  "rarita": "epico",
+  "prezzo_bc": 169,
+  "nome": "Stella del Duellante",
+  "descrizione": "Una stella a quattro punte incisa nel metallo blu."
+ },
+ {
+  "key": "xe_corona",
+  "categoria": "Emblemi",
+  "rarita": "epico",
+  "prezzo_bc": 239,
+  "nome": "Corona Spezzata",
+  "descrizione": "Una corona d’oro crepata: chi la porta ha perso un regno e ne ha conquistato un altro."
+ },
+ {
+  "key": "xe_ali",
+  "categoria": "Emblemi",
+  "rarita": "leggendario",
+  "prezzo_bc": 389,
+  "nome": "Ali dell’Araldo",
+  "descrizione": "Due grandi ali bianche attorno a una gemma celeste."
+ },
+ {
+  "key": "xe_teschio",
+  "categoria": "Emblemi",
+  "rarita": "leggendario",
+  "prezzo_bc": 529,
+  "nome": "Teschio Coronato",
+  "descrizione": "Un teschio con corona e occhi di brace: il re dei morti non dimentica."
+ },
+ {
+  "key": "xe_drago",
+  "categoria": "Emblemi",
+  "rarita": "mitico",
+  "prezzo_bc": 719,
+  "nome": "Sigillo del Drago Antico",
+  "descrizione": "Un drago che si avvolge su sé stesso dentro un cerchio di rune."
+ },
+ {
+  "key": "xe_infinito",
+  "categoria": "Emblemi",
+  "rarita": "mitico",
+  "prezzo_bc": 899,
+  "nome": "Emblema dell’Infinito",
+  "descrizione": "Il segno dell’infinito, luminoso e senza fine, su un disco di notte."
+ },
+ {
+  "key": "xt_cacciatore",
+  "categoria": "Titoli",
+  "rarita": "comune",
+  "prezzo_bc": 35,
+  "nome": "Cacciatore di Draghi",
+  "descrizione": "Il titolo di chi ha già affrontato qualcosa di più grosso di lui."
+ },
+ {
+  "key": "xt_custode",
+  "categoria": "Titoli",
+  "rarita": "raro",
+  "prezzo_bc": 79,
+  "nome": "Custode delle Rune",
+  "descrizione": "Per chi conosce i segni antichi e li protegge."
+ },
+ {
+  "key": "xt_stregone",
+  "categoria": "Titoli",
+  "rarita": "raro",
+  "prezzo_bc": 109,
+  "nome": "Stregone Errante",
+  "descrizione": "Nessuna dimora, mille incantesimi."
+ },
+ {
+  "key": "xt_signore",
+  "categoria": "Titoli",
+  "rarita": "epico",
+  "prezzo_bc": 179,
+  "nome": "Signore del Mazzo",
+  "descrizione": "Ogni carta al suo posto, ogni mano sotto controllo."
+ },
+ {
+  "key": "xt_eroe",
+  "categoria": "Titoli",
+  "rarita": "epico",
+  "prezzo_bc": 259,
+  "nome": "Eroe della Leggenda",
+  "descrizione": "Il suo nome sarà cantato nelle taverne del Tempio."
+ },
+ {
+  "key": "xt_caos",
+  "categoria": "Titoli",
+  "rarita": "leggendario",
+  "prezzo_bc": 449,
+  "nome": "Maestro del Caos",
+  "descrizione": "Perde il controllo solo quando vuole."
+ },
+ {
+  "key": "xt_re",
+  "categoria": "Titoli",
+  "rarita": "leggendario",
+  "prezzo_bc": 619,
+  "nome": "Re dei Duellanti",
+  "descrizione": "Il trono è vuoto solo finché non arriva lui."
+ },
+ {
+  "key": "xt_imperatore",
+  "categoria": "Titoli",
+  "rarita": "mitico",
+  "prezzo_bc": 769,
+  "nome": "Imperatore dell’Abisso",
+  "descrizione": "Regna dove la luce non arriva."
+ },
+ {
+  "key": "xt_dio",
+  "categoria": "Titoli",
+  "rarita": "mitico",
+  "prezzo_bc": 969,
+  "nome": "Dio dei Duelli",
+  "descrizione": "Non gioca le carte: le scrive."
+ },
+ {
+  "key": "xt_sovrano",
+  "categoria": "Titoli",
+  "rarita": "divino",
+  "prezzo_bc": 3000,
+  "nome": "Eterno Sovrano del Tempio",
+  "descrizione": "Il titolo che nessuno ha mai davvero tolto a chi lo porta."
+ },
+ {
+  "key": "xx_scintille",
+  "categoria": "Effetti",
+  "rarita": "comune",
+  "prezzo_bc": 31,
+  "nome": "Scintille Dorate",
+  "descrizione": "Stelline d’oro che si accendono e si spengono sul profilo."
+ },
+ {
+  "key": "xx_piume",
+  "categoria": "Effetti",
+  "rarita": "raro",
+  "prezzo_bc": 97,
+  "nome": "Piume di Fenice",
+  "descrizione": "Piume incandescenti che cadono piano e si spengono prima di toccare terra."
+ },
+ {
+  "key": "xx_fulmini",
+  "categoria": "Effetti",
+  "rarita": "epico",
+  "prezzo_bc": 209,
+  "nome": "Fulmini Viola",
+  "descrizione": "Saette viola che guizzano ai lati del profilo."
+ },
+ {
+  "key": "xx_neve",
+  "categoria": "Effetti",
+  "rarita": "epico",
+  "prezzo_bc": 289,
+  "nome": "Neve Mistica",
+  "descrizione": "Fiocchi di neve azzurra che scendono come una magia."
+ },
+ {
+  "key": "xx_meteore",
+  "categoria": "Effetti",
+  "rarita": "leggendario",
+  "prezzo_bc": 569,
+  "nome": "Pioggia di Meteore",
+  "descrizione": "Meteore che solcano il cielo del tuo profilo, una dopo l’altra."
+ },
+ {
+  "key": "xx_anime",
+  "categoria": "Effetti",
+  "rarita": "mitico",
+  "prezzo_bc": 929,
+  "nome": "Tempesta di Anime",
+  "descrizione": "Spiriti luminosi che girano in cerchio attorno a te, sussurrando."
+ }
+]

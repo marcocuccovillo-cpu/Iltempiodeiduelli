@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anteprima — 60 nuovi premi dello Shop</title>
+<style>
+:root{--bg:#070d1c;--surf:#0b1326;--line:rgba(0,229,255,.2);--tx:#e2e8f0;--mu:#94a3b8;--gold:#e8b84a;--disp:Cinzel,Georgia,serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,sans-serif;padding:16px 16px 60px;max-width:1200px;margin-inline:auto}
+h1{font:700 1.5rem var(--disp);color:var(--gold);margin:6px 0 4px}h2{font:700 1.15rem var(--disp);color:var(--gold);margin:26px 0 10px;display:flex;gap:10px;align-items:center}h2::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+p.lead{color:var(--mu);margin:0 0 14px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.bar button{all:unset;cursor:pointer;padding:7px 12px;border:1px solid var(--line);border-radius:99px;color:var(--tx);font-size:.9rem}.bar button[aria-pressed=true]{background:#162a5c;border-color:#00e5ff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{border:1px solid var(--line);border-radius:14px;padding:10px;background:linear-gradient(160deg,#13224a88,var(--surf));text-align:center;display:flex;flex-direction:column;gap:6px}
+.art{width:100%;aspect-ratio:1;max-width:130px;margin:0 auto;background:radial-gradient(circle at 50% 40%,#13224a,#060b17);border-radius:12px;position:relative;overflow:hidden;display:grid;place-items:center}
+.art .av{position:absolute;inset:26.5%;border-radius:50%;background:linear-gradient(145deg,#334155,#0f172a);display:grid;place-items:center;font:700 1.4rem var(--disp);color:#cbd5e1}
+.art svg{position:absolute;inset:0}
+.card b{font-size:.92rem;line-height:1.2}.card small{color:var(--mu);font-size:.78rem;line-height:1.25}
+.r{display:inline-block;font:700 .66rem system-ui;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:99px;margin:0 auto}
+.r.comune{background:#334155;color:#e2e8f0}.r.raro{background:#1d4ed8;color:#dbeafe}.r.epico{background:#7e22ce;color:#f3e8ff}.r.leggendario{background:#b45309;color:#fff7d1}.r.mitico{background:#be123c;color:#ffe4e6}.r.divino{background:linear-gradient(90deg,#22d3ee,#a78bfa,#f472b6);color:#06101f}
+.pr{font:700 .95rem var(--disp);color:var(--gold)}
+.ttl{display:grid;place-items:center;min-height:130px;font-size:1.05rem;text-align:center;padding:6px}
+.mock{margin:18px 0;border:1px solid var(--line);border-radius:16px;padding:16px;background:var(--surf);display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.mock .stage{position:relative;width:200px;height:200px;flex:none}.mock .stage>*{position:absolute}.mock .stage .av{inset:50px;border-radius:50%;background:linear-gradient(145deg,#475569,#0f172a);display:grid;place-items:center;font:700 2.4rem var(--disp)}
+.mock .pet{width:110px;height:110px;right:-34px;bottom:-14px}
+.mock select{background:#0f172a;color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:6px;margin:3px 0;width:100%}
+.mock .ctl{flex:1 1 220px}.mock .nm{font:700 1.4rem var(--disp);margin:0}.mock .tt{margin:2px 0 8px}
+</style></head><body>
+<h1>Anteprima dei 60 nuovi premi</h1>
+<p class="lead">Pagina di prova autonoma: mostra la grafica originale di <code>shop-art-extra.js</code>. Non tocca lo Shop, i BC o il database.</p>
+<div class="bar" id="bar"><button data-a="1" aria-pressed="true">Animazioni accese</button></div>
+<div class="mock" id="mock"></div>
+<div id="out"></div>
+<script src="shop-art-extra.js"></script>
+<script>
+SHOP_EXTRA.init();
+var CAT={pet:'Pet (14)',frame:'Cornici (10)',aura:'Aure (10)',emblem:'Emblemi (10)',title:'Titoli (10)',effect:'Effetti (6)'};
+var RAR={comune:'Comune',raro:'Raro',epico:'Epico',leggendario:'Leggendario',mitico:'Mitico',divino:'Divino'};
+var anim=true;
+function card(it){
+  var a;
+  if(it.cat==='title') a='<div class="art ttl">'+SHOP_EXTRA.title(it.key,it.name)+'</div>';
+  else if(it.cat==='pet'||it.cat==='emblem') a='<div class="art">'+SHOP_EXTRA.svg(it.key,{anim:anim})+'</div>';
+  else if(it.cat==='aura') a='<div class="art">'+SHOP_EXTRA.svg(it.key,{anim:anim})+'<div class="av">A</div></div>';
+  else a='<div class="art"><div class="av">A</div>'+SHOP_EXTRA.svg(it.key,{anim:anim})+'</div>';
+  return '<div class="card">'+a+'<b>'+it.name+'</b><span class="r '+it.rarity+'">'+RAR[it.rarity]+'</span><span class="pr">'+it.price.toLocaleString('it-IT')+' BC</span><small>'+it.desc+'</small></div>';
+}
+function render(){
+  var h='';
+  Object.keys(CAT).forEach(function(c){h+='<h2>'+CAT[c]+'</h2><div class="grid">'+SHOP_EXTRA.items.filter(function(i){return i.cat===c}).map(card).join('')+'</div>'});
+  document.getElementById('out').innerHTML=h;
+}
+function opts(c){return '<select data-c="'+c+'"><option value="">— nessuno —</option>'+SHOP_EXTRA.items.filter(function(i){return i.cat===c}).map(function(i){return '<option value="'+i.key+'">'+i.name+'</option>'}).join('')+'</select>'}
+var sel={aura:'xa_galattica',frame:'xf_millennio',pet:'xp_drago_cosmico',title:'xt_re',effect:'xx_scintille',emblem:'xe_corona'};
+function mock(){
+  var m=document.getElementById('mock');
+  m.innerHTML='<div class="stage">'+(sel.aura?'<div style="inset:-10px;width:220px;height:220px">'+SHOP_EXTRA.svg(sel.aura,{anim:anim})+'</div>':'')+'<div class="av">A</div>'+(sel.frame?'<div style="inset:0;width:200px;height:200px">'+SHOP_EXTRA.svg(sel.frame,{anim:anim})+'</div>':'')+(sel.effect?'<div style="inset:0;width:200px;height:200px">'+SHOP_EXTRA.svg(sel.effect,{anim:anim})+'</div>':'')+(sel.pet?'<div class="pet">'+SHOP_EXTRA.svg(sel.pet,{anim:anim})+'</div>':'')+'</div>'+
+  '<div class="ctl"><p class="nm">Alessia</p><p class="tt">'+(sel.title?SHOP_EXTRA.title(sel.title):'')+'</p>'+(sel.emblem?'<div style="width:52px;height:52px;display:inline-block">'+SHOP_EXTRA.svg(sel.emblem,{anim:anim})+'</div>':'')+'<br>'+['pet','frame','aura','emblem','title','effect'].map(opts).join('')+'</div>';
+  m.querySelectorAll('select').forEach(function(s){s.value=sel[s.dataset.c]||'';s.onchange=function(){sel[s.dataset.c]=s.value;mock()}});
+}
+document.querySelector('#bar button').onclick=function(){anim=!anim;this.setAttribute('aria-pressed',anim);this.textContent=anim?'Animazioni accese':'Animazioni spente';render();mock()};
+render();mock();
+</script></body></html>

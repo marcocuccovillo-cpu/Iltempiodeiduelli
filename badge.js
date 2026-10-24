@@ -9,8 +9,8 @@
   'use strict';
   var TIER = ['', 'Bronzo', 'Argento', 'Oro', 'Leggenda', 'Unico'];
   var PTS = [0, 1, 3, 6, 10, 5];                       // punti Tempio per livello
-  var GRADES = [[0, 'Novizio'], [6, 'Duellante'], [18, 'Veterano'], [40, 'Maestro'], [80, 'Campione'], [140, 'Leggenda del Tempio']];
-  var AREAS = [['market', 'Black Market'], ['duel', 'Match ufficiali'], ['ladder', 'Ladder'], ['special', 'Speciali']];
+  var GRADES = [[0, 'Novizio'], [6, 'Duellante'], [18, 'Veterano'], [40, 'Maestro'], [80, 'Campione'], [140, 'Leggenda del Tempio'], [240, 'Mito Vivente'], [380, 'Immortale del Tempio'], [520, 'Divinità del Tempio']];
+  var AREAS = [['market', 'Black Market'], ['duel', 'Match ufficiali'], ['ladder', 'Ladder'], ['eroi', 'Guerra degli Eroi'], ['bets', 'Scommesse'], ['sim', 'Duel Simulator'], ['special', 'Speciali']];
   var n = function (v) { return Number(v || 0).toLocaleString('it-IT'); };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }); };
 
@@ -47,6 +47,63 @@
     custode:   { t: 'Custode del Tempio',   ic: 'guard',  names: ['Custode del Tempio', '', '', '', 'Custode del Tempio'], thr: [1], area: 'special', d: function () { return 'Fai parte dello staff del Tempio'; } }
   };
 
+  /* Nuovi traguardi: Guerra degli Eroi, Scommesse e Duel Simulator (calcolati dalla funzione badge_progress_extra, migrazione black-market-badge-extra.sql) */
+  var FAMX = {
+    e_livello: { t: 'Livello dell’eroe', ic: 'hero', names: ['Eroe Emergente', 'Eroe Temprato', 'Eroe Epico', 'Eroe Immortale'], thr: [5, 10, 25, 50], area: 'eroi',
+      d: function(v){return 'Porta il tuo eroe al livello '+n(v)} },
+    e_boss: { t: 'Boss del giorno sconfitti', ic: 'boss', names: ['Primo Sangue', 'Spezzaossa', 'Ammazzabestie', 'Flagello dei Boss'], thr: [1, 5, 15, 40], area: 'eroi',
+      d: function(v){return v==1?'Partecipa alla sconfitta del tuo primo boss del giorno':'Partecipa alla sconfitta di '+n(v)+' boss del giorno'} },
+    e_arena: { t: 'Duelli degli eroi vinti', ic: 'clash', names: ['Battesimo dell’Arena', 'Sfidante dell’Arena', 'Dominatore dell’Arena', 'Imperatore dell’Arena'], thr: [1, 10, 30, 75], area: 'eroi',
+      d: function(v){return v==1?'Vinci il tuo primo duello tra eroi':'Vinci '+n(v)+' duelli tra eroi'} },
+    e_dungeon: { t: 'Dungeon conquistati', ic: 'door', names: ['Esploratore', 'Cavaliere dei Sotterranei', 'Signore del Labirinto', 'Conquistatore degli Abissi'], thr: [1, 5, 15, 40], area: 'eroi',
+      d: function(v){return v==1?'Conquista il tuo primo dungeon':'Conquista '+n(v)+' dungeon diversi'} },
+    e_squadra: { t: 'Imprese in squadra', ic: 'party', names: ['Compagnia Formata', 'Fratelli d’Armi', 'Legione del Tempio', 'Leggenda della Compagnia'], thr: [1, 5, 15, 40], area: 'eroi',
+      d: function(v){return v==1?'Completa un dungeon insieme alla tua squadra':'Completa '+n(v)+' dungeon in squadra'} },
+    e_attacchi: { t: 'Colpi al boss', ic: 'blade', names: ['Primo Fendente', 'Lama Instancabile', 'Tempesta d’Acciaio', 'Distruttore di Mondi'], thr: [10, 50, 150, 400], area: 'eroi',
+      d: function(v){return 'Attacca il boss del giorno '+n(v)+' volte'} },
+    e_cure: { t: 'Cure ai compagni', ic: 'heart', names: ['Mano Gentile', 'Guaritore del Tempio', 'Luce Vitale', 'Santo Rigenerante'], thr: [5, 25, 75, 200], area: 'eroi',
+      d: function(v){return 'Cura i tuoi compagni '+n(v)+' volte'} },
+    e_guardia: { t: 'Guardia alzata', ic: 'ward', names: ['Scudo Alzato', 'Muro Vivente', 'Bastione Eterno', 'Egida Immortale'], thr: [5, 25, 75, 200], area: 'eroi',
+      d: function(v){return 'Proteggi la squadra '+n(v)+' volte'} },
+    e_arsenale: { t: 'Arsenale', ic: 'chest', names: ['Zaino Pieno', 'Collezionista d’Armi', 'Armeria Reale', 'Tesoro del Drago'], thr: [3, 8, 15, 25], area: 'eroi',
+      d: function(v){return 'Possiedi '+n(v)+' oggetti oltre a quelli iniziali'} },
+    e_ruoli: { t: 'Triade Perfetta', ic: 'triad', names: ['', '', '', '', 'Triade Perfetta'], thr: [3], area: 'eroi', sp: true,
+      d: function(){return 'Completa un dungeon come Tank, come Danni e come Supporto'} },
+    b_puntate: { t: 'Scommesse piazzate', ic: 'dice', names: ['Prima Puntata', 'Frequentatore del Banco', 'Habitué del Tavolo', 'Re del Tavolo'], thr: [1, 10, 30, 75], area: 'bets',
+      d: function(v){return v==1?'Piazza la tua prima scommessa':'Piazza '+n(v)+' scommesse'} },
+    b_vinte: { t: 'Scommesse vinte', ic: 'clover', names: ['Colpo Riuscito', 'Occhio Lungo', 'Profeta dell’Arena', 'Oracolo del Tempio'], thr: [1, 5, 15, 40], area: 'bets',
+      d: function(v){return v==1?'Vinci la tua prima scommessa':'Vinci '+n(v)+' scommesse'} },
+    b_serie: { t: 'Serie di scommesse vinte', ic: 'bolt', names: ['Mano Calda', 'Serie d’Oro', 'Fortuna Divina'], thr: [3, 5, 8], area: 'bets',
+      d: function(v){return 'Vinci '+n(v)+' scommesse di fila'} },
+    b_quota: { t: 'Quota più alta vinta', ic: 'target', names: ['Cecchino', 'Colpo Grosso', 'Azzardo Leggendario'], thr: [300, 500, 800], area: 'bets',
+      d: function(v){return 'Vinci una scommessa con quota almeno '+(v/100).toLocaleString('it-IT',{minimumFractionDigits:2})} },
+    b_vincita: { t: 'Vincita più ricca', ic: 'gem', names: ['Guadagno Facile', 'Bella Vincita', 'Colpo da Maestro', 'Il Grande Banco'], thr: [100, 250, 500, 1000], area: 'bets',
+      d: function(v){return 'Guadagna almeno '+n(v)+' BC con una sola scommessa'} },
+    b_profitto: { t: 'Profitto sulle scommesse', ic: 'coins', names: ['In Attivo', 'Banco Saltato', 'Magnate delle Puntate'], thr: [200, 1000, 3000], area: 'bets',
+      d: function(v){return 'Chiudi con '+n(v)+' BC di profitto netto sulle scommesse'} },
+    b_volume: { t: 'Totale puntato', ic: 'stack', names: ['Puntate in Corso', 'Pezzo Grosso', 'Alto Rullante', 'Leviatano del Banco'], thr: [500, 2500, 10000, 25000], area: 'bets',
+      d: function(v){return 'Punta in totale '+n(v)+' BC'} },
+    b_outsider: { t: 'Contro pronostico', ic: 'eye', names: ['Contro Pronostico', 'Bastian Contrario', 'Eretico delle Quote'], thr: [1, 5, 15], area: 'bets',
+      d: function(v){return v==1?'Vinci puntando su chi aveva al massimo il 30% di probabilità':'Vinci '+n(v)+' volte puntando su chi aveva al massimo il 30% di probabilità'} },
+    s_partite: { t: 'Incontri giocati', ic: 'deck', names: ['Primo Incontro', 'Duellante di Tavolo', 'Habitué del Simulatore', 'Maestro del Campo'], thr: [1, 10, 30, 75], area: 'sim',
+      d: function(v){return v==1?'Gioca il tuo primo incontro nel Duel Simulator':'Gioca '+n(v)+' incontri nel Duel Simulator'} },
+    s_vittorie: { t: 'Incontri vinti', ic: 'cup', names: ['Prima Vittoria Virtuale', 'Stratega del Campo', 'Dominatore del Simulatore', 'Leggenda del Campo'], thr: [1, 5, 15, 40], area: 'sim',
+      d: function(v){return v==1?'Vinci il tuo primo incontro nel Duel Simulator':'Vinci '+n(v)+' incontri nel Duel Simulator'} },
+    s_duelli: { t: 'Duelli vinti', ic: 'cards', names: ['Colpo d’Apertura', 'Mano Calda', 'Fiume di Duelli', 'Valanga di Vittorie'], thr: [3, 15, 50, 120], area: 'sim',
+      d: function(v){return 'Vinci '+n(v)+' singoli duelli nel Duel Simulator'} },
+    s_serie: { t: 'Serie di incontri vinti', ic: 'flame', names: ['Tripletta Virtuale', 'Catena di Vittorie', 'Tempesta Digitale'], thr: [3, 5, 8], area: 'sim',
+      d: function(v){return 'Vinci '+n(v)+' incontri di fila nel Duel Simulator'} },
+    s_rimonta: { t: 'Rimonte', ic: 'redo', names: ['Rimonta', 'Ritorno dal Cimitero', 'Fenice del Campo'], thr: [1, 3, 8], area: 'sim',
+      d: function(v){return v==1?'Vinci un incontro dopo aver perso il primo duello':'Vinci '+n(v)+' incontri dopo aver perso il primo duello'} },
+    s_mazzi: { t: 'Mazzi salvati', ic: 'tome', names: ['Primo Mazzo', 'Costruttore', 'Architetto dei Mazzi', 'Bibliotecario del Tempio'], thr: [1, 3, 8, 15], area: 'sim',
+      d: function(v){return v==1?'Salva il tuo primo mazzo nel Duel Simulator':'Salva '+n(v)+' mazzi nella libreria del Duel Simulator'} },
+    s_invitto: { t: 'Vittorie a vita piena', ic: 'ward', names: ['Muro Inviolato', 'Difesa Perfetta', 'Intoccabile'], thr: [1, 3, 10], area: 'sim',
+      d: function(v){return v==1?'Vinci un duello finendo con 8.000 Life Points o più':'Vinci '+n(v)+' duelli finendo con 8.000 Life Points o più'} },
+    x_tre: { t: 'Signore dei Tre Mondi', ic: 'trine', names: ['', '', '', '', 'Signore dei Tre Mondi'], thr: [3], area: 'special', sp: true,
+      d: function(){return 'Vinci una scommessa, conquista un dungeon e vinci un incontro nel Duel Simulator'} }
+  };
+  Object.keys(FAMX).forEach(function (k) { FAM[k] = FAMX[k]; });
+
   /* Icone (24×24, tratto): disegnate a mano, nessuna dipendenza esterna */
   var IC = {
     scroll: '<path d="M7 3h9l3 3v15H7z"/><path d="M10 9h6M10 13h6M10 17h3"/><circle cx="16.5" cy="17.5" r="1.6" fill="currentColor"/>',
@@ -64,6 +121,23 @@
     redo:   '<path d="M20 12a8 8 0 1 1-3-6.2M20 4v5h-5"/><path d="M12 8l-3 4h6z" fill="currentColor"/>',
     eye:    '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/>',
     duo:    '<circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/>',
+    hero: '<path d="M5 13a7 7 0 0 1 14 0v6H5z"/><path d="M5 13h14M12 7v6"/><path d="M12 6c1-3 4-4 7-3-2 1-3 2-3 4"/>',
+    boss: '<path d="M5 3c0 4 1 6 3 7M19 3c0 4-1 6-3 7"/><path d="M7 10h10v5a5 5 0 0 1-10 0z"/><circle cx="9.5" cy="13" r="1.3" fill="currentColor"/><circle cx="14.5" cy="13" r="1.3" fill="currentColor"/><path d="M10 18v3M14 18v3"/>',
+    clash: '<path d="M4 4l10 10M20 4L10 14"/><path d="M13 11l3 3M11 11l-3 3"/><path d="M3 21l4-4M21 21l-4-4"/>',
+    door: '<path d="M5 21V10a7 7 0 0 1 14 0v11z"/><path d="M12 3v18M3 21h18"/><circle cx="9.3" cy="13.5" r="1" fill="currentColor"/><circle cx="14.7" cy="13.5" r="1" fill="currentColor"/>',
+    party: '<circle cx="12" cy="8" r="2.6"/><circle cx="5.5" cy="10" r="2"/><circle cx="18.5" cy="10" r="2"/><path d="M7.5 20c0-3 2-5 4.5-5s4.5 2 4.5 5zM1.5 19c0-2.2 1.5-3.8 3.5-3.8M22.5 19c0-2.2-1.5-3.8-3.5-3.8"/>',
+    blade: '<path d="M12 2l2.2 3v10h-4.4V5z"/><path d="M7 15h10M12 15v5M10 21h4"/>',
+    heart: '<path d="M12 20.5C5 15.5 3 12 3 8.8A4.6 4.6 0 0 1 12 7a4.6 4.6 0 0 1 9 1.8C21 12 19 15.5 12 20.5z"/><path d="M12 9.5v5M9.5 12h5"/>',
+    ward: '<path d="M12 2.5l8 3v6.5c0 4.5-3 7.8-8 9.5-5-1.7-8-5-8-9.5V5.5z"/><path d="M12 6v12M7 11h10"/>',
+    chest: '<path d="M4 10c0-3 2-5 4-5h8c2 0 4 2 4 5v10H4z"/><path d="M4 11h16M4 15h16M12 11v4"/><rect x="10.5" y="13" width="3" height="3" fill="currentColor"/>',
+    triad: '<path d="M12 3l9 16H3z"/><circle cx="12" cy="3" r="1.6" fill="currentColor"/><circle cx="21" cy="19" r="1.6" fill="currentColor"/><circle cx="3" cy="19" r="1.6" fill="currentColor"/><circle cx="12" cy="14" r="2"/>',
+    dice: '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/>',
+    clover: '<circle cx="9" cy="8.5" r="3.4"/><circle cx="15" cy="8.5" r="3.4"/><circle cx="9" cy="14.5" r="3.4"/><circle cx="15" cy="14.5" r="3.4"/><path d="M12 14c0 4 1 6 3.5 7.5"/>',
+    stack: '<ellipse cx="12" cy="6" rx="7" ry="2.6"/><path d="M5 6v4c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V6M5 10v4c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v-4M5 14v4c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v-4"/>',
+    deck: '<rect x="5" y="3.5" width="12" height="17" rx="2" transform="rotate(-8 11 12)"/><rect x="8" y="3.5" width="12" height="17" rx="2"/><path d="M14 9l2 3-2 3-2-3z" fill="currentColor"/>',
+    cards: '<rect x="3.5" y="5" width="11" height="15" rx="2" transform="rotate(-12 9 12)"/><rect x="9.5" y="4" width="11" height="15" rx="2" transform="rotate(10 15 11)"/><path d="M15 9.5l1.4 2-1.4 2-1.4-2z" fill="currentColor"/>',
+    tome: '<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/><path d="M12 6.5l.9 1.8 2 .3-1.4 1.4.3 2-1.8-1-1.8 1 .3-2-1.4-1.4 2-.3z" fill="currentColor"/>',
+    trine: '<circle cx="12" cy="8.5" r="5"/><circle cx="8" cy="15" r="5"/><circle cx="16" cy="15" r="5"/>',
     guard:  '<path d="M12 2.5l8 3v6c0 5-3.4 8.8-8 10.5-4.6-1.7-8-5.5-8-10.5v-6z"/><path d="M12 8l1.4 2.9 3.1.4-2.3 2.1.6 3.1-2.8-1.6-2.8 1.6.6-3.1-2.3-2.1 3.1-.4z" fill="currentColor"/>'
   };
 
@@ -72,9 +146,12 @@
     market:  { o: 'M50 3 L91 26.5 V73.5 L50 97 L9 73.5 V26.5 Z',                                   i: 'M50 11 L84 30.5 V69.5 L50 89 L16 69.5 V30.5 Z', c: 'hex' },
     duel:    { o: 'M50 3 L90 15 V50 C90 75 72 90 50 98 C28 90 10 75 10 50 V15 Z',                   i: 'M50 10 L83 20 V50 C83 71 68 84 50 91 C32 84 17 71 17 50 V20 Z', c: 'shield' },
     ladder:  { o: 'M33 3 H67 L97 33 V67 L67 97 H33 L3 67 V33 Z',                                    i: 'M35 10 H65 L90 35 V65 L65 90 H35 L10 65 V35 Z', c: 'oct' },
+    eroi:    { o: 'M50 2 L88 14 L95 52 L50 98 L5 52 L12 14 Z',                              i: 'M50 10 L81 21 L87 51 L50 89 L13 51 L19 21 Z', c: 'crest' },
+    bets:    { o: 'M50 2 L98 50 L50 98 L2 50 Z',                                             i: 'M50 11 L89 50 L50 89 L11 50 Z', c: 'dia' },
+    sim:     { o: 'M24 3 H76 Q93 3 93 20 V80 Q93 97 76 97 H24 Q7 97 7 80 V20 Q7 3 24 3 Z',   i: 'M25 10 H75 Q86 10 86 21 V79 Q86 90 75 90 H25 Q14 90 14 79 V21 Q14 10 25 10 Z', c: 'card' },
     special: { o: 'M50 3 a47 47 0 1 0 .01 0 Z',                                                    i: 'M50 11 a39 39 0 1 0 .01 0 Z', c: 'circ' }
   };
-  var PLATE = { market: 'pm', duel: 'pd', ladder: 'pl', special: 'ps' };
+  var PLATE = { market: 'pm', duel: 'pd', ladder: 'pl', eroi: 'pe', bets: 'pb', sim: 'px', special: 'ps' };
   var ICCOL = ['', '#ffd9b3', '#f4f8ff', '#fff3b8', '#d9fdff', '#ffffff'];
 
   var CSS = '.tdb{width:96px;height:96px;display:block;flex:none;overflow:visible;transition:transform .25s,filter .25s}.tdb.md{width:72px;height:72px}.tdb.sm{width:56px;height:56px}.tdb.xs{width:42px;height:42px}.tdb.xl{width:150px;height:150px}' +
@@ -104,9 +181,13 @@
     '<radialGradient id="tdgpm" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#7a1a38"/><stop offset="1" stop-color="#1a0610"/></radialGradient>' +
     '<radialGradient id="tdgpd" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#1360a8"/><stop offset="1" stop-color="#04132a"/></radialGradient>' +
     '<radialGradient id="tdgpl" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#6a33c8"/><stop offset="1" stop-color="#150833"/></radialGradient>' +
+    '<radialGradient id="tdgpe" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#c2410c"/><stop offset="1" stop-color="#2a0a02"/></radialGradient>' +
+    '<radialGradient id="tdgpb" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#15803d"/><stop offset="1" stop-color="#02170b"/></radialGradient>' +
+    '<radialGradient id="tdgpx" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#0e7490"/><stop offset="1" stop-color="#031a24"/></radialGradient>' +
     '<radialGradient id="tdgps" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#12896a"/><stop offset="1" stop-color="#03201a"/></radialGradient>' +
     '<linearGradient id="tdgsh" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
     '<clipPath id="tdc-hex"><path d="' + SH.market.o + '"/></clipPath><clipPath id="tdc-shield"><path d="' + SH.duel.o + '"/></clipPath><clipPath id="tdc-oct"><path d="' + SH.ladder.o + '"/></clipPath><clipPath id="tdc-circ"><path d="' + SH.special.o + '"/></clipPath>' +
+    '<clipPath id="tdc-crest"><path d="' + SH.eroi.o + '"/></clipPath><clipPath id="tdc-dia"><path d="' + SH.bets.o + '"/></clipPath><clipPath id="tdc-card"><path d="' + SH.sim.o + '"/></clipPath>' +
     '</defs></svg>';
 
   function init() {
@@ -157,7 +238,7 @@
   /* Vetrina: i badge più alti ottenuti (per il profilo e la dashboard) */
   function showcase(rows, max, size) {
     var e = rows.filter(function (r) { return r.earned; }).sort(function (a, b) { return (b.tier === 5 ? 3.5 : b.tier) - (a.tier === 5 ? 3.5 : a.tier) || (b.threshold - a.threshold) || (a.sort - b.sort); });
-    if (!e.length) return '<p class="mute" style="margin:0">Nessun badge ancora: i traguardi si sbloccano giocando match ufficiali, mettendo e riscuotendo taglie, e sfidando in Ladder.</p>';
+    if (!e.length) return '<p class="mute" style="margin:0">Nessun badge ancora: i traguardi si sbloccano giocando match ufficiali, mettendo e riscuotendo taglie, sfidando in Ladder, combattendo con gli eroi, scommettendo e usando il Duel Simulator.</p>';
     var shown = e.slice(0, max || 8), more = e.length - shown.length;
     return '<div class="tdb-show">' + shown.map(function (r) { return btn(r, size || 'md', true) }).join('') + '</div>' + (more > 0 ? '<p class="mute" style="margin:8px 0 0;font-size:.9rem">…e altri ' + more + '.</p>' : '');
   }
@@ -178,7 +259,7 @@
         if (filter === 'todo' && !nx) return '';
         var shown = filter === 'got' ? got : rs;
         var prog = '';
-        if (hid) prog = '<p class="tdb-hid">' + (rs[0].area === 'ladder' ? 'La Ladder non è attiva: i suoi traguardi tornano visibili quando verrà riaccesa.' : 'Visibile solo al diretto interessato e allo staff.') + '</p>';
+        if (hid) prog = '<p class="tdb-hid">' + (rs[0].area === 'ladder' ? 'La Ladder non è attiva: i suoi traguardi tornano visibili quando verrà riaccesa.' : rs[0].area === 'eroi' ? 'La guerra degli Eroi non è attiva: i suoi traguardi tornano visibili quando verrà riaccesa.' : rs[0].area === 'sim' ? 'Il Duel Simulator non è attivo: i suoi traguardi tornano visibili quando verrà riacceso.' : rs[0].metric === 'x_tre' ? 'Torna visibile quando Eroi e Duel Simulator sono attivi.' : 'Visibile solo al diretto interessato e allo staff.') + '</p>';
         else if (nx) prog = '<p class="tdb-nx">Prossimo: <b>' + esc(meta(nx).name) + '</b> — ' + esc(meta(nx).desc) + '</p><div class="bar"><i style="width:' + Math.min(100, nx.value / nx.threshold * 100) + '%"></i></div><small class="pr">' + n(Math.min(nx.value, nx.threshold)) + ' / ' + n(nx.threshold) + '</small>';
         else prog = '<p class="tdb-nx"><b>Famiglia completata.</b> Hai sbloccato ogni livello.</p>';
         return '<article class="tdb-f' + (!nx && !hid ? ' done' : '') + '"><header><h4>' + esc(fm.t) + '</h4><span>' + got.length + '/' + rs.length + '</span></header><div class="tdb-t">' + shown.map(function (r) { return btn(r, 'md', true) }).join('') + '</div>' + prog + '</article>';
@@ -222,9 +303,14 @@
 
   /* Legge i progressi dal database; richiede la migrazione 007 */
   function load(sb, userId) {
-    return sb.rpc('badge_progress', userId ? { p_user: userId } : {}).then(function (res) {
+    var arg = userId ? { p_user: userId } : {};
+    return sb.rpc('badge_progress', arg).then(function (res) {
       if (res.error) { var m = res.error.message || ''; throw new Error(/could not find the function|schema cache/i.test(m) ? 'Badge non attivi: l’amministratore deve eseguire la migrazione black-market-badge.sql' : m) }
-      return res.data || [];
+      var base = res.data || [];
+      /* nuovi traguardi (Eroi, Scommesse, Duel Simulator): senza la migrazione black-market-badge-extra.sql si vedono solo quelli di prima */
+      return Promise.resolve(sb.rpc('badge_progress_extra', arg)).then(function (ex) {
+        return base.concat(ex && !ex.error && ex.data ? ex.data : []);
+      }, function () { return base; });
     });
   }
 
@@ -233,7 +319,7 @@
     var rows = [], sortN = 0;
     Object.keys(FAM).forEach(function (k) {
       var f = FAM[k];
-      f.thr.forEach(function (th, i) { rows.push({ code: k + '_' + (i + 1), family: k, area: f.area, tier: f.area === 'special' ? 5 : i + 1, metric: '', kind: 'count', threshold: th, value: 0, earned: false, earned_at: null, hidden: false, sort: sortN++ }) });
+      f.thr.forEach(function (th, i) { rows.push({ code: k + '_' + (i + 1), family: k, area: f.area, tier: (f.area === 'special' || f.sp) ? 5 : i + 1, metric: '', kind: 'count', threshold: th, value: 0, earned: false, earned_at: null, hidden: false, sort: sortN++ }) });
     });
     return rows;
   }
