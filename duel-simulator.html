@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="it"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Duel Simulator — Il Tempio Dei Duelli</title><meta name="theme-color" content="#000000">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png?v=2" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,19 +42,20 @@
 /* ===== tavolo ===== */
 body.sm-tbl-on .pg>header,body.sm-tbl-on .sm-intro{display:none}
 body.sm-tbl-on .pg{padding:4px 2px 8px;max-width:600px}
-.sm-t{--cw:52px;--ch:76px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+.sm-t{--cw:52px;--ch:76px;position:relative;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 .sm-t button{touch-action:manipulation}
-.sm-bar{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 8px;padding:4px 8px;border:1px solid var(--line);border-radius:12px;background:var(--surf);min-height:46px}
+.sm-bar{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:2px 8px;padding:4px 8px;border:1px solid var(--line);border-radius:12px;background:var(--surf);height:58px;box-sizing:border-box}
 .sm-bar.turn{border-color:var(--ac);box-shadow:0 0 14px rgba(var(--ac-rgb),.35)}
 .sm-bar .who{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .sm-bar .who small{color:var(--mu);font-weight:400;margin-left:6px}
-.sm-bar .cnt{display:flex;gap:6px;flex-wrap:wrap;font-size:.74rem;color:var(--mu);grid-column:1}
+.sm-bar .cnt{display:flex;gap:6px;flex-wrap:nowrap;overflow:hidden;font-size:.74rem;color:var(--mu);grid-column:1;white-space:nowrap}
 .sm-bar .cnt button{border:1px solid var(--line);border-radius:99px;background:var(--inp);color:var(--tx);font:600 .74rem var(--ui);padding:2px 8px;min-height:26px;cursor:pointer}
-.sm-lp{grid-column:2;grid-row:1/3;border:1.5px solid var(--line);border-radius:12px;background:var(--inp);color:var(--tx);font:700 1.45rem var(--disp);min-width:96px;min-height:44px;font-variant-numeric:tabular-nums;cursor:pointer;padding:0 10px}
+.sm-lp{grid-column:3;grid-row:1/3;border:1.5px solid var(--line);border-radius:12px;background:var(--inp);color:var(--tx);font:700 1.45rem var(--disp);min-width:92px;min-height:44px;font-variant-numeric:tabular-nums;cursor:pointer;padding:0 10px}
 .sm-lp.low{color:var(--bad);border-color:var(--bad)}
-.sm-opph{display:flex;gap:2px;min-height:26px;padding:2px 0;justify-content:center;flex-wrap:nowrap;overflow:hidden}
+.sm-opph{display:flex;gap:2px;height:30px;box-sizing:border-box;padding:2px 0;justify-content:center;flex-wrap:nowrap;overflow:hidden}
 .sm-opph .mc{width:18px;height:26px;border-radius:2px;flex:none}
-.sm-row{display:grid;grid-template-columns:repeat(7,var(--cw));gap:3px;justify-content:center;margin:3px 0}
+.sm-board{display:flex;flex-direction:column;gap:3px}
+.sm-row{display:grid;grid-template-columns:repeat(7,var(--cw));gap:3px;justify-content:center;margin:0}
 .sm-z{position:relative;width:var(--cw);height:var(--ch);border:1px dashed rgba(var(--ac-rgb),.3);border-radius:6px;background:rgba(var(--ac-rgb),.04);color:rgba(var(--mu-rgb),.6);font:600 8px/1 var(--ui);display:grid;place-items:center;padding:0;cursor:pointer;text-transform:uppercase;letter-spacing:.04em}
 .sm-z.sp{border-style:solid;border-color:rgba(var(--ac-rgb),.18);background:transparent;cursor:default}
 .sm-z.pick{border:2px solid var(--gold);background:rgba(232,184,74,.16);box-shadow:0 0 10px rgba(232,184,74,.5);animation:smp 1s infinite alternate;color:var(--gold)}
@@ -71,8 +72,9 @@ body.sm-tbl-on .pg{padding:4px 2px 8px;max-width:600px}
 .sm-badge{position:absolute;z-index:2;min-width:16px;height:16px;padding:0 3px;border-radius:99px;font:700 10px/16px var(--ui);text-align:center;color:#120a2b;background:var(--gold);box-shadow:0 0 0 1px #000}
 .sm-badge.n{right:-3px;top:-3px}.sm-badge.o{left:-3px;top:-3px;background:var(--ac2)}.sm-badge.c{right:-3px;bottom:-3px;background:var(--ac2);}
 .sm-pile{position:absolute;inset:0}.sm-pile .sm-cd{inset:0}
-.sm-mid{display:flex;align-items:center;justify-content:center;gap:6px;color:var(--mu);font-size:.8rem;min-height:12px}
-.sm-last{margin:4px 0;padding:6px 10px;border-radius:10px;background:var(--inp);border:1px solid var(--line);font-size:.84rem;color:var(--tx);min-height:32px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.sm-mid{display:flex;align-items:center;justify-content:center;gap:6px;color:var(--mu);font-size:.78rem;height:20px;overflow:hidden;white-space:nowrap}
+.sm-mid span{overflow:hidden;text-overflow:ellipsis}
+.sm-last{margin:2px 0;padding:0 10px;border-radius:10px;background:var(--inp);border:1px solid var(--line);font-size:.84rem;color:var(--tx);height:32px;line-height:30px;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
 .sm-last b{color:var(--ac2)}
 .sm-ph{display:flex;gap:4px;align-items:center;margin:4px 0}
 .sm-ph button{flex:1;min-width:0;min-height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surf);color:var(--mu);font:700 .78rem var(--ui);cursor:pointer;padding:0}
@@ -80,14 +82,15 @@ body.sm-tbl-on .pg{padding:4px 2px 8px;max-width:600px}
 .sm-ph button:disabled{opacity:.55}
 .sm-ph .end{flex:1.9;color:var(--tx);border-color:var(--ac);background:rgba(var(--ac-rgb),.1)}
 .sm-dock{position:sticky;bottom:0;z-index:30;background:var(--bg);padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:0 -8px 12px -8px #000}
-.sm-hand{display:flex;gap:5px;overflow-x:auto;padding:5px 3px 7px;min-height:calc(var(--ch) + 14px);scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;border-top:1px solid var(--line)}
+.sm-hand{display:flex;gap:5px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;padding:5px 3px 7px;min-height:calc(var(--ch) + 14px);box-sizing:border-box;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;border-top:1px solid var(--line)}
 .sm-hand .sm-hc{flex:none;position:relative;width:var(--cw);height:var(--ch);border-radius:5px;scroll-snap-align:start;padding:0;border:0;background:none;cursor:pointer}
 .sm-hand .sm-hc.rev::after{content:"mostrata";position:absolute;left:0;right:0;bottom:0;background:rgba(232,184,74,.85);color:#1a1204;font:700 8px/1.5 var(--ui);text-align:center;text-transform:uppercase;border-radius:0 0 5px 5px}
 .sm-tools{display:flex;gap:6px;margin:2px 0}
 .sm-tools button{flex:1;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surf);color:var(--tx);font:700 .86rem var(--ui);cursor:pointer;padding:0 4px}
-.sm-ban{margin:4px 0;padding:9px 10px;border-radius:12px;border:1.5px solid var(--warn);background:rgba(255,209,102,.1);display:grid;gap:8px;font-size:.92rem}
+.sm-ban{position:absolute;left:6px;right:6px;top:50%;transform:translateY(-50%);z-index:25;margin:0;padding:10px 12px;border-radius:12px;border:1.5px solid var(--warn);background:#20190a;box-shadow:0 10px 30px #000;display:grid;gap:8px;font-size:.92rem}
+.sm-ban+.sm-ban{top:auto;bottom:6px;transform:none}
 .sm-ban .row{gap:8px}.sm-ban .btn{min-height:44px;flex:1}
-.sm-pickbar{margin:4px 0;padding:8px 10px;border-radius:12px;border:2px solid var(--gold);background:#1c1608;color:var(--gold);display:flex;gap:10px;align-items:center;justify-content:space-between;font-weight:700}
+.sm-pickbar{position:absolute;left:0;right:0;bottom:100%;margin:0 0 4px;box-shadow:0 6px 18px #000;padding:8px 10px;border-radius:12px;border:2px solid var(--gold);background:#1c1608;color:var(--gold);display:flex;gap:10px;align-items:center;justify-content:space-between;font-weight:700}
 .sm-ov{position:fixed;inset:0;z-index:2500;background:rgba(0,0,0,.72);display:flex;align-items:flex-end;justify-content:center}
 .sm-sh{width:100%;max-width:600px;max-height:86dvh;overflow-y:auto;background:var(--deep);border:1px solid var(--ac);border-radius:18px 18px 0 0;padding:14px 14px calc(16px + env(safe-area-inset-bottom,0px));-webkit-overflow-scrolling:touch}
 .sm-sh h3{font-size:1.1rem;margin:0 0 4px;overflow-wrap:anywhere}
@@ -113,6 +116,53 @@ body.sm-tbl-on .pg{padding:4px 2px 8px;max-width:600px}
 .sm-toast{position:fixed;left:50%;bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:3000;max-width:min(92vw,560px);padding:10px 14px;border-radius:12px;background:#2a0f16;border:1px solid var(--bad);color:#ffd5db;font-weight:600;text-align:center}
 .sm-toast.ok{background:#0e2a1d;border-color:var(--good);color:#c8f7df}
 @media (prefers-reduced-motion:reduce){.sm-z.pick{animation:none}}
+
+/* Tavolo a schermo FISSO (schermi alti almeno 600 px): la pagina non scorre mai, il campo occupa tutto lo spazio e le carte
+   si ridimensionano per starci. Su schermi più bassi (telefono in orizzontale) resta la pagina che scorre, con i comandi fissi in basso. */
+@media(min-height:600px){
+ html.sm-tbl-on{overflow:hidden;height:100vh;height:100dvh;box-sizing:border-box;overscroll-behavior:none}
+ html.sm-tbl-on body{height:100%;overflow:hidden;overscroll-behavior:none}
+ html.sm-tbl-on .pg{height:100%;box-sizing:border-box;padding:4px 2px calc(4px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;overflow:hidden}
+ html.sm-tbl-on #main,html.sm-tbl-on #v{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+ .sm-t{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;overflow:hidden}
+ .sm-t>*{flex:none}
+ .sm-t>.sm-board{flex:1 1 0;min-height:0;justify-content:space-evenly;overflow:hidden}
+ .sm-t.cmp .sm-opph,.sm-t.cmp .sm-mid{display:none}
+ .sm-dock{position:relative;box-shadow:none;padding-bottom:0}
+}
+/* ===== segnali Penso / OK, chat, mischia mano ===== */
+.sm-sg{grid-column:2;grid-row:1/3;display:flex;gap:5px;align-items:center;justify-content:flex-end}
+.sm-sb{display:grid;place-items:center;align-content:center;gap:0;width:50px;height:46px;padding:0;border-radius:12px;border:1.5px solid var(--line);background:var(--inp);color:var(--tx);cursor:pointer;font:700 .62rem/1 var(--ui);touch-action:manipulation}
+.sm-sb i{font-style:normal;font-size:1.35rem;line-height:1.1}.sm-sb b{font-weight:700;color:var(--mu);letter-spacing:.02em}
+.sm-sb.on{border-color:var(--warn);background:rgba(255,209,102,.18);box-shadow:0 0 12px rgba(255,209,102,.55);animation:smb 1s infinite alternate}
+.sm-sb.ok.on{border-color:var(--good);background:rgba(74,222,155,.16);box-shadow:0 0 12px rgba(74,222,155,.5)}
+.sm-sb.on b{color:var(--tx)}
+@keyframes smb{to{box-shadow:0 0 3px rgba(255,209,102,.2)}}
+.sm-sp{display:grid;place-items:center;align-content:center;min-width:60px;height:46px;padding:0 8px;border-radius:12px;border:1.5px solid var(--warn);background:rgba(255,209,102,.16);font:700 .66rem/1 var(--ui);color:var(--tx);animation:smb 1s infinite alternate}
+.sm-sp i{font-style:normal;font-size:1.4rem;line-height:1.1}
+.sm-sp.ok{border-color:var(--good);background:rgba(74,222,155,.16);animation:none}
+.sm-tools{position:relative}
+.sm-tools button{white-space:nowrap;font-size:.8rem;letter-spacing:-.01em}
+.sm-bdg{font-style:normal;position:absolute;top:-5px;right:-3px;min-width:18px;height:18px;padding:0 4px;border-radius:99px;background:var(--bad);color:#fff;font:700 11px/18px var(--ui);text-align:center;box-shadow:0 0 0 1px #000}
+.sm-tools button{position:relative}
+.sm-hand.shuf{animation:smh .45s}
+@keyframes smh{0%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}100%{transform:none}}
+.sm-note{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);z-index:2600;max-width:min(92vw,520px);display:flex;gap:10px;align-items:center;padding:12px 16px;border-radius:16px;border:2px solid var(--warn);background:#20190a;color:#fff;font-weight:700;box-shadow:0 12px 34px #000;cursor:pointer;animation:smn .25s}
+.sm-note i{font-style:normal;font-size:2rem;line-height:1}.sm-note span{overflow-wrap:anywhere;font-size:1rem}.sm-note small{display:block;font-weight:600;color:#d9d2ee;font-size:.82rem}
+.sm-note.ok{border-color:var(--good);background:#0b2418}.sm-note.chat{border-color:var(--ac);background:#150f2b}
+@keyframes smn{from{opacity:0;transform:translate(-50%,-40%)}}
+@media(min-width:720px){.sm-note{left:calc(50% + var(--menu-w,0px)/2)}}
+.sm-fab{position:fixed;right:14px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;width:58px;height:58px;border-radius:50%;border:2px solid var(--ac);background:var(--deep);color:var(--tx);font-size:1.6rem;cursor:pointer;box-shadow:0 6px 20px #000}
+.sm-chat{display:grid;gap:8px;margin-top:8px}
+.sm-cl{height:min(46dvh,380px);overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--inp);-webkit-overflow-scrolling:touch}
+.sm-cl .m{max-width:84%;padding:7px 11px;border-radius:14px;border:1px solid var(--line);background:var(--surf);overflow-wrap:anywhere;line-height:1.35;font-size:.95rem;align-self:flex-start;border-bottom-left-radius:4px}
+.sm-cl .m.me{align-self:flex-end;background:rgba(var(--ac-rgb),.22);border-color:var(--ac);border-radius:14px;border-bottom-right-radius:4px}
+.sm-cl .m small{display:block;color:var(--mu);font-size:.72rem;margin-bottom:1px}
+.sm-cl .e{margin:auto;color:var(--mu);text-align:center;font-size:.9rem}
+.sm-cin{display:grid;grid-template-columns:1fr auto;gap:8px}
+.sm-cin input{min-height:46px}.sm-cin .btn{min-height:46px}
+.sm-cerr{margin:0;color:var(--bad);font-size:.86rem}
+@media (prefers-reduced-motion:reduce){.sm-sb.on,.sm-sp,.sm-hand.shuf,.sm-note{animation:none}}
 </style></head><body>
 
 <main class="pg">
@@ -123,8 +173,10 @@ body.sm-tbl-on .pg{padding:4px 2px 8px;max-width:600px}
 </main>
 <div id="ov"></div>
 <div id="toast" hidden></div>
+<div id="note" class="sm-note" hidden></div>
+<button id="chatFab" class="sm-fab" type="button" hidden aria-label="Chat con l’avversario">💬<em class="sm-bdg" hidden></em></button>
 
-<script src="tempio.js?v=11"></script>
+<script src="tempio.js?v=12"></script>
 <script src="tempio-notifiche.js?v=2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
@@ -135,6 +187,8 @@ const KD='tempio.deck.v1',KSIM='tempio.deck.simid',CK='tempio.sim.cards.v1';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const num=v=>Number(v||0).toLocaleString('it-IT');
+function tblMode(on){document.documentElement.classList.toggle('sm-tbl-on',on);document.body.classList.toggle('sm-tbl-on',on);if(!on)LASTH=''}
+let LASTH='';
 let sb=null,ME=null,HOME=null,LID=null,S=null,busy=false,view='',tmr=null,pollBusy=false,flash=null;
 
 /* ---------- dati carte (YGOPRODeck), in cache sul dispositivo ---------- */
@@ -162,7 +216,7 @@ function rpc(name,args){return sb.rpc(name,args||{}).then(r=>{if(r.error)throw n
 function errTxt(e){const m=String(e&&e.message||e);return /Modulo non attivo/i.test(m)?'Il Duel Simulator non è attivo al momento.':esc(m)}
 function say(t,kind){flash=t?{t,kind}:null;const m=$('msg');if(m)m.innerHTML=t?`<p class="sm-msg ${kind||''}">${t}</p>`:''}
 let toastT=null;function toast(t,ok){const e=$('toast');e.className='sm-toast'+(ok?' ok':'');e.textContent=t;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{e.hidden=true},3800)}
-function gate(html){S=null;LID=null;$('main').hidden=true;$('gate').hidden=false;$('gate').innerHTML=html;document.body.classList.remove('sm-tbl-on');stopPoll()}
+function gate(html){S=null;LID=null;$('main').hidden=true;$('gate').hidden=false;$('gate').innerHTML=html;tblMode(false);stopPoll()}
 function gateLogin(){gate(`<section class="card sm-gate"><h2>Entra dal Black Market</h2><p class="mute" style="max-width:34em;margin:0 auto 14px">Il Duel Simulator usa il tuo profilo del Black Market: lo stesso nickname. Entra (o crea il profilo) dal Black Market e poi torna qui.</p><a class="btn gold" href="black-market.html">Accedi dal Black Market</a></section>`)}
 function gateOff(){gate(`<section class="card sm-gate"><h2>Il Duel Simulator non è attivo</h2><p class="mute" style="max-width:34em;margin:0 auto">Il simulatore è al momento spento dagli amministratori. Torna a trovarci più tardi.</p></section>`)}
 async function act(btn,fn){if(busy)return;busy=true;if(btn)btn.disabled=true;try{await fn()}catch(e){if(/Modulo non attivo/i.test(String(e.message)))gateOff();else if(view==='table'||view==='choose')toast(String(e.message||e));else say(errTxt(e),'bad')}finally{busy=false;if(btn&&btn.isConnected)btn.disabled=false}}
@@ -209,7 +263,7 @@ function homeLobbies(){const L=HOME.lobbies;return L.length?L.map(l=>`<div class
 function homeDecks(){return HOME.decks.length?HOME.decks.map(d=>deckRow(d,{manage:true})).join(''):'<p class="empty" style="margin:0">Non hai ancora deck. Importa una lista .ydk o apri un deck dal Deck Analyzer.</p>'}
 function homeRecent(){return HOME.recent.length?HOME.recent.map(r=>{const me=r.my_seat,w=r.winner_seat,res=r.end_reason==='forfeit'||r.end_reason==='abbandonata'?` · ${esc(r.end_reason==='forfeit'?'abbandono':'inattività')}`:'';
   const t=w==null?'Pareggio':(w===me?'Vittoria':'Sconfitta');return `<div class="sm-recent"><span><b>${t}</b> contro ${esc(r.opponent||'—')}${res}</span><span>${r.my_seat===1?r.wins_1:r.wins_2}–${r.my_seat===1?r.wins_2:r.wins_1}</span></div>`}).join(''):'<p class="empty" style="margin:0">Ancora nessun incontro.</p>'}
-function renderHome(){view='home';document.body.classList.remove('sm-tbl-on');$('main').hidden=false;$('gate').hidden=true;
+function renderHome(){view='home';tblMode(false);$('main').hidden=false;$('gate').hidden=true;
  const v=$('v');
  if(v.dataset.k!=='home'){v.dataset.k='home';
   v.innerHTML=`<section class="card" style="margin-top:18px"><h2 class="sm-h">Gioca</h2>
@@ -227,7 +281,7 @@ function renderHome(){view='home';document.body.classList.remove('sm-tbl-on');$(
 function myP(){return S.players.find(p=>p.seat===S.me.seat)||{}}
 function oppP(){return S.players.find(p=>p.seat!==S.me.seat)}
 function ini(n){return esc((n||'?').trim().charAt(0).toUpperCase())}
-function renderLobby(){view='lobby';document.body.classList.remove('sm-tbl-on');$('main').hidden=false;$('gate').hidden=true;const v=$('v');
+function renderLobby(){view='lobby';tblMode(false);$('main').hidden=false;$('gate').hidden=true;const v=$('v');
  if(v.dataset.k!=='lobby:'+LID){v.dataset.k='lobby:'+LID;
   v.innerHTML=`<section class="card" style="margin-top:18px"><p class="kicker" id="lbT"></p><div id="lbP"></div>
   <p class="sm-sub" style="margin:10px 0 0">Si gioca al <b>meglio di 3</b>, con possibilità di fare side tra un duello e l’altro. Ognuno sceglie il suo deck e si segna <b>PRONTO</b>: poi l’host avvia la partita.</p></section>
@@ -248,7 +302,7 @@ function renderLobby(){view='lobby';document.body.classList.remove('sm-tbl-on');
  startPoll();if(flash)say(flash.t,flash.kind)}
 
 /* ---------- scelta di chi inizia ---------- */
-function renderChoose(){view='choose';document.body.classList.remove('sm-tbl-on');$('main').hidden=false;$('gate').hidden=true;
+function renderChoose(){view='choose';tblMode(false);$('main').hidden=false;$('gate').hidden=true;
  const g=S.game,me=S.me.seat,ch=g.chooser===me,opN=(oppP()||{}).nickname||'L’avversario',w=S.lobby.wins;
  $('v').dataset.k='choose';
  $('v').innerHTML=`<section class="card" style="margin-top:18px">${scoreBox()}<h2 class="sm-h" style="text-align:center">Duello ${g.no} di 3</h2>
@@ -266,7 +320,7 @@ function sdErr(){const c=S.me.cfg,e=[];if(SD.main.length<40)e.push('Il Main Deck
 function sdSec(key,label){const m=cnt3(SD[key]),ids=Object.keys(m).map(Number).sort((a,b)=>ci(a).n.localeCompare(ci(b).n));
  return `<h3 class="sm-h" style="font-size:1rem">${label} <span class="mute">(${SD[key].length})</span></h3>`+(ids.length?ids.map(id=>{const c=ci(id),to=key==='side'?(isExtraT(c)?'extra':'main'):'side';
   return `<div class="sm-cr">${cardImg(id)}<div class="nn">${esc(c.n)}<small>${esc(c.t)}</small></div><div class="qq"><b>×${m[id]}</b><button data-sd="${key}:${to}:${id}" aria-label="Sposta una copia di ${esc(c.n)} in ${to==='side'?'Side':to==='main'?'Main':'Extra'}">→ ${to==='side'?'Side':to==='main'?'Main':'Extra'}</button></div></div>`}).join(''):'<p class="empty" style="margin:0">Vuoto.</p>')}
-function renderSiding(){view='siding';document.body.classList.remove('sm-tbl-on');$('main').hidden=false;$('gate').hidden=true;
+function renderSiding(){view='siding';tblMode(false);$('main').hidden=false;$('gate').hidden=true;
  const c=S.me.cfg,key=S.lobby.id+':'+S.lobby.game_no+':'+JSON.stringify(c);
  if(SDkey!==key){SDkey=key;SD={main:[...c.main],extra:[...c.extra],side:[...c.side]}}
  needThen([...SD.main,...SD.extra,...SD.side]);
@@ -289,7 +343,7 @@ function renderSiding(){view='siding';document.body.classList.remove('sm-tbl-on'
  startPoll()}
 
 /* ---------- fine incontro ---------- */
-function renderEnd(){view='end';document.body.classList.remove('sm-tbl-on');$('main').hidden=false;$('gate').hidden=true;
+function renderEnd(){view='end';tblMode(false);$('main').hidden=false;$('gate').hidden=true;
  const L=S.lobby,me=S.me.seat,op=oppP()||{};let h;
  if(L.status==='cancelled'){h=`<h2>Lobby chiusa</h2><p class="mute">${L.end_reason==='scaduta'?'La lobby era ferma da troppo tempo.':'L’host ha chiuso la lobby.'}</p>`}
  else{const w=L.winner;h=`<h2>${w==null?'Incontro pari':w===me?'Hai vinto l’incontro!':'Hai perso l’incontro'}</h2>${scoreBox()}<p class="mute">${L.end_reason==='forfeit'?(w===me?`${esc(op.nickname||'L’avversario')} ha abbandonato la partita.`:'Hai abbandonato la partita.'):L.end_reason==='abbandonata'?'L’incontro è stato chiuso per inattività.':'Al meglio di 3.'}</p>`}
@@ -301,13 +355,15 @@ function applyState(st){if(!st||st.same)return false;const first=!S;S=st;needThe
 async function loadState(){const st=await rpc('sim_state',{p_lobby:LID,p_since:null});S=st;needThen(codesOf(st));if(HOME===null||st.lobby.status==='lobby')await refreshHomeQuiet();render()}
 async function refreshHomeQuiet(){try{HOME=await rpc('sim_home')}catch(_){}}
 function render(){
- if(!S){renderHome();return}
+ if(!S){renderHome();updateFab();return}
+ chatSync();sigSync();
  const st=S.lobby.status,g=S.game;
  if(st==='lobby')renderLobby();
  else if(st==='playing'&&g&&g.status==='choosing')renderChoose();
  else if(st==='playing')renderTable();
  else if(st==='siding')renderSiding();
- else renderEnd()}
+ else renderEnd();
+ updateFab()}
 function refreshAll(){render()}
 let pollMs=0;
 function stopPoll(){clearInterval(tmr);tmr=null;pollMs=0}
@@ -367,8 +423,10 @@ function rowSpells(B,side){const me=side===S.me.seat,cells=[pileBtn(B,side,'extr
 function rowEmz(B){const me=S.me.seat,a=zoneBtn(B,0,'emz',1,'EMZ'),b=zoneBtn(B,0,'emz',2,'EMZ'),sp='<span class="sm-z sp" aria-hidden="true"></span>';
  return `<div class="sm-row">${sp}${sp}${me===1?a:b}${sp}${me===1?b:a}${sp}${sp}</div>`}
 function barHtml(side,B){const me=side===S.me.seat,p=S.players.find(x=>x.seat===side)||{},cnt=S.counts[side]||{},g=S.game,lp=g.lp[side-1],turn=g.turn_seat===side;
- const bn=B.pile.banish[side].length;
- return `<div class="sm-bar${turn?' turn':''}"><div class="who">${esc(p.nickname)}${me?'<small>tu</small>':''}${turn?'<small>● turno</small>':''}</div>
+ const bn=B.pile.banish[side].length,opn=esc(((oppP()||{}).nickname)||'l’avversario'),ms=sigNow(S.me.seat);
+ const sg=me?`<div class="sm-sg"><button class="sm-sb${ms==='think'?' on':''}" data-a="sigThink" aria-pressed="${ms==='think'}" aria-label="Penso: avvisa ${opn} che stai pensando (tocca di nuovo per spegnere)" title="Penso"><i>🤔</i><b>Penso</b></button><button class="sm-sb ok${ms==='ok'?' on':''}" data-a="sigOk" aria-label="OK: avvisa ${opn} che puoi procedere" title="OK"><i>👍</i><b>OK</b></button></div>`
+  :`<div class="sm-sg" data-sigbox="${side}">${pillHtml(side)}</div>`;
+ return `<div class="sm-bar${turn?' turn':''}"><div class="who">${esc(p.nickname)}${me?'<small>tu</small>':''}${turn?'<small>● turno</small>':''}</div>${sg}
  <button class="sm-lp${lp<=2000?' low':''}" data-lp="${side}" aria-label="Punti vita di ${esc(p.nickname)}: ${lp}. Tocca per modificarli">${num(lp)}</button>
  <div class="cnt"><span>Mano ${cnt.hand||0}</span><button data-pile="banish" data-side="${side}">Rimosse ${bn}</button>${me?'':`<button data-pile="extra" data-side="${side}">Extra ${cnt.extra||0}</button>`}</div></div>`}
 function oppHand(B){const o=3-S.me.seat,n=(S.counts[o]||{}).hand||0,rev=S.cards.filter(c=>c.z==='hand'&&c.o===o);let h='';
@@ -388,6 +446,7 @@ function logLine(e){const d=e.data||{},who=`<b>${esc(nick(e.seat))}</b>`,z=k=>ZN
   case 'phase':return `${who} passa alla ${PHN[d.phase]||d.phase}.`;
   case 'turn':return `Turno ${d.turn}: tocca a <b>${esc(nick(d.seat))}</b>.`;
   case 'shuffle':return `${who} mescola il proprio deck.`;
+  case 'shuffle_hand':return `${who} mescola la propria mano.`;
   case 'search':return `${who} consulta il proprio deck.`;
   case 'peek':return `${who} guarda le prime ${d.n} carte del proprio deck.`;
   case 'reorder':return `${who} rimette ${d.n} ${d.n===1?'carta':'carte'} ${d.bottom?'in fondo al':'in cima al'} deck.`;
@@ -407,31 +466,42 @@ function logLine(e){const d=e.data||{},who=`<b>${esc(nick(e.seat))}</b>`,z=k=>ZN
 function lastLog(){const l=S.log;return l.length?l[l.length-1]:null}
 
 function renderTable(){
- view='table';document.body.classList.add('sm-tbl-on');$('main').hidden=false;$('gate').hidden=true;
+ view='table';tblMode(true);$('main').hidden=false;$('gate').hidden=true;
  const g=S.game,me=S.me.seat,op=3-me,B=board(),mine=g.turn_seat===me,hand=S.cards.filter(c=>c.z==='hand'&&c.o===me).sort((a,b)=>a.k-b.k),pe=g.pending_end,pr=g.proposal;
  const old=document.querySelector('.sm-hand');if(old)lastHandScroll=old.scrollLeft;
- const w=Math.min(window.innerWidth,596)-8,hh=window.innerHeight;
- const cw=Math.max(46,Math.min(Math.floor((w-6*3)/7),Math.floor((hh-377)/7.5)));
  const ll=lastLog(),sc=S.lobby.wins;
  let ban='';
  if(pe){const lo=pe.loser;ban=`<div class="sm-ban"><div><b>${pe.reason==='lp'?'Punti vita a zero':'Mazzo vuoto'}</b> — ${lo===0?'pareggio':`${esc(nick(lo))} perde il duello`}. Se è tutto corretto, conferma.</div><div class="row"><button class="btn" data-a="confirmEnd">Conferma la fine del duello</button>${pe.reason==='deckout'&&lo!==me?'<button class="btn ghost" data-a="dismissEnd">Annulla (errore)</button>':''}</div>${pe.reason==='lp'?'<div class="mute" style="font-size:.84rem">Hai sbagliato a inserire i punti? Correggili toccando gli LP.</div>':''}</div>`}
  if(pr){const by=pr.by;ban+=by===me?`<div class="sm-ban"><div>Hai proposto ${pr.kind==='draw'?'il <b>pareggio</b>':'di <b>vincere per effetto</b>'}${pr.reason?` («${esc(pr.reason)}»)`:''}. Aspetto la risposta…</div><div class="row"><button class="btn ghost" data-a="withdraw">Ritira la proposta</button></div></div>`
   :`<div class="sm-ban"><div><b>${esc(nick(by))}</b> propone ${pr.kind==='draw'?'il <b>pareggio</b>':'di <b>vincere per effetto di una carta</b>'}${pr.reason?`: «${esc(pr.reason)}»`:''}.</div><div class="row"><button class="btn" data-a="accept">Accetta</button><button class="btn ghost" data-a="decline">Rifiuta</button></div></div>`}
  const pick=PICK?`<div class="sm-pickbar"><span>${esc(PICK.hint)}</span><button class="btn sm ghost" data-a="pickCancel">Annulla</button></div>`:'';
- $('v').dataset.k='table';
- $('v').innerHTML=`<div class="sm-t" style="--cw:${cw}px;--ch:${Math.round(cw*1.46)}px">
- ${barHtml(op,B)}${oppHand(B)}${rowSpells(B,op)}${rowMonsters(B,op)}${rowEmz(B)}${rowMonsters(B,me)}${rowSpells(B,me)}${barHtml(me,B)}
- ${ban}
+ const un=chatUnread();
+ const html=`<div class="sm-t">
+ ${barHtml(op,B)}${oppHand(B)}<div class="sm-board">${rowSpells(B,op)}${rowMonsters(B,op)}${rowEmz(B)}${rowMonsters(B,me)}${rowSpells(B,me)}</div>${barHtml(me,B)}
  <div class="sm-mid"><span>Duello ${g.no}/3 · ${num(sc[me-1])}–${num(sc[op-1])} · Turno ${g.turn_no} · ${mine?'<b style="color:var(--ac2)">tocca a te</b>':`tocca a ${esc(nick(op))}`}</span></div>
- <div class="sm-last" data-a="openLog" role="button" tabindex="0" aria-label="Apri il registro">${ll?logLine(ll):'—'}</div>
+ <div class="sm-last" data-a="openLog" role="button" tabindex="0" aria-label="Apri il registro del duello">📜 ${ll?logLine(ll):'—'}</div>
  <div class="sm-dock">${pick}<div class="sm-ph" role="group" aria-label="Fasi del turno">${PH.map(p=>`<button data-ph="${p[0]}" class="${g.phase===p[0]?'on':''}" ${mine?'':'disabled'} aria-label="${p[2]}" aria-pressed="${g.phase===p[0]}">${p[1]}</button>`).join('')}<button class="end" data-a="endTurn" ${mine?'':'disabled'}>Fine turno</button></div>
- <div class="sm-tools"><button data-a="draw1">Pesca</button><button data-a="deckMenu">Deck…</button><button data-a="openLog">Registro</button><button data-a="more">Altro…</button></div>
- <div class="sm-hand" id="hand" aria-label="La tua mano">${hand.length?hand.map(c=>`<button class="sm-hc${c.r?' rev':''}" data-hand="${c.i}" aria-label="${esc(ci(c.x).n)}">${cdHtml(c,null)}</button>`).join(''):'<span class="mute" style="padding:18px 8px">Mano vuota</span>'}</div></div></div>`;
- const hd=$('hand');if(hd)hd.scrollLeft=lastHandScroll;
+ <div class="sm-tools"><button data-a="draw1">Pesca</button><button data-a="deckMenu">Deck…</button><button data-a="shuffleHand" aria-label="Mischia la tua mano" title="Mischia la tua mano">🔀 Mano</button><button data-a="chat" aria-label="Chat con ${esc(nick(op))}${un?`, ${un} non lett${un===1?'o':'i'}`:''}">💬 Chat${un?`<em class="sm-bdg">${un>9?'9+':un}</em>`:''}</button><button data-a="more">Altro…</button></div>
+ <div class="sm-hand" id="hand" aria-label="La tua mano">${hand.length?hand.map(c=>`<button class="sm-hc${c.r?' rev':''}" data-hand="${c.i}" aria-label="${esc(ci(c.x).n)}">${cdHtml(c,null)}</button>`).join(''):'<span class="mute" style="padding:18px 8px">Mano vuota</span>'}</div></div>${ban}</div>`;
+ const v=$('v');
+ if(v.dataset.k!=='table'||LASTH!==html){v.dataset.k='table';LASTH=html;v.innerHTML=html;const hd=$('hand');if(hd)hd.scrollLeft=lastHandScroll;fitTable()}
  restartPoll();
+ sigTick();
  if(SHOWN)reopen()}
+/* le carte si ridimensionano per far stare TUTTO il tavolo nello schermo: la pagina non scorre e nulla si sposta */
+function fitTable(){const t=document.querySelector('.sm-t');if(!t)return;
+ const bd=t.querySelector('.sm-board'),hd=t.querySelector('.sm-hand');if(!bd||!hd)return;
+ const byW=(t.clientWidth-6*3-2)/7,gap=3;
+ t.classList.remove('cmp');
+ if(!(window.matchMedia&&matchMedia('(min-height:600px)').matches)){const cw=Math.max(34,Math.min(52,Math.floor(byW)));t.style.setProperty('--cw',cw+'px');t.style.setProperty('--ch',Math.round(cw*1.46)+'px');return}
+ const meas=()=>{t.style.setProperty('--cw','34px');t.style.setProperty('--ch','50px');   /* misura con carte piccole: il campo non è mai schiacciato */
+  const extra=hd.offsetHeight-50,fixed=t.clientHeight-bd.clientHeight-hd.offsetHeight;return(t.clientHeight-fixed-extra-4*gap)/(6*1.46)};
+ let byH=meas();
+ if(byH<40){t.classList.add('cmp');byH=meas()}   /* schermo basso: tolgo la mano dell'avversario e la riga d'informazioni */
+ const cw=Math.max(30,Math.floor(Math.min(byH,byW)));
+ t.style.setProperty('--cw',cw+'px');t.style.setProperty('--ch',Math.round(cw*1.46)+'px')}
 function restartPoll(){startPoll()}
-function reopen(){const s=SHOWN;if(!s)return;const sc=$('ov').querySelector('.sm-sh'),top=sc?sc.scrollTop:0,typed=($('sayT')||{}).value,hadFocus=document.activeElement&&document.activeElement.id==='sayT';
+function reopen(){const s=SHOWN;if(!s)return;if(s.kind==='chat'){chatRefresh();return}const sc=$('ov').querySelector('.sm-sh'),top=sc?sc.scrollTop:0,typed=($('sayT')||{}).value,hadFocus=document.activeElement&&document.activeElement.id==='sayT';
  reopen2(s);const n=$('ov').querySelector('.sm-sh');if(n)n.scrollTop=top;if(typed&&$('sayT')){$('sayT').value=typed;if(hadFocus)$('sayT').focus()}}
 function reopen2(s){
  if(s.kind==='card'){const c=S.cards.find(x=>x.i===s.id);if(c)openCard(c,s.back,true);else closeSheet()}
@@ -593,11 +663,13 @@ function moreSheet(){const g=S.game;
   <button class="btn ghost" data-m="coin:1">Lancia una moneta</button><button class="btn ghost" data-m="dice:1">Tira un dado</button>
   <button class="btn ghost" data-m="coin:3">3 monete</button><button class="btn ghost" data-m="dice:2">2 dadi</button>
   <button class="btn ghost" data-m="token">Evoca un segnalino</button><button class="btn ghost" data-m="tokenx">Segnalino (zona extra)</button>
+  <h4>Avvisi</h4><button class="btn ghost full" data-m="snd">${SOUND?'🔔 Suoni e vibrazione: accesi':'🔕 Suoni e vibrazione: spenti'}</button>
   <h4>Fine del duello</h4>
   <button class="btn ghost" data-m="draw">Proponi il pareggio</button><button class="btn ghost" data-m="win">Dichiara vittoria per effetto…</button>
   <button class="btn danger" data-m="concede">Arrenditi al duello</button><button class="btn danger" data-m="leave">Abbandona l’incontro</button></div>`,{label:'Altro'});
  sh.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>act(b,async()=>{const[k,v]=b.dataset.m.split(':');
-  if(k==='coin'){closeSheet();await call('sim_coin',{p_n:+v})}
+  if(k==='snd'){SOUND=!SOUND;try{localStorage.setItem('tempio.sim.sound',SOUND?'1':'0')}catch(_){}closeSheet();toast(SOUND?'Suoni accesi':'Suoni spenti',true)}
+  else if(k==='coin'){closeSheet();await call('sim_coin',{p_n:+v})}
   else if(k==='dice'){closeSheet();await call('sim_dice',{p_n:+v})}
   else if(k==='token'){closeSheet();await call('sim_token',{p_zone:'mz',p_slot:null,p_pos:'atk'})}
   else if(k==='tokenx'){closeSheet();await call('sim_token',{p_zone:'emz',p_slot:null,p_pos:'atk'})}
@@ -649,12 +721,89 @@ function tableClick(t){
   else if(k==='deckMenu')deckMenu();
   else if(k==='openLog')openLog();
   else if(k==='more')moreSheet();
+  else if(k==='chat')openChat();
+  else if(k==='sigThink')act(a,async()=>{await call('sim_signal',{p_kind:sigNow(S.me.seat)==='think'?'clear':'think'})});
+  else if(k==='sigOk')act(a,async()=>{await call('sim_signal',{p_kind:'ok'})});
+  else if(k==='shuffleHand')act(a,async()=>{await call('sim_shuffle_hand');const h=$('hand');if(h){h.classList.remove('shuf');void h.offsetWidth;h.classList.add('shuf')}});
   else if(k==='endTurn')act(a,async()=>{await call('sim_end_turn')});
   else if(k==='pickCancel'){PICK=null;render()}
   else if(k==='confirmEnd')act(a,async()=>{await call('sim_confirm_end')});
   else if(k==='dismissEnd')act(a,async()=>{await call('sim_dismiss_end')});
   else if(k==='accept')act(a,async()=>{await call('sim_respond',{p_accept:true})});
   else if(k==='decline'||k==='withdraw')act(a,async()=>{await call('sim_respond',{p_accept:false})})}}
+
+
+/* =====================================================================
+   CHAT, SEGNALI «PENSO» / «OK», AVVISI
+   ===================================================================== */
+let SOUND=true;try{SOUND=localStorage.getItem('tempio.sim.sound')!=='0'}catch(_){}
+let AC=null;
+function ping(freq){if(!SOUND)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=freq;g.gain.value=.06;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+.28);o.stop(AC.currentTime+.3)}catch(_){}}
+function buzz(){if(!SOUND)return;try{if(navigator.vibrate)navigator.vibrate([90,50,90])}catch(_){}}
+let noteT=null;
+function note(icon,html,cls,fn){const e=$('note');e.className='sm-note'+(cls?' '+cls:'');e.innerHTML=`<i aria-hidden="true">${icon}</i><span>${html}</span>`;e.hidden=false;e.onclick=()=>{e.hidden=true;if(fn)fn()};clearTimeout(noteT);noteT=setTimeout(()=>{e.hidden=true},cls==='chat'?5000:3800)}
+
+/* segnali: per ogni giocatore ricordo l'ultimo segnale visto e quando scade (l'orologio è del browser, l'età la dà il database) */
+let SIGSEEN={},SIGDL={},SIGLID=null,sigT=null;
+const SIGLIFE={think:300,ok:12};
+function sigSync(){if(!S||!S.players)return;
+ if(SIGLID!==LID){SIGLID=LID;SIGSEEN={};SIGDL={}}
+ const now=Date.now();
+ S.players.forEach(p=>{const n=p.sig_n||0,first=SIGSEEN[p.seat]===undefined,d=SIGDL[p.seat];
+  if(!d||d.n!==n){SIGDL[p.seat]={n,k:p.sig||null,until:p.sig?now+Math.max(0,(SIGLIFE[p.sig]-(p.sig_age||0)))*1000:0};
+   if(p.sig&&p.seat!==S.me.seat&&(!first||(p.sig_age||0)<=10)){
+    const nn=esc(p.nickname||'L’avversario');
+    if(p.sig==='think'){note('🤔',`${nn} sta pensando…<small>Aspetta un attimo</small>`,'');ping(520)}
+    else{note('👍',`${nn}: OK<small>Puoi procedere</small>`,'ok');ping(780)}
+    buzz()}}
+  else if(!p.sig&&d.k){d.k=null}
+  SIGSEEN[p.seat]=n})}
+function sigNow(seat){const d=SIGDL[seat];return d&&d.k&&Date.now()<d.until?d.k:null}
+function pillHtml(seat){const k=sigNow(seat);return k==='think'?'<span class="sm-sp" role="status"><i>🤔</i>Pensa…</span>':k==='ok'?'<span class="sm-sp ok" role="status"><i>👍</i>OK</span>':''}
+/* quando un segnale scade aggiorno solo i bottoni, senza ridisegnare il tavolo */
+function sigTick(){clearTimeout(sigT);const now=Date.now();let next=0;
+ Object.values(SIGDL).forEach(d=>{if(d.k&&d.until>now&&(!next||d.until<next))next=d.until});
+ if(next)sigT=setTimeout(()=>{if(view==='table'&&S){LASTH='';render()}},next-now+60)}
+
+/* chat */
+let CHATLID=null,CHATN=0,CHATNOT=0;
+const chatKey=()=>'tempio.sim.chat.'+LID;
+function chatList(){return(S&&S.chat)||[]}
+function chatOpen(){return !!(SHOWN&&SHOWN.kind==='chat')}
+function chatUnread(){if(!S||!S.me)return 0;return chatList().filter(m=>m.n>CHATN&&m.seat!==S.me.seat).length}
+function chatSave(){try{localStorage.setItem(chatKey(),String(CHATN))}catch(_){}}
+function chatSync(){if(!S||!S.me||!LID)return;
+ const m=chatList(),mx=m.length?m[m.length-1].n:0;
+ if(CHATLID!==LID){CHATLID=LID;let v=null;try{v=localStorage.getItem(chatKey())}catch(_){}
+  CHATN=v==null?mx:Math.min(+v||0,mx);CHATNOT=mx;chatSave()}
+ if(chatOpen()){CHATN=mx;CHATNOT=mx;chatSave();chatRefresh();return}
+ const fresh=m.filter(x=>x.n>CHATNOT&&x.seat!==S.me.seat);
+ CHATNOT=Math.max(CHATNOT,mx);
+ if(fresh.length){const f=fresh[fresh.length-1];
+  note('💬',`<b>${esc(nick(f.seat))}</b><small>${esc(f.t.length>90?f.t.slice(0,90)+'…':f.t)}</small>`,'chat',openChat);ping(660);buzz()}}
+function updateFab(){const f=$('chatFab');if(!f)return;
+ const show=!!(S&&S.me&&LID&&(view==='lobby'||view==='choose'||view==='siding'));
+ f.hidden=!show;const b=f.querySelector('.sm-bdg'),u=show?chatUnread():0;b.hidden=!u;b.textContent=u>9?'9+':u}
+function hhmm(ts){const d=new Date(ts*1000);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+function chatRefresh(force){const l=$('chatL');if(!l)return;
+ const m=chatList(),me=S.me.seat,atEnd=force||l.scrollHeight-l.scrollTop-l.clientHeight<40;
+ const html=m.length?m.map(x=>`<div class="m${x.seat===me?' me':''}"><small>${x.seat===me?'Tu':esc(nick(x.seat))} · ${hhmm(x.ts)}</small>${esc(x.t)}</div>`).join(''):'<p class="e">Nessun messaggio.<br>Scrivi tu per primo!</p>';
+ if(l.dataset.h!==html){l.dataset.h=html;l.innerHTML=html}
+ if(atEnd)l.scrollTop=l.scrollHeight}
+function openChat(){if(!S||!S.me)return;
+ const opn=(oppP()||{}).nickname||'l’avversario';
+ sheet(`${xBtn()}<h3>Chat con ${esc(opn)}</h3><div class="sm-chat"><div class="sm-cl" id="chatL" role="log" aria-live="polite"></div><p class="sm-cerr" id="chatE" hidden></p>
+  <div class="sm-cin"><input id="chatT" maxlength="200" placeholder="Scrivi un messaggio" enterkeyhint="send" autocomplete="off" aria-label="Messaggio"><button class="btn" id="chatB" type="button">Invia</button></div></div>`,{label:'Chat'});
+ SHOWN={kind:'chat'};const m=chatList();CHATN=m.length?m[m.length-1].n:0;CHATNOT=CHATN;chatSave();
+ chatRefresh(true);updateFab();
+ if(view==='table'){LASTH='';render()}
+ const send=()=>{const i=$('chatT'),t=i.value.trim();if(!t)return;
+  act($('chatB'),async()=>{const e=$('chatE');e.hidden=true;
+   try{i.value='';await call('sim_chat_send',{p_text:t})}catch(er){i.value=t;e.textContent=String(er.message||er);e.hidden=false}
+   const c=$('chatT');if(c)c.focus()})};
+ $('chatB').onclick=send;$('chatT').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();send()}};
+ if(window.matchMedia&&matchMedia('(pointer:fine)').matches)$('chatT').focus()}
+$('chatFab').onclick=openChat;
 
 /* =====================================================================
    EVENTI E AVVIO
@@ -664,7 +813,7 @@ function confirmSheet(title,msg,okLabel,fn){const sh=sheet(`${xBtn()}<h3>${esc(t
 function leaveFlow(btn){const st=S&&S.lobby.status;
  if(st==='playing'||st==='siding'){confirmSheet('Abbandonare l’incontro?','Perderai l’intero incontro e uscirai dalla partita.','Sì, abbandono',async()=>{await rpc('sim_lobby_leave',{p_lobby:LID});await loadState()});return}
  act(btn,async()=>{await rpc('sim_lobby_leave',{p_lobby:LID});LID=null;S=null;SDkey='';say('Sei uscito dalla lobby.');await loadHome()})}
-async function goHome(){LID=null;S=null;SDkey='';PICK=null;SHOWN=null;closeSheet();document.body.classList.remove('sm-tbl-on');$('v').dataset.k='';await loadHome()}
+async function goHome(){LID=null;S=null;SDkey='';PICK=null;SHOWN=null;closeSheet();tblMode(false);SIGSEEN={};SIGDL={};SIGLID=null;CHATLID=null;$('v').dataset.k='';await loadHome()}
 function renameSheet(d){const sh=sheet(`${xBtn()}<h3>Rinomina il deck</h3><label for="rnN">Nome</label><input id="rnN" maxlength="40" value="${esc(d.name)}"><button class="btn block" id="rnGo" style="margin-top:10px">Salva</button>`,{label:'Rinomina'});
  $('rnGo').onclick=()=>act($('rnGo'),async()=>{await rpc('sim_deck_save',{p_id:d.id,p_name:$('rnN').value,p_main:d.main,p_extra:d.extra,p_side:d.side,p_temp:false});closeSheet();say('Deck rinominato.','good');await loadHome();if(LID)await loadState()})}
 
@@ -701,7 +850,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('change',e=>{const f=e.target;if(f&&f.id==='impFile'&&f.files&&f.files[0]){const file=f.files[0];file.text().then(txt=>{const d=parseYdk(txt);if(d.main.length+d.extra.length+d.side.length===0){say('Il file non contiene carte: serve un .ydk valido.','bad');return}d.name=file.name.replace(/\.(ydk|txt)$/i,'')||'Deck';impStart(d)});f.value=''}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sheetOpen())closeSheet();if((e.key==='Enter'||e.key===' ')&&e.target&&e.target.classList&&e.target.classList.contains('sm-last')){e.preventDefault();openLog()}});
-window.addEventListener('resize',()=>{if(view==='table'&&S)render()});
+let rsT=null;window.addEventListener('resize',()=>{clearTimeout(rsT);rsT=setTimeout(()=>{if(view==='table'&&S){LASTH='';render()}},120)});
 
 
 async function boot(){
