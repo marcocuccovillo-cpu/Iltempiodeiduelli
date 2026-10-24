@@ -234,6 +234,12 @@ body.sm-tbl-on .pg{padding:4px 2px 8px;max-width:600px}
 .sm-fx .tk{background:radial-gradient(circle,#6b7280,#374151)}
 .sm-fx.atk{border-color:#ff7a45;box-shadow:0 0 28px rgba(255,106,74,.65),0 10px 26px #000}
 .sm-fx.atk .chn{color:#ff9a7a}
+
+/* ===== avatar del profilo Black Market (v43) ===== */
+.sm-av{overflow:hidden}
+.sm-av img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+.sm-av.xs{display:inline-grid;vertical-align:middle;width:30px;height:30px;font-size:.9rem;border-width:1.5px;margin-right:7px}
+.sm-av.s{width:40px;height:40px;font-size:1rem;margin:0 auto 4px}
 </style></head><body>
 
 <main class="pg">
@@ -266,6 +272,16 @@ let sb=null,ME=null,HOME=null,LID=null,S=null,busy=false,view='',tmr=null,pollBu
 let CARDS={};try{CARDS=JSON.parse(localStorage.getItem(CK)||'{}')}catch(_){}
 const saveCards=()=>{try{localStorage.setItem(CK,JSON.stringify(CARDS))}catch(_){try{Object.keys(CARDS).forEach(k=>{if(CARDS[k])delete CARDS[k].d});localStorage.setItem(CK,JSON.stringify(CARDS))}catch(__){}}};
 function keep(c){const i={n:c.name,t:c.type||'',d:(c.desc||'').slice(0,800),a:c.atk,df:c.def,l:c.level||c.linkval||0,r:c.race||'',at:c.attribute||'',sc:c.scale};CARDS[c.id]=i;(c.card_images||[]).forEach(x=>{CARDS[x.id]=i})}
+/* avatar del profilo del Black Market (foto o emoji), letti una volta per giocatore: nessuna modifica al database */
+let AV={},AVP=null;
+function avHtml(p,cls){const a=AV[p.user_id]||{},e=a.e||p.avatar;
+ return `<div class="sm-av${cls?' '+cls:''}" aria-hidden="true">${a.img?`<img src="${esc(a.img)}" alt="" referrerpolicy="no-referrer">`:esc(e||(p.nickname||'?').trim().charAt(0).toUpperCase())}</div>`}
+function loadAv(){if(!S||!S.players||!sb||AVP)return;
+ const ids=S.players.map(p=>p.user_id).filter(u=>u&&!(u in AV));if(!ids.length)return;
+ AVP=(async()=>{let r=await sb.from('profiles').select('id,avatar,avatar_img').in('id',ids);
+  if(r.error)r=await sb.from('profiles').select('id,avatar').in('id',ids);
+  (r.data||[]).forEach(x=>{AV[x.id]={img:x.avatar_img||null,e:x.avatar||null}})})()
+  .catch(()=>{}).then(()=>{ids.forEach(u=>{if(!(u in AV))AV[u]={img:null,e:null}});AVP=null;LASTH='';render()})}
 const unknown=id=>({n:'Carta '+id,t:'',d:'',a:null,df:null,l:0,r:'',at:'',u:1});
 const ci=id=>CARDS[id]||unknown(id);
 const isMon=c=>/Monster/.test(c.t),isSpell=c=>c.t==='Spell Card',isTrap=c=>c.t==='Trap Card',isExtraT=c=>/Fusion|Synchro|XYZ|Link/i.test(c.t||''),isPend=c=>/Pendulum/.test(c.t||''),isField=c=>isSpell(c)&&c.r==='Field';
@@ -361,7 +377,7 @@ function renderLobby(){view='lobby';tblMode(false);$('main').hidden=false;$('gat
  if(IMP)impPreview();
  const me=myP(),op=oppP(),host=S.lobby.host_id===S.me.user_id;
  $('lbT').textContent=S.lobby.title?`Lobby · ${S.lobby.title}`:'Lobby';
- const prow=(p,isMe)=>`<div class="sm-pl"><div class="sm-av" aria-hidden="true">${ini(p.nickname)}</div><div style="min-width:0"><b style="overflow-wrap:anywhere">${esc(p.nickname)}</b>${p.user_id===S.lobby.host_id?' <span class="chip s">Host</span>':''}${isMe?' <span class="chip">Tu</span>':''}<small class="mute" style="display:block">${p.deck_set?'Deck scelto':'Deck non scelto'}</small></div><span class="sm-rdy${p.ready?' on':''}">${p.ready?'PRONTO':'non pronto'}</span></div>`;
+ const prow=(p,isMe)=>`<div class="sm-pl">${avHtml(p)}<div style="min-width:0"><b style="overflow-wrap:anywhere">${esc(p.nickname)}</b>${p.user_id===S.lobby.host_id?' <span class="chip s">Host</span>':''}${isMe?' <span class="chip">Tu</span>':''}<small class="mute" style="display:block">${p.deck_set?'Deck scelto':'Deck non scelto'}</small></div><span class="sm-rdy${p.ready?' on':''}">${p.ready?'PRONTO':'non pronto'}</span></div>`;
  $('lbP').innerHTML=prow(me,true)+(op?prow(op,false):`<div class="sm-pl"><div class="sm-av" aria-hidden="true">?</div><div class="mute">In attesa di uno sfidante…</div><span></span></div>`);
  $('lbD').innerHTML=(HOME&&HOME.decks.length?HOME.decks.map(d=>deckRow(d,{pick:true,sel:me.deck_id})).join(''):'')+
    (HOME&&HOME.temp_decks&&HOME.temp_decks.length?HOME.temp_decks.map(d=>deckRow({id:d.id,name:d.name+' (temporaneo)',main:Array(d.main).fill(0),extra:Array(d.extra).fill(0),side:Array(d.side).fill(0)},{pick:true,sel:me.deck_id})).join(''):'')||'<p class="empty" style="margin:0">Non hai deck: importane uno qui sotto.</p>';
@@ -381,7 +397,7 @@ function renderChoose(){view='choose';tblMode(false);$('main').hidden=false;$('g
  :`<p style="text-align:center" class="mute">${esc(opN)} sta scegliendo chi gioca per primo…</p>`}
  </section><div class="sm-big"><button class="btn danger" id="lbLeave">Abbandona l’incontro</button></div>`;
  startPoll()}
-function scoreBox(){const me=S.me.seat,w=S.lobby.wins,op=oppP()||{};return `<div class="sm-score"><div><span>${w[me-1]}</span><small>${esc((myP()||{}).nickname||'Tu')}</small></div><div style="font-size:1.2rem;color:var(--mu)">–</div><div><span>${w[2-me]}</span><small>${esc(op.nickname||'Avversario')}</small></div></div>`}
+function scoreBox(){const me=S.me.seat,w=S.lobby.wins,op=oppP()||{};return `<div class="sm-score"><div>${avHtml(myP(),'s')}<span>${w[me-1]}</span><small>${esc((myP()||{}).nickname||'Tu')}</small></div><div style="font-size:1.2rem;color:var(--mu)">–</div><div>${avHtml(op,'s')}<span>${w[2-me]}</span><small>${esc(op.nickname||'Avversario')}</small></div></div>`}
 
 /* ---------- side deck ---------- */
 let SD=null,SDkey='';
@@ -427,7 +443,7 @@ async function loadState(){const st=await rpc('sim_state',{p_lobby:LID,p_since:n
 async function refreshHomeQuiet(){try{HOME=await rpc('sim_home')}catch(_){}}
 function render(){
  if(!S){renderHome();updateFab();return}
- chatSync();sigSync();
+ chatSync();sigSync();loadAv();
  const st=S.lobby.status,g=S.game;
  if(st==='lobby')renderLobby();
  else if(st==='playing'&&g&&g.status==='choosing')renderChoose();
@@ -501,7 +517,7 @@ function barHtml(side,B){const me=side===S.me.seat,p=S.players.find(x=>x.seat===
  const bn=B.pile.banish[side].length,opn=esc(((oppP()||{}).nickname)||'l’avversario'),ms=sigNow(S.me.seat);
  const sg=me?`<div class="sm-sg"><button class="sm-sb${ms==='think'?' on':''}" data-a="sigThink" aria-pressed="${ms==='think'}" aria-label="Penso: avvisa ${opn} che stai pensando (tocca di nuovo per spegnere)" title="Penso"><i>🤔</i><b>Penso</b></button><button class="sm-sb ok${ms==='ok'?' on':''}" data-a="sigOk" aria-label="OK: avvisa ${opn} che puoi procedere" title="OK"><i>👍</i><b>OK</b></button></div>`
   :`<div class="sm-sg" data-sigbox="${side}">${pillHtml(side)}</div>`;
- return `<div class="sm-bar${turn?' turn':''}"><div class="who">${esc(p.nickname)}${me?'<small>tu</small>':''}${turn?'<small>● turno</small>':''}</div>${sg}
+ return `<div class="sm-bar${turn?' turn':''}"><div class="who">${avHtml(p,'xs')}${esc(p.nickname)}${me?'<small>tu</small>':''}${turn?'<small>● turno</small>':''}</div>${sg}
  <button class="sm-lp${lp<=2000?' low':''}" data-lp="${side}" aria-label="Punti vita di ${esc(p.nickname)}: ${lp}. Tocca per modificarli">${num(lp)}</button>
  <div class="cnt"><span>Mano ${cnt.hand||0}</span><button data-pile="banish" data-side="${side}">Rimosse ${bn}${B.pile.banish[side].some(x=>isTg(x.i))?' 🎯':''}</button>${me?'':`<button data-pile="extra" data-side="${side}">Extra ${cnt.extra||0}</button>`}</div></div>`}
 function oppHand(B){const o=3-S.me.seat,n=(S.counts[o]||{}).hand||0,rev=S.cards.filter(c=>c.z==='hand'&&c.o===o);let h='';
