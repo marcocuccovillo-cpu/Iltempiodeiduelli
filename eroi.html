@@ -56,6 +56,31 @@
 .er-inv{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
 .er-inv .btn{min-height:44px;padding:0 14px;font-size:.92rem}
 /* boss */
+/* cruscotto: 5 equipaggiati in colonna a sinistra dell'avatar */
+.er-dash{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:stretch}
+.er-eqcol{display:flex;flex-direction:column;gap:6px;justify-content:space-between;width:48px}
+.er-eqb{display:grid;grid-template-columns:48px minmax(0,1fr);align-items:center;gap:0;padding:0;border:0;background:none;color:var(--tx);font:inherit;text-align:left;cursor:pointer;min-width:0;border-radius:12px}
+.er-eqb .ic{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-size:1.45rem;background:var(--raise);border:2px solid var(--rc,var(--line));box-shadow:0 0 12px rgba(0,0,0,.35)}
+.er-eqb.empty .ic{border-style:dashed;opacity:.5}
+.er-eqb:hover .ic,.er-eqb:focus-visible .ic{border-color:var(--ac2)}
+.er-eqb .tx{display:none;min-width:0;padding-left:10px}
+.er-eqb .tx b{display:block;font-size:.84rem;line-height:1.2;color:var(--rc,var(--tx));overflow-wrap:anywhere}
+.er-eqb .tx small{display:block;color:var(--mu);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
+.er-dmain{display:grid;gap:12px;min-width:0;align-content:start}
+.er-who{flex-wrap:wrap;row-gap:8px}
+@media(min-width:620px){.er-eqcol{width:210px}.er-eqb .tx{display:block}}
+/* riquadri espandibili (abilità e cartelle dello zaino) */
+.er-fd{margin:0 0 8px;scroll-margin-top:190px}
+.er-fold{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surf);color:var(--tx);font:700 1rem var(--ui);text-align:left;cursor:pointer}
+.er-fold .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:1.25rem;background:var(--raise);border:1.5px solid var(--line);flex:none}
+.er-fold .t{flex:1;min-width:0}.er-fold .t small{display:block;font-weight:400;color:var(--mu);font-size:.8rem;margin-top:1px;overflow-wrap:anywhere}
+.er-fold .n{flex:none;min-width:28px;padding:1px 9px;border-radius:99px;border:1px solid var(--line);font:700 .8rem var(--ui);text-align:center;color:var(--ac2);background:rgba(var(--ac-rgb),.08)}
+.er-fold .chev{flex:none;width:10px;height:10px;border-right:2px solid var(--mu);border-bottom:2px solid var(--mu);transform:rotate(-45deg);transition:transform .18s}
+.er-fold[aria-expanded="true"]{border-color:var(--ac);border-radius:14px 14px 0 0}
+.er-fold[aria-expanded="true"] .chev{transform:rotate(45deg)}
+.er-fp{border:1px solid var(--ac);border-top:0;border-radius:0 0 14px 14px;padding:4px 14px 10px;background:var(--surf)}
+.er-fp>.er-inv:first-of-type{border-top:0}
+@media(prefers-reduced-motion:reduce){.er-fold .chev{transition:none}}
 .er-boss{display:grid;gap:14px}
 .er-bh{display:flex;gap:14px;align-items:center}
 .er-sig{width:84px;height:84px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:2.8rem;background:radial-gradient(circle at 35% 30%,hsl(var(--h) 70% 40%),hsl(var(--h) 60% 12%) 70%);border:2px solid hsl(var(--h) 80% 65%);box-shadow:0 0 28px hsl(var(--h) 80% 55% / .45)}
@@ -196,7 +221,7 @@ const SL=Object.fromEntries(SLOTS.map(s=>[s[0],s]));
 const RAR={base:'Base',comune:'Comune',non_comune:'Non comune',raro:'Raro',epico:'Epico',leggendario:'Leggendario',mitico:'Mitico'};
 const SRC={start:'Base',shop:'Mercante',boss:'Boss',dungeon:'Dungeon'};
 const API='https://db.ygoprodeck.com/api/v7/cardinfo.php',CROP='https://images.ygoprodeck.com/images/cards_cropped/';
-let AVOK=false,AV={},avOpen=false,avQ='',avRes=null,avBusy=false;
+let AVOK=false,AV={},avOpen=false,avQ='',avRes=null,avBusy=false,FOLD={};   // FOLD: riquadri aperti (abilità, cartelle zaino)
 let lastDngCan=true,lastCan=true,sb=null,ST=null,ME=null,BAL=null,CAP=9999,tab='hero',draft=null,heal='',LB=null,AR=null,busy=false,last=0,pending=null,flash=null,ISADM=null;
 
 /* ---------- utilità ---------- */
@@ -241,6 +266,19 @@ function modal(html){const o=document.createElement('div');o.className='er-ov';o
  const close=()=>{o.remove();document.removeEventListener('keydown',k);if(o._t)clearInterval(o._t)};function k(e){if(e.key==='Escape')close()}
  o.onclick=e=>{if(e.target===o)close()};o.querySelectorAll('[data-close]').forEach(b=>b.onclick=close);document.addEventListener('keydown',k);document.body.appendChild(o);
  const f=o.querySelector('[data-close]');if(f)f.focus();o.close=close;return o}
+/* ---------- riquadri espandibili ---------- */
+function fold(key,ic,title,sub,n,body){const o=!!FOLD[key];
+ return `<div class="er-fd" id="fd-${key}"><button type="button" class="er-fold" data-fold="${key}" aria-expanded="${o}" aria-controls="fp-${key}"><span class="ic" aria-hidden="true">${ic}</span><span class="t">${title}${sub?`<small>${sub}</small>`:''}</span>${n==null?'':`<span class="n">${n}</span>`}<span class="chev" aria-hidden="true"></span></button><div class="er-fp" id="fp-${key}" ${o?'':'hidden'}>${body}</div></div>`}
+function toggleFold(b){const k=b.dataset.fold,o=b.getAttribute('aria-expanded')!=='true';FOLD[k]=o;b.setAttribute('aria-expanded',String(o));const p=$('fp-'+k);if(p)p.hidden=!o}
+/* potenza di un oggetto = somma delle sue 5 percentuali; a parità contano i bonus speciali, poi il livello richiesto e il nome */
+const itemPow=i=>STATS.reduce((a,s)=>a+Number(i['p_'+s[0]]||0),0);
+const itemCmp=(a,b)=>itemPow(a)-itemPow(b)||(Number(a.xp_pct||0)+Number(a.extra_actions||0)+Number(a.extra_fights||0))-(Number(b.xp_pct||0)+Number(b.extra_actions||0)+Number(b.extra_fights||0))||Number(a.min_level)-Number(b.min_level)||String(a.name).localeCompare(String(b.name),'it');
+function slotSheet(k){const m=ST.me,s=SL[k],i=m.equipped[k];
+ const o=modal(`<h2 style="margin:0 0 10px">${s[2]} ${s[1]}</h2>${i?`<div class="er-sl">${itemBox(Object.assign({slot:k},i))}</div>`:`<p class="mute" style="margin:0">Nessun oggetto indossato in questo slot.</p>`}
+  <div class="row" style="margin-top:14px"><button class="btn" data-goinv="${k}">Apri nello zaino</button><button class="btn ghost" data-close>Chiudi</button></div>`);
+ const g=o.querySelector('[data-goinv]');if(g)g.onclick=()=>{o.close();goInv(k)}}
+function goInv(k){FOLD['inv_'+k]=true;if(tab!=='hero')setTab('hero');else renderHero();const e=$('fd-inv_'+k);if(e&&e.scrollIntoView)try{e.scrollIntoView({block:'start'})}catch(_){}}
+
 async function heroSheet(uid){
  try{const h=await rpc('game_hero',{p_user:uid});
   const eq=SLOTS.map(s=>{const i=(h.equipped||{})[s[0]];return `<div class="er-sl" style="margin-top:8px">${i?itemBox(Object.assign({slot:s[0]},i)):`<div class="er-ic">${s[2]}</div><div class="mute">${s[1]}: vuoto</div>`}</div>`}).join('');
@@ -251,10 +289,14 @@ async function heroSheet(uid){
 /* ---------- schermata principale ---------- */
 function paintTop(){
  const m=ST.me,pct=m.level>=CAP?100:Math.min(100,Math.round(100*m.xp/m.xp_need));
- $('top').innerHTML=`<div class="er-who"><div class="er-pic" aria-hidden="true">${face(m.user_id,m.nickname)}</div><div style="min-width:0"><h2>${esc(m.nickname)}</h2><div class="er-lv">Livello <b>${num(m.level)}</b> · Potenza <b>${num(pw(m.stats))}</b> · ${num(m.max_hp)} PV</div></div><div class="er-bc"><b>${BAL==null?'—':num(BAL)}</b><span>BC</span></div></div>
+ const col=SLOTS.map(([k,nm,ic])=>{const i=m.equipped[k];
+  return i?`<button type="button" class="er-eqb r-${esc(i.rarity)}" data-slot="${k}" aria-label="${nm}: ${esc(i.name)}, ${esc(RAR[i.rarity]||i.rarity)}. Tocca per i dettagli"><span class="ic" aria-hidden="true">${ic}</span><span class="tx"><b>${esc(i.name)}</b><small>${nm} · ${esc(RAR[i.rarity]||i.rarity)}</small></span></button>`
+   :`<button type="button" class="er-eqb empty" data-slot="${k}" aria-label="${nm}: vuoto"><span class="ic" aria-hidden="true">${ic}</span><span class="tx"><b>${nm}</b><small>vuoto</small></span></button>`}).join('');
+ $('top').innerHTML=`<div class="er-dash"><div class="er-eqcol" role="group" aria-label="Equipaggiamento indossato">${col}</div><div class="er-dmain">
+  <div class="er-who"><div class="er-pic" aria-hidden="true">${face(m.user_id,m.nickname)}</div><div style="min-width:0"><h2>${esc(m.nickname)}</h2><div class="er-lv">Livello <b>${num(m.level)}</b> · Potenza <b>${num(pw(m.stats))}</b> · ${num(m.max_hp)} PV</div></div><div class="er-bc"><b>${BAL==null?'—':num(BAL)}</b><span>BC</span></div></div>
   <div><div class="er-xp" role="progressbar" aria-valuemin="0" aria-valuemax="${m.xp_need}" aria-valuenow="${m.xp}" aria-label="Esperienza"><i style="width:${pct}%"></i></div><div class="er-xpt"><span>${m.level>=CAP?'XP al massimo':`${num(m.xp)} / ${num(m.xp_need)} XP`}</span><span>${m.level>=CAP?'Livello massimo':`al livello ${num(m.level+1)}`}</span></div></div>
   <div class="er-reset">Nuovo boss e nuove offerte del mercante tra <b data-cd>${cd()}</b></div>
-  ${m.stats_set&&m.points_free>0?`<div class="er-reset">✨ Hai <b>${num(m.points_free)}</b> punti abilità da spendere: scheda <b>Eroe</b></div>`:''}`}
+  ${m.stats_set&&m.points_free>0?`<div class="er-reset">✨ Hai <b>${num(m.points_free)}</b> punti abilità da spendere: scheda <b>Eroe</b></div>`:''}</div></div>`}
 
 function gate(html){ST=null;ME=null;$('main').hidden=true;$('gate').hidden=false;$('gate').innerHTML=html}
 function gateLogin(){gate(`<section class="card er-gate" style="margin-top:20px"><h2>Entra dal Black Market</h2><p class="mute" style="max-width:34em;margin:0 auto 14px">La guerra degli Eroi usa il tuo profilo del Black Market: lo stesso nickname e lo stesso saldo di BC. Entra (o crea il profilo) dal Black Market e poi torna qui.</p><a class="btn gold" href="black-market.html">Accedi dal Black Market</a></section>`);
@@ -273,8 +315,14 @@ function renderHero(){
   return `<div class="er-st"><div class="nm">${nm}<small>${ds}</small></div><div class="val">${num(v)}${d?`<em style="${d<0?'color:var(--bad)':''}">${d>0?'+':''}${num(d)}</em>`:''}</div>
    <div class="er-ctl">${big?`<button class="s10" data-a="-10" data-k="${k}" aria-label="Togli 10 punti a ${nm}" ${draft[k]<10?'disabled':''}>−10</button>`:''}<button data-a="-" data-k="${k}" aria-label="Togli un punto a ${nm}" ${draft[k]<=0?'disabled':''}>−</button><div class="er-pbar" aria-hidden="true"><i style="width:${pb}%"></i></div><input type="number" inputmode="numeric" min="0" max="${cap}" step="1" value="${draft[k]}" data-pin="${k}" aria-label="Punti in ${nm}"><button data-a="+" data-k="${k}" aria-label="Aggiungi un punto a ${nm}" ${room<=0?'disabled':''}>+</button>${big?`<button class="s10" data-a="+10" data-k="${k}" aria-label="Aggiungi 10 punti a ${nm}" ${room<10?'disabled':''}>+10</button>`:''}</div></div>`}).join('');
  const hpD=50+12*Math.round((5+draft.vig*m.level)*(100+pctSum('vig'))/100);
- const eq=SLOTS.map(([k,nm,ic])=>{const i=m.equipped[k];return `<div class="er-sl">${i?itemBox(Object.assign({slot:k},i)):`<div class="er-ic" aria-hidden="true">${ic}</div><div class="mute">${nm}: vuoto</div>`}</div>`}).join('');
- const inv=SLOTS.map(([k,nm])=>{const L=ST.inventory.filter(i=>i.slot===k);return L.length?`<h3 class="er-h" style="font-size:1rem;margin:16px 0 4px">${nm}</h3>`+L.map(i=>{const lock=m.level<i.min_level;return `<div class="er-inv">${itemBox(i,i.source==='start'?'':' · '+esc(SRC[i.source]||''))}<div>${i.equipped?'<span class="chip s">Indossato</span>':lock?`<span class="er-lock">Liv. ${num(i.min_level)}</span>`:`<button class="btn ghost" data-eq="${esc(i.id)}">Indossa</button>`}</div></div>`}).join(''):''}).join('');
+ const inv=SLOTS.map(([k,nm,ic])=>{const L=ST.inventory.filter(i=>i.slot===k).sort(itemCmp);
+  const on=L.find(i=>i.equipped);
+  const body=L.length?L.map(i=>{const lock=m.level<i.min_level;return `<div class="er-inv">${itemBox(i,i.source==='start'?'':' · '+esc(SRC[i.source]||''))}<div>${i.equipped?'<span class="chip s">Indossato</span>':lock?`<span class="er-lock">Liv. ${num(i.min_level)}</span>`:`<button class="btn ghost" data-eq="${esc(i.id)}">Indossa</button>`}</div></div>`}).join(''):'<p class="mute" style="margin:8px 0 0">Nessun oggetto di questa categoria.</p>';
+  return fold('inv_'+k,ic,nm,on?`Indossato: ${esc(on.name)}`:'Nessuno indossato',L.length,body)}).join('');
+ const nTemp=m.temp_skills.length;
+ const skBody=`<p class="er-sub" style="margin:8px 0 12px">Le abilità si comprano dal <b>Mercante</b> con i BC: quelle permanenti restano per sempre, i potenziamenti durano ${S.temp_hours} ore.</p>
+  <b>Permanenti</b>${m.perm_skills.length?`<div class="er-chipl">${m.perm_skills.map(n=>`<span>${esc(n)}</span>`).join('')}</div>`:'<p class="mute" style="margin:4px 0 0">Nessuna, per ora.</p>'}
+  <div style="margin-top:12px"><b>Potenziamenti attivi</b></div>${nTemp?m.temp_skills.map(t=>`<div class="er-sk"><div class="nmk">${esc(t.name)} <small class="mute">· ${esc((SL[t.slot]||[0,t.slot])[1])}</small></div><div class="mute">ancora <b data-ut="${esc(t.until)}">${lf(new Date(t.until).getTime()-Date.now())}</b></div></div>`).join(''):'<p class="mute" style="margin:4px 0 0">Nessuno attivo.</p>'}`;
  $('p-hero').innerHTML=`${!m.stats_set?`<p class="er-msg" style="margin:0 0 16px"><b>Benvenuto, eroe!</b> Per iniziare distribuisci i tuoi ${m.points} punti abilità e salva: poi potrai combattere.</p>`:m.points_free>0?`<p class="er-msg good" style="margin:0 0 16px">✨ Hai <b>${num(m.points_free)}</b> punti abilità da spendere: ne ricevi <b>${S.points_per_level}</b> a ogni livello. Distribuiscili qui sotto e salva.</p>`:''}
  ${AVOK?`<h2 class="er-h">Avatar</h2><p class="er-sub">Scegli l’illustrazione di una carta Yu-Gi-Oh! come faccia del tuo eroe: la vedono tutti.</p>
  <div class="card"><div class="er-avbox"><div class="er-avbig" aria-hidden="true">${face(m.user_id,m.nickname)}</div><div style="min-width:0"><b style="overflow-wrap:anywhere">${AV[m.user_id]?esc(AV[m.user_id].n):'Nessun avatar'}</b>
@@ -286,12 +334,8 @@ function renderHero(){
  <div class="card"><div class="er-left"><span>Punti da assegnare</span><b>${num(left)}</b></div>${rows}
   <p class="er-note">PV con questa distribuzione: <b>${num(hpD)}</b>.${pays?` <span style="color:var(--warn)">Togliere punti già assegnati costa <b>${S.respec_cost} BC</b>.</span>`:m.stats_set&&m.fights_total>0&&S.respec_cost>0?` Aggiungere punti nuovi è sempre gratis; togliere punti già assegnati, una volta combattuto, costa ${S.respec_cost} BC.`:' Finché non combatti puoi cambiare idea gratis.'}</p>
   <div class="row" style="margin-top:12px"><button class="btn" id="stSave" ${(!changed&&m.stats_set)||left<0||(!m.stats_set&&used===0)?'disabled':''}>${pays?`Salva (${S.respec_cost} BC)`:'Salva i punti'}</button><button class="btn ghost" id="stReset" ${changed?'':'disabled'}>Annulla</button></div></div>
- <h2 class="er-h">Equipaggiamento</h2>${(m.xp_pct||m.extra_actions||m.extra_fights)?`<p class="er-sub">Bonus speciali attivi: ${[m.xp_pct?`+${m.xp_pct}% XP`:'',m.extra_actions?`+${m.extra_actions} azioni boss al giorno`:'',m.extra_fights?`+${m.extra_fights*25}% ricarica energia`:''].filter(Boolean).join(' · ')}</p>`:'<p class="er-sub">Ogni oggetto aumenta una o due statistiche in percentuale.</p>'}
- <div class="er-slots">${eq}</div>
- <h2 class="er-h">Abilità</h2><p class="er-sub">Le abilità si comprano dal <b>Mercante</b> con i BC: quelle permanenti restano per sempre, i potenziamenti durano ${S.temp_hours} ore.</p>
- <div class="card"><b>Permanenti</b>${m.perm_skills.length?`<div class="er-chipl">${m.perm_skills.map(n=>`<span>${esc(n)}</span>`).join('')}</div>`:'<p class="mute" style="margin:4px 0 0">Nessuna, per ora.</p>'}
-  <div style="margin-top:12px"><b>Potenziamenti attivi</b></div>${m.temp_skills.length?m.temp_skills.map(t=>`<div class="er-sk"><div class="nmk">${esc(t.name)} <small class="mute">· ${esc((SL[t.slot]||[0,t.slot])[1])}</small></div><div class="mute">ancora <b data-ut="${esc(t.until)}">${lf(new Date(t.until).getTime()-Date.now())}</b></div></div>`).join(''):'<p class="mute" style="margin:4px 0 0">Nessuno attivo.</p>'}</div>
- <h2 class="er-h">Zaino</h2>${inv||'<p class="mute">Lo zaino è vuoto.</p>'}
+ <div style="margin-top:26px">${fold('skills','✨','Abilità',`${m.perm_skills.length} permanent${m.perm_skills.length===1?'e':'i'} · ${nTemp} potenziament${nTemp===1?'o attivo':'i attivi'}`,m.perm_skills.length+nTemp,skBody)}</div>
+ <h2 class="er-h">Zaino</h2>${(m.xp_pct||m.extra_actions||m.extra_fights)?`<p class="er-sub">Bonus speciali attivi: ${[m.xp_pct?`+${m.xp_pct}% XP`:'',m.extra_actions?`+${m.extra_actions} azioni boss al giorno`:'',m.extra_fights?`+${m.extra_fights*25}% ricarica energia`:''].filter(Boolean).join(' · ')}</p>`:''}<p class="er-sub">Una cartella per ogni categoria, con gli oggetti dal meno al più potente. Gli oggetti che indossi sono nella colonna a sinistra, in alto.</p>${inv}
  ${ISADM?`<h2 class="er-h">Strumenti admin</h2><div class="card"><p class="mute" style="margin:0 0 10px">Visibile solo a te (amministratore). Riporta la tua batteria al 100%; l’uso viene registrato nell’audit.</p><button class="btn gold" id="admEn">⚡ Ricarica la mia energia</button></div>`:''}
  <h2 class="er-h">Come si gioca</h2><details class="card"><summary>Le regole in breve</summary><ul class="mute er-how" style="padding-left:20px;margin:6px 0 0">
   <li><b>Boss del giorno</b>: ogni giorno compare un boss, lo stesso per tutti. Ogni eroe ha <b>una lobby al giorno</b>: ne crea una sua (anche da solo) oppure entra in una già aperta. Quando siete pronti uno qualunque dei presenti la fa partire (dopo la partenza non si entra più). I PV del boss si calcolano sugli eroi presenti${S.min_players>1?`, e servono almeno <b>${S.min_players} eroi</b>`:''}.</li>
@@ -605,6 +649,8 @@ document.querySelector('.tabs').onclick=e=>{const b=e.target.closest('[data-t]')
 document.addEventListener('click',e=>{
  const t=e.target.closest('button,[data-hero]');if(!t)return;
  if(t.id==='retry'){boot();return}
+ if(t.dataset.fold){toggleFold(t);return}
+ if(t.dataset.slot){slotSheet(t.dataset.slot);return}
  if(t.dataset.hero){heroSheet(t.dataset.hero);return}
  const a=t.dataset.a;
  if(a&&draft){const k=t.dataset.k;const used=STATS.reduce((s,x)=>s+draft[x[0]],0),stp={'+':1,'-':-1,'+10':10,'-10':-10}[a]||0;
