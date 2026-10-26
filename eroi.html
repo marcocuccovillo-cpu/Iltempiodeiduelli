@@ -83,6 +83,31 @@
 @media(prefers-reduced-motion:reduce){.er-fold .chev{transition:none}}
 .er-mb{display:block;height:7px;border-radius:99px;background:var(--inp);border:1px solid var(--line);overflow:hidden;margin-top:7px}.er-mb i{display:block;height:100%;background:linear-gradient(90deg,var(--bar-a),var(--ac2))}
 .er-fp .dg-card{box-shadow:none;background:var(--inp);margin-top:10px}
+/* chat pubblica e presenza */
+.er-on{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px rgba(74,222,155,.22);margin-left:8px;vertical-align:middle;flex:none}
+.er-bdg{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ac2);margin-left:6px;vertical-align:super;box-shadow:0 0 0 3px rgba(var(--ac-rgb),.25)}
+.er-bdg[hidden]{display:none}
+.er-oc{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.er-ochip{display:inline-flex;align-items:center;gap:7px;padding:3px 11px 3px 4px;border:1px solid var(--line);border-radius:99px;background:var(--inp);font-size:.88rem;font-weight:600;max-width:100%;overflow-wrap:anywhere}
+.er-ochip .av,.er-cm .av{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--raise);border:1px solid var(--line);font:700 .8rem var(--disp);color:var(--ac2);overflow:hidden;font-style:normal}
+.er-ochip .av img,.er-cm .av img{width:100%;height:100%;object-fit:cover;display:block}
+.er-chat{padding:0;overflow:hidden;margin-top:10px}
+.er-cmsgs{position:relative;height:min(56vh,460px);min-height:260px;overflow-y:auto;overscroll-behavior:contain;padding:12px;display:flex;flex-direction:column;gap:11px}
+.er-cm{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:start}
+.er-cm .av{width:34px;height:34px;font-size:.95rem}
+.er-cm .hd{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;min-width:0}
+.er-cm .hd b{overflow-wrap:anywhere}.er-cm .hd small{color:var(--mu);font-size:.74rem}
+.er-cm.me .hd b{color:var(--ac2)}
+.er-cm .tx{overflow-wrap:anywhere;line-height:1.4;margin-top:1px}
+.er-cx{margin-left:auto;min-height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--mu);font:600 .74rem var(--ui);cursor:pointer}
+.er-cx:hover{border-color:var(--bad);color:var(--bad)}
+.er-ccomp{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--line);background:var(--surf)}
+.er-ccomp input{flex:1;min-width:0;min-height:48px;font-size:16px}
+.er-ccomp .btn{min-height:48px;flex:none}
+.er-cerr{margin:0;padding:0 12px 10px;color:var(--bad);font-size:.86rem;min-height:0}.er-cerr:empty{display:none}
+.er-cnew{position:sticky;bottom:0;align-self:center;margin-top:auto;min-height:36px;padding:0 14px;border-radius:99px;border:1px solid var(--ac);background:var(--surf);color:var(--tx);font:700 .82rem var(--ui);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.45)}
+.er-cnew[hidden]{display:none}
+.er-lbon{display:flex;align-items:center;gap:8px;margin:-4px 0 12px;color:var(--mu);font-size:.9rem}.er-lbon b{color:var(--tx)}
 .er-boss{display:grid;gap:14px}
 .er-bh{display:flex;gap:14px;align-items:center}
 .er-sig{width:84px;height:84px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:2.8rem;background:radial-gradient(circle at 35% 30%,hsl(var(--h) 70% 40%),hsl(var(--h) 60% 12%) 70%);border:2px solid hsl(var(--h) 80% 65%);box-shadow:0 0 28px hsl(var(--h) 80% 55% / .45)}
@@ -197,7 +222,7 @@
 
  <div id="main" hidden>
  <div class="er-sticky"><div id="bat"></div>
- <div class="tabs" role="tablist"><button role="tab" data-t="hero" aria-selected="true">Eroe</button><button role="tab" data-t="boss" aria-selected="false">Boss</button><button role="tab" data-t="dng" aria-selected="false">Dungeon</button><button role="tab" data-t="arena" aria-selected="false">Arena</button><button role="tab" data-t="shop" aria-selected="false">Mercante</button><button role="tab" data-t="lb" aria-selected="false">Classifica</button></div></div>
+ <div class="tabs" role="tablist"><button role="tab" data-t="hero" aria-selected="true">Eroe</button><button role="tab" data-t="boss" aria-selected="false">Boss</button><button role="tab" data-t="dng" aria-selected="false">Dungeon</button><button role="tab" data-t="arena" aria-selected="false">Arena</button><button role="tab" data-t="shop" aria-selected="false">Mercante</button><button role="tab" data-t="lb" aria-selected="false">Classifica</button><button role="tab" data-t="chat" aria-selected="false">Chat<span class="er-bdg" id="chBadge" hidden title="Nuovi messaggi"></span></button></div></div>
  <div id="msg" role="status" aria-live="polite"></div>
  <section class="tp" id="p-hero"></section>
  <section class="tp" id="p-boss" hidden></section>
@@ -205,6 +230,7 @@
  <section class="tp" id="p-arena" hidden></section>
  <section class="tp" id="p-shop" hidden></section>
  <section class="tp" id="p-lb" hidden></section>
+ <section class="tp" id="p-chat" hidden></section>
  </div>
 </main>
 
@@ -223,7 +249,7 @@ const SL=Object.fromEntries(SLOTS.map(s=>[s[0],s]));
 const RAR={base:'Base',comune:'Comune',non_comune:'Non comune',raro:'Raro',epico:'Epico',leggendario:'Leggendario',mitico:'Mitico'};
 const SRC={start:'Base',shop:'Mercante',boss:'Boss',dungeon:'Dungeon'};
 const API='https://db.ygoprodeck.com/api/v7/cardinfo.php',CROP='https://images.ygoprodeck.com/images/cards_cropped/';
-let AVOK=false,AV={},avOpen=false,avQ='',avRes=null,avBusy=false,FOLD={};   // FOLD: riquadri aperti (abilità, cartelle zaino)
+let AVOK=false,AV={},avOpen=false,avQ='',avRes=null,avBusy=false,FOLD={chat_online:true};   // FOLD: riquadri aperti (abilità, cartelle zaino, online)
 let lastDngCan=true,lastCan=true,sb=null,ST=null,ME=null,BAL=null,CAP=9999,tab='hero',draft=null,heal='',LB=null,AR=null,busy=false,last=0,pending=null,flash=null,ISADM=null;
 
 /* ---------- utilità ---------- */
@@ -604,24 +630,78 @@ function skillRow(sk,cur){
  return `<div class="er-sk ${sk.active_until?'act':''}"><div style="min-width:0"><div class="nmk">${esc(sk.name)} <small class="mute">· grado ${sk.tier}</small></div>${bonusTags(sk)}${sk.active_until?`<small class="mute">Attivo ancora <b data-ut="${esc(sk.active_until)}">${lf(new Date(sk.active_until).getTime()-Date.now())}</b></small>`:''}</div><div>${act}</div></div>`}
 
 /* ---------- Classifica ---------- */
-async function loadLb(){try{const{data,error}=await sb.from('game_leaderboard_v').select('*').order('rank',{ascending:true}).order('nickname',{ascending:true}).limit(50);if(error)throw new Error(error.message);LB=data||[]}catch(e){LB=[];say(errTxt(e),'bad')}renderLb()}
+async function loadLb(){loadOnline();try{const{data,error}=await sb.from('game_leaderboard_v').select('*').order('rank',{ascending:true}).order('nickname',{ascending:true}).limit(50);if(error)throw new Error(error.message);LB=data||[]}catch(e){LB=[];say(errTxt(e),'bad')}renderLb()}
 function renderLb(){
  $('p-lb').innerHTML=`<h2 class="er-h">Classifica degli eroi</h2><p class="er-sub">Ordinata per livello e, a parità, per XP. Compaiono gli eroi che hanno assegnato i loro punti.</p>
+ ${chatAvail===false?'':`<p class="er-lbon"><span class="er-on" style="margin:0" aria-hidden="true"></span><span><b>${ONL.size}</b> ${ONL.size===1?'eroe online':'eroi online'} adesso: il pallino verde accanto al nome</span></p>`}
  ${LB==null?'<p class="mute">Caricamento…</p>':LB.length?LB.map(r=>`<div class="er-lb ${r.user_id===ST.me.user_id?'me':''}"><div class="rk">${r.rank}</div><div class="av" aria-hidden="true">${face(r.user_id,r.nickname)}</div>
-   <div style="min-width:0"><button class="er-link" data-hero="${esc(r.user_id)}">${esc(r.nickname)}</button><small>${num(r.bosses_beaten)} boss · ${num(r.duels_won)} duelli vinti</small></div><div class="lv">Lv. ${num(r.level)}</div></div>`).join(''):'<p class="mute">Nessun eroe in classifica, per ora.</p>'}`}
+   <div style="min-width:0"><button class="er-link" data-hero="${esc(r.user_id)}">${esc(r.nickname)}</button>${ONL.has(r.user_id)?'<span class="er-on" role="img" aria-label="Online" title="Online"></span>':''}<small>${num(r.bosses_beaten)} boss · ${num(r.duels_won)} duelli vinti</small></div><div class="lv">Lv. ${num(r.level)}</div></div>`).join(''):'<p class="mute">Nessun eroe in classifica, per ora.</p>'}`}
+
+/* ---------- chat pubblica e presenza ---------- */
+let CH={msgs:[],me:null,staff:false,seen:null,remote:0,hp:null,sending:false,n:0,key:'',loading:false,once:false,prevMax:0},ONL=new Map(),ONLK='',chatAvail=null;
+const seenKey=()=>'er_chat_seen:'+(ME?ME.user_id:'');
+function seenLoad(){try{const v=localStorage.getItem(seenKey());return v==null?null:Number(v)}catch(_){return null}}
+function seenSave(){try{if(CH.seen!=null)localStorage.setItem(seenKey(),String(CH.seen))}catch(_){}}
+// se la migrazione della chat non è ancora stata applicata, la scheda Chat sparisce e il resto del gioco funziona come prima
+function chatMissing(e){const m=String(e&&e.message||e);if(/could not find|schema cache|does not exist|PGRST202/i.test(m)){chatAvail=false;const b=document.querySelector('.tabs [data-t="chat"]');if(b)b.hidden=true;if(tab==='chat')setTab('hero');return true}return false}
+function badge(){const b=$('chBadge');if(b)b.hidden=!(tab!=='chat'&&CH.seen!=null&&CH.remote>CH.seen)}
+async function beat(){if(chatAvail===false||!ME)return;
+ try{const r=await rpc('game_presence_ping');chatAvail=true;CH.remote=Number((r&&r.last_id)||0);
+  if(CH.seen==null){CH.seen=seenLoad();if(CH.seen==null){CH.seen=CH.remote;seenSave()}}badge()}catch(e){chatMissing(e)}}
+async function loadOnline(){if(chatAvail===false)return;
+ try{const L=await rpc('game_online');chatAvail=true;const k=(L||[]).map(x=>x.u).join(',');(L||[]).forEach(x=>{if(x.ac)AV[x.u]={c:x.ac,n:x.an}});ONL=new Map((L||[]).map(x=>[x.u,x]));
+  if(k!==ONLK){ONLK=k;if(tab==='lb')renderLb()}if(tab==='chat')paintOnline()}catch(e){if(/Modulo non attivo/i.test(String(e&&e.message))){boot();return}chatMissing(e)}}
+function ingest(list,replace){(list||[]).forEach(m=>{if(m.ac)AV[m.u]={c:m.ac,n:m.an}});
+ if(replace){CH.msgs=(list||[]).slice()}else{const have=new Set(CH.msgs.map(x=>x.id));(list||[]).forEach(m=>{if(!have.has(m.id))CH.msgs.push(m)});CH.msgs.sort((a,b)=>a.id-b.id)}
+ if(CH.msgs.length>200)CH.msgs=CH.msgs.slice(-200)}
+async function loadChat(full){if(CH.loading||chatAvail===false)return;CH.loading=true;
+ try{const after=(!full&&CH.msgs.length)?CH.msgs[CH.msgs.length-1].id:null;
+  const r=await rpc('game_chat_list',after==null?{}:{p_after:after});chatAvail=true;CH.me=r.me;CH.staff=!!r.staff;
+  ingest(r.msgs,full||after==null);CH.remote=Math.max(CH.remote,Number(r.last_id||0));
+  if(tab==='chat'){const e=$('chErr');if(e&&!CH.sending&&/^Non riesco/.test(e.textContent))e.textContent='';paintChat(false)}}
+ catch(e){if(/Modulo non attivo/i.test(String(e&&e.message))){boot();return}if(!chatMissing(e)&&tab==='chat'){const x=$('chErr');if(x)x.textContent='Non riesco ad aggiornare la chat: riprovo da solo.'}}
+ finally{CH.loading=false}}
+function chatRow(m){const mine=CH.me&&m.u===CH.me,d=new Date(m.at*1000),now=new Date();
+ const tm=d.toDateString()===now.toDateString()?pad(d.getHours())+':'+pad(d.getMinutes()):pad(d.getDate())+'/'+pad(d.getMonth()+1)+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+ return `<div class="er-cm${mine?' me':''}"><div class="av" aria-hidden="true">${face(m.u,m.n)}</div><div style="min-width:0"><div class="hd"><b>${esc(m.n)}</b><small>${tm}</small>${CH.staff?`<button type="button" class="er-cx" data-chhide="${m.id}" aria-label="Nascondi il messaggio di ${esc(m.n)}">${CH.hp===m.id?'Conferma?':'Nascondi'}</button>`:''}</div><div class="tx">${esc(m.t)}</div></div></div>`}
+function paintChat(force){const box=$('chMsgs');if(!box)return;
+ const key=CH.msgs.map(m=>m.id).join(',')+'|'+CH.hp+'|'+CH.staff+'|'+CH.me;
+ if(!force&&key===CH.key)return;CH.key=key;
+ const atB=!CH.once||box.scrollHeight-box.scrollTop-box.clientHeight<70,st=box.scrollTop,max=CH.msgs.length?CH.msgs[CH.msgs.length-1].id:0;
+ box.innerHTML=(CH.msgs.length?CH.msgs.map(chatRow).join(''):'<p class="mute" style="margin:auto;text-align:center">Nessun messaggio, per ora. Scrivi tu il primo!</p>')+'<button type="button" class="er-cnew" id="chNew" hidden>↓ Nuovi messaggi</button>';
+ CH.once=true;box.scrollTop=atB?box.scrollHeight:st;
+ const nb=$('chNew');if(nb)nb.hidden=atB||max<=CH.prevMax;if(atB)CH.prevMax=max;
+ if(tab==='chat'&&max>(CH.seen||0)){CH.seen=max;seenSave()}badge()}
+function paintOnline(){const f=$('fd-chat_online');if(!f)return;const L=[...ONL.values()],c=f.querySelector('.n'),p=$('fp-chat_online');if(c)c.textContent=L.length;
+ if(p)p.innerHTML=L.length?`<div class="er-oc">${L.map(x=>`<span class="er-ochip"><i class="av" aria-hidden="true">${face(x.u,x.n)}</i>${esc(x.n)}</span>`).join('')}</div>`:'<p class="mute" style="margin:8px 0 0">Nessuno online.</p>'}
+function renderChat(){const el=$('p-chat');
+ if(!$('chMsgs')){
+  el.innerHTML=`<h2 class="er-h">Chat</h2><p class="er-sub">Una sola chat per tutti gli eroi: niente messaggi privati. Scrivi con rispetto, i moderatori possono nascondere i messaggi.</p>
+  ${fold('chat_online','🟢','Online ora','Chi ha il gioco aperto in questo momento',ONL.size,'')}
+  <section class="card er-chat" aria-label="Chat degli eroi"><div class="er-cmsgs" id="chMsgs" role="log" aria-label="Messaggi della chat" tabindex="0"></div>
+   <form class="er-ccomp" id="chForm" autocomplete="off"><input id="chIn" type="text" maxlength="300" placeholder="Scrivi a tutti…" aria-label="Il tuo messaggio" enterkeyhint="send" autocomplete="off" autocapitalize="sentences"><button class="btn" id="chSend" type="submit">Invia</button></form>
+   <p class="er-cerr" id="chErr" role="alert"></p></section>`;
+  const box=$('chMsgs');box.addEventListener('scroll',()=>{if(box.scrollHeight-box.scrollTop-box.clientHeight<70){const n=$('chNew');if(n)n.hidden=true;CH.prevMax=CH.msgs.length?CH.msgs[CH.msgs.length-1].id:0}},{passive:true})}
+ paintOnline();paintChat(true)}
+async function openChat(){renderChat();await loadChat(true);loadOnline();beat()}
+async function sendChat(){if(CH.sending)return;const inp=$('chIn'),btn=$('chSend'),err=$('chErr');if(!inp)return;const txt=(inp.value||'').trim();if(!txt)return;
+ CH.sending=true;btn.disabled=true;err.textContent='';
+ try{const m=await rpc('game_chat_send',{p_text:txt});inp.value='';CH.me=CH.me||m.u;ingest([m],false);CH.seen=Math.max(CH.seen||0,m.id);seenSave();CH.prevMax=m.id;paintChat(true);const box=$('chMsgs');if(box)box.scrollTop=box.scrollHeight;loadChat(false)}
+ catch(e){const s=String(e&&e.message||e);if(/Modulo non attivo/i.test(s)){boot();return}err.textContent=s}
+ finally{CH.sending=false;btn.disabled=false;inp.focus()}}
 
 /* ---------- navigazione e caricamento ---------- */
 function paint(){
  paintTop();paintBat();
- if(tab==='hero')renderHero();else if(tab==='boss')renderBoss();else if(tab==='dng')renderDng();else if(tab==='arena')renderArena();else if(tab==='shop')renderShop();else renderLb();
+ if(tab==='hero')renderHero();else if(tab==='boss')renderBoss();else if(tab==='dng')renderDng();else if(tab==='arena')renderArena();else if(tab==='shop')renderShop();else if(tab==='chat')renderChat();else renderLb();
 }
 function setTab(t,push){
  tab=t;document.querySelectorAll('.tabs [data-t]').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));const cb=document.querySelector('.tabs [data-t="'+t+'"]');if(cb&&cb.scrollIntoView)try{cb.scrollIntoView({inline:'nearest',block:'nearest'})}catch(_){}
- ['hero','boss','dng','arena','shop','lb'].forEach(x=>$('p-'+x).hidden=x!==t);
+ ['hero','boss','dng','arena','shop','lb','chat'].forEach(x=>$('p-'+x).hidden=x!==t);
  if(push!==false)history.replaceState(null,'','#'+t);
  clearSay();pending=null;
  if(!ST)return;paint();
- if(t==='arena')loadArena();if(t==='lb')loadLb();if(t==='dng')loadDng(true);}
+ if(t==='arena')loadArena();if(t==='lb')loadLb();if(t==='dng')loadDng(true);if(t==='chat')openChat();badge()}
 async function load(keepDraft){
  ST=await rpc('game_state');ME=ST.me;last=Date.now();
  if(ISADM===null){try{ISADM=(await rpc('is_admin'))===true}catch(_){ISADM=false}}      // la voce admin si vede solo a chi è davvero amministratore (il database lo ricontrolla comunque)
@@ -642,7 +722,8 @@ async function boot(){
   if(!pr.data){gate('<section class="card er-gate" style="margin-top:20px"><h2>Completa il profilo</h2><p class="mute">Il tuo accesso non ha ancora un profilo Black Market.</p><a class="btn gold" href="black-market.html">Completa la registrazione</a></section>');return}
   const first=!ST;
   await load(false);
-  if(first){const h=(location.hash||'').slice(1);setTab(['hero','boss','dng','arena','shop','lb'].includes(h)?h:(ME.stats_set?'boss':'hero'),false)}
+  beat();
+  if(first){const h=(location.hash||'').slice(1);setTab(['hero','boss','dng','arena','shop','lb','chat'].includes(h)?h:(ME.stats_set?'boss':'hero'),false)}
  }catch(e){
   if(/Modulo non attivo/i.test(String(e.message)))gateOff();
   else gate(`<section class="card er-gate" style="margin-top:20px"><h2>Errore di collegamento</h2><p class="mute">${errTxt(e)}</p><button class="btn ghost" id="retry">Riprova</button></section>`)}}
@@ -652,6 +733,10 @@ document.querySelector('.tabs').onclick=e=>{const b=e.target.closest('[data-t]')
 document.addEventListener('click',e=>{
  const t=e.target.closest('button,[data-hero]');if(!t)return;
  if(t.id==='retry'){boot();return}
+ if(t.id==='chNew'){const b=$('chMsgs');if(b)b.scrollTop=b.scrollHeight;t.hidden=true;return}
+ if(t.dataset.chhide){const id=Number(t.dataset.chhide);
+  if(CH.hp!==id){CH.hp=id;paintChat(true);setTimeout(()=>{if(CH.hp===id){CH.hp=null;paintChat(true)}},5000);return}
+  CH.hp=null;run(t,async()=>{await rpc('game_chat_hide',{p_id:id,p_reason:'Messaggio nascosto dalla moderazione'});CH.msgs=CH.msgs.filter(x=>x.id!==id);paintChat(true);say('Messaggio nascosto.','good')});return}
  if(t.dataset.fold){toggleFold(t);return}
  if(t.dataset.slot){slotSheet(t.dataset.slot);return}
  if(t.dataset.hero){heroSheet(t.dataset.hero);return}
@@ -711,7 +796,11 @@ setInterval(()=>{if(!ST)return;document.querySelectorAll('[data-cd]').forEach(e=
  if(new Date(ST.next_reset).getTime()<=Date.now()&&Date.now()-last>8000&&!busy&&!document.hidden)load(true).catch(()=>{})},1000);
 setInterval(()=>{if(ST&&!document.hidden&&tab==='boss'&&!busy&&!document.querySelector('.er-ov'))load(true).catch(()=>{})},10000);
 setInterval(()=>{if(ST&&!document.hidden&&tab==='dng'&&!busy)loadDng().catch(()=>{})},5000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ST&&Date.now()-last>15000&&!busy)load(true).catch(()=>{})});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ST&&Date.now()-last>15000&&!busy)load(true).catch(()=>{});if(!document.hidden&&ST){beat();if(tab==='chat')loadChat(false)}});
+document.addEventListener('submit',e=>{if(e.target&&e.target.id==='chForm'){e.preventDefault();sendChat()}});
+setInterval(()=>{if(ST&&!document.hidden)beat()},40000);                                                      // «ci sono»: chi ha la pagina aperta risulta online
+setInterval(()=>{if(ST&&!document.hidden&&tab==='chat'){CH.n++;loadChat(CH.n%8===0)}},4000);                  // nuovi messaggi (ogni 8 giri ricarica tutto, così spariscono i messaggi nascosti)
+setInterval(()=>{if(ST&&!document.hidden&&(tab==='chat'||tab==='lb'))loadOnline()},20000);
 boot();
 })();
 </script></body></html>
