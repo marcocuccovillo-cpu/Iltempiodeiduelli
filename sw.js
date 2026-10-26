@@ -1,5 +1,5 @@
 /* Il Tempio Dei Duelli — service worker: guscio offline. Rete per prima (gli aggiornamenti arrivano subito), cache solo se si è offline. Tutti i file stanno nella stessa cartella. */
-const CACHE="tempio-v54";
+const CACHE="tempio-v55";
 const CORE=["index.html","sentiero.html","black-market.html","black-market-moduli.js?v=20","badge.js?v=13","shop-art-extra.js?v=1","shop-art.js?v=13","black-market-shop.js?v=13","black-market-notifiche.js?v=16","black-market-caccia.js?v=15","black-market-scommesse.js?v=3","gestisci-torneo.html","match-pro.html","deck-analyzer.html","tempio.css?v=10","tempio.js?v=12","eroi.html","duel-simulator.html","tempio-notifiche.js?v=2","tempio-logo.svg?v=1","tempio-mark.png","manifest.webmanifest"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>Promise.all(CORE.map(u=>c.add(u).catch(()=>{})))));self.skipWaiting()});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))));self.clients.claim()});

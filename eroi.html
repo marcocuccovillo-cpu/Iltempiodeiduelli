@@ -263,6 +263,7 @@ const RAR={base:'Base',comune:'Comune',non_comune:'Non comune',raro:'Raro',epico
 const SRC={start:'Base',shop:'Mercante',boss:'Boss',dungeon:'Dungeon'};
 const API='https://db.ygoprodeck.com/api/v7/cardinfo.php',CROP='https://images.ygoprodeck.com/images/cards_cropped/';
 let AVOK=false,AV={},avOpen=false,avQ='',avRes=null,avBusy=false,FOLD={};   // FOLD: riquadri aperti (abilità, cartelle zaino)
+const REFILL_BELOW=100;      // come nel database (_game_refill_below_level): la ricarica dell'energia al livello vale solo se si parte sotto questo livello
 let lastDngCan=true,lastCan=true,sb=null,ST=null,ME=null,BAL=null,CAP=9999,tab='hero',draft=null,heal='',LB=null,AR=null,busy=false,last=0,pending=null,flash=null,ISADM=null;
 
 /* ---------- utilità ---------- */
@@ -382,7 +383,7 @@ function renderHero(){
   <li><b>Boss del giorno</b>: ogni giorno compare un boss, lo stesso per tutti. Ogni eroe ha <b>una lobby al giorno</b>: ne crea una sua (anche da solo) oppure entra in una già aperta. Quando siete pronti uno qualunque dei presenti la fa partire (dopo la partenza non si entra più). I PV del boss si calcolano sugli eroi presenti${S.min_players>1?`, e servono almeno <b>${S.min_players} eroi</b>`:''}.</li>
   <li>Una volta partito, puoi <b>attaccare quando vuoi</b>, senza limiti: ogni attacco però ti costa PV, perché il boss reagisce, e a 0 PV sei KO finché un alleato non ti cura. Ogni giorno hai inoltre ${S.actions} azioni di supporto (difendi, cura, studia) e i danni di chi è nella tua lobby si sommano. Se lo abbattete, <b>tutti quelli della lobby</b> ricevono <b>${S.boss_bc} BC</b>, <b>XP doppia</b> e <b>un oggetto casuale</b>.</li>
   <li>Ogni lobby ha il suo boss: ognuno può batterlo, anche se un’altra lobby c’è già riuscita. Se almeno una lo batte, il giorno dopo arriva uno più forte (ce ne sono ${ST.boss.total}); se nessuno ci riesce, il boss ritorna.</li>
-  <li><b>Arena</b>: sfida gli altri eroi quante volte vuoi, anche lo stesso avversario più volte. Ogni duello consuma <b>energia</b> (la batteria in alto): ${ST.energy.win} se vinci, ${ST.energy.loss} se perdi, e ne servono almeno ${ST.energy.min} per sfidare. La batteria arriva a ${ST.energy.max} e si ricarica da sola in ${Math.round(ST.energy.max/ST.energy.per_hour)} ore circa. Vincere dà <b>solo XP</b>, mai BC. <b>Ogni volta che sali di livello la batteria si ricarica al 100%</b>. Il boss non consuma energia.</li>
+  <li><b>Arena</b>: sfida gli altri eroi quante volte vuoi, anche lo stesso avversario più volte. Ogni duello consuma <b>energia</b> (la batteria in alto): ${ST.energy.win} se vinci, ${ST.energy.loss} se perdi, e ne servono almeno ${ST.energy.min} per sfidare. La batteria arriva a ${ST.energy.max} e si ricarica da sola in ${Math.round(ST.energy.max/ST.energy.per_hour)} ore circa. Vincere dà <b>solo XP</b>, mai BC. <b>Finché sei sotto il livello 100, ogni volta che sali di livello la batteria si ricarica al 100%</b>: dal livello 100 in poi la ricarica non c’è più e l’energia torna solo con il tempo. Il boss non consuma energia.</li>
   <li><b>Punti abilità</b>: ${S.points} all’inizio e <b>${S.points_per_level} a ogni livello</b>, da mettere nelle statistiche.</li>
   <li><b>Mercante</b>: ogni giorno propone oggetti diversi; vende anche <b>abilità permanenti</b> (+% a una statistica, per sempre) e <b>potenziamenti temporanei</b> (+% per ${S.temp_hours} ore su un equipaggiamento). Accetta solo BC.</li>
   <li>I livelli arrivano fino al <b>${num(CAP)}</b>${m_over()}.</li></ul></details>`;
@@ -431,7 +432,7 @@ function renderBoss(){
   <div class="er-chips">${b.shield>0?`<span>🛡️ Scudo comune ${num(b.shield)}</span>`:''}${b.weak>0?`<span>🔎 Debolezza svelata +${b.weak}%</span>`:''}<span>⏳ ${lobby?'Il boss scappa tra ':open?'Resta ':'Prossimo boss tra '}<b data-cd>${cd()}</b></span></div>
   ${prev?`<p class="mute" style="margin:0;font-size:.9rem">${prev}</p>`:''}
  </div>
- ${lobby?LOBBY:done&&rw?`<div class="card er-win" style="margin-top:12px"><h3>🏆 Boss sconfitto! La tua ricompensa</h3><p style="margin:6px 0 0"><b>+${num(rw.bc)} BC</b> · <b>+${num(rw.xp)} XP</b>${rw.levels?` (sei salito di ${rw.levels} livell${rw.levels>1?'i':'o'}: energia al 100%!)`:''}${rw.item?` · oggetto: <b class="r-${esc(rw.item_rarity)}" style="color:var(--rc)">${esc(rw.item)}</b>`:''}</p></div>`
+ ${lobby?LOBBY:done&&rw?`<div class="card er-win" style="margin-top:12px"><h3>🏆 Boss sconfitto! La tua ricompensa</h3><p style="margin:6px 0 0"><b>+${num(rw.bc)} BC</b> · <b>+${num(rw.xp)} XP</b>${rw.levels?` (sei salito di ${rw.levels} livell${rw.levels>1?'i':'o'}${ST.me&&ST.me.level<=REFILL_BELOW?': energia al 100%!':''})`:''}${rw.item?` · oggetto: <b class="r-${esc(rw.item_rarity)}" style="color:var(--rc)">${esc(rw.item)}</b>`:''}</p></div>`
    :done?`<p class="er-msg" style="margin-top:12px">La tua lobby ha sconfitto il boss. Tornate domani!</p>`:''}
  ${lobby?WHY:ACT}
  ${NJ?'':`<h2 class="er-h">${lobby?'Nella lobby':'In battaglia oggi'} · ${b.party.length}</h2>`}
@@ -600,7 +601,7 @@ function dngModal(res,no){
   rw=(win?`<p class="er-big w">+${num(me.bc)} BC · +${num(me.xp)} XP</p>`:`<p class="er-big l">+${num(me.xp)} XP di consolazione</p>`)
    +(win&&!me.first?`<p class="mute" style="text-align:center;margin:0">Replica: premi ridotti (${S.replay_bc_pct||25}% dei BC, ${S.replay_xp_pct||50}% dell’XP).</p>`:'')
    +(res.party_bonus>0&&win&&me.first?`<p class="mute" style="text-align:center;margin:0">Bonus gruppo sui BC: +${num(res.party_bonus)}%.</p>`:'')
-   +(me.levels>0?`<p class="er-msg">⬆️ Sei salito al livello <b>${num(me.level)}</b>! Hai nuovi punti abilità nella scheda Eroe e l’energia è tornata al <b>100%</b>.</p>`:'')
+   +(me.levels>0?`<p class="er-msg">⬆️ Sei salito al livello <b>${num(me.level)}</b>! Hai nuovi punti abilità nella scheda Eroe.${(me.level-me.levels)<REFILL_BELOW?' L’energia è tornata al <b>100%</b>.':''}</p>`:'')
    +(its?`<h3 class="er-h" style="font-size:1rem;margin:12px 0 2px">Oggetti ottenuti</h3><ul class="dg-its">${its}</ul><p class="mute" style="margin:0;font-size:.84rem">Li trovi nello zaino: indossali dalla scheda Eroe.</p>`:'')
    +(me.milestone?`<p class="er-msg">🏆 Traguardo raggiunto: ogni 5 dungeon completati ottieni un oggetto <b style="color:#c084fc">epico</b>!</p>`:'')}
  const others=mem.filter(x=>x!==me&&win).map(x=>`${esc(x.nickname)} +${num(x.bc)} BC`).join(' · ');
