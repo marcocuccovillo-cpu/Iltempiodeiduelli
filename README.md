@@ -521,5 +521,12 @@ Solo `eroi.html` (e `sw.js` v51): nessuna migrazione SQL, nessun cambio al datab
 - **Provato** (PostgreSQL 16 locale con Supabase simulato e catena ridotta, Chromium simulato; non su un Supabase vero né su telefoni veri): 336 controlli a 320, 360, 390, 412, 844×390 e 1280×800 (colonna allineata a sinistra dell'avatar, 5 cartelle con oggetti della sola categoria giusta e in ordine crescente, cruscotto aggiornato dopo «Indossa», dettaglio slot, nessun errore JS); le prove esistenti sulla pagina (limite di livello, boss, dungeon con scelte) passano.
 - Già presente prima e non toccato: a 320 px, con molti punti da assegnare, i pulsanti −10/+10 delle statistiche escono di 9 px dallo schermo.
 
+## La guerra degli Eroi: dungeon completati in un riquadro espandibile (26 ottobre 2026)
+Solo `eroi.html` (e `sw.js` v52): nessuna migrazione SQL.
+- Scheda **Dungeon**: la scheda «Dungeon completati» diventa un riquadro espandibile, chiuso di default. L'intestazione mostra «N su 55», una barra e la **percentuale** (es. 13%). Dentro ci sono i dungeon già completati, in ordine, divisi in classici e a scelte, con il numero di completamenti e le repliche (BC e XP ridotti) ancora giocabili, più la nota sul prossimo oggetto epico.
+- L'elenco principale, sotto la scelta del ruolo e le lobby, ora si chiama «Da completare» e contiene solo i dungeon non ancora completati (compresi quelli bloccati). Se li hai finiti tutti compare «Hai completato tutti i dungeon!».
+- Lo stato aperto/chiuso resta anche quando la scheda si ridisegna (cambio scheda, aggiornamento automatico).
+- **Provato** (PostgreSQL 16 locale con Supabase simulato, Chromium simulato; non su un Supabase vero né su telefoni veri): 132 controlli con 0, 7 e 55 dungeon completati a 320, 360, 390, 412, 844×390 e 1280×800 (conteggio e percentuale, tile chiuso, completati solo dentro e da fare solo fuori, nessun doppione, stato aperto che resta, nessuno sforamento). Le prove già esistenti (scheda Eroe, limite di livello, boss, dungeon a scelte) passano; quelle sui dungeon a scelte ho dovuto adattarle, perché ora i completati stanno nel riquadro e vanno aperti prima.
+
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.

@@ -81,6 +81,8 @@
 .er-fp{border:1px solid var(--ac);border-top:0;border-radius:0 0 14px 14px;padding:4px 14px 10px;background:var(--surf)}
 .er-fp>.er-inv:first-of-type{border-top:0}
 @media(prefers-reduced-motion:reduce){.er-fold .chev{transition:none}}
+.er-mb{display:block;height:7px;border-radius:99px;background:var(--inp);border:1px solid var(--line);overflow:hidden;margin-top:7px}.er-mb i{display:block;height:100%;background:linear-gradient(90deg,var(--bar-a),var(--ac2))}
+.er-fp .dg-card{box-shadow:none;background:var(--inp);margin-top:10px}
 .er-boss{display:grid;gap:14px}
 .er-bh{display:flex;gap:14px;align-items:center}
 .er-sig{width:84px;height:84px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:2.8rem;background:radial-gradient(circle at 35% 30%,hsl(var(--h) 70% 40%),hsl(var(--h) 60% 12%) 70%);border:2px solid hsl(var(--h) 80% 65%);box-shadow:0 0 28px hsl(var(--h) 80% 55% / .45)}
@@ -511,6 +513,9 @@ function renderDng(){
  const can=!why&&!my;
  const picker=`<div class="dg-roles" role="group" aria-label="${my?'Il tuo ruolo nel gruppo':'Il ruolo con cui entri'}">${Object.keys(ROLES).map(k=>`<button data-drole="${k}" aria-pressed="${cur===k}" ${roleOk(k)?'':'disabled'}><span>${ROLES[k][1]} ${ROLES[k][0]}</span><small>${ROLES[k][2]}</small></button>`).join('')}</div>`;
  const pct=Math.round(100*S.cleared/S.total);
+ // dungeon completati dentro un riquadro espandibile; nell'elenco principale restano solo quelli da fare
+ const all=S.dungeons.map((d,i)=>({d,i})),done=all.filter(x=>x.d.clears>0),todo=all.filter(x=>!(x.d.clears>0));
+ const grp=items=>items.map((x,j)=>{const pv=j>0?items[j-1].d:null,hd=(!pv||pv.kind!==x.d.kind)?(x.d.kind==='path'?`<h3 class="er-h dg-sep">🔀 Dungeon a scelte<small>Più difficili dei classici. Ogni bivio cambia la storia: dagli indizi alla strada giusta, fino al finale. Ci sono finali migliori (premi più ricchi), finali sul filo e finali di fallimento.</small></h3>`:`<h3 class="er-h dg-sep">⚔️ Dungeon classici<small>Si risolvono in automatico, stanza dopo stanza.</small></h3>`):'';return hd+dngCard(x.d,can,S.dungeons[x.i-1])}).join('');
  let LOBBY='';
  if(my){const d=dn(my.dungeon_no),n=my.members.length;
   LOBBY=`<section class="card er-lobby dg-lb" aria-label="La tua lobby"><h3>🚪 La tua lobby · ${esc(d.emoji||'')} ${esc(d.name)}</h3>
@@ -529,14 +534,12 @@ function renderDng(){
     ${!d.open?'<p class="er-note">Per te questo dungeon è ancora bloccato.</p>':!d.level_ok?`<p class="er-note">Serve il livello ${num(d.min_level)}.</p>`:full?'<p class="er-note">Lobby piena.</p>':''}</div>`}).join(''):'<p class="mute">Nessuna lobby aperta in questo momento. Creane una dall’elenco qui sotto!</p>'}`;
  const epic=S.cleared>=S.total?'Hai completato tutti i dungeon!':`Prossimo oggetto <b style="color:#c084fc">epico</b> tra ${S.next_epic_in} ${S.next_epic_in===1?'dungeon completato':'dungeon completati'}.`;
  $('p-dng').innerHTML=`<h2 class="er-h">Dungeon</h2><p class="er-sub">${S.total} dungeon a difficoltà crescente: ${S.dungeons.filter(x=>x.kind!=='path').length} classici e ${S.dungeons.filter(x=>x.kind==='path').length} <b>a scelte</b>, dove decidi tu la strada. Da soli o in squadra (fino a ${S.max_party}). Ogni partenza costa <b>${S.cost} energie</b> a testa e dà BC, XP e un oggetto esclusivo.</p>
-  <div class="card"><div class="row" style="justify-content:space-between"><span>Dungeon completati</span><b>${S.cleared} / ${S.total}</b></div>
-   <div class="er-lbar" role="progressbar" aria-valuemin="0" aria-valuemax="${S.total}" aria-valuenow="${S.cleared}" aria-label="Dungeon completati"><i style="width:${pct}%"></i></div>
-   <p class="er-note" style="margin:0">${epic}</p></div>
+  ${fold('dng_done','🏆','Dungeon completati',`${S.cleared} su ${S.total}<span class="er-mb" role="progressbar" aria-valuemin="0" aria-valuemax="${S.total}" aria-valuenow="${S.cleared}" aria-label="Dungeon completati"><i style="width:${pct}%"></i></span>`,pct+'%',`<p class="er-note" style="margin:8px 0 0">${epic}${done.length?` Puoi rigiocare i dungeon completati: ${S.replay_bc_pct}% dei BC e ${S.replay_xp_pct}% dell’XP.`:''}</p>${done.length?grp(done):'<p class="mute" style="margin:10px 0 0">Nessun dungeon completato, per ora.</p>'}`)}
   ${why?`<p class="er-msg ${!m.stats_set?'':'bad'}">${why}</p>`:''}
   <h2 class="er-h">${my?'Il tuo ruolo':'Scegli il tuo ruolo'}</h2>${picker}
   ${LOBBY}${my?'':LOBBIES}
-  <h2 class="er-h">${my?'I dungeon':'I dungeon'}</h2>
-  ${S.dungeons.map((d,i)=>{const pv=S.dungeons[i-1],hd=(!pv||pv.kind!==d.kind)?(d.kind==='path'?`<h3 class="er-h dg-sep">🔀 Dungeon a scelte<small>Più difficili dei classici. Ogni bivio cambia la storia: dagli indizi alla strada giusta, fino al finale. Ci sono finali migliori (premi più ricchi), finali sul filo e finali di fallimento.</small></h3>`:`<h3 class="er-h dg-sep">⚔️ Dungeon classici<small>Si risolvono in automatico, stanza dopo stanza.</small></h3>`):'';return hd+dngCard(d,can,pv)}).join('')}
+  <h2 class="er-h">Da completare</h2>
+  ${todo.length?grp(todo):'<p class="mute">Hai completato tutti i dungeon!</p>'}
   <h2 class="er-h">Come funzionano</h2><details class="card"><summary>Le regole in breve</summary><ul class="mute er-how">
    <li>I dungeon si sbloccano <b>uno dopo l’altro</b>: completa il precedente per aprire il successivo. Alcuni chiedono anche un livello minimo.</li>
    <li>Ogni giocatore spende <b>${S.cost} energie</b> quando il dungeon parte, vinca o perda il gruppo.</li>
