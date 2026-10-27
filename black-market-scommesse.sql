@@ -6,9 +6,12 @@
 --
 -- Come funziona
 --  * Tutti i duellanti possono puntare dei BC sulla vittoria di uno dei due sfidanti, finché la sfida è «in attesa» o «accettata».
---    Chi gioca la sfida NON può scommettere su di essa. Una sola scommessa per utente per sfida.
---  * Le scommesse si chiudono: appena la sfida ha un risultato inviato, oppure N minuti dopo l'accettazione (bet_close_minutes: serve a
---    evitare puntate fatte guardando la partita; 0 = nessun limite di tempo). Le sfide già accettate prima di questa migrazione sono chiuse.
+--    Chi gioca la sfida NON può scommettere su di essa. Su una stessa sfida si possono fare PIÙ scommesse (anche sullo stesso duellante, o
+--    sull'altro): ognuna è una scommessa a sé, con la quota di QUEL momento (che tiene conto anche delle puntate già fatte, comprese le tue),
+--    fissata e pagata separatamente. Restano validi i limiti: puntata minima/massima per scommessa e massimo di scommesse aperte per utente.
+--  * Le scommesse si chiudono appena la sfida ha un risultato inviato (o è conclusa, contestata, rifiutata, annullata). Il limite di tempo
+--    dall'accettazione (bet_close_minutes) ora è SPENTO (0): si punta fino all'invio del risultato; l'amministratore può rimetterlo
+--    (es. 10 = si punta solo nei primi 10 minuti dopo l'accettazione, per evitare puntate fatte guardando la partita).
 --  * QUOTA (decimale, fissata al momento della puntata, mostrata prima di confermare). Tre segnali CONTANO INSIEME. Ognuno sposta la
 --    probabilità di vittoria (in «log-odds», cioè in modo che le spinte si sommino senza mai superare 0–100%) con un peso scelto dall'admin:
 --      logit(P) = peso_winrate·L_winrate + peso_bounty·L_bounty + peso_scommesse·L_scommesse     e poi   P = 1 / (1 + e^(−logit))
@@ -73,7 +76,7 @@ insert into public.system_settings (key, value_int, description) values
  ('bet_min_games',     3,   'Scommesse: partite minime di ENTRAMBI i duellanti nel formato per usare il win rate (sotto: si usa il bounty value)'),
  ('bet_bounty_smooth', 100, 'Scommesse: BC aggiunti alle taglie di ciascuno nel calcolo senza dati (più alto = quote più vicine a 50/50)'),
  ('bet_pool_smooth',   100, 'Scommesse: BC aggiunti a ciascun duellante nel calcolo dalle scommesse già presenti (più alto = le prime puntate spostano meno la quota)'),
- ('bet_close_minutes', 10,  'Scommesse: minuti dall''accettazione dopo i quali non si può più puntare (0 = fino all''invio del risultato)'),
+ ('bet_close_minutes', 0,   'Scommesse: minuti dall''accettazione dopo i quali non si può più puntare (0 = fino all''invio del risultato)'),
  ('bet_w_winrate',     100, 'Scommesse: peso (in %) del win rate Ladder nel calcolo della quota (100 = intero, 0 = ignorato)'),
  ('bet_w_bounty',      30,  'Scommesse: peso (in %) del bounty value, cioè delle taglie attive sui duellanti, nel calcolo della quota (0 = ignorato)'),
  ('bet_w_pool',        40,  'Scommesse: peso (in %) delle scommesse già presenti sulla sfida nel calcolo della quota (0 = ignorato)')
@@ -106,12 +109,20 @@ create table if not exists public.bets (
   client_request_id text not null,
   created_at timestamptz not null default clock_timestamp(),
   settled_at timestamptz,
-  unique (user_id, match_id),
   unique (user_id, client_request_id)
 );
 -- se la tabella esisteva già (versioni precedenti di questa migrazione): ammette anche i criteri «bets» e «mix» (i tre segnali insieme)
 alter table public.bets drop constraint if exists bets_basis_check;
 alter table public.bets add constraint bets_basis_check check (basis in ('winrate','bounty','bets','even','mix'));
+-- più scommesse sulla stessa sfida: da una versione precedente (una sola per utente per sfida) si toglie il vincolo; solo quella volta il limite di tempo
+-- di 10 minuti (valore predefinito di prima) passa a 0 (fino all'invio del risultato). Le scommesse già fatte non cambiano. Rieseguire non rimette nulla a posto: se l'amministratore
+-- sceglie di nuovo un limite di tempo, resta quello.
+do $$ begin
+  if exists (select 1 from pg_constraint where conrelid = 'public.bets'::regclass and conname = 'bets_user_id_match_id_key') then
+    alter table public.bets drop constraint bets_user_id_match_id_key;
+    update public.system_settings set value_int = 0 where key = 'bet_close_minutes' and value_int = 10;
+  end if;
+end $$;
 alter table public.bets add column if not exists detail jsonb;                                   -- segnali e pesi usati per la quota di questa puntata
 -- versioni precedenti: ammette lo stato «revoked» e aggiunge i dati della revoca
 alter table public.bets drop constraint if exists bets_status_check;
@@ -285,7 +296,6 @@ begin
   if v_me in (m.challenger_id, m.opponent_id) then raise exception 'Non puoi scommettere su una sfida che giochi tu'; end if;
   if p_pick is null or p_pick not in (m.challenger_id, m.opponent_id) then raise exception 'Scegli uno dei due sfidanti'; end if;
   if not public._bet_is_open(m) then raise exception 'Le scommesse su questa sfida sono chiuse'; end if;
-  if exists (select 1 from public.bets where user_id = v_me and match_id = p_match) then raise exception 'Hai già scommesso su questa sfida'; end if;
   if p_stake is null or p_stake < v_min then raise exception 'Puntata inferiore al minimo (% BC)', v_min; end if;
   if p_stake > v_max then raise exception 'Puntata superiore al massimo (% BC)', v_max; end if;
   if (select count(*) from public.bets where user_id = v_me and status = 'open') >= v_open then
@@ -299,7 +309,8 @@ begin
     values (v_id, v_me, p_match, p_pick, p_stake, v_quota, q->>'basis', v_prob, p_request_id, q);
   perform public._ledger_move(v_me, -p_stake, 'bet_stake', 'bet', v_id, 'betstake:' || v_id, 'Scommessa piazzata');
   perform public._audit(v_me, 'place_bet', 'bet', v_id::text, null, jsonb_build_object('match', p_match, 'pick', p_pick, 'stake', p_stake, 'quota', v_quota, 'basis', q->>'basis'), null);
-  return jsonb_build_object('bet_id', v_id, 'already', false, 'quota', v_quota, 'stake', p_stake, 'payout_if_win', floor(p_stake * v_quota / 100.0)::integer, 'basis', q->>'basis');
+  return jsonb_build_object('bet_id', v_id, 'already', false, 'quota', v_quota, 'stake', p_stake, 'payout_if_win', floor(p_stake * v_quota / 100.0)::integer, 'basis', q->>'basis',
+    'on_match', (select count(*) from public.bets where user_id = v_me and match_id = p_match));
 end $$;
 
 -- ---------- lettura: sfide su cui si può scommettere, con le quote ----------
@@ -313,7 +324,8 @@ begin
       'challenger', m.challenger_id, 'opponent', m.opponent_id, 'challenger_name', pc.nickname, 'opponent_name', po.nickname,
       'open', public._bet_is_open(m), 'closes_at', public._bet_closes_at(m), 'quote', public._bet_quote(m),
       'can_bet', (v <> m.challenger_id and v <> m.opponent_id),
-      'mine', (select jsonb_build_object('id', b.id, 'pick', b.pick, 'stake', b.stake, 'quota', b.quota) from public.bets b where b.match_id = m.id and b.user_id = v)) as x
+      'mine', coalesce((select jsonb_agg(jsonb_build_object('id', b.id, 'pick', b.pick, 'stake', b.stake, 'quota', b.quota, 'created_at', b.created_at) order by b.created_at, b.id)
+                        from public.bets b where b.match_id = m.id and b.user_id = v), '[]'::jsonb)) as x
     from public.ladder_matches m join public.profiles pc on pc.id = m.challenger_id join public.profiles po on po.id = m.opponent_id
     where m.status in ('pending','accepted') order by m.created_at desc limit 60) s;
   return r;

@@ -105,9 +105,12 @@ do $$
 declare d text;
 begin
   assert (select count(*) from public.system_settings where key like 'bet\_%') = 12, 'S1: dodici impostazioni';
-  assert (select value_int from public.system_settings where key = 'bet_margin_pct') = 10 and (select value_int from public.system_settings where key = 'bet_close_minutes') = 10
+  assert (select value_int from public.system_settings where key = 'bet_margin_pct') = 10 and (select value_int from public.system_settings where key = 'bet_close_minutes') = 0
      and (select value_int from public.system_settings where key = 'bet_w_winrate') = 100 and (select value_int from public.system_settings where key = 'bet_w_bounty') = 30
-     and (select value_int from public.system_settings where key = 'bet_w_pool') = 40, 'S1: valori iniziali (anche i tre pesi 100/30/40)';
+     and (select value_int from public.system_settings where key = 'bet_w_pool') = 40, 'S1: valori iniziali (limite di tempo 0 = fino al risultato; i tre pesi 100/30/40)';
+  assert not exists (select 1 from pg_constraint where conrelid = 'public.bets'::regclass and contype = 'u' and pg_get_constraintdef(oid) like '%match_id%'), 'S1: nessun vincolo di unicità utente+sfida: si può scommettere più volte';
+  assert exists (select 1 from pg_constraint where conrelid = 'public.bets'::regclass and contype = 'u' and pg_get_constraintdef(oid) like '%client_request_id%'), 'S1: resta la richiesta unica (niente doppi addebiti)';
+  perform pg_temp.set_('bet_close_minutes', 10);      -- dagli scenari seguenti in poi si prova la finestra di 10 minuti (S3); S14 prova il caso senza limite
   select pg_get_constraintdef(oid) into d from pg_constraint where conrelid = 'public.ledger_entries'::regclass and conname = 'ledger_entries_kind_check';
   assert d like '%initial_bonus%' and d like '%bounty_payout%' and d like '%admin_adjustment%' and d like '%bet_stake%' and d like '%bet_payout%' and d like '%bet_refund%' and d like '%bet_reversal%',
     'S1: i tipi di movimento vecchi restano e i nuovi si aggiungono';
@@ -252,7 +255,6 @@ begin
   assert pg_temp.berr('Eve', m, 'Cyr', 50) like '%uno dei due sfidanti%', 'S3: si punta solo su uno dei due';
   assert pg_temp.berr('Eve', m, 'Bob', 9) like '%inferiore al minimo%', 'S3: puntata minima';
   assert pg_temp.berr('Eve', m, 'Bob', 201) like '%superiore al massimo%', 'S3: puntata massima';
-  assert pg_temp.berr('Cyr', m, 'Bob', 50) like '%già scommesso%', 'S3: una sola scommessa per sfida (anche sull''altro)';
   assert pg_temp.berr('Povero', m, 'Bob', 50) like '%Saldo insufficiente%' and pg_temp.bal('Povero') = 20, 'S3: saldo insufficiente, niente cambia';
   assert pg_temp.berr('Eve', m, 'Bob', 50, 600) like '%quota è cambiata%', 'S3: la quota richiesta non c''è più';
   assert pg_temp.err_as('Eve', format('select public.place_bet(%L, %L, 50, null, ''corta'')', m, pg_temp.uid('Bob'))) like '%Richiesta non valida%', 'S3: richiesta senza identificativo valido';
@@ -462,11 +464,11 @@ begin
   perform pg_temp.as_('Dia');
   r := public.bet_markets();
   x := (select e from jsonb_array_elements(r) e where e->>'id' = m::text);
-  assert x is not null and (x->>'open')::boolean and (x->>'can_bet')::boolean and x->'mine' = 'null'::jsonb, 'S9: elenco: sfida aperta, Di può puntare, nessuna sua scommessa: ' || coalesce(x::text, 'assente');
+  assert x is not null and (x->>'open')::boolean and (x->>'can_bet')::boolean and x->'mine' = '[]'::jsonb, 'S9: elenco: sfida aperta, Di può puntare, nessuna sua scommessa: ' || coalesce(x::text, 'assente');
   assert x->>'challenger_name' = 'Ann' and x->>'opponent_name' = 'Gus' and x->'quote'->>'basis' is not null and x->>'closes_at' is not null, 'S9: nomi, quote e orario di chiusura';
   perform pg_temp.as_('Cyr'); r := public.bet_markets();
   x := (select e from jsonb_array_elements(r) e where e->>'id' = m::text);
-  assert (x->'mine'->>'stake')::int = 60, 'S9: la mia scommessa compare sulla sfida';
+  assert (x->'mine'->0->>'stake')::int = 60, 'S9: la mia scommessa compare sulla sfida';
   perform pg_temp.as_('Ann'); r := public.bet_markets();
   x := (select e from jsonb_array_elements(r) e where e->>'id' = m::text);
   assert not (x->>'can_bet')::boolean, 'S9: chi gioca vede che non può puntare';
@@ -755,6 +757,128 @@ begin
   assert pg_temp.bst('Cyr', m3) = 'open' and pg_temp.bst('Dia', m3) = 'open', 'S13: le scommesse da pagare non sono toccate';
   assert pg_temp.inv() = 0, 'S13: saldi = registro';
   insert into t_log (msg) values ('OK S13 — admin: elenco da pagare/liquidate, revoca (piena, solo vincita, rimborso), saldo già speso, nessuna ripetizione, nemmeno dopo correzioni');
+end $$;
+
+-- ---------------------------------------------------------------- S14 più scommesse sulla stessa sfida, ognuna alla quota del momento
+do $$
+declare m uuid; m3 uuid; m4 uuid; q0 jsonb; q1 jsonb; q2 jsonb; r1 jsonb; r2 jsonb; r3 jsonb; r4 jsonb; x jsonb; n integer; er text; b0 integer; bef integer; net bigint; lg integer;
+begin
+  perform pg_temp.set_('bet_close_minutes', 0);        -- la nuova impostazione di partenza: si punta fino all'invio del risultato
+  perform pg_temp.set_('bet_max_open', 50);
+  perform pg_temp.fund('Eve', 1000); perform pg_temp.fund('Cyr', 1000); perform pg_temp.fund('Dia', 1000);
+  m := pg_temp.mk('Fay', 'Gus', 'accepted', 'Rush');
+  update public.bet_windows set accepted_at = clock_timestamp() - interval '3 hours' where match_id = m;        -- accettata da ore: nessun limite di tempo
+  q0 := pg_temp.q(m);
+  assert (q0->>'quota_challenger')::int = 180 and (q0->>'quota_opponent')::int = 180, 'S14: premessa: 1,80 / 1,80';
+  b0 := pg_temp.bal('Eve');
+  -- 1) prima puntata su Fay, alla quota di quel momento
+  r1 := pg_temp.bet('Eve', m, 'Fay', 100);
+  assert (r1->>'quota')::int = 180 and (r1->>'on_match')::int = 1, 'S14: prima puntata a 1,80: ' || r1::text;
+  q1 := pg_temp.q(m);
+  assert (q1->>'quota_challenger')::int < 180 and (q1->>'quota_opponent')::int > 180, 'S14: con 100 su Fay la sua quota scende e quella di Gus sale: ' || q1::text;
+  -- 2) seconda puntata, stessa persona, stesso duellante: alla quota AGGIORNATA
+  r2 := pg_temp.bet('Eve', m, 'Fay', 100);
+  assert (r2->>'quota')::int = (q1->>'quota_challenger')::int and (r2->>'quota')::int < (r1->>'quota')::int and (r2->>'on_match')::int = 2, 'S14: seconda puntata alla quota aggiornata (più bassa): ' || r2::text;
+  q2 := pg_temp.q(m);
+  -- 3) terza puntata sull'altro duellante, alla sua quota di adesso
+  r3 := pg_temp.bet('Eve', m, 'Gus', 50);
+  assert (r3->>'quota')::int = (q2->>'quota_opponent')::int and (r3->>'quota')::int > 180 and (r3->>'on_match')::int = 3, 'S14: puntata sull''altro alla sua quota di adesso: ' || r3::text;
+  assert (select count(*) from public.bets where user_id = pg_temp.uid('Eve') and match_id = m) = 3 and pg_temp.bal('Eve') = b0 - 250, 'S14: tre scommesse distinte, 250 addebitati';
+  assert (select count(*) from public.ledger_entries where user_id = pg_temp.uid('Eve') and kind = 'bet_stake' and ref_id in (select id from public.bets where match_id = m)) = 3, 'S14: tre righe nel registro';
+  assert (select count(distinct quota) from public.bets where user_id = pg_temp.uid('Eve') and match_id = m) = 3, 'S14: ogni scommessa ha la sua quota fissata';
+  -- la quota non resta quella di prima dopo le puntate di altri
+  perform pg_temp.bet('Cyr', m, 'Fay', 200);
+  assert (select quota from public.bets where id = (r1->>'bet_id')::uuid) = 180, 'S14: la quota di una scommessa già fatta non cambia';
+  -- 4) idempotenza: la stessa richiesta non addebita due volte; una richiesta nuova uguale è una scommessa nuova
+  perform pg_temp.as_('Dia');
+  r4 := public.place_bet(m, pg_temp.uid('Gus'), 60, null, 'richiesta-multi-001');
+  assert not (r4->>'already')::boolean, 'S14: prima richiesta';
+  r4 := public.place_bet(m, pg_temp.uid('Gus'), 60, null, 'richiesta-multi-001');
+  assert (r4->>'already')::boolean and (select count(*) from public.bets where user_id = pg_temp.uid('Dia') and match_id = m) = 1, 'S14: stessa richiesta ripetuta: nessun doppio addebito';
+  r4 := pg_temp.bet('Dia', m, 'Gus', 60);
+  assert not (r4->>'already')::boolean and (select count(*) from public.bets where user_id = pg_temp.uid('Dia') and match_id = m) = 2, 'S14: richiesta nuova uguale = seconda scommessa';
+  -- 5) la quota minima accettata vale anche per le puntate successive
+  assert pg_temp.berr('Eve', m, 'Fay', 50, 600) like '%quota è cambiata%', 'S14: quota minima richiesta non più disponibile';
+  -- 6) regole che restano: chi gioca non scommette; minimo e massimo per singola scommessa; saldo
+  er := pg_temp.berr('Fay', m, 'Gus', 50); assert er like '%che giochi tu%', 'S14: chi gioca non scommette';
+  er := pg_temp.berr('Eve', m, 'Fay', 9); assert er like '%inferiore al minimo%', 'S14: puntata minima';
+  er := pg_temp.berr('Eve', m, 'Fay', 201); assert er like '%superiore al massimo%', 'S14: puntata massima';
+  assert pg_temp.bal('Povero') = 20, 'S14: premessa: Povero ha 20 BC';
+  er := pg_temp.berr('Povero', m, 'Fay', 50);
+  assert er like '%Saldo insufficiente%', 'S14: 50 BC con 20 a disposizione: no';
+  er := pg_temp.berr('Povero', m, 'Gus', 15);
+  assert er is null, 'S14: 15 BC con 20 a disposizione: sì';
+  er := pg_temp.berr('Povero', m, 'Gus', 15);
+  assert er like '%Saldo insufficiente%' and pg_temp.bal('Povero') = 5, 'S14: il saldo vale per ogni scommessa: con 5 BC rimasti la seconda non passa';
+  -- 7) il limite di scommesse aperte conta ogni scommessa, non ogni sfida
+  n := (select count(*) from public.bets where user_id = pg_temp.uid('Eve') and status = 'open');
+  perform pg_temp.set_('bet_max_open', n);
+  er := pg_temp.berr('Eve', m, 'Fay', 50);
+  assert er like '%scommesse aperte%', 'S14: il limite di scommesse aperte conta ogni scommessa';
+  perform pg_temp.set_('bet_max_open', n + 1);
+  er := pg_temp.berr('Eve', m, 'Fay', 50);
+  assert er is null, 'S14: una in più passa';
+  er := pg_temp.berr('Eve', m, 'Fay', 50);
+  assert er like '%scommesse aperte%', 'S14: poi di nuovo il limite';
+  perform pg_temp.set_('bet_max_open', 50);
+  -- 8) elenco sfide e «le mie scommesse»: tutte le scommesse della persona su quella sfida
+  perform pg_temp.as_('Eve');
+  x := (select e from jsonb_array_elements(public.bet_markets()) e where e->>'id' = m::text);
+  assert jsonb_typeof(x->'mine') = 'array' and jsonb_array_length(x->'mine') = 4 and (x->>'open')::boolean and (x->>'can_bet')::boolean, 'S14: l''elenco mostra le 4 scommesse di Eve sulla sfida: ' || coalesce(x::text, 'null');
+  assert (x->'mine'->0->>'stake')::int = 100 and (x->'mine'->0->>'quota')::int = 180 and (x->'mine'->2->>'stake')::int = 50, 'S14: in ordine di puntata';
+  assert (x->'quote'->>'pool_challenger')::int >= 300 and (x->'quote'->>'pool_opponent')::int >= 50, 'S14: la quota mostrata tiene conto di tutte le puntate';
+  assert (select count(*) from jsonb_array_elements(public.bet_mine()) e where e->>'match' = m::text) = 4, 'S14: le mie scommesse: una riga per scommessa';
+  perform pg_temp.as_('Fay');
+  x := (select e from jsonb_array_elements(public.bet_markets()) e where e->>'id' = m::text);
+  assert not (x->>'can_bet')::boolean and x->'mine' = '[]'::jsonb, 'S14: chi gioca non può scommettere e non ha scommesse';
+  -- 9) finestra: senza limite di tempo si punta anche ore dopo l'accettazione; con il limite (10 min) no
+  er := pg_temp.berr('Cyr', m, 'Gus', 50);
+  assert er is null, 'S14: accettata da 3 ore e ancora aperta (limite di tempo 0)';
+  perform pg_temp.set_('bet_close_minutes', 10);
+  er := pg_temp.berr('Cyr', m, 'Gus', 50);
+  assert er like '%chiuse%', 'S14: con il limite di 10 minuti la stessa sfida è chiusa';
+  perform pg_temp.set_('bet_close_minutes', 0);
+  -- 10) chiusura: appena il risultato è inviato non si punta più, nemmeno da chi ha già scommesso; nulla viene liquidato
+  perform pg_temp.mst(m, 'reported', 'challenger');
+  er := pg_temp.berr('Eve', m, 'Fay', 50); assert er like '%chiuse%', 'S14: risultato inviato: chiuse (anche per chi ha già scommesso)';
+  er := pg_temp.berr('Cyr', m, 'Gus', 50); assert er like '%chiuse%', 'S14: risultato inviato: chiuse per tutti';
+  perform pg_temp.as_('Eve');
+  assert not exists (select 1 from jsonb_array_elements(public.bet_markets()) e where e->>'id' = m::text), 'S14: la sfida con il risultato inviato esce dall''elenco su cui puntare';
+  assert (select count(*) from public.bets where match_id = m and status = 'open') = (select count(*) from public.bets where match_id = m), 'S14: tutte ancora aperte finché la sfida non si chiude';
+  -- 11) liquidazione: ogni scommessa per conto suo (vince Fay: le puntate su Fay vincono, quella su Gus si perde)
+  bef := pg_temp.bal('Eve');
+  perform pg_temp.mst(m, 'closed', 'challenger');
+  assert (select count(*) from public.bets where user_id = pg_temp.uid('Eve') and match_id = m and status = 'won') = 3
+     and (select count(*) from public.bets where user_id = pg_temp.uid('Eve') and match_id = m and status = 'lost') = 1, 'S14: 3 vinte (su Fay) e 1 persa (su Gus)';
+  assert (select bool_and(returned = floor(stake * quota / 100.0)) from public.bets where user_id = pg_temp.uid('Eve') and match_id = m and status = 'won'), 'S14: ogni vincita = puntata × la SUA quota';
+  assert pg_temp.bal('Eve') = bef + (select sum(returned) from public.bets where user_id = pg_temp.uid('Eve') and match_id = m), 'S14: accreditato esattamente il totale delle vincite';
+  assert pg_temp.inv() = 0, 'S14: saldi = registro';
+  -- 12) correzione del risultato (vince Gus): le scommesse si ricalcolano una per una
+  perform pg_temp.mst(m, 'closed', 'opponent');
+  assert (select count(*) from public.bets where user_id = pg_temp.uid('Eve') and match_id = m and status = 'won') = 1
+     and (select count(*) from public.bets where user_id = pg_temp.uid('Eve') and match_id = m and status = 'lost') = 3, 'S14: dopo la correzione: 1 vinta (su Gus) e 3 perse';
+  net := (select coalesce(sum(amount), 0) from public.ledger_entries where user_id = pg_temp.uid('Eve') and ref_id in (select id from public.bets where match_id = m));
+  assert net = (select sum(returned) - sum(stake) from public.bets where user_id = pg_temp.uid('Eve') and match_id = m), 'S14: registro = vincite − puntate, scommessa per scommessa';
+  -- pareggio: tutte restituite
+  perform pg_temp.mst(m, 'closed', null);
+  assert (select count(*) from public.bets where user_id = pg_temp.uid('Eve') and match_id = m and status = 'refunded' and returned = stake) = 4, 'S14: pareggio: tutte e 4 restituite per intero';
+  net := (select coalesce(sum(amount), 0) from public.ledger_entries where user_id = pg_temp.uid('Eve') and ref_id in (select id from public.bets where match_id = m));
+  assert net = 0 and pg_temp.inv() = 0 and not exists (select 1 from public.wallets where balance < 0), 'S14: dopo il pareggio Eve è a zero su questa sfida e i saldi tornano';
+  -- 13) sfida annullata: ogni scommessa restituita
+  m4 := pg_temp.mk('Fay', 'Gus', 'accepted', 'Rush');
+  b0 := pg_temp.bal('Dia');
+  perform pg_temp.bet('Dia', m4, 'Fay', 60); perform pg_temp.bet('Dia', m4, 'Fay', 40); perform pg_temp.bet('Dia', m4, 'Gus', 30);
+  assert pg_temp.bal('Dia') = b0 - 130, 'S14: tre puntate addebitate (130)';
+  perform pg_temp.mst(m4, 'cancelled');
+  assert (select count(*) from public.bets where match_id = m4 and status = 'refunded' and returned = stake) = 3 and pg_temp.bal('Dia') = b0, 'S14: sfida annullata: tutte restituite, saldo com''era';
+  -- 14) revoca dell'admin: agisce sulla singola scommessa
+  m3 := pg_temp.mk('Fay', 'Gus', 'accepted', 'Rush');
+  perform pg_temp.bet('Dia', m3, 'Fay', 60); perform pg_temp.bet('Dia', m3, 'Fay', 40);
+  perform pg_temp.mst(m3, 'closed', 'challenger');
+  x := pg_temp.adm(format('select public.bet_admin_revoke(%L, ''prova revoca singola'', false)', (select id from public.bets where match_id = m3 and stake = 60)));
+  assert (select count(*) from public.bets where match_id = m3 and status = 'revoked') = 1 and (select count(*) from public.bets where match_id = m3 and status = 'won') = 1, 'S14: la revoca tocca solo la scommessa scelta';
+  assert pg_temp.inv() = 0, 'S14: saldi = registro';
+  insert into t_log (msg) values ('OK S14 — più scommesse sulla stessa sfida: quota del momento per ognuna, idempotenza, limiti, nessun limite di tempo, chiusura al risultato, liquidazione/correzione/pareggio/annullamento una per una');
 end $$;
 
 select n, msg from t_log order by n;

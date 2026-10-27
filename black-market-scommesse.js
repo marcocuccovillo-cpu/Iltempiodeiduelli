@@ -49,8 +49,8 @@ ${row('Win rate Ladder', 'bet_w_winrate', 100, wr, qd.l_winrate || 0)}${row('Tag
   const head = `<h1 class="t">Scom<em>messe</em></h1><p class="sub">Punta BC sulla vittoria di un duellante nelle sfide Ladder. Se vince ricevi puntata × quota, se perde la puntata è persa; pareggio o sfida non giocata: la puntata ti torna.</p>`;
   const how = () => BM.fold('bets-how', 'Come funziona', `<ul class="mute" style="margin:0;padding-left:20px;line-height:1.6">
 <li><b>La quota</b> tiene conto di <b>tre cose insieme</b>: il <b>win rate</b> in Ladder nel formato della sfida (pesa per intero se entrambi hanno almeno ${S().bet_min_games ?? 3} partite, meno se ne hanno meno), il <b>valore delle taglie</b> che hanno addosso (chi ne ha di più è considerato il favorito) e le <b>scommesse già presenti</b> su quella sfida (più BC sono su un duellante, più la sua quota scende). Un fattore senza dati non conta. È fissata quando punti.</li>
-<li><b>Puntata</b> da ${BC(minS())} a ${BC(maxS())}, una sola scommessa per sfida, al massimo ${S().bet_max_open ?? 5} aperte insieme. Chi gioca la sfida non può scommettere su di essa.</li>
-<li><b>Si punta</b> finché la sfida è in attesa o appena accettata${(S().bet_close_minutes ?? 10) > 0 ? ` (entro ${S().bet_close_minutes ?? 10} minuti dall'accettazione)` : ''}, mai dopo l'invio del risultato.</li>
+<li><b>Puntata</b> da ${BC(minS())} a ${BC(maxS())} per ogni scommessa, al massimo ${S().bet_max_open ?? 5} aperte insieme. Sulla stessa sfida puoi fare <b>più scommesse</b> (anche sullo stesso duellante): ognuna ha la <b>quota del momento</b>, che cambia a ogni puntata, e resta fissata. Chi gioca la sfida non può scommettere su di essa.</li>
+<li><b>Si punta</b> finché il risultato della sfida non è stato inviato${(S().bet_close_minutes ?? 0) > 0 ? ` e al massimo ${S().bet_close_minutes} minuti dopo l'accettazione` : ''}; dopo, le scommesse sono chiuse per tutti.</li>
 <li><b>La vincita arriva da sola</b> appena la sfida si chiude. Se l'amministratore corregge un risultato, le scommesse vengono ricalcolate.</li></ul>`, { style: 'margin-top:14px' });
   const off = msg => shell(head + `<div class="box" style="margin-top:18px"><h2>${msg[0]}</h2><p>${msg[1]}</p><a class="btn ghost" href="#/">Torna alla dashboard</a></div>`, 'bets');
 
@@ -62,16 +62,19 @@ ${row('Win rate Ladder', 'bet_w_winrate', 100, wr, qd.l_winrate || 0)}${row('Tag
   };
   const market = m => {
     const head2 = `<b>${esc(m.challenger_name)}</b> <span class="mute">vs</span> <b>${esc(m.opponent_name)}</b><small>${esc(m.format)} · ${KN[m.kind] || ''} · ${ST[m.status] || ''} · ${when(m.created_at)}</small>`;
+    const my = Array.isArray(m.mine) ? m.mine : (m.mine ? [m.mine] : []);          // una o più scommesse mie su questa sfida
+    const nm = id => id === m.challenger ? m.challenger_name : m.opponent_name;
+    const win = b => Math.floor(b.stake * b.quota / 100);
+    const mineBox = !my.length ? '' : `<div style="margin-top:8px"><p style="margin:0"><b>${my.length === 1 ? 'La tua scommessa' : `Le tue ${my.length} scommesse`}</b> su questa sfida${my.length > 1 ? ` · in tutto <b>${BC(my.reduce((t, b) => t + b.stake, 0))}</b>` : ''}:</p>
+<ul style="margin:4px 0 0;padding-left:20px;line-height:1.5">${my.map(b => `<li><b>${BC(b.stake)}</b> su <b>${esc(nm(b.pick))}</b> a quota <b>${qt(b.quota)}</b> · vincita possibile <b>${BC(win(b))}</b></li>`).join('')}</ul>
+${my.length > 1 ? `<p class="mute" style="font-size:.85rem;margin:4px 0 0">Se vince ${esc(m.challenger_name)} incassi ${BC(my.filter(b => b.pick === m.challenger).reduce((t, b) => t + win(b), 0))} · se vince ${esc(m.opponent_name)} incassi ${BC(my.filter(b => b.pick === m.opponent).reduce((t, b) => t + win(b), 0))}.</p>` : ''}</div>`;
     let body;
-    if (m.mine) {
-      const who = m.mine.pick === m.challenger ? m.challenger_name : m.opponent_name;
-      body = `<p style="margin:8px 0 0">La tua scommessa: <b>${BC(m.mine.stake)}</b> su <b>${esc(who)}</b> a quota <b>${qt(m.mine.quota)}</b> · vincita possibile <b>${BC(Math.floor(m.mine.stake * m.mine.quota / 100))}</b></p>`;
-    } else if (!m.can_bet) {
+    if (!m.can_bet) {
       body = `<p class="mute" style="margin:8px 0 0">Giochi tu questa sfida: non puoi scommettere su di essa.</p>`;
     } else if (!m.open) {
-      body = `<p class="mute" style="margin:8px 0 0">Scommesse chiuse per questa sfida.</p>`;
+      body = mineBox + `<p class="mute" style="margin:8px 0 0">Scommesse chiuse per questa sfida.</p>`;
     } else {
-      body = `<div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap">${pickBtn(m, 'c')}${pickBtn(m, 'o')}</div>
+      body = mineBox + (my.length ? `<p style="margin:10px 0 0"><b>Vuoi puntare ancora?</b> <span class="mute">Scegli su chi: la quota è quella di adesso.</span></p>` : '') + `<div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap">${pickBtn(m, 'c')}${pickBtn(m, 'o')}</div>
 <p class="mute" style="font-size:.85rem;margin:6px 0 0">Quota ${BASIS[m.quote.basis] || ''}${(m.quote.pool_challenger || 0) + (m.quote.pool_opponent || 0) > 0 ? ` · puntati finora: ${esc(m.challenger_name)} ${BC(m.quote.pool_challenger || 0)}, ${esc(m.opponent_name)} ${BC(m.quote.pool_opponent || 0)}` : ''}${m.closes_at ? ` · si punta fino alle ${hhmm(m.closes_at)}` : ''}</p>${why(m)}
 <div class="bet-panel" data-m="${m.id}" hidden style="margin-top:10px;border-top:1px solid var(--line,#444);padding-top:10px">
   <label for="bs-${m.id}">Puntata su <b class="bet-who"></b> (BC)</label>
