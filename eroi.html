@@ -219,6 +219,11 @@ body.er-fab-on{padding-bottom:88px}
 .dg-opts{display:grid;gap:8px;margin-top:10px}.dg-opt{display:block;width:100%;text-align:left;min-height:48px;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--inp);color:var(--tx);cursor:pointer;font:600 .95rem/1.3 var(--ui);overflow-wrap:anywhere}
 .dg-opt:hover:not(:disabled){border-color:var(--ac)}.dg-opt:disabled{opacity:.55;cursor:not-allowed}.dg-opt small{display:block;color:var(--mu);font-weight:400;font-size:.8rem;margin-top:2px}
 .dg-flags{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.dg-inter{display:flex;flex-wrap:wrap;gap:6px}.dg-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.dg-tags span{font:600 .74rem/1 var(--ui);padding:4px 8px;border-radius:999px;border:1px solid var(--line);color:var(--mu);background:var(--bg,transparent)}
+.dg-opt.stay{border-style:dashed}.dg-who{display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px;margin:-2px 0 4px;border:1px dashed var(--ac);border-radius:12px;background:var(--inp)}.dg-who p{flex:1 0 100%}
+.dg-lock{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--inp);margin:10px 0}.dg-lk-slots{display:flex;gap:8px;justify-content:center;margin-bottom:10px}.dg-slot{display:grid;place-items:center;width:52px;height:52px;border:2px dashed var(--line);border-radius:12px;font-size:1.6rem;color:var(--mu)}.dg-slot.on{border-style:solid;border-color:var(--ac);color:var(--tx)}
+.dg-lk-syms{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.dg-sym{min-height:52px;font-size:1.6rem;border:1.5px solid var(--line);border-radius:12px;background:var(--card,var(--inp));cursor:pointer;color:var(--tx)}.dg-sym:hover:not(:disabled){border-color:var(--ac)}.dg-sym:disabled{opacity:.5;cursor:not-allowed}
+.dg-clock{display:flex;align-items:center;gap:8px;margin:8px 0;font-size:.9rem}.dg-clk-bar{flex:1;height:8px;border-radius:99px;background:var(--line);overflow:hidden}.dg-clk-bar i{display:block;height:100%;background:var(--ac)}.dg-clock.low .dg-clk-bar i{background:#ef4444}.dg-clock.low b{color:#ef4444}
 .dg-log{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px;font-size:.88rem;color:var(--mu)}.dg-log b{color:var(--tx)}
 .dg-end{padding:12px;border:1.5px solid var(--ac);border-radius:12px;background:rgba(var(--ac-rgb),.12);margin:8px 0}.dg-end.l{border-color:var(--bad)}.dg-end h3{margin:0 0 4px;font-size:1.05rem}.dg-end p{margin:0;overflow-wrap:anywhere}
 .dg-sep{margin:18px 0 4px}.dg-sep small{display:block;color:var(--mu);font-weight:400;font-size:.86rem}
@@ -226,7 +231,7 @@ body.er-fab-on{padding-bottom:88px}
 
 <main class="pg">
  <header><p class="kicker">Mini gioco di ruolo</p><h1>La guerra degli Eroi</h1>
- <p class="lead">Ogni duellante è un eroe con il suo nickname. Distribuisci i punti abilità, compra le abilità dal Mercante, sfida gli altri eroi in Arena (ogni duello consuma energia), abbatti il boss del giorno da solo o con la tua lobby e affronta i 55 dungeon, 30 dei quali a scelte, da solo o in squadra.</p></header>
+ <p class="lead">Ogni duellante è un eroe con il suo nickname. Distribuisci i punti abilità, compra le abilità dal Mercante, sfida gli altri eroi in Arena (ogni duello consuma energia), abbatti il boss del giorno da solo o con la tua lobby e affronta i 100 dungeon (dal 26 a scelte, dal 56 con prove, serrature e orologio), da solo o in squadra.</p></header>
 
  <section class="card er-top" id="top" aria-live="polite"><p class="mute" style="margin:0" role="status">Caricamento dell’eroe…</p></section>
 
@@ -493,6 +498,9 @@ function duelModal(r){
 /* ---------- Dungeon ---------- */
 const ROLES={tank:['Tank','🛡️','Più PV (+30%), attira i colpi e ne subisce meno; colpisce piano.'],dps:['Danni','⚔️','Colpisce più forte (+40%), ma regge meno.'],support:['Supporto','💚','Cura ogni round l’alleato più ferito (conta lo Spirito); colpisce poco.']};
 let DS=null,dngRole='dps',dngSeen=null,dngKey='',dngFirst=true,dngLoading=false;
+const STAT_IT={for:'Forza',des:'Destrezza',vig:'Vigore',spi:'Spirito',frt:'Fortezza'};
+const INTER={chk:['🎲','Prove di abilità','Una scelta riesce o no a seconda delle statistiche del gruppo: le probabilità sono indicate.'],lock:['🔐','Serratura','Un codice di simboli da indovinare, con pochi tentativi.'],stay:['🧭','Azioni uniche','Azioni che si possono fare una volta sola e non cambiano scena.'],who:['👤','Scelta dell’eroe','Il capo sceglie quale eroe compie l’azione.'],role:['🛡️','Azioni di ruolo','Alcune azioni richiedono un Tank, un eroe Danni o un Supporto vivo nel gruppo.'],clock:['⏳','Tempo limitato','Ogni scelta consuma un po’ di tempo: sprecarlo ha un prezzo.']};
+let lkSel=[],lkScene='',pickOpt=null;
 function seenGet(){try{const v=localStorage.getItem('er_dng_seen');return v==null?dngSeen:v}catch(_){return dngSeen}}
 function seenSet(v){dngSeen=v;try{localStorage.setItem('er_dng_seen',v)}catch(_){}}
 async function loadDng(force){
@@ -503,7 +511,7 @@ async function loadDng(force){
  const k=JSON.stringify(Object.assign({},DS,{energy:0}));
  if(tab==='dng'&&(force||k!==dngKey)){dngKey=k;renderDng()}
  checkLast()}
-function checkLast(){const lr=DS&&DS.last_result;if(!lr||tab!=='dng'||document.querySelector('.er-ov')||seenGet()===lr.run_id)return;seenSet(lr.run_id);dngModal(lr.result,lr.dungeon_no)}
+function checkLast(){const lr=DS&&DS.last_result;if(!lr||!lr.result||tab!=='dng'||document.querySelector('.er-ov')||seenGet()===lr.run_id)return;seenSet(lr.run_id);dngModal(lr.result,lr.dungeon_no)}
 function dngRun(btn,fn){return run(btn,async()=>{try{await fn()}catch(e){loadDng(true).catch(()=>{});throw e}})}
 function dngMem(x,my){return `<div class="dg-mem"><div class="av" aria-hidden="true">${face(x.user_id,x.nickname)}</div><div style="min-width:0"><b>${esc(x.nickname)}</b>${x.user_id===my.leader_id?' <span class="chip s">Capo</span>':''}<small>Livello ${num(x.level)}</small></div><span class="dg-role">${ROLES[x.role][1]} ${ROLES[x.role][0]}</span></div>`}
 function dngCard(d,can,prev){
@@ -519,24 +527,48 @@ function dngCard(d,can,prev){
   <div class="dg-h"><div style="min-width:0"><div class="dg-no">Dungeon ${d.no}</div><h3>${esc(d.emoji)} ${esc(d.name)}</h3></div>${chip}</div>
   <div class="dg-meta"><span>Livello consigliato <b>${num(d.ref_level)}</b>${d.min_level>1?` · minimo ${num(d.min_level)}`:''}</span>${pth?`<span><b>${d.forks}</b> bivi · finali scoperti <b>${d.endings_found}/${d.endings_total}</b></span>`:`<span><b>${d.rooms.length}</b> stanze</span>`}</div>
   ${lock?'':`<p class="mute" style="margin:0;font-size:.9rem">${esc(d.lore)}</p>`}
+  ${!lock&&d.inter&&d.inter.length?`<div class="dg-inter" aria-label="Interazioni di questo dungeon">${d.inter.filter(k=>INTER[k]).map(k=>`<span class="chip" title="${esc(INTER[k][2])}">${INTER[k][0]} ${INTER[k][1]}</span>`).join('')}</div>`:''}
   <div class="dg-boss">${esc(d.boss_emoji)} <b>${esc(d.boss_name)}</b>${lock?'':`<small>${esc(d.boss_lore)}</small>`}</div>
   <div class="dg-rw"><span class="bc">${num(d.bc)} BC</span><span>${num(d.xp)} XP</span>${rep}</div>${pth?'<p class="er-note" style="margin:0">Premi indicati per il finale «normale»: i finali migliori pagano di più, quelli peggiori meno. Le scelte sbagliate possono far fallire la spedizione.</p>':''}
   ${itx}${act}</article>`}
-function pathLog(L){return (L||[]).map(x=>x.k==='c'?`<li>➤ <b>${esc(x.l)}</b>${x.r?`<br>${esc(x.r)}`:''}</li>`:`<li>${x.win?'⚔️ Scontro vinto':'💀 Scontro perso'}: ${esc(x.em||'')} ${esc(x.e)}${x.boss?' · BOSS':''}</li>`).join('')}
+function pathLog(L){return (L||[]).map(x=>{
+ if(x.k==='c'){const ck=x.chk?` <small class="mute">🎲 ${esc(STAT_IT[x.chk.s]||x.chk.s)} ${num(x.chk.p)}% · ${x.chk.ok?'riuscita':'fallita'}</small>`:'';return `<li>➤ <b>${esc(x.l)}</b>${x.w?` <small class="mute">(${esc(x.w)})</small>`:''}${ck}${x.r?`<br>${esc(x.r)}`:''}</li>`}
+ if(x.k==='l')return `<li>🔐 <b>${esc(x.l)}</b> <small class="mute">${x.ok?'giusto':'sbagliato'}</small>${x.r?`<br>${esc(x.r)}`:''}</li>`;
+ if(x.k==='t')return `<li>⏳ ${esc(x.r)}</li>`;
+ return `<li>${x.win?'⚔️ Scontro vinto':'💀 Scontro perso'}: ${esc(x.em||'')} ${esc(x.e)}${x.boss?' · BOSS':''}</li>`}).join('')}
 function renderPath(){
  const S=DS,A=S.active,m=ST.me,d=S.dungeons.find(x=>x.no===A.dungeon_no)||{name:'Dungeon',emoji:'🏰'},leader=A.leader_id===m.user_id,sc=A.scene,ldr=A.members.find(x=>x.user_id===A.leader_id);
  const mem=A.members.map(x=>`<div class="dg-mem"><div class="av" aria-hidden="true">${face(x.user_id,x.nickname)}</div><div style="min-width:0"><b>${esc(x.nickname)}</b>${x.user_id===A.leader_id?' <span class="chip s">Capo</span>':''}<div class="er-hp me sm" style="margin-top:4px"><i style="width:${x.max_hp?Math.max(0,100*x.hp/x.max_hp):0}%"></i><span>${num(x.hp)} / ${num(x.max_hp)}</span></div></div><span class="dg-role">${ROLES[x.role]?ROLES[x.role][1]+' '+ROLES[x.role][0]:''}</span></div>`).join('');
  const pw_=A.pow,pwt=pw_>0?'+'+pw_+'%':pw_<0?pw_+'%':'0%';
  const flags=(A.flags||[]).map(f=>`<span class="chip s">🗝️ ${esc(f.label)}</span>`).join('');
- const opts=sc?sc.options.map(o=>`<button class="dg-opt" data-dchoose="${esc(o.id)}" ${leader&&!o.locked?'':'disabled'}>${esc(o.label)}${o.locked&&o.hint?`<small>🔒 ${esc(o.hint)}</small>`:''}</button>`).join(''):'';
+ if(sc&&sc.id!==lkScene){lkScene=sc.id;lkSel=[];pickOpt=null}
+ const alive=A.members.filter(x=>x.hp>0);
+ const optBtn=o=>{const tg=[];
+   if(o.chk)tg.push(`🎲 ${esc(STAT_IT[o.chk.stat]||o.chk.stat)} · ${num(o.chk.odds)}%`);
+   if(o.who)tg.push('👤 scegli chi agisce');
+   if(o.stay)tg.push(o.done?'🧭 già fatto':'🧭 azione unica');
+   if(o.role)tg.push(`🛡️ ${esc(ROLES[o.role]?ROLES[o.role][0]:o.role)}`);
+   const off=!leader||o.locked;
+   return `<button class="dg-opt${o.stay?' stay':''}" ${o.who?`data-dpick="${esc(o.id)}"`:`data-dchoose="${esc(o.id)}"`} ${off?'disabled':''} aria-expanded="${pickOpt===o.id}">${esc(o.label)}${tg.length?`<span class="dg-tags">${tg.map(t=>`<span>${t}</span>`).join('')}</span>`:''}${o.locked&&o.hint?`<small>🔒 ${esc(o.hint)}</small>`:''}</button>${pickOpt===o.id?`<div class="dg-who" role="group" aria-label="Chi compie l’azione"><p class="er-note" style="margin:0 0 6px">Chi compie questa azione?</p>${alive.map(x=>`<button class="btn sm" data-dchoose="${esc(o.id)}" data-darg="${esc(x.user_id)}">${ROLES[x.role]?ROLES[x.role][1]:''} ${esc(x.nickname)}</button>`).join('')}<button class="btn sm ghost" data-dpickx="1">Annulla</button></div>`:''}`};
+ const opts=sc&&sc.type!=='lock'?sc.options.map(optBtn).join(''):'';
+ let lockUi='';
+ if(sc&&sc.type==='lock'&&sc.lock){const L=sc.lock,full=lkSel.length>=L.len;
+  lockUi=`<div class="dg-lock" role="group" aria-label="Serratura a simboli">
+   <div class="dg-lk-slots" aria-live="polite">${Array.from({length:L.len},(_,i)=>`<span class="dg-slot${lkSel[i]!=null?' on':''}">${lkSel[i]!=null?esc(L.symbols[lkSel[i]]):'·'}</span>`).join('')}</div>
+   <div class="dg-lk-syms">${L.symbols.map((y,i)=>`<button class="dg-sym" data-lk="${i}" ${leader&&!full&&L.tries_left>0?'':'disabled'} aria-label="Simbolo ${i+1}">${esc(y)}</button>`).join('')}</div>
+   ${L.feedback?`<p class="er-msg" style="margin:8px 0 0">${esc(L.feedback)}</p>`:''}
+   <p class="er-note" style="margin:8px 0 0">Tentativi rimasti: <b>${num(L.tries_left)}</b> · Tocca ${L.len} simboli nell’ordine che pensi sia giusto.</p>
+   ${leader?`<div class="dg-btns"><button class="btn gold" data-lksend="1" ${full&&L.tries_left>0?'':'disabled'}>🔐 Prova il codice</button><button class="btn ghost" data-lkclr="1" ${lkSel.length?'':'disabled'}>Azzera</button></div>`:''}</div>`}
+ const clk=A.clock?`<div class="dg-clock${A.clock.left<=2?' low':''}" role="progressbar" aria-valuemin="0" aria-valuemax="${A.clock.total}" aria-valuenow="${Math.max(0,A.clock.left)}" aria-label="Tempo rimasto"><span>⏳ Tempo</span><div class="dg-clk-bar"><i style="width:${A.clock.total?Math.max(0,100*A.clock.left/A.clock.total):0}%"></i></div><b>${Math.max(0,A.clock.left)} / ${A.clock.total}</b></div>`:'';
  $('p-dng').innerHTML=`<h2 class="er-h">${esc(d.emoji||'')} ${esc(d.name)}</h2><p class="er-sub">Dungeon a scelte · ogni decisione conta, e qualcuna porta dritta al fallimento. Decide il capo gruppo${leader?' (sei tu)':ldr?`: <b>${esc(ldr.nickname)}</b>`:''}.</p>
   <section class="card dg-path" aria-label="Spedizione in corso">
    <div class="row" style="justify-content:space-between"><span>Potenza della spedizione</span><b>${pwt}</b></div>
+   ${clk}
    ${flags?`<div class="dg-flags" aria-label="Indizi trovati">${flags}</div>`:''}
    ${mem}
-   ${sc?`<div class="dg-sc" role="group" aria-label="Scena"><h3>${esc(sc.title)}</h3><p>${esc(sc.text)}</p></div>
-   <div class="dg-opts" role="group" aria-label="Le tue scelte">${opts}</div>
-   <p class="er-note">${leader?'Scegli con cura: non si torna indietro. Alcune scelte restano bloccate finché non trovi l’indizio giusto.':`Sta scegliendo ${ldr?esc(ldr.nickname):'il capo gruppo'}: la schermata si aggiorna da sola.`} Se nessuno decide entro <b data-dut="${esc(A.expires_at)}">…</b>, la spedizione viene data per fallita.</p>`:''}
+   ${sc?`<div class="dg-sc" role="group" aria-label="Scena"><h3>${esc(sc.type==='lock'?'🔐 '+sc.title:sc.title)}</h3><p>${esc(sc.text)}</p></div>
+   ${sc.type==='lock'?lockUi:`<div class="dg-opts" role="group" aria-label="Le tue scelte">${opts}</div>`}
+   <p class="er-note">${leader?`Scegli con cura: non si torna indietro. Alcune scelte restano bloccate finché non trovi l’indizio giusto${A.clock?'; ogni scelta consuma tempo':''}.`:`Sta scegliendo ${ldr?esc(ldr.nickname):'il capo gruppo'}: la schermata si aggiorna da sola.`} Se nessuno decide entro <b data-dut="${esc(A.expires_at)}">…</b>, la spedizione viene data per fallita.</p>`:''}
    ${leader?`<div class="dg-btns"><button class="btn ghost sm" id="dgAbandon">${pending==='abandon'?'Conferma: ritirarsi e fallire':'🏳️ Ritirati'}</button></div>`:''}
   </section>
   ${A.log&&A.log.length?`<h2 class="er-h">Cronaca</h2><div class="card"><ul class="dg-log">${pathLog(A.log)}</ul></div>`:''}`;
@@ -555,7 +587,11 @@ function renderDng(){
  const pct=Math.round(100*S.cleared/S.total);
  // dungeon completati dentro un riquadro espandibile (in cima l'ultimo completato); nell'elenco principale restano solo quelli da fare
  const all=S.dungeons.map((d,i)=>({d,i})),done=all.filter(x=>x.d.clears>0),todo=all.filter(x=>!(x.d.clears>0));
- const grp=items=>items.map((x,j)=>{const pv=j>0?items[j-1].d:null,hd=(!pv||pv.kind!==x.d.kind)?(x.d.kind==='path'?`<h3 class="er-h dg-sep">🔀 Dungeon a scelte<small>Più difficili dei classici. Ogni bivio cambia la storia: dagli indizi alla strada giusta, fino al finale. Ci sono finali migliori (premi più ricchi), finali sul filo e finali di fallimento.</small></h3>`:`<h3 class="er-h dg-sep">⚔️ Dungeon classici<small>Si risolvono in automatico, stanza dopo stanza.</small></h3>`):'';return hd+dngCard(x.d,can,S.dungeons[x.i-1])}).join('');
+ const gk=d=>d.kind!=='path'?'c':d.no<56?'p':'a';
+ const grp=items=>items.map((x,j)=>{const pv=j>0?items[j-1].d:null,hd=(!pv||gk(pv)!==gk(x.d))?(gk(x.d)==='a'?`<h3 class="er-h dg-sep">🌀 Dungeon avanzati (56–${S.total})<small>Per eroi dal livello 400 al 600. Nuove interazioni: prove di abilità con probabilità, serrature a simboli, azioni uniche, scelta dell’eroe, azioni di ruolo e, in alcuni, un orologio che scorre. Più difficili e più ricchi dei precedenti.</small></h3>`:gk(x.d)==='p'?`<h3 class="er-h dg-sep">🔀 Dungeon a scelte<small>Più difficili dei classici. Ogni bivio cambia la storia: dagli indizi alla strada giusta, fino al finale. Ci sono finali migliori (premi più ricchi), finali sul filo e finali di fallimento.</small></h3>`:`<h3 class="er-h dg-sep">⚔️ Dungeon classici<small>Si risolvono in automatico, stanza dopo stanza.</small></h3>`):'';return hd+dngCard(x.d,can,S.dungeons[x.i-1])}).join('');
+ // dei dungeon ancora bloccati si vedono solo i primi due: gli altri stanno in un riquadro
+ const todoOpen=todo.filter(x=>x.d.open),todoLock=todo.filter(x=>!x.d.open),lockShown=todoLock.slice(0,2),lockHidden=todoLock.slice(2);
+ const todoHtml=todo.length?grp(todoOpen.concat(lockShown))+(lockHidden.length?fold('dng_locked','🔒','Altri dungeon bloccati',`Dal ${lockHidden[0].d.no} al ${lockHidden[lockHidden.length-1].d.no}`,lockHidden.length,grp(lockHidden)):''):'<p class="mute">Hai completato tutti i dungeon!</p>';
  let LOBBY='';
  if(my){const d=dn(my.dungeon_no),n=my.members.length;
   LOBBY=`<section class="card er-lobby dg-lb" aria-label="La tua lobby"><h3>🚪 La tua lobby · ${esc(d.emoji||'')} ${esc(d.name)}</h3>
@@ -579,13 +615,14 @@ function renderDng(){
   <h2 class="er-h">${my?'Il tuo ruolo':'Scegli il tuo ruolo'}</h2>${picker}
   ${LOBBY}${my?'':LOBBIES}
   <h2 class="er-h">Da completare</h2>
-  ${todo.length?grp(todo):'<p class="mute">Hai completato tutti i dungeon!</p>'}
+  ${todoHtml}
   <h2 class="er-h">Come funzionano</h2><details class="card"><summary>Le regole in breve</summary><ul class="mute er-how">
    <li>I dungeon si sbloccano <b>uno dopo l’altro</b>: completa il precedente per aprire il successivo. Alcuni chiedono anche un livello minimo.</li>
    <li>Ogni giocatore spende <b>${S.cost} energie</b> quando il dungeon parte, vinca o perda il gruppo.</li>
    <li>Da soli o in lobby da 2 a ${S.max_party} eroi. Ruoli: <b>1 Tank</b>, <b>1 Supporto</b> e fino a <b>2 Danni</b>. Il capo della lobby fa partire quando vuole; una lobby non avviata scade dopo ${S.lobby_minutes} minuti.</li>
    <li>I dungeon classici si risolvono in automatico, stanza dopo stanza, in base a livello, punti abilità, oggetti e ruoli. Tra una stanza e l’altra il gruppo riprende fiato. Se tutti cadono, il dungeon è fallito.</li>
    <li><b>Dungeon a scelte</b> (dal 26): a ogni bivio il <b>capo gruppo</b> sceglie, gli altri guardano e la schermata si aggiorna da sola. Le scelte danno indizi, bonus o malus di potenza e PV, e aprono o chiudono strade: senza l’indizio giusto certe opzioni restano bloccate. Gli scontri si risolvono da soli, in base alla potenza della spedizione. Alcune scelte fanno fallire subito. Esistono più <b>finali</b>: il migliore paga fino al <b>140%</b> dei BC e dell’XP, il più magro l’85%, e ogni finale scoperto resta segnato. Se nessuno decide per ${S.path_minutes} minuti, la spedizione fallisce.</li>
+   <li><b>Dungeon avanzati</b> (dal 56 al ${S.total}, per eroi fino al livello 600): oltre alle scelte compaiono <b>prove di abilità</b> (🎲 con la probabilità indicata, che dipende dalle statistiche del gruppo), <b>serrature a simboli</b> (🔐 un codice da indovinare con pochi tentativi), <b>azioni uniche</b> (🧭), <b>scelta dell’eroe</b> (👤 il capo sceglie chi agisce), <b>azioni di ruolo</b> (🛡️ servono Tank, Danni o Supporto vivi) e, in alcuni, un <b>orologio</b> (⏳) che consuma tempo a ogni scelta: se finisce, il gruppo viene raggiunto dai nemici. Servono indizi, buoni ruoli e un po’ di fortuna per arrivare al finale migliore.</li>
    <li><b>Prima vittoria</b>: BC pieni (<b>+${S.party_bonus_pct}% per ogni compagno</b> nel gruppo), XP pieni e l’<b>oggetto esclusivo</b> del dungeon, <b>epico</b> ogni 5 dungeon completati. A volte arriva anche un secondo oggetto.</li>
    <li><b>Repliche</b>: ${S.replay_bc_pct}% dei BC, ${S.replay_xp_pct}% dell’XP e, ogni tanto, un oggetto casuale. <b>Sconfitta</b>: nessun BC, un po’ di XP di consolazione.</li>
   </ul></details>`;
@@ -791,7 +828,14 @@ document.addEventListener('click',e=>{
   dngRun(t,async()=>{const c=await rpc('game_dungeon_create',{p_dungeon:no,p_role:dngRole});let r;
    try{r=await rpc('game_dungeon_start',{p_run:c.run_id})}catch(e){try{await rpc('game_dungeon_leave',{p_run:c.run_id})}catch(_){}throw e}
    clearSay();if(r.result)seenSet(r.run_id);await load(true);await loadDng(true);if(r.result)dngModal(r.result,r.dungeon_no)});return}
- if(t.dataset.dchoose){dngRun(t,async()=>{const r=await rpc('game_dungeon_choose',{p_run:DS.active.run_id,p_option:t.dataset.dchoose});
+ if(t.dataset.dpick){pickOpt=pickOpt===t.dataset.dpick?null:t.dataset.dpick;renderDng();return}
+ if(t.dataset.dpickx){pickOpt=null;renderDng();return}
+ if(t.dataset.lk!=null&&t.dataset.lk!==''){const L=DS.active&&DS.active.scene&&DS.active.scene.lock;if(L&&lkSel.length<L.len){lkSel.push(Number(t.dataset.lk));renderDng()}return}
+ if(t.dataset.lkclr){lkSel=[];renderDng();return}
+ if(t.dataset.lksend){const code=lkSel.join(',');dngRun(t,async()=>{lkSel=[];const r=await rpc('game_dungeon_choose',{p_run:DS.active.run_id,p_option:'lock',p_arg:code});
+   if(r.expired){say('La spedizione è stata data per fallita: nessuno aveva più deciso.','bad')}
+   if(r.result)seenSet(r.run_id);await load(true);await loadDng(true);if(r.result)dngModal(r.result,r.dungeon_no)});return}
+ if(t.dataset.dchoose){pickOpt=null;dngRun(t,async()=>{const a={p_run:DS.active.run_id,p_option:t.dataset.dchoose};if(t.dataset.darg)a.p_arg=t.dataset.darg;const r=await rpc('game_dungeon_choose',a);
    if(r.expired){say('La spedizione è stata data per fallita: nessuno aveva più deciso.','bad')}
    if(r.result)seenSet(r.run_id);await load(true);await loadDng(true);if(r.result)dngModal(r.result,r.dungeon_no)});return}
  if(t.id==='dgAbandon'){if(pending!=='abandon'){pending='abandon';renderDng();setTimeout(()=>{if(pending==='abandon'){pending=null;if(tab==='dng')renderDng()}},5000);return}
