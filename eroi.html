@@ -231,7 +231,7 @@ body.er-fab-on{padding-bottom:88px}
 
 <main class="pg">
  <header><p class="kicker">Mini gioco di ruolo</p><h1>La guerra degli Eroi</h1>
- <p class="lead">Ogni duellante è un eroe con il suo nickname. Distribuisci i punti abilità, compra le abilità dal Mercante, sfida gli altri eroi in Arena (ogni duello consuma energia), abbatti il boss del giorno da solo o con la tua lobby e affronta i 100 dungeon (dal 26 a scelte, dal 56 con prove, serrature e orologio), da solo o in squadra.</p></header>
+ <p class="lead">Ogni duellante è un eroe con il suo nickname. Distribuisci i punti abilità, compra le abilità dal Mercante, sfida gli altri eroi in Arena (ogni duello consuma energia), abbatti il boss del giorno da solo o con la tua lobby e affronta i 100 dungeon (dal 26 a scelte, dal 56 con prove, serrature e orologio) e scala la Torre Infinita, da solo o in squadra.</p></header>
 
  <section class="card er-top" id="top" aria-live="polite"><p class="mute" style="margin:0" role="status">Caricamento dell’eroe…</p></section>
 
@@ -239,11 +239,12 @@ body.er-fab-on{padding-bottom:88px}
 
  <div id="main" hidden>
  <div class="er-sticky"><div id="bat"></div>
- <div class="tabs" role="tablist"><button role="tab" data-t="hero" aria-selected="true">Eroe</button><button role="tab" data-t="boss" aria-selected="false">Boss</button><button role="tab" data-t="dng" aria-selected="false">Dungeon</button><button role="tab" data-t="arena" aria-selected="false">Arena</button><button role="tab" data-t="shop" aria-selected="false">Mercante</button><button role="tab" data-t="lb" aria-selected="false">Classifica</button></div></div>
+ <div class="tabs" role="tablist"><button role="tab" data-t="hero" aria-selected="true">Eroe</button><button role="tab" data-t="boss" aria-selected="false">Boss</button><button role="tab" data-t="dng" aria-selected="false">Dungeon</button><button role="tab" data-t="tower" aria-selected="false">Torre</button><button role="tab" data-t="arena" aria-selected="false">Arena</button><button role="tab" data-t="shop" aria-selected="false">Mercante</button><button role="tab" data-t="lb" aria-selected="false">Classifica</button></div></div>
  <div id="msg" role="status" aria-live="polite"></div>
  <section class="tp" id="p-hero"></section>
  <section class="tp" id="p-boss" hidden></section>
  <section class="tp" id="p-dng" hidden></section>
+ <section class="tp" id="p-tower" hidden></section>
  <section class="tp" id="p-arena" hidden></section>
  <section class="tp" id="p-shop" hidden></section>
  <section class="tp" id="p-lb" hidden></section>
@@ -254,6 +255,7 @@ body.er-fab-on{padding-bottom:88px}
 <div id="chPanel" class="er-cp" role="dialog" aria-label="Chat degli eroi" hidden></div>
 <script src="tempio.js?v=12"></script>
 <script src="tempio-notifiche.js?v=2"></script>
+<script src="eroi-torre.js?v=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 (function(){'use strict';
@@ -265,7 +267,7 @@ const STATS=[['for','Forza','Più danno a ogni colpo','FOR'],['des','Destrezza',
 const SLOTS=[['weapon','Arma','⚔️'],['armor','Armatura','🛡️'],['helm','Elmo','⛑️'],['amulet','Amuleto','📿'],['tool','Strumento','🧪']];
 const SL=Object.fromEntries(SLOTS.map(s=>[s[0],s]));
 const RAR={base:'Base',comune:'Comune',non_comune:'Non comune',raro:'Raro',epico:'Epico',leggendario:'Leggendario',mitico:'Mitico'};
-const SRC={start:'Base',shop:'Mercante',boss:'Boss',dungeon:'Dungeon'};
+const SRC={start:'Base',shop:'Mercante',boss:'Boss',dungeon:'Dungeon',tower:'Torre'};
 const API='https://db.ygoprodeck.com/api/v7/cardinfo.php',CROP='https://images.ygoprodeck.com/images/cards_cropped/';
 let AVOK=false,AV={},avOpen=false,avQ='',avRes=null,avBusy=false,FOLD={};   // FOLD: riquadri aperti (abilità, cartelle zaino)
 const REFILL_BELOW=100;      // come nel database (_game_refill_below_level): la ricarica dell'energia al livello vale solo se si parte sotto questo livello
@@ -651,6 +653,85 @@ function dngModal(res,no){
   <button class="btn block" style="margin-top:14px" data-close>Chiudi</button>`)}
 
 /* ---------- Mercante ---------- */
+/* ---------- Torre Infinita ---------- */
+const ART=window.TorreArt;
+let TW=null,twAvail=null,lastTwCan=true;
+function twMissing(e){return /could not find|schema cache|does not exist|PGRST202/i.test(String(e&&e.message||e))}
+function twTab(){const b=document.querySelector('.tabs [data-t="tower"]');if(b)b.hidden=twAvail===false}
+async function loadTower(force){
+ if(twAvail===false||!ST)return;
+ try{TW=await rpc('game_tower_state');twAvail=true}
+ catch(e){if(twMissing(e)){twAvail=false;twTab();if(tab==='tower')renderTower();return}throw e}
+ twTab();if(tab==='tower'&&!document.querySelector('.er-ov'))renderTower()}
+function twChance(c){return c>=90?['Facile','#4ade9b']:c>=65?['Favorevole','#9be15d']:c>=35?['Incerto','#ffd166']:c>=12?['Duro','#ff9f43']:['Quasi impossibile','#ff5468']}
+function twSprite(e,size,cls){return ART?ART.sprite(e.sprite,{tier:e.tier,size,alt:e.name,cls}):`<span style="font-size:${Math.round(size/2)}px">${esc(e.emoji||'👾')}</span>`}
+function twRewards(rw){if(!rw)return '';const o=[`<span>🪙 +${num(rw.bc)} BC</span>`,`<span>✨ +${num(rw.xp)} XP</span>`];if(rw.item)o.push(`<span class="g">🎁 ${esc(rw.item.name)}</span>`);return `<div class="tw-rw">${o.join('')}</div>`}
+function twCan(){if(!ME.stats_set)return{ok:false,why:'Prima assegna i tuoi punti abilità nella scheda <b>Eroe</b>.'};const ev=enNow();
+ if(ev<TW.cost)return{ok:false,why:`Energia troppo bassa: ne servono ${TW.cost}. Pronta tra ${fmtDur((TW.cost-ev)/ST.energy.per_hour*3600)}.`};return{ok:true}}
+function renderTower(){
+ const el=$('p-tower');
+ if(twAvail===false){el.innerHTML=`<h2 class="er-h">Torre Infinita</h2><p class="er-msg">La Torre non è ancora attiva: nel database va eseguita la migrazione <b>black-market-eroi-torre.sql</b>.</p>`;return}
+ if(!TW||!ART){el.innerHTML='<p class="mute">Caricamento…</p>';return}
+ const m=ST.me,e=TW.enemy,fl=TW.next_floor,z=ART.zone(fl),can=twCan(),ch=twChance(e.chance),b=TW.boss;lastTwCan=can.ok;
+ const up=TW.upcoming.map(u=>{const c=twChance(u.chance);return `<div class="tw-uc ${u.boss?'boss':''}"><b>Piano ${num(u.floor)}</b>${twSprite(u,u.boss?64:52)}<small>${esc(u.name)}</small><small style="color:${c[1]};font-weight:700">${u.chance}%</small></div>`}).join('');
+ const lb=TW.top.length?TW.top.map(r=>`<div class="er-lb ${r.user_id===m.user_id?'me':''}"><div class="rk">${r.rank}</div><div class="av" aria-hidden="true">${face(r.user_id,r.nickname)}</div><div style="min-width:0"><button class="er-link" data-hero="${esc(r.user_id)}">${esc(r.nickname)}</button><small>Liv. ${num(r.level)} · ${esc(ART.rank(r.best_floor))}</small></div><div class="lv">${num(r.best_floor)}</div></div>`).join(''):'<p class="mute">Nessuno ha ancora scalato la Torre: il primo piano aspetta te!</p>';
+ const hall=TW.hall.length?TW.hall.map(h=>`<div class="er-lbrow"><div class="l1"><b>Piano ${num(h.floor)} · ${esc(h.boss)}</b><small>👑 ${esc(h.nickname)} · ${new Date(h.at).toLocaleDateString('it-IT')}</small></div></div>`).join(''):'<p class="mute">Nessun boss della Torre è ancora stato sconfitto. Chi ci riesce per primo entra nell’albo!</p>';
+ const rec=TW.recent.length?`<div class="tw-hist">${TW.recent.map(x=>`<span class="${x.won?'w':'l'}">${x.won?'✓':'✗'} piano ${num(x.floor)}</span>`).join('')}</div>`:'<p class="mute">Nessun tentativo, per ora.</p>';
+ el.innerHTML=`<div class="tw-top"><div><h2>Torre Infinita</h2><small>${esc(ART.rank(TW.best_floor))} · ${num(TW.wins)} ${TW.wins===1?'piano vinto':'piani vinti'}</small></div><div class="tw-best"><b>${num(TW.best_floor)}</b><span>piano più alto${TW.rank?` · ${TW.rank}º in classifica`:''}</span></div></div>
+ <div class="tw-stage" style="${ART.zoneVars(z)}"><div class="tw-zn"><b>${esc(z.name)}</b><span>Piano ${num(fl)}${e.boss?' · BOSS':''}</span></div>
+  <div class="tw-grid">${ART.ladder(TW.best_floor,TW.boss_floor,z)}
+   <div class="tw-foe"><div class="tw-pl ${e.boss?'boss':''}"><div class="tw-aura" aria-hidden="true"></div><div class="tw-sh" aria-hidden="true"></div>${twSprite(e,e.boss?176:136)}</div>
+    <div class="tw-fn">${esc(e.name)}</div>
+    <div class="tw-tags">${e.boss?'<span class="tw-tag b">BOSS</span>':''}${e.affix?`<span class="tw-tag a">${esc(e.affix.name)}</span>`:''}</div>
+    ${e.lore?`<p class="tw-lore">${esc(e.lore)}</p>`:''}${e.trait?`<p class="tw-lore">${esc(e.trait)}</p>`:''}${e.affix?`<p class="tw-lore">${esc(e.affix.descr)}</p>`:''}
+    <div class="tw-st"><span>PV <b>${num(e.max_hp)}</b></span><span>FOR <b>${num(e.s_for)}</b></span><span>DES <b>${num(e.s_des)}</b></span><span>VIG <b>${num(e.s_vig)}</b></span><span>SPI <b>${num(e.s_spi)}</b></span><span>FRT <b>${num(e.s_frt)}</b></span></div></div></div></div>
+ <div class="tw-info"><div class="tw-chrow"><span>Stima di vittoria</span><b style="color:${ch[1]}">${e.chance}% · ${ch[0]}</b></div><div class="tw-ch" role="img" aria-label="Probabilità stimata ${e.chance}%"><i style="width:${e.chance}%;background:${ch[1]}"></i></div>
+  <p class="er-note">Stima indicativa: i dadi (colpi critici e schivate) possono sempre cambiare l’esito. Tu: PV <b>${num(m.max_hp)}</b> · FOR <b>${num(m.stats.for)}</b> · DES <b>${num(m.stats.des)}</b> · VIG <b>${num(m.stats.vig)}</b> · SPI <b>${num(m.stats.spi)}</b> · FRT <b>${num(m.stats.frt)}</b>.</p>
+  <p class="er-note" style="margin-top:8px"><b>Premio del piano</b> (una sola volta):</p>${twRewards(e.reward)}
+  <button class="btn tw-go" id="twGo" ${can.ok?'':'disabled'}>⚔️ Sali al piano ${num(fl)} <small>(−${TW.cost} energia)</small></button>${can.ok?'':`<p class="er-note">${can.why}</p>`}</div>
+ ${b?`<div class="tw-boss ${TW.boss_in<=3?'near':''}">${twSprite(b,64)}<div style="min-width:0"><small>Prossimo boss · piano ${num(TW.boss_floor)} · tra ${num(TW.boss_in)} ${TW.boss_in===1?'piano':'piani'}</small><b>${esc(b.name)}</b><small>🎁 ${b.reward&&b.reward.item?esc(b.reward.item.name):'Premio doppio in BC e XP'} · stima oggi ${b.chance}%</small></div></div>`:''}
+ <h2 class="er-h" style="margin-top:20px">Prossimi piani</h2><div class="tw-up">${up}</div>
+ <h2 class="er-h">Classifica e albo</h2>
+ ${fold('tw_lb','🏆','Classifica della Torre','Chi è salito più in alto',TW.top.length,lb)}
+ ${fold('tw_hall','👑','Albo delle prime conquiste','Chi ha sconfitto per primo ogni boss',TW.hall.length,hall)}
+ ${fold('tw_rec','📜','I tuoi ultimi tentativi','Vittorie e sconfitte recenti',TW.recent.length,rec)}
+ ${fold('tw_how','📖','Come funziona la Torre','Regole in breve',null,`<ul class="er-how"><li>Si sale <b>un piano alla volta, da soli</b>: ogni tentativo è un combattimento con le stesse regole dei duelli in Arena e costa <b>${TW.cost} energia</b>, che tu vinca o perda.</li><li>Se vinci passi al piano dopo e incassi <b>BC e XP</b> di quel piano, una volta sola. Se perdi resti dove sei: rafforza l’eroe e riprova.</li><li>Ogni <b>10 piani</b> c’è un boss con una reliquia esclusiva (fino al piano 600). Chi lo sconfigge per primo entra nell’albo.</li><li>Alcuni nemici hanno un <b>tratto</b> (Corazzato, Furioso, Veloce, Mistico, Anziano, Fragile) che cambia le loro statistiche: lo vedi prima di salire.</li><li>I nemici crescono di piano in piano, senza fine: il tuo limite dipende da livello, statistiche e oggetti.</li></ul>`)}`}
+function towerModal(r){
+ const e=r.enemy,z=ART?ART.zone(r.floor):null,me=ST.me,L=r.log||[],lv0=r.level-(r.levels||0);let i=0;
+ const hero=ART?ART.sprite('eroe',{size:112,alt:me.nickname}):'<span style="font-size:60px">🧑</span>';
+ const o=modal(`<div class="tw-ar" style="${z?ART.zoneVars(z):''}"><h2>Piano ${num(r.floor)}${e.boss?' <span class="tw-tag b">BOSS</span>':''}${e.affix?` <span class="tw-tag a">${esc(e.affix.name)}</span>`:''}</h2>
+  <div class="tw-field" id="twF"><div class="tw-duel">
+   <div class="tw-side me"><span class="tw-hpt" id="twAt">${num(r.max_a)} / ${num(r.max_a)}</span><div class="tw-hpb"><i id="twA" style="width:100%"></i></div><div class="tw-body me" id="twBa"><span class="tw-av" aria-hidden="true">${face(me.user_id,me.nickname)}</span>${hero}</div><div class="nm">${esc(me.nickname)}<br><span style="font-weight:400;opacity:.8">Liv. ${num(lv0)}</span></div></div>
+   <div class="tw-side foe"><span class="tw-hpt" id="twBt">${num(r.max_b)} / ${num(r.max_b)}</span><div class="tw-hpb"><i id="twB" style="width:100%"></i></div><div class="tw-body" id="twBb">${twSprite(e,e.boss?150:112)}</div><div class="nm">${esc(e.name)}</div></div></div>
+   <div class="tw-log" id="twLog" aria-live="off"></div></div>
+  <div id="twRes"></div>
+  <div class="row" style="margin-top:12px"><button class="btn ghost" id="twSkip">Salta</button><button class="btn" data-close id="twClose" hidden>Chiudi</button></div></div>`);
+ const A=o.querySelector('#twA'),B=o.querySelector('#twB'),At=o.querySelector('#twAt'),Bt=o.querySelector('#twBt'),F=o.querySelector('#twF'),Ba=o.querySelector('#twBa'),Bb=o.querySelector('#twBb'),G=o.querySelector('#twLog');
+ const upd=(ha,hb)=>{A.style.width=Math.max(0,100*ha/r.max_a)+'%';B.style.width=Math.max(0,100*hb/r.max_b)+'%';At.textContent=num(ha)+' / '+num(r.max_a);Bt.textContent=num(hb)+' / '+num(r.max_b)};
+ const anim=(el,c)=>{el.classList.remove(c);void el.offsetWidth;el.classList.add(c);setTimeout(()=>el.classList.remove(c),460)};
+ const fx=(el,txt,cls)=>{const n=document.createElement('span');n.className='tw-num '+(cls||'');n.textContent=txt;el.appendChild(n);setTimeout(()=>n.remove(),1000)};
+ const line=s=>{const w=s.w==='a'?esc(me.nickname):esc(e.name);return `<div><b>${w}</b> ${s.x?'attacca ma viene schivato':`infligge ${num(s.d)} danni${s.c?' (critico!)':''}`}</div>`};
+ const step=s=>{const att=s.w==='a'?Ba:Bb,def=s.w==='a'?Bb:Ba;anim(att,s.w==='a'?'atk-l':'atk-r');
+  if(s.x){anim(def,'dodge');fx(def,'Schivata!','x')}
+  else setTimeout(()=>{anim(def,'hit');fx(def,'−'+num(s.d)+(s.c?'!':''),s.c?'c':'');if(s.c){F.classList.remove('shake');void F.offsetWidth;F.classList.add('shake')}},140);
+  G.insertAdjacentHTML('beforeend',line(s));while(G.children.length>3)G.removeChild(G.firstChild);upd(s.ha,s.hb)};
+ const nxt=TW&&TW.enemy?TW.enemy:null;
+ const fin=()=>{if(o._t){clearInterval(o._t);o._t=null}upd(r.hp_a,r.hp_b);(r.won?Bb:Ba).classList.add('ko');
+  o.querySelector('#twSkip').hidden=true;o.querySelector('#twClose').hidden=false;
+  const canAgain=ME.stats_set&&TW&&enNow()>=TW.cost;
+  o.querySelector('#twRes').innerHTML=r.won?`<div class="tw-res"><h3 class="w">🏆 Piano ${num(r.floor)} conquistato!</h3>
+    <div class="tw-rw" style="justify-content:center"><span>🪙 +${num(r.bc)} BC</span><span>✨ +${num(r.xp)} XP</span><span>🔋 −${r.energy_cost}</span></div>
+    ${r.levels>0?`<p class="er-note" style="text-align:center">Sei salito al livello <b>${num(r.level)}</b>!${r.energy_full?' Energia ricaricata al <b>100%</b>.':''}</p>`:''}
+    ${r.first_global?`<div class="tw-first">👑 Prima conquista del piano ${num(r.floor)}: il tuo nome entra nell’albo della Torre!</div>`:''}
+    ${r.item?`<div class="tw-drop">${itemBox(r.item)}</div><p class="er-note" style="text-align:center">La reliquia è nello zaino: indossala dalla scheda <b>Eroe</b>.</p>`:''}
+    ${nxt?`<p class="er-note" style="text-align:center">Prossimo: piano ${num(r.next_floor)} — ${esc(nxt.name)} (stima ${nxt.chance}%)</p>`:''}</div>`
+   :`<div class="tw-res"><h3 class="l">💥 Sconfitto al piano ${num(r.floor)}</h3><p class="er-note" style="text-align:center">${esc(e.name)} ti ha respinto (stima di partenza ${e.chance}%). Energia −${r.energy_cost}. Rafforza l’eroe (statistiche, abilità, oggetti) oppure riprova: i dadi possono girare.</p></div>`;
+  if(canAgain){const b=document.createElement('button');b.className='btn';b.textContent=r.won?`⚔️ Sali al piano ${num(r.next_floor)}`:'⚔️ Riprova';b.onclick=()=>{o.close();const g=$('twGo');if(g&&!g.disabled)g.click()};o.querySelector('.row').insertBefore(b,o.querySelector('#twClose'))}
+  o.scrollTop=0};
+ o.querySelector('#twSkip').onclick=fin;
+ if(matchMedia('(prefers-reduced-motion: reduce)').matches||!L.length)fin();
+ else o._t=setInterval(()=>{if(i>=L.length){fin();return}step(L[i++])},560)}
+
 function renderShop(){
  const m=ST.me;
  $('p-shop').innerHTML=`<h2 class="er-h">Il Mercante</h2><p class="er-sub">Ogni giorno nuove offerte, le stesse per tutti. Accetta solo <b>Black Credits</b>. Hai <b style="color:var(--gold)">${BAL==null?'—':num(BAL)} BC</b>. Nuove offerte tra <b data-cd>${cd()}</b>.</p>
@@ -751,15 +832,15 @@ async function sendChat(){if(CH.sending)return;const inp=$('chIn'),btn=$('chSend
 /* ---------- navigazione e caricamento ---------- */
 function paint(){
  paintTop();paintBat();
- if(tab==='hero')renderHero();else if(tab==='boss')renderBoss();else if(tab==='dng')renderDng();else if(tab==='arena')renderArena();else if(tab==='shop')renderShop();else renderLb();
+ if(tab==='hero')renderHero();else if(tab==='boss')renderBoss();else if(tab==='dng')renderDng();else if(tab==='tower')renderTower();else if(tab==='arena')renderArena();else if(tab==='shop')renderShop();else renderLb();
 }
 function setTab(t,push){
  tab=t;document.querySelectorAll('.tabs [data-t]').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));const cb=document.querySelector('.tabs [data-t="'+t+'"]');if(cb&&cb.scrollIntoView)try{cb.scrollIntoView({inline:'nearest',block:'nearest'})}catch(_){}
- ['hero','boss','dng','arena','shop','lb'].forEach(x=>$('p-'+x).hidden=x!==t);
+ ['hero','boss','dng','tower','arena','shop','lb'].forEach(x=>$('p-'+x).hidden=x!==t);
  if(push!==false)history.replaceState(null,'','#'+t);
  clearSay();pending=null;
  if(!ST)return;paint();
- if(t==='arena')loadArena();if(t==='lb')loadLb();if(t==='dng')loadDng(true)}
+ if(t==='arena')loadArena();if(t==='lb')loadLb();if(t==='dng')loadDng(true);if(t==='tower')loadTower(true).catch(e=>say(errTxt(e),'bad'))}
 async function load(keepDraft){
  ST=await rpc('game_state');ME=ST.me;last=Date.now();
  if(ISADM===null){try{ISADM=(await rpc('is_admin'))===true}catch(_){ISADM=false}}      // la voce admin si vede solo a chi è davvero amministratore (il database lo ricontrolla comunque)
@@ -781,7 +862,8 @@ async function boot(){
   const first=!ST;
   await load(false);
   beat();
-  if(first){const h=(location.hash||'').slice(1);setTab(['hero','boss','dng','arena','shop','lb'].includes(h)?h:(ME.stats_set?'boss':'hero'),false)}
+  loadTower().catch(()=>{});
+  if(first){const h=(location.hash||'').slice(1);setTab(['hero','boss','dng','tower','arena','shop','lb'].includes(h)?h:(ME.stats_set?'boss':'hero'),false)}
  }catch(e){
   if(/Modulo non attivo/i.test(String(e.message)))gateOff();
   else gate(`<section class="card er-gate" style="margin-top:20px"><h2>Errore di collegamento</h2><p class="mute">${errTxt(e)}</p><button class="btn ghost" id="retry">Riprova</button></section>`)}}
@@ -838,6 +920,7 @@ document.addEventListener('click',e=>{
  if(t.dataset.dchoose){pickOpt=null;dngRun(t,async()=>{const a={p_run:DS.active.run_id,p_option:t.dataset.dchoose};if(t.dataset.darg)a.p_arg=t.dataset.darg;const r=await rpc('game_dungeon_choose',a);
    if(r.expired){say('La spedizione è stata data per fallita: nessuno aveva più deciso.','bad')}
    if(r.result)seenSet(r.run_id);await load(true);await loadDng(true);if(r.result)dngModal(r.result,r.dungeon_no)});return}
+ if(t.id==='twGo'){run(t,async()=>{const r=await rpc('game_tower_climb');clearSay();await load(true);await loadTower();towerModal(r)});return}
  if(t.id==='dgAbandon'){if(pending!=='abandon'){pending='abandon';renderDng();setTimeout(()=>{if(pending==='abandon'){pending=null;if(tab==='dng')renderDng()}},5000);return}
   pending=null;dngRun(t,async()=>{const r=await rpc('game_dungeon_abandon',{p_run:DS.active.run_id});seenSet(r.run_id);await load(true);await loadDng(true);dngModal(r.result,r.dungeon_no)});return}
  if(t.dataset.djoin){dngRun(t,async()=>{await rpc('game_dungeon_join',{p_run:t.dataset.djoin,p_role:t.dataset.role});say('Sei nella lobby! Aspetta che il capo faccia partire il dungeon.','good');await loadDng(true)});return}
@@ -859,6 +942,7 @@ setInterval(()=>{if(!ST)return;document.querySelectorAll('[data-cd]').forEach(e=
  let exp=false;document.querySelectorAll('[data-ut]').forEach(e=>{const t=new Date(e.dataset.ut).getTime()-Date.now();e.textContent=t>0?lf(t):'scaduto';if(t<=0)exp=true});
  if(exp&&Date.now()-last>5000&&!busy&&!document.hidden)load(true).catch(()=>{});
  if(tab==='arena'&&ST.energy&&(enNow()>=ST.energy.min)!==lastCan&&!busy&&!document.querySelector('.er-ov'))renderArena();
+ if(tab==='tower'&&TW&&twAvail&&(enNow()>=TW.cost)!==lastTwCan&&!busy&&!document.querySelector('.er-ov'))renderTower();
  if(tab==='dng'&&DS){paintDut();if((enNow()>=DS.cost)!==lastDngCan&&!busy)renderDng();document.querySelectorAll('[data-dut]').forEach(e=>{if(new Date(e.dataset.dut).getTime()<=Date.now()&&Date.now()-last>4000&&!busy)loadDng(true).catch(()=>{})})}
  if(new Date(ST.next_reset).getTime()<=Date.now()&&Date.now()-last>8000&&!busy&&!document.hidden)load(true).catch(()=>{})},1000);
 setInterval(()=>{if(ST&&!document.hidden&&tab==='boss'&&!busy&&!document.querySelector('.er-ov'))load(true).catch(()=>{})},10000);
