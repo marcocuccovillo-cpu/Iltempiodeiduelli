@@ -227,11 +227,40 @@ body.er-fab-on{padding-bottom:88px}
 .dg-log{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px;font-size:.88rem;color:var(--mu)}.dg-log b{color:var(--tx)}
 .dg-end{padding:12px;border:1.5px solid var(--ac);border-radius:12px;background:rgba(var(--ac-rgb),.12);margin:8px 0}.dg-end.l{border-color:var(--bad)}.dg-end h3{margin:0 0 4px;font-size:1.05rem}.dg-end p{margin:0;overflow-wrap:anywhere}
 .dg-sep{margin:18px 0 4px}.dg-sep small{display:block;color:var(--mu);font-weight:400;font-size:.86rem}
+/* lo stagno (pet companion) */
+.pt-strip{display:grid;grid-template-columns:56px minmax(0,1fr);gap:10px;align-items:center;width:100%;padding:8px 10px;border:1px solid var(--line);border-left:3px solid var(--rc,var(--line));border-radius:12px;background:var(--inp);color:var(--tx);font:inherit;text-align:left;cursor:pointer;min-width:0}
+.pt-strip:hover,.pt-strip:focus-visible{border-color:var(--ac2)}.pt-strip.empty{border-style:dashed}
+.pt-ph{width:56px;height:56px;border-radius:12px;display:grid;place-items:center;background:radial-gradient(circle at 50% 70%,rgba(80,200,200,.28),rgba(20,30,60,.9));border:2px solid var(--rc,var(--line));overflow:hidden;font-size:1.6rem}
+.pt-tx{display:grid;gap:3px;min-width:0}.pt-tx b{font-size:.95rem;overflow-wrap:anywhere}.pt-tx b em{font-style:normal;color:var(--ac2);font-family:var(--disp);margin-left:4px;white-space:nowrap}.pt-tx small{color:var(--mu);font-size:.76rem}
+.pt-tx .er-bn{margin-top:2px}
+.er-xp.sm{height:7px}
+.pt-pond{position:relative;border:1px solid var(--line);border-radius:16px;padding:16px;overflow:hidden;background:linear-gradient(180deg,rgba(30,60,90,.55),rgba(14,28,52,.92)),var(--surf)}
+.pt-pond::before{content:"";position:absolute;inset:auto -10% -30px -10%;height:90px;background:radial-gradient(ellipse at 20% 50%,rgba(120,220,220,.18),transparent 60%),radial-gradient(ellipse at 75% 60%,rgba(120,220,220,.14),transparent 55%);pointer-events:none}
+.pt-hero{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;position:relative}
+@media(max-width:520px){.pt-hero{grid-template-columns:1fr;justify-items:center;text-align:center}.pt-hero .pt-ls li{text-align:left}}
+.pt-hero h2{margin:2px 0 4px;font-size:1.35rem;overflow-wrap:anywhere}.pt-hero h2 em{font-style:normal;color:var(--ac2);font-family:var(--disp)}
+.pt-hero>div:last-child{min-width:0;width:100%}
+.pt-big{width:152px;height:152px;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,rgba(120,220,220,.22),transparent 68%);position:relative}
+.pt-big::after{content:"";position:absolute;bottom:12px;left:24%;right:24%;height:12px;border-radius:50%;background:rgba(0,0,0,.35);filter:blur(3px)}
+.pt-big img{position:relative;z-index:1;animation:ptb 2.8s ease-in-out infinite}
+@keyframes ptb{50%{transform:translateY(-4px)}}
+@media(prefers-reduced-motion:reduce){.pt-big img{animation:none}}
+.pt-ls{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:2px}
+.pt-ls li{display:flex;justify-content:space-between;gap:2px 8px;flex-wrap:wrap;font-size:.86rem;padding:4px 0;border-top:1px dashed var(--line)}
+.pt-ls li:first-child{border-top:0}.pt-ls li span{font-weight:700;color:var(--ac2)}.pt-ls li small{color:var(--mu)}
+.pt-ls li.off{opacity:.65}.pt-ls li.off span{color:var(--mu)}
+.pt-grid{display:grid;gap:12px}@media(min-width:620px){.pt-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.pt-c{display:grid;gap:8px;padding:12px;border:1px solid var(--line);border-top:3px solid var(--rc,var(--line));border-radius:12px;background:var(--surf);min-width:0;align-content:start}
+.pt-c.act{border-color:var(--ac);border-top-color:var(--rc,var(--ac))}
+.pt-sp{display:grid;place-items:center;padding:8px;border-radius:10px;background:radial-gradient(circle at 50% 75%,rgba(80,200,200,.22),rgba(20,30,60,.75))}
+.pt-c h3{margin:0;font-size:1.02rem;overflow-wrap:anywhere}.pt-c .lore{color:var(--mu);font-size:.8rem;margin:0}
+.pt-c .btn{min-height:46px}.pt-why{color:var(--bad);font-size:.84rem;font-weight:600;margin:0}
+.pt-go{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.pt-go .badge{font-size:.74rem;font-weight:700;padding:2px 9px;border-radius:99px;border:1px solid var(--ac);color:var(--ac2)}
 </style></head><body>
 
 <main class="pg">
  <header><p class="kicker">Mini gioco di ruolo</p><h1>La guerra degli Eroi</h1>
- <p class="lead">Ogni duellante è un eroe con il suo nickname. Distribuisci i punti abilità, compra le abilità dal Mercante, sfida gli altri eroi in Arena (ogni duello consuma energia), abbatti il boss del giorno da solo o con la tua lobby e affronta i 100 dungeon (dal 26 a scelte, dal 56 con prove, serrature e orologio) e scala la Torre Infinita, da solo o in squadra.</p></header>
+ <p class="lead">Ogni duellante è un eroe con il suo nickname. Distribuisci i punti abilità, compra le abilità dal Mercante, sfida gli altri eroi in Arena (ogni duello consuma energia), abbatti il boss del giorno da solo o con la tua lobby e affronta i 100 dungeon (dal 26 a scelte, dal 56 con prove, serrature e orologio), scala la Torre Infinita, da solo o in squadra, e fatti seguire da un compagno dello Stagno che cresce con te.</p></header>
 
  <section class="card er-top" id="top" aria-live="polite"><p class="mute" style="margin:0" role="status">Caricamento dell’eroe…</p></section>
 
@@ -239,7 +268,7 @@ body.er-fab-on{padding-bottom:88px}
 
  <div id="main" hidden>
  <div class="er-sticky"><div id="bat"></div>
- <div class="tabs" role="tablist"><button role="tab" data-t="hero" aria-selected="true">Eroe</button><button role="tab" data-t="boss" aria-selected="false">Boss</button><button role="tab" data-t="dng" aria-selected="false">Dungeon</button><button role="tab" data-t="tower" aria-selected="false">Torre</button><button role="tab" data-t="arena" aria-selected="false">Arena</button><button role="tab" data-t="shop" aria-selected="false">Mercante</button><button role="tab" data-t="lb" aria-selected="false">Classifica</button></div></div>
+ <div class="tabs" role="tablist"><button role="tab" data-t="hero" aria-selected="true">Eroe</button><button role="tab" data-t="boss" aria-selected="false">Boss</button><button role="tab" data-t="dng" aria-selected="false">Dungeon</button><button role="tab" data-t="tower" aria-selected="false">Torre</button><button role="tab" data-t="arena" aria-selected="false">Arena</button><button role="tab" data-t="shop" aria-selected="false">Mercante</button><button role="tab" data-t="pond" aria-selected="false">Stagno</button><button role="tab" data-t="lb" aria-selected="false">Classifica</button></div></div>
  <div id="msg" role="status" aria-live="polite"></div>
  <section class="tp" id="p-hero"></section>
  <section class="tp" id="p-boss" hidden></section>
@@ -247,6 +276,7 @@ body.er-fab-on{padding-bottom:88px}
  <section class="tp" id="p-tower" hidden></section>
  <section class="tp" id="p-arena" hidden></section>
  <section class="tp" id="p-shop" hidden></section>
+ <section class="tp" id="p-pond" hidden></section>
  <section class="tp" id="p-lb" hidden></section>
  </div>
 </main>
@@ -256,6 +286,7 @@ body.er-fab-on{padding-bottom:88px}
 <script src="tempio.js?v=12"></script>
 <script src="tempio-notifiche.js?v=2"></script>
 <script src="eroi-torre.js?v=1"></script>
+<script src="eroi-pet.js?v=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 (function(){'use strict';
@@ -344,6 +375,7 @@ function paintTop(){
  $('top').innerHTML=`<div class="er-dash"><div class="er-eqcol" role="group" aria-label="Equipaggiamento indossato">${col}</div><div class="er-dmain">
   <div class="er-who"><div class="er-pic" aria-hidden="true">${face(m.user_id,m.nickname)}</div><div style="min-width:0"><h2>${esc(m.nickname)}</h2><div class="er-lv">Livello <b>${num(m.level)}</b> · Potenza <b>${num(pw(m.stats))}</b> · ${num(m.max_hp)} PV</div></div><div class="er-bc"><b>${BAL==null?'—':num(BAL)}</b><span>BC</span></div></div>
   <div><div class="er-xp" role="progressbar" aria-valuemin="0" aria-valuemax="${m.xp_need}" aria-valuenow="${m.xp}" aria-label="Esperienza"><i style="width:${pct}%"></i></div><div class="er-xpt"><span>${m.level>=CAP?'XP al massimo':`${num(m.xp)} / ${num(m.xp_need)} XP`}</span><span>${m.level>=CAP?'Livello massimo':`al livello ${num(m.level+1)}`}</span></div></div>
+  ${petStrip(m)}
   <div class="er-reset">Nuovo boss e nuove offerte del mercante tra <b data-cd>${cd()}</b></div>
   ${m.stats_set&&m.points_free>0?`<div class="er-reset">✨ Hai <b>${num(m.points_free)}</b> punti abilità da spendere: scheda <b>Eroe</b></div>`:''}</div></div>`}
 
@@ -653,6 +685,65 @@ function dngModal(res,no){
   <button class="btn block" style="margin-top:14px" data-close>Chiudi</button>`)}
 
 /* ---------- Mercante ---------- */
+/* ---------- Lo stagno (pet companion) ---------- */
+const PA=window.PetArt;
+let PD=null,petAvail=null;
+const PRAR=['base','comune','non_comune','non_comune','raro','raro','epico','leggendario','leggendario','mitico'];
+const PEFF={for:'Forza',des:'Destrezza',vig:'Vigore',spi:'Spirito',frt:'Fortezza'};
+const prc=t=>PRAR[Math.max(0,Math.min(9,Number(t)||0))];
+const pgrade=t=>Number(t)===0?'Compagno base':'Grado '+t;
+function petLabel(l,v){if(PEFF[l.effect])return `+${num(v)}% ${PEFF[l.effect]}`;if(l.effect==='xp')return `+${num(v)}% XP`;if(l.effect==='actions')return `+${num(v)} azione boss al giorno`;return `+${num(v*25)}% ricarica energia`}
+function petSprite(p,size,cls){return PA?PA.sprite(p.sprite,{tier:p.tier,size,alt:p.name,cls}):`<span style="font-size:${Math.round(size/2)}px" aria-hidden="true">🐸</span>`}
+function petTab(){const b=document.querySelector('.tabs [data-t="pond"]');if(b)b.hidden=petAvail===false}
+function petStrip(m){
+ if(petAvail===false||!('pet' in m))return '';
+ const p=m.pet;
+ if(!p)return `<button type="button" class="pt-strip empty" data-pond aria-label="Nessun compagno: scegline uno nello Stagno"><span class="pt-ph" aria-hidden="true">🥚</span><span class="pt-tx"><b>Nessun compagno</b><small>Scegli il tuo pet nello Stagno</small></span></button>`;
+ const pct=p.at_cap?100:Math.min(100,Math.round(100*p.xp/p.xp_need)),on=p.lines.filter(l=>l.value>0);
+ return `<button type="button" class="pt-strip r-${prc(p.tier)}" data-pond aria-label="Compagno ${esc(p.name)}, livello ${p.level}. Tocca per aprire lo Stagno"><span class="pt-ph">${petSprite(p,48)}</span><span class="pt-tx"><b>${esc(p.name)} <em>Lv. ${num(p.level)}</em></b><span class="er-xp sm" role="progressbar" aria-valuemin="0" aria-valuemax="${p.xp_need}" aria-valuenow="${p.at_cap?p.xp_need:p.xp}" aria-label="Esperienza del compagno"><i style="width:${pct}%"></i></span><small>${p.at_cap?'Compagno al massimo per ora':`${num(p.xp)} / ${num(p.xp_need)} XP`}</small>${on.length?`<span class="er-bn">${on.map(l=>`<span>${petLabel(l,l.value)}</span>`).join('')}</span>`:''}</span></button>`}
+async function loadPond(){
+ if(petAvail===false||!ST)return;
+ try{PD=await rpc('game_pet_state');petAvail=true}
+ catch(e){if(twMissing(e)){petAvail=false;petTab();paintTop();if(tab==='pond')renderPond();return}throw e}
+ petTab();if(tab==='pond'&&!document.querySelector('.er-ov'))renderPond()}
+function pLines(p){
+ return `<ul class="pt-ls">${p.lines.map(l=>{
+  if(p.owned&&l.value>0)return `<li><span>${petLabel(l,l.value)}</span><small>${l.value<l.max?`fino a ${petLabel(l,l.max)} al liv. ${PD.max_level}`:'al massimo'}</small></li>`;
+  if(p.owned)return `<li class="off"><span>🔒 ${petLabel(l,l.max)}</span><small>si sblocca al livello ${l.unlock}</small></li>`;
+  return `<li><span>fino a ${petLabel(l,l.max)}</span><small>${l.unlock>1?`dal livello ${l.unlock} del pet`:'subito'}</small></li>`}).join('')}</ul>`}
+function pXp(p){const cap=Math.min(PD.max_level,PD.hero_level),atcap=p.level>=cap,pct=atcap?100:Math.min(100,Math.round(100*p.xp/p.xp_need));
+ return `<div class="er-xp" role="progressbar" aria-valuemin="0" aria-valuemax="${p.xp_need}" aria-valuenow="${atcap?p.xp_need:p.xp}" aria-label="Esperienza del compagno"><i style="width:${pct}%"></i></div><div class="er-xpt"><span>${atcap?'XP ferma al tetto':`${num(p.xp)} / ${num(p.xp_need)} XP`}</span><span>${atcap?(p.level>=PD.max_level?'Livello massimo':`tetto: livello dell’eroe (${num(PD.hero_level)})`):`al livello ${num(p.level+1)}`}</span></div>`}
+function pChoose(p){const id='pc:'+p.id,ask=pending===id;
+ return `<div class="pt-c r-${prc(p.tier)}"><div class="pt-sp">${petSprite(p,112)}</div><div><div class="er-rar">${esc(p.family)} · ${pgrade(p.tier)}</div><h3>${esc(p.name)}</h3></div><p class="lore">${esc(p.lore||'')}</p>${pLines(p)}
+  <button class="btn ${ask?'gold':''}" data-pchoose="${esc(p.id)}">${ask?`Conferma: ${esc(p.name)} sarà il tuo compagno`:'Scegli questo compagno'}</button></div>`}
+function pOwned(p){const act=p.active;
+ return `<div class="pt-c r-${prc(p.tier)} ${act?'act':''}"><div class="pt-sp">${petSprite(p,96)}</div><div><div class="er-rar">${esc(p.family)} · ${pgrade(p.tier)}</div><h3>${esc(p.name)} <small class="mute">Lv. ${num(p.level)}</small></h3></div>${pLines(p)}
+  <div class="pt-go">${act?'<span class="badge">Compagno attivo</span>':`<button class="btn" data-pact="${esc(p.id)}">Rendilo il tuo compagno</button>`}</div></div>`}
+function pShop(p){const id='pb:'+p.id,ask=pending===id,bal=BAL==null?0:BAL;let why='';
+ if(PD.hero_level<p.min_level)why=`Ti serve un eroe di livello ${num(p.min_level)} (ora ${num(PD.hero_level)}).`;else if(bal<p.price)why=`Ti mancano ${num(p.price-bal)} BC.`;
+ return `<div class="pt-c r-${prc(p.tier)}"><div class="pt-sp">${petSprite(p,96)}</div><div><div class="er-rar">${esc(p.family)} · ${pgrade(p.tier)}</div><h3>${esc(p.name)}</h3></div><p class="lore">${esc(p.lore||'')}</p>${pLines(p)}
+  <div class="er-pr"><b>${num(p.price)} BC</b><span class="mute">· eroe Lv. ${num(p.min_level)}+</span></div>
+  <button class="btn ${ask?'gold':''}" data-pbuy="${esc(p.id)}" ${why?'disabled':''}>${ask?`Conferma l’acquisto (${num(p.price)} BC)`:'Compra'}</button>${why?`<p class="pt-why">${why}</p>`:''}</div>`}
+function renderPond(){
+ const el=$('p-pond');
+ if(petAvail===false){el.innerHTML=`<h2 class="er-h">Lo stagno</h2><p class="er-msg">Lo Stagno non è ancora attivo: nel database va eseguita la migrazione <b>black-market-eroi-stagno.sql</b>.</p>`;return}
+ if(!PD){el.innerHTML='<p class="mute">Caricamento…</p>';return}
+ const P=PD.pets,how=fold('pt_how','📖','Come funziona lo Stagno','Regole in breve',null,`<ul class="er-how"><li>Scegli <b>uno dei tre compagni base</b> (gratis, una volta sola): da quel momento ti segue ovunque.</li><li>Il compagno attivo dà <b>bonus alle tue statistiche</b> in ogni combattimento: duelli, boss, dungeon e Torre.</li><li>Guadagna il <b>${PD.xp_pct}% dell’XP</b> che ottieni tu e sale di livello (fino al livello ${PD.max_level}, mai oltre il tuo eroe). Più sale, più i bonus <b>diventano forti e numerosi</b>: se ne sbloccano di nuovi ai livelli 10, 25, 45 e 70.</li><li>Gli altri <b>27 compagni</b> si comprano con i BC, in 9 gradi: più alto è il grado, più costano e più sono forti e belli. Si compra solo dopo aver scelto il compagno base.</li><li>Puoi cambiare compagno quando vuoi: ognuno <b>conserva il suo livello</b>, ma solo quello attivo guadagna esperienza.</li></ul>`);
+ if(!PD.chosen){
+  el.innerHTML=`<div class="pt-pond"><h2 class="er-h" style="position:relative">Lo stagno</h2><p class="er-sub" style="position:relative">Un compagno ti aspetta tra le ninfee. Scegli quello che ti segue: uno solo tra i tre, e ti accompagnerà in ogni battaglia crescendo con te (guadagna il ${PD.xp_pct}% della tua XP).</p></div>
+  <h2 class="er-h">Scegli il tuo compagno</h2><div class="pt-grid">${P.filter(p=>p.starter).map(pChoose).join('')}</div>
+  <h2 class="er-h">Gli altri compagni</h2><p class="er-sub">Dopo la scelta potrai comprare i 27 compagni dei gradi superiori con i BC. Eccoli in anteprima.</p>
+  <div class="pt-grid">${P.filter(p=>!p.starter&&p.tier<=1).map(p=>`<div class="pt-c r-${prc(p.tier)}"><div class="pt-sp">${petSprite(p,80)}</div><div><div class="er-rar">${pgrade(p.tier)}</div><h3>${esc(p.name)}</h3></div><div class="er-pr"><b>${num(p.price)} BC</b></div></div>`).join('')}</div>
+  <p class="er-note">… e altri 24 compagni fino al grado 9.</p>${how}`;return}
+ const a=P.find(x=>x.active),own=P.filter(x=>x.owned),shop=P.filter(x=>!x.starter&&!x.owned);
+ let g0=1;for(let t=1;t<=9;t++){if(P.some(x=>x.tier===t&&!x.owned)){g0=t;break}}
+ if(!FOLD._pt){FOLD._pt=1;FOLD['pt_g'+g0]=true}
+ const groups=[];for(let t=1;t<=9;t++){const L=shop.filter(x=>x.tier===t);if(L.length)groups.push(fold('pt_g'+t,'🐾',`Grado ${t}`,`Eroe Lv. ${num(L[0].min_level)}+ · ${num(L[0].price)} BC l’uno`,L.length,`<div class="pt-grid">${L.map(pShop).join('')}</div>`))}
+ el.innerHTML=`<div class="pt-pond r-${prc(a.tier)}"><div class="pt-hero"><div class="pt-big">${petSprite(a,128)}</div><div><div class="er-rar">Il tuo compagno · ${esc(a.family)} · ${pgrade(a.tier)}</div><h2>${esc(a.name)} <em>Lv. ${num(a.level)}</em></h2>${pXp(a)}<p class="er-note" style="margin-top:6px">Guadagna il ${PD.xp_pct}% della tua esperienza.</p>${pLines(a)}</div></div></div>
+ <h2 class="er-h">I tuoi compagni <small class="mute">(${own.length} su 30)</small></h2><div class="pt-grid">${own.map(pOwned).join('')}</div>
+ <h2 class="er-h">In vendita</h2>${groups.length?`<p class="er-sub">Il tuo saldo: <b>${BAL==null?'—':num(BAL)} BC</b></p>${groups.join('')}`:'<p class="mute">Hai tutti i compagni dello Stagno: complimenti!</p>'}${how}`}
+async function pondDone(msg){say(msg,'good');await load(true);await loadPond()}
+
 /* ---------- Torre Infinita ---------- */
 const ART=window.TorreArt;
 let TW=null,twAvail=null,lastTwCan=true;
@@ -832,15 +923,15 @@ async function sendChat(){if(CH.sending)return;const inp=$('chIn'),btn=$('chSend
 /* ---------- navigazione e caricamento ---------- */
 function paint(){
  paintTop();paintBat();
- if(tab==='hero')renderHero();else if(tab==='boss')renderBoss();else if(tab==='dng')renderDng();else if(tab==='tower')renderTower();else if(tab==='arena')renderArena();else if(tab==='shop')renderShop();else renderLb();
+ if(tab==='hero')renderHero();else if(tab==='boss')renderBoss();else if(tab==='dng')renderDng();else if(tab==='tower')renderTower();else if(tab==='arena')renderArena();else if(tab==='shop')renderShop();else if(tab==='pond')renderPond();else renderLb();
 }
 function setTab(t,push){
  tab=t;document.querySelectorAll('.tabs [data-t]').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));const cb=document.querySelector('.tabs [data-t="'+t+'"]');if(cb&&cb.scrollIntoView)try{cb.scrollIntoView({inline:'nearest',block:'nearest'})}catch(_){}
- ['hero','boss','dng','tower','arena','shop','lb'].forEach(x=>$('p-'+x).hidden=x!==t);
+ ['hero','boss','dng','tower','arena','shop','pond','lb'].forEach(x=>$('p-'+x).hidden=x!==t);
  if(push!==false)history.replaceState(null,'','#'+t);
  clearSay();pending=null;
  if(!ST)return;paint();
- if(t==='arena')loadArena();if(t==='lb')loadLb();if(t==='dng')loadDng(true);if(t==='tower')loadTower(true).catch(e=>say(errTxt(e),'bad'))}
+ if(t==='arena')loadArena();if(t==='lb')loadLb();if(t==='dng')loadDng(true);if(t==='tower')loadTower(true).catch(e=>say(errTxt(e),'bad'));if(t==='pond')loadPond().catch(e=>say(errTxt(e),'bad'))}
 async function load(keepDraft){
  ST=await rpc('game_state');ME=ST.me;last=Date.now();
  if(ISADM===null){try{ISADM=(await rpc('is_admin'))===true}catch(_){ISADM=false}}      // la voce admin si vede solo a chi è davvero amministratore (il database lo ricontrolla comunque)
@@ -862,8 +953,8 @@ async function boot(){
   const first=!ST;
   await load(false);
   beat();
-  loadTower().catch(()=>{});
-  if(first){const h=(location.hash||'').slice(1);setTab(['hero','boss','dng','tower','arena','shop','lb'].includes(h)?h:(ME.stats_set?'boss':'hero'),false)}
+  loadTower().catch(()=>{});loadPond().catch(()=>{});
+  if(first){const h=(location.hash||'').slice(1);setTab(['hero','boss','dng','tower','arena','shop','pond','lb'].includes(h)?h:(ME.stats_set?'boss':'hero'),false)}
  }catch(e){
   if(/Modulo non attivo/i.test(String(e.message)))gateOff();
   else gate(`<section class="card er-gate" style="margin-top:20px"><h2>Errore di collegamento</h2><p class="mute">${errTxt(e)}</p><button class="btn ghost" id="retry">Riprova</button></section>`)}}
@@ -879,6 +970,14 @@ document.addEventListener('click',e=>{
  if(t.dataset.chhide){const id=Number(t.dataset.chhide);
   if(CH.hp!==id){CH.hp=id;paintChat(true);setTimeout(()=>{if(CH.hp===id){CH.hp=null;paintChat(true)}},5000);return}
   CH.hp=null;run(t,async()=>{await rpc('game_chat_hide',{p_id:id,p_reason:'Messaggio nascosto dalla moderazione'});CH.msgs=CH.msgs.filter(x=>x.id!==id);paintChat(true);say('Messaggio nascosto.','good')});return}
+ if(t.dataset.pond!=null){setTab('pond');window.scrollTo({top:0,behavior:'smooth'});return}
+ if(t.dataset.pchoose){const id='pc:'+t.dataset.pchoose;
+  if(pending!==id){pending=id;renderPond();setTimeout(()=>{if(pending===id){pending=null;if(tab==='pond')renderPond()}},5000);return}
+  pending=null;run(t,async()=>{const r=await rpc('game_pet_choose',{p_pet:t.dataset.pchoose});await pondDone(`<b>${esc(r.pet)}</b> è il tuo compagno: ti seguirà da ora in poi!`)});return}
+ if(t.dataset.pbuy){const id='pb:'+t.dataset.pbuy;
+  if(pending!==id){pending=id;renderPond();setTimeout(()=>{if(pending===id){pending=null;if(tab==='pond')renderPond()}},5000);return}
+  pending=null;run(t,async()=>{const r=await rpc('game_pet_buy',{p_pet:t.dataset.pbuy});BAL=r.balance;await pondDone(`Hai preso <b>${esc(r.pet)}</b> per ${num(r.price)} BC. Rendilo il tuo compagno quando vuoi.`)});return}
+ if(t.dataset.pact){run(t,async()=>{const r=await rpc('game_pet_activate',{p_pet:t.dataset.pact});await pondDone(`<b>${esc(r.pet)}</b> ora ti segue.`)});return}
  if(t.dataset.fold){toggleFold(t);return}
  if(t.dataset.slot){slotSheet(t.dataset.slot);return}
  if(t.dataset.hero){heroSheet(t.dataset.hero);return}

@@ -607,5 +607,33 @@ Poi si ricaricano `eroi.html`, `index.html` e `sw.js` (cache `tempio-v57`). Si p
 - **Provato** (PostgreSQL 16 locale con Supabase simulato e Chromium simulato; **non su un Supabase vero né su telefoni veri**): test con 8 scenari (catalogo, ordine di acquisto, livelli richiesti, prezzi e bonus esatti sul registro e sulle statistiche reali, saldo insufficiente, doppio acquisto, tutte e 5 le scale, catalogo in sola lettura), 7 mutazioni dei dati scoperte su 7, riapplicazione, annullamento e riapplicazione, e controllo grafico del Mercante a 390 e 1280 px. Il vecchio test della migrazione «v2» conta 20 abilità permanenti e dopo questa migrazione fallisce su quel solo controllo: è atteso.
 - **Da sapere**: il bilanciamento dei gradi alti non è misurabile nei miei test (non so quanti BC guadagnano davvero i tuoi giocatori ai livelli alti): +109% è molto, e va rivisto giocando; si regola con i prezzi.
 
+## La guerra degli Eroi: Lo stagno, i pet companion (migrazione 031, 30 ottobre 2026)
+**Una scheda nuova «Stagno»** in La guerra degli Eroi, e il compagno dell'eroe sul **cruscotto**. Si esegue **una volta sola** `black-market-eroi-stagno.sql` nell'SQL Editor di Supabase (dopo le migrazioni della guerra degli Eroi, anche dopo dungeon e Torre), poi si ricaricano `eroi.html`, `eroi-pet.js` e `sw.js` (cache `tempio-v60`). Si può rieseguire senza danni (pet e livelli posseduti restano). Senza la migrazione la scheda si nasconde da sola e il cruscotto resta com'era.
+- **30 compagni in pixel art**, disegnati dal codice (`eroi-pet.js`, nessuna immagine da caricare): creature originali ispirate ai tipi di mostro di Yu-Gi-Oh! e al fantasy (rane, draghi, spettri, fenici, sfingi, golem…), nessun personaggio esistente. Più alto è il grado, più il disegno è ricco (scintille e aure).
+- **Scelta iniziale**: dentro lo Stagno si sceglie **1 dei 3 compagni base** (Ranocchio Scintilla – Assalto, Tartaruga Muschio – Baluardo, Libellula Lucente – Saggezza). Gratis, una volta sola, con conferma. Da quel momento ti segue.
+- **Gli altri 27** si comprano con i BC, in **9 gradi da 3 compagni** (uno per stile). Più è alto il grado, più costano, più sono forti (bonus più alti **e più numerosi**: 3, 4 o 5) e più sono belli:
+
+  | Grado | Prezzo | Livello eroe |
+  |---|---|---|
+  | 1 | 1.500 BC | 5 |
+  | 2 | 4.000 BC | 15 |
+  | 3 | 9.000 BC | 30 |
+  | 4 | 20.000 BC | 50 |
+  | 5 | 45.000 BC | 80 |
+  | 6 | 90.000 BC | 120 |
+  | 7 | 180.000 BC | 180 |
+  | 8 | 350.000 BC | 260 |
+  | 9 | 700.000 BC | 380 |
+
+- **Bonus**: percentuali su Forza, Destrezza, Vigore, Spirito, Fortezza e **XP**; i gradi alti aggiungono anche +25% di ricarica dell'energia (1–2 volte) o +1 azione boss al giorno. Valgono per il compagno **attivo**, in ogni combattimento (duelli, boss, dungeon, Torre), perché entrano nelle statistiche dell'eroe insieme a oggetti e abilità.
+- **Crescita del compagno**: guadagna il **20% dell'XP** che prende l'eroe (impostazione `game_pet_xp_pct`), ovunque la prenda; la curva è quella dell'eroe. Non supera il **livello 100** (`game_pet_max_level`) né il livello dell'eroe. Salendo, ogni bonus **cresce** (parte da un quarto del valore massimo e arriva al massimo al livello 100) e se ne **sbloccano di nuovi** ai livelli 1, 10, 25, 45 e 70.
+- **Cambiare compagno**: quando vuoi, dallo Stagno. Ogni compagno conserva il suo livello, ma solo quello attivo guadagna XP. Il pet comprato non si attiva da solo.
+- **Cruscotto**: nome, livello, barra dell'esperienza e bonus attivi del compagno; un tocco apre lo Stagno. Senza compagno compare l'invito a sceglierlo.
+- **Registro BC**: nuovo tipo di movimento `game_pet`. Le tabelle dei pet sono chiuse al browser; tutto passa da 4 funzioni (`game_pet_state`, `_choose`, `_buy`, `_activate`).
+- **Sostituisce tre funzioni interne** (`_game_calc`, `_game_hero_json`, `_game_add_xp`) con le stesse di prima più la parte pet.
+- **Annullamento**: `black-market-eroi-stagno-down.sql` **rimborsa** i BC dei pet comprati (movimento `admin_adjustment`), rimette le tre funzioni com'erano e toglie tabelle e impostazioni; i pet scelti e i loro livelli si perdono.
+- **Provato** (PostgreSQL 16 locale con Supabase simulato e Chromium simulato; **non su un Supabase vero né su telefoni veri**): `black-market-eroi-stagno-test.sql` con 8 scenari (catalogo, permessi, scelta, bonus e sblocchi, XP al pet con tetti, acquisto/registro/attivazione, duello e Torre, modulo spento); 17 mutazioni del codice tutte scoperte dal test; rieseguire, annullare e riapplicare (anche ricomprare dopo l'annullamento); guardia su database vuoto; 45 controlli nel browser a 390 e 1280 px (scelta con conferma, acquisto, attivazione, XP dopo un duello, nessuno scroll orizzontale, migrazione assente).
+- **Da sapere**: prezzi e bonus sono scelti a occhio e **non misurabili** nei miei test (non so quanti BC e XP fanno davvero i tuoi giocatori): i gradi alti, con tanti bonus al 100, pesano molto e vanno rivisti giocando. Si regolano dal database (prezzi in `game_pets`, valori in `game_pet_lines`, XP con `game_pet_xp_pct`). Il pet parte dal livello 1 anche per chi ha un eroe già alto: all'inizio rende poco, poi cresce (con il 20% dell'XP serve tempo). Il pet non mostra l'XP guadagnata in un singolo combattimento: la barra sul cruscotto si aggiorna.
+
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.
