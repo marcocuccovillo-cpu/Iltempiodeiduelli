@@ -589,5 +589,23 @@ Poi si ricaricano `eroi.html`, `index.html` e `sw.js` (cache `tempio-v57`). Si p
 - **Provato** (PostgreSQL 16 locale con Supabase simulato, Chromium simulato; **non su Supabase vero né su telefoni veri**): test SQL con 11 scenari (crescita dei nemici, stima contro 120 simulazioni per caso, premi una volta sola, reliquie, energia, classifica, accessi, difficoltà), riapplicazione/rimozione, e controlli nel browser (scena, anteprime, combattimento, boss con reliquia e prima conquista, sconfitta, energia finita; schermo da 390 e 1280 px).
 - **Da sapere**: l'equilibrio è calibrato su costruzioni simulate; dove si trova il «muro» e quanti BC si guadagnano per energia va verificato giocando (all'incirca come i dungeon, ma senza limite di piani): si regola con le 4 impostazioni. La probabilità mostrata è una stima.
 
+## La guerra degli Eroi: abilità permanenti, gradi dal 5° all'8° (migrazione 030, 30 ottobre 2026)
+**Una migrazione sola**, `black-market-eroi-abilita-gradi.sql`, da eseguire una volta nell'SQL Editor di Supabase (dopo le migrazioni della guerra degli Eroi; la Torre non serve). Poi si ricaricano `eroi.html` e `sw.js` (cache `tempio-v59`). Si può rieseguire senza danni.
+- **20 abilità nuove** (4 gradi in più per ognuna delle 5 statistiche, in totale 40 abilità permanenti), vendute dal Mercante come le altre: si comprano **in ordine** (prima il grado precedente), una volta sola, per sempre, solo con BC (che escono dal gioco).
+
+  | grado | bonus | prezzo | livello richiesto |
+  |---|---|---|---|
+  | 5 | +15% | 25.000 BC | 100 |
+  | 6 | +18% | 60.000 BC | 170 |
+  | 7 | +22% | 150.000 BC | 260 |
+  | 8 | +26% | 400.000 BC | 400 |
+
+  Con tutti gli 8 gradi una statistica ha **+109%** (i primi 4 danno +28%). Per ogni statistica la scala completa costa 649.150 BC. Nomi: Braccio del Colosso, Ira del Vulcano, Colpo Leggendario, Forza Divina (Forza); Passo d'Ombra, Lama del Vento, Maestro del Tempo, Sguardo del Fato (Destrezza); Cuore di Pietra, Tempra Immortale, Vita Inesauribile, Corpo Indistruttibile (Vigore); Fiamma Interiore, Mente Illuminata, Spirito Antico, Coscienza Cosmica (Spirito); Muro di Volontà, Egida Interiore, Cittadella dell'Anima, Fortezza Inviolabile (Fortezza).
+- Nessuna funzione o tabella cambia: la pagina e il database leggono già il catalogo così com'è. In `eroi.html` cambia solo il testo del Mercante («dal primo all'ottavo grado»).
+- **Prezzi e livelli**: si possono cambiare in qualunque momento dal database, per esempio `update public.game_skills set price_bc = 300000 where id = 'sk_for_8';` (vale anche per chi non ha ancora comprato; chi ha già comprato non paga né riceve differenze).
+- **Annullamento**: `black-market-eroi-abilita-gradi-down.sql` toglie i 20 gradi dal catalogo, ma **si ferma senza toccare nulla** se qualcuno ne ha già comprato uno (i BC spesi non tornano da soli e gli acquisti non si cancellano).
+- **Provato** (PostgreSQL 16 locale con Supabase simulato e Chromium simulato; **non su un Supabase vero né su telefoni veri**): test con 8 scenari (catalogo, ordine di acquisto, livelli richiesti, prezzi e bonus esatti sul registro e sulle statistiche reali, saldo insufficiente, doppio acquisto, tutte e 5 le scale, catalogo in sola lettura), 7 mutazioni dei dati scoperte su 7, riapplicazione, annullamento e riapplicazione, e controllo grafico del Mercante a 390 e 1280 px. Il vecchio test della migrazione «v2» conta 20 abilità permanenti e dopo questa migrazione fallisce su quel solo controllo: è atteso.
+- **Da sapere**: il bilanciamento dei gradi alti non è misurabile nei miei test (non so quanti BC guadagnano davvero i tuoi giocatori ai livelli alti): +109% è molto, e va rivisto giocando; si regola con i prezzi.
+
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.
