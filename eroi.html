@@ -234,6 +234,14 @@ body.er-fab-on{padding-bottom:88px}
 .pt-tx{display:grid;gap:3px;min-width:0}.pt-tx b{font-size:.95rem;overflow-wrap:anywhere}.pt-tx b em{font-style:normal;color:var(--ac2);font-family:var(--disp);margin-left:4px;white-space:nowrap}.pt-tx small{color:var(--mu);font-size:.76rem}
 .pt-tx .er-bn{margin-top:2px}
 .er-xp.sm{height:7px}
+.tr-strip{display:flex;align-items:center;gap:10px;width:100%;margin-top:8px;padding:9px 11px;border:1px solid var(--line);border-left:3px solid var(--good);border-radius:12px;background:var(--inp);color:var(--tx);font:inherit;text-align:left;cursor:pointer;min-height:44px;overflow-wrap:anywhere}
+.tr-strip small{display:block;color:var(--mu)}.tr-strip .ic{font-size:1.4rem;flex:none}
+.tr-act{border:1px solid var(--good);border-radius:16px;padding:14px;background:rgba(74,222,155,.07);margin:14px 0}.tr-act h3{margin:0 0 6px;font:600 1.15rem var(--disp)}
+.tr-act .er-xp{margin:10px 0 6px}.tr-big{font:700 1.4rem var(--disp);color:var(--gold);font-variant-numeric:tabular-nums}
+.tr-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}.tr-row:first-of-type{border-top:0}
+.tr-row b{display:block}.tr-row small{color:var(--mu)}.tr-lv{display:flex;gap:3px;margin-top:5px}.tr-lv i{width:100%;max-width:22px;height:7px;border-radius:3px;background:var(--inp);border:1px solid var(--line)}.tr-lv i.on{background:var(--good);border-color:var(--good)}
+.tr-sp{display:grid;gap:4px;margin:8px 0}.tr-sp div{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tr-two{display:grid;grid-template-columns:1fr;gap:14px}@media(min-width:760px){.tr-two{grid-template-columns:1fr 1fr}}
 .pt-pond{position:relative;border:1px solid var(--line);border-radius:16px;padding:16px;overflow:hidden;background:linear-gradient(180deg,rgba(30,60,90,.55),rgba(14,28,52,.92)),var(--surf)}
 .pt-pond::before{content:"";position:absolute;inset:auto -10% -30px -10%;height:90px;background:radial-gradient(ellipse at 20% 50%,rgba(120,220,220,.18),transparent 60%),radial-gradient(ellipse at 75% 60%,rgba(120,220,220,.14),transparent 55%);pointer-events:none}
 .pt-hero{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;position:relative}
@@ -268,13 +276,14 @@ body.er-fab-on{padding-bottom:88px}
 
  <div id="main" hidden>
  <div class="er-sticky"><div id="bat"></div>
- <div class="tabs" role="tablist"><button role="tab" data-t="hero" aria-selected="true">Eroe</button><button role="tab" data-t="boss" aria-selected="false">Boss</button><button role="tab" data-t="dng" aria-selected="false">Dungeon</button><button role="tab" data-t="tower" aria-selected="false">Torre</button><button role="tab" data-t="arena" aria-selected="false">Arena</button><button role="tab" data-t="shop" aria-selected="false">Mercante</button><button role="tab" data-t="pond" aria-selected="false">Stagno</button><button role="tab" data-t="lb" aria-selected="false">Classifica</button></div></div>
+ <div class="tabs" role="tablist"><button role="tab" data-t="hero" aria-selected="true">Eroe</button><button role="tab" data-t="boss" aria-selected="false">Boss</button><button role="tab" data-t="dng" aria-selected="false">Dungeon</button><button role="tab" data-t="tower" aria-selected="false">Torre</button><button role="tab" data-t="arena" aria-selected="false">Arena</button><button role="tab" data-t="train" aria-selected="false">Allenamento</button><button role="tab" data-t="shop" aria-selected="false">Mercante</button><button role="tab" data-t="pond" aria-selected="false">Stagno</button><button role="tab" data-t="lb" aria-selected="false">Classifica</button></div></div>
  <div id="msg" role="status" aria-live="polite"></div>
  <section class="tp" id="p-hero"></section>
  <section class="tp" id="p-boss" hidden></section>
  <section class="tp" id="p-dng" hidden></section>
  <section class="tp" id="p-tower" hidden></section>
  <section class="tp" id="p-arena" hidden></section>
+ <section class="tp" id="p-train" hidden></section>
  <section class="tp" id="p-shop" hidden></section>
  <section class="tp" id="p-pond" hidden></section>
  <section class="tp" id="p-lb" hidden></section>
@@ -375,7 +384,7 @@ function paintTop(){
  $('top').innerHTML=`<div class="er-dash"><div class="er-eqcol" role="group" aria-label="Equipaggiamento indossato">${col}</div><div class="er-dmain">
   <div class="er-who"><div class="er-pic" aria-hidden="true">${face(m.user_id,m.nickname)}</div><div style="min-width:0"><h2>${esc(m.nickname)}</h2><div class="er-lv">Livello <b>${num(m.level)}</b> · Potenza <b>${num(pw(m.stats))}</b> · ${num(m.max_hp)} PV</div></div><div class="er-bc"><b>${BAL==null?'—':num(BAL)}</b><span>BC</span></div></div>
   <div><div class="er-xp" role="progressbar" aria-valuemin="0" aria-valuemax="${m.xp_need}" aria-valuenow="${m.xp}" aria-label="Esperienza"><i style="width:${pct}%"></i></div><div class="er-xpt"><span>${m.level>=CAP?'XP al massimo':`${num(m.xp)} / ${num(m.xp_need)} XP`}</span><span>${m.level>=CAP?'Livello massimo':`al livello ${num(m.level+1)}`}</span></div></div>
-  ${petStrip(m)}
+  ${petStrip(m)}${trStrip(m)}
   <div class="er-reset">Nuovo boss e nuove offerte del mercante tra <b data-cd>${cd()}</b></div>
   ${m.stats_set&&m.points_free>0?`<div class="er-reset">✨ Hai <b>${num(m.points_free)}</b> punti abilità da spendere: scheda <b>Eroe</b></div>`:''}</div></div>`}
 
@@ -411,7 +420,7 @@ function renderHero(){
   ${avOpen?`<div class="er-avsrch"><input id="avQ" type="search" placeholder="Nome della carta (es. Dark Magician)" value="${esc(avQ)}" maxlength="60" aria-label="Nome della carta" autocomplete="off"><button class="btn" id="avGo" ${avBusy?'disabled':''}>Cerca</button></div>
    ${!avRes?'':avRes.wait?'<p class="mute" style="margin:10px 0 0">Ricerca in corso…</p>':avRes.err?`<p class="warn">${esc(avRes.err)}</p>`:avRes.list.length?`<div class="er-avgrid">${avRes.list.map(c=>`<button data-avpick="${c.id}" data-avname="${esc(c.name)}" aria-label="Usa ${esc(c.name)}"><img src="${CROP}${c.id}.jpg" alt="" loading="lazy" referrerpolicy="no-referrer"><span>${esc(c.name)}</span></button>`).join('')}</div>`:'<p class="mute" style="margin:10px 0 0">Nessuna carta trovata.</p>'}
    <p class="er-note">Le immagini arrivano dall’archivio di YGOPRODeck. L’avatar è sempre una carta: non si possono caricare foto.</p>`:''}</div>`:''}
- <h2 class="er-h">Punti abilità</h2><p class="er-sub">Hai <b>${num(m.points)}</b> punti in tutto: ${S.points} all’inizio più ${S.points_per_level} a ogni livello (massimo ${num(cap)} su una statistica per ora). Le statistiche valgono <b>5 + punti × livello</b>, più i bonus di oggetti e abilità.</p>
+ <h2 class="er-h">Punti abilità</h2><p class="er-sub">Hai <b>${num(m.points)}</b> punti in tutto: ${S.points} all’inizio più ${S.points_per_level} a ogni livello${m.train_points>0?` più <b>${num(m.train_points)}</b> guadagnat${m.train_points===1?'o':'i'} con l’allenamento amichevole`:''} (massimo ${num(cap)} su una statistica per ora). Le statistiche valgono <b>5 + punti × livello</b>, più i bonus di oggetti e abilità.</p>
  <div class="card"><div class="er-left"><span>Punti da assegnare</span><b>${num(left)}</b></div>${rows}
   <p class="er-note">PV con questa distribuzione: <b>${num(hpD)}</b>.${pays?` <span style="color:var(--warn)">Togliere punti già assegnati costa <b>${S.respec_cost} BC</b>.</span>`:m.stats_set&&m.fights_total>0&&S.respec_cost>0?` Aggiungere punti nuovi è sempre gratis; togliere punti già assegnati, una volta combattuto, costa ${S.respec_cost} BC.`:' Finché non combatti puoi cambiare idea gratis.'}</p>
   <div class="row" style="margin-top:12px"><button class="btn" id="stSave" ${(!changed&&m.stats_set)||left<0||(!m.stats_set&&used===0)?'disabled':''}>${pays?`Salva (${S.respec_cost} BC)`:'Salva i punti'}</button><button class="btn ghost" id="stReset" ${changed?'':'disabled'}>Annulla</button></div></div>
@@ -515,7 +524,7 @@ function renderArena(){
 }
 function duelModal(r){
  const me=ST.me,op=r.opponent,L=r.log||[];let i=0;
- const o=modal(`<h2>${r.won?'Vittoria!':'Sconfitta'}</h2>
+ const o=modal(`<h2>${r.friendly?(r.won?'Amichevole: vittoria':'Amichevole: sconfitta'):(r.won?'Vittoria!':'Sconfitta')}</h2>
   <div class="er-duel"><div><b>${esc(me.nickname)}</b><small>Liv. ${num(me.level)}</small><div class="er-hp me sm" style="margin-top:6px"><i id="dA" style="width:100%"></i><span id="dAt">${num(r.max_a)}</span></div></div>
   <div><b>${esc(op)}</b><small>Liv. ${num(r.opponent_level)}</small><div class="er-hp sm" style="margin-top:6px"><i id="dB" style="width:100%"></i><span id="dBt">${num(r.max_b)}</span></div></div></div>
   <ul class="er-dl" id="dLog" aria-live="off"></ul><div id="dRes"></div>
@@ -524,7 +533,7 @@ function duelModal(r){
  const upd=(ha,hb)=>{A.style.width=(100*ha/r.max_a)+'%';B.style.width=(100*hb/r.max_b)+'%';At.textContent=num(ha)+' / '+num(r.max_a);Bt.textContent=num(hb)+' / '+num(r.max_b)};
  const step=s=>{const w=s.w==='a'?esc(me.nickname):esc(op);G.insertAdjacentHTML('beforeend',`<li><b>${w}</b> ${s.x?'attacca ma viene schivato':`infligge ${num(s.d)} danni${s.c?' (critico!)':''}`}</li>`);G.scrollTop=G.scrollHeight;upd(s.ha,s.hb)};
  const fin=()=>{if(o._t){clearInterval(o._t);o._t=null}G.innerHTML=L.map(s=>`<li><b>${s.w==='a'?esc(me.nickname):esc(op)}</b> ${s.x?'attacca ma viene schivato':`infligge ${num(s.d)} danni${s.c?' (critico!)':''}`}</li>`).join('');upd(r.hp_a,r.hp_b);
-  o.querySelector('#dRes').innerHTML=`<p class="er-big ${r.won?'w':'l'}">${r.won?`+${num(r.xp)} XP`:'Nessun XP'}</p><p class="mute" style="text-align:center;margin:0">${r.won?(r.levels>0?`Sei salito al livello <b>${num(r.level)}</b>! `:'Solo XP: nessun BC in palio in Arena. ')+(r.energy_full?'Energia ricaricata al <b>100%</b>!':`Energia −${r.energy_cost}.`):`Hai perso: energia −${r.energy_cost}. Riprova con un altro avversario quando la batteria si è ricaricata.`}</p>`;o.querySelector('#dSkip').hidden=true};
+  o.querySelector('#dRes').innerHTML=r.friendly?`<p class="er-big ${r.won?'w':'l'}">${r.won?(r.counted?'Vittoria valida':'Vittoria'):'Sconfitta'}</p><p class="mute" style="text-align:center;margin:0">${r.won?(r.counted?`Conta per i punti abilità: ${num(r.spar_wins)} vittorie, ne mancano <b>${num(r.to_next)}</b> al prossimo punto.${r.point_gained?' <b>Hai guadagnato 1 punto abilità!</b>':''}`:(r.reason==='pair'?'Questa vittoria non conta: oggi hai già ottenuto il massimo contro questo avversario.':'Questa vittoria non conta: oggi hai raggiunto il limite di vittorie valide.')):'Nessun problema: è solo allenamento.'} Nessuna energia, XP o BC in gioco.</p>`:`<p class="er-big ${r.won?'w':'l'}">${r.won?`+${num(r.xp)} XP`:'Nessun XP'}</p><p class="mute" style="text-align:center;margin:0">${r.won?(r.levels>0?`Sei salito al livello <b>${num(r.level)}</b>! `:'Solo XP: nessun BC in palio in Arena. ')+(r.energy_full?'Energia ricaricata al <b>100%</b>!':`Energia −${r.energy_cost}.`):`Hai perso: energia −${r.energy_cost}. Riprova con un altro avversario quando la batteria si è ricaricata.`}</p>`;o.querySelector('#dSkip').hidden=true};
  o.querySelector('#dSkip').onclick=fin;
  if(matchMedia('(prefers-reduced-motion: reduce)').matches||!L.length){fin()}
  else{o._t=setInterval(()=>{if(i>=L.length){fin();return}step(L[i++])},420)}}
@@ -615,7 +624,7 @@ function renderDng(){
  const me=my?my.members.find(x=>x.user_id===m.user_id):null,cur=me?me.role:dngRole;
  const others=my?my.members.filter(x=>x.user_id!==m.user_id):[];
  const roleOk=k=>!my?true:k===cur?true:k==='dps'?others.filter(x=>x.role==='dps').length<S.max_party-2:!others.some(x=>x.role===k);
- const why=!m.stats_set?'Assegna prima i tuoi punti abilità nella scheda <b>Eroe</b>.':!canE?`Energia troppo bassa: per un dungeon ne servono ${S.cost} e ne hai ${Math.floor(ev)}. Ti bastano tra ${fmtDur((S.cost-ev)/perHour*3600)}.`:'';
+ const why=!m.stats_set?'Assegna prima i tuoi punti abilità nella scheda <b>Eroe</b>.':trBusy()?'Sei in allenamento: fermalo nella scheda <b>Allenamento</b> per entrare nei dungeon.':!canE?`Energia troppo bassa: per un dungeon ne servono ${S.cost} e ne hai ${Math.floor(ev)}. Ti bastano tra ${fmtDur((S.cost-ev)/perHour*3600)}.`:'';
  const can=!why&&!my;
  const picker=`<div class="dg-roles" role="group" aria-label="${my?'Il tuo ruolo nel gruppo':'Il ruolo con cui entri'}">${Object.keys(ROLES).map(k=>`<button data-drole="${k}" aria-pressed="${cur===k}" ${roleOk(k)?'':'disabled'}><span>${ROLES[k][1]} ${ROLES[k][0]}</span><small>${ROLES[k][2]}</small></button>`).join('')}</div>`;
  const pct=Math.round(100*S.cleared/S.total);
@@ -743,6 +752,70 @@ function renderPond(){
  <h2 class="er-h">I tuoi compagni <small class="mute">(${own.length} su 30)</small></h2><div class="pt-grid">${own.map(pOwned).join('')}</div>
  <h2 class="er-h">In vendita</h2>${groups.length?`<p class="er-sub">Il tuo saldo: <b>${BAL==null?'—':num(BAL)} BC</b></p>${groups.join('')}`:'<p class="mute">Hai tutti i compagni dello Stagno: complimenti!</p>'}${how}`}
 async function pondDone(msg){say(msg,'good');await load(true);await loadPond()}
+
+/* ---------- Allenamento ---------- */
+let TR=null,trAvail=null,lastTr=0,trAR=null,trArAt=0;
+function trTab(){const b=document.querySelector('.tabs [data-t="train"]');if(b)b.hidden=trAvail===false}
+function trBusy(){const a=TR&&TR.active;if(!a)return false;return a.kind==='spar'||new Date(a.ends_at).getTime()>Date.now()}
+function trStrip(m){
+ const t=m.training;if(!t||trAvail===false)return '';
+ if(t.kind==='spar')return `<button type="button" class="tr-strip" data-train aria-label="Allenamento amichevole in corso. Tocca per aprire"><span class="ic" aria-hidden="true">🤺</span><span><b>Allenamento amichevole</b><small>Niente dungeon finché non lo fermi · tocca per aprire</small></span></button>`;
+ return `<button type="button" class="tr-strip" data-train aria-label="Allenamento in corso: ${esc(STAT_IT[t.stat])}. Tocca per aprire"><span class="ic" aria-hidden="true">🏋️</span><span><b>Allenamento: ${esc(STAT_IT[t.stat])} → livello ${t.target_level}</b><small>finisce tra <span data-ut="${esc(t.ends_at)}">…</span></small></span></button>`}
+async function loadTrain(){
+ if(trAvail===false||!ST)return;
+ try{TR=await rpc('game_train_state');trAvail=true;lastTr=Date.now()}
+ catch(e){if(twMissing(e)){trAvail=false;trTab();if(tab==='train')renderTrain();return}throw e}
+ trTab();
+ if(TR.finished){say(`Allenamento completato: <b>${esc(STAT_IT[TR.finished.stat])}</b> al livello ${TR.finished.level} (bonus +${TR.finished.bonus_pct}%).`,'good');await load(true)}
+ if(tab==='train'&&!document.querySelector('.er-ov'))renderTrain();
+ else if(tab==='dng'&&DS&&!busy)renderDng();
+ if(tab==='train')trEnsureAr()}
+function trEnsureAr(){
+ if(!TR||!TR.active||TR.active.kind!=='spar'||(trAR&&Date.now()-trArAt<30000))return;
+ trArAt=Date.now();rpc('game_arena_list').then(r=>{trAR=r;if(tab==='train'&&!document.querySelector('.er-ov'))renderTrain()}).catch(e=>{trAR=[];say(errTxt(e),'bad')})}
+function trHours(h){return h>=24&&h%24===0?`${h/24} ${h===24?'giorno':'giorni'}`:`${h} ore`}
+function renderTrain(){
+ const el=$('p-train');
+ if(trAvail===false){el.innerHTML=`<h2 class="er-h">Allenamento</h2><p class="er-msg">L’Allenamento non è ancora attivo: nel database va eseguita la migrazione <b>black-market-eroi-allenamento.sql</b>.</p>`;return}
+ if(!TR){el.innerHTML='<p class="mute">Caricamento…</p>';return}
+ const m=ST.me,a=TR.active,sp=TR.spar,td=sp.today,wps=sp.per_point;
+ const lead=`<h2 class="er-h">Allenamento</h2><p class="er-sub">Un’attività <b>senza energia, XP né BC</b>: allena una statistica col passare del tempo, oppure combatti in amichevole per guadagnare punti abilità. <b>Mentre ti alleni non puoi entrare nei dungeon.</b> Ti alleni in una sola forma alla volta.</p>`;
+ let body='';
+ if(a&&a.kind==='stat'){
+  const t0=new Date(a.started_at).getTime(),t1=new Date(a.ends_at).getTime(),pct=Math.min(100,Math.max(0,Math.round(100*(Date.now()-t0)/Math.max(1,t1-t0)))),lv=TR.levels.find(x=>x.level===a.target_level);
+  const id='tr:stop';
+  body=`<section class="tr-act" aria-label="Allenamento in corso"><h3>🏋️ Stai allenando ${esc(STAT_IT[a.stat])}</h3>
+   <div class="tr-big" aria-live="off" data-ut="${esc(a.ends_at)}">…</div>
+   <div class="er-xp" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Avanzamento dell’allenamento"><i data-trbar data-t0="${t0}" data-t1="${t1}" style="width:${pct}%"></i></div>
+   <p class="er-note" style="margin:0">Finito il tempo ${esc(STAT_IT[a.stat])} sale al <b>livello ${a.target_level}</b>: bonus permanente di <b>+${lv?lv.bonus_pct:'?'}%</b>. Puoi chiudere la pagina: si completa da solo.</p>
+   <div class="dg-btns" style="margin-top:10px"><button class="btn ghost" data-tstop ${pending===id?'data-confirm':''}>${pending===id?'Conferma: perdi il progresso':'Ferma l’allenamento'}</button></div>
+   ${pending===id?'<p class="er-note" style="color:var(--warn)">Fermarti ora fa perdere tutto il tempo già passato.</p>':''}</section>`}
+ else if(a&&a.kind==='spar'){
+  const pc=Math.round(100*(wps-sp.to_next)/wps),list=trAR||[],full=td.fights>=td.max_fights;
+  body=`<section class="tr-act" aria-label="Allenamento amichevole"><h3>🤺 Allenamento amichevole attivo</h3>
+   <div class="er-xp" role="progressbar" aria-valuemin="0" aria-valuemax="${wps}" aria-valuenow="${wps-sp.to_next}" aria-label="Vittorie verso il prossimo punto abilità"><i style="width:${pc}%"></i></div>
+   <div class="tr-sp"><div><span>Verso il prossimo punto abilità</span><b>${num(wps-sp.to_next)} / ${wps}</b></div>
+    <div><span>Vittorie valide oggi</span><b>${num(td.counted)} / ${td.max_wins}</b></div><div><span>Combattimenti oggi</span><b>${num(td.fights)} / ${td.max_fights}</b></div>
+    <div><span>Punti abilità guadagnati finora</span><b>${num(TR.train_points)}</b></div></div>
+   <p class="er-note" style="margin:0">Ogni <b>${wps} vittorie valide</b> = 1 punto abilità. Oltre ${td.max_wins} vittorie al giorno, o più di ${td.pair_max} contro lo stesso avversario, la vittoria non conta. Nessuna energia, XP o BC.</p>
+   <div class="dg-btns" style="margin-top:10px"><button class="btn ghost" data-tstop>Ferma l’allenamento</button></div></section>
+   <h2 class="er-h">Contro chi ti alleni</h2><p class="er-sub">Gli eroi che accettano sfide in Arena. L’avversario non perde né guadagna nulla.</p>
+   ${full?`<p class="er-msg">Hai fatto tutti i ${td.max_fights} combattimenti di oggi: riprova domani.</p>`:''}
+   ${trAR==null?'<p class="mute">Caricamento…</p>':list.length?list.map(o=>{const c=(sp.pair||{})[o.user_id]||0;return `<div class="er-ar"><div class="av" aria-hidden="true">${face(o.user_id,o.nickname)}</div>
+    <div style="min-width:0"><button class="er-link" data-hero="${esc(o.user_id)}">${esc(o.nickname)}</button><small>Liv. ${num(o.level)} · potenza ${num(o.power)}${c>0?` · oggi ${c}/${td.pair_max} valide`:''}</small></div>
+    <button class="btn sm" data-spar="${esc(o.user_id)}" ${(!m.stats_set||full)?'disabled':''}>Allenati</button></div>`}).join(''):'<p class="mute">Nessun altro eroe è disponibile in Arena, per ora.</p>'}`}
+ else{
+  const stop=!m.stats_set?'<p class="er-msg">Assegna prima i tuoi punti abilità nella scheda <b>Eroe</b> (serve per l’amichevole).</p>':'',inD=TR.in_dungeon?'<p class="er-msg bad">Sei in una lobby o in un dungeon: esci prima di iniziare un allenamento.</p>':'';
+  const rows=TR.stats.map(s=>{const nm=STAT_IT[s.stat],nx=s.next,dots=Array.from({length:TR.max_level},(_,i)=>`<i class="${i<s.level?'on':''}"></i>`).join('');
+   return `<div class="tr-row"><div><b>${esc(nm)} <small>livello ${s.level} / ${TR.max_level}${s.bonus_pct?` · +${s.bonus_pct}%`:''}</small></b><div class="tr-lv" aria-hidden="true">${dots}</div>
+    <small>${nx?`Prossimo: livello ${nx.level} · ${trHours(nx.hours)} · bonus +${nx.bonus_pct}%`:'Livello massimo raggiunto'}</small></div>
+    <button class="btn sm" data-tstart="stat" data-tstat="${esc(s.stat)}" ${nx&&!TR.in_dungeon?'':'disabled'} aria-label="Allena ${esc(nm)}">${nx?'Allena':'Al massimo'}</button></div>`}).join('');
+  body=`${stop}${inD}<div class="tr-two"><section class="card"><h2 class="er-h" style="margin-top:0">🏋️ Allena una statistica</h2><p class="er-sub" style="margin-top:0">Scegli una statistica e lascia passare il tempo: a ogni livello il bonus <b>permanente</b> cresce di +1%, fino a +${TR.levels[TR.levels.length-1].bonus_pct}%. Gratis.</p>${rows}</section>
+   <section class="card"><h2 class="er-h" style="margin-top:0">🤺 Allenamento amichevole</h2><p class="er-sub" style="margin-top:0">Combatti in amichevole con altri eroi, senza energia, XP né BC. Ogni <b>${wps} vittorie valide</b> guadagni <b>1 punto abilità</b> da distribuire. Fino a ${td.max_wins} vittorie valide al giorno (${td.pair_max} contro lo stesso avversario).</p>
+    <div class="tr-sp"><div><span>Vittorie valide totali</span><b>${num(sp.wins)}</b></div><div><span>Al prossimo punto abilità</span><b>${num(sp.to_next)}</b></div><div><span>Punti guadagnati finora</span><b>${num(TR.train_points)}</b></div></div>
+    <button class="btn gold" data-tstart="spar" ${TR.in_dungeon?'disabled':''}>Inizia l’allenamento amichevole</button></section></div>`}
+ const info=`<details class="card" style="margin-top:14px"><summary><b>Livelli di allenamento</b></summary><div class="tr-sp" style="margin-top:8px">${TR.levels.map(l=>`<div><span>Livello ${l.level}</span><b>${trHours(l.hours)} · bonus +${l.bonus_pct}%</b></div>`).join('')}</div></details>`;
+ el.innerHTML=lead+body+info}
 
 /* ---------- Torre Infinita ---------- */
 const ART=window.TorreArt;
@@ -923,15 +996,15 @@ async function sendChat(){if(CH.sending)return;const inp=$('chIn'),btn=$('chSend
 /* ---------- navigazione e caricamento ---------- */
 function paint(){
  paintTop();paintBat();
- if(tab==='hero')renderHero();else if(tab==='boss')renderBoss();else if(tab==='dng')renderDng();else if(tab==='tower')renderTower();else if(tab==='arena')renderArena();else if(tab==='shop')renderShop();else if(tab==='pond')renderPond();else renderLb();
+ if(tab==='hero')renderHero();else if(tab==='boss')renderBoss();else if(tab==='dng')renderDng();else if(tab==='tower')renderTower();else if(tab==='arena')renderArena();else if(tab==='train')renderTrain();else if(tab==='shop')renderShop();else if(tab==='pond')renderPond();else renderLb();
 }
 function setTab(t,push){
  tab=t;document.querySelectorAll('.tabs [data-t]').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));const cb=document.querySelector('.tabs [data-t="'+t+'"]');if(cb&&cb.scrollIntoView)try{cb.scrollIntoView({inline:'nearest',block:'nearest'})}catch(_){}
- ['hero','boss','dng','tower','arena','shop','pond','lb'].forEach(x=>$('p-'+x).hidden=x!==t);
+ ['hero','boss','dng','tower','arena','train','shop','pond','lb'].forEach(x=>$('p-'+x).hidden=x!==t);
  if(push!==false)history.replaceState(null,'','#'+t);
  clearSay();pending=null;
  if(!ST)return;paint();
- if(t==='arena')loadArena();if(t==='lb')loadLb();if(t==='dng')loadDng(true);if(t==='tower')loadTower(true).catch(e=>say(errTxt(e),'bad'));if(t==='pond')loadPond().catch(e=>say(errTxt(e),'bad'))}
+ if(t==='arena')loadArena();if(t==='lb')loadLb();if(t==='dng')loadDng(true);if(t==='tower')loadTower(true).catch(e=>say(errTxt(e),'bad'));if(t==='pond')loadPond().catch(e=>say(errTxt(e),'bad'));if(t==='train')loadTrain().catch(e=>say(errTxt(e),'bad'))}
 async function load(keepDraft){
  ST=await rpc('game_state');ME=ST.me;last=Date.now();
  if(ISADM===null){try{ISADM=(await rpc('is_admin'))===true}catch(_){ISADM=false}}      // la voce admin si vede solo a chi è davvero amministratore (il database lo ricontrolla comunque)
@@ -953,8 +1026,8 @@ async function boot(){
   const first=!ST;
   await load(false);
   beat();
-  loadTower().catch(()=>{});loadPond().catch(()=>{});
-  if(first){const h=(location.hash||'').slice(1);setTab(['hero','boss','dng','tower','arena','shop','pond','lb'].includes(h)?h:(ME.stats_set?'boss':'hero'),false)}
+  loadTower().catch(()=>{});loadPond().catch(()=>{});loadTrain().catch(()=>{});
+  if(first){const h=(location.hash||'').slice(1);setTab(['hero','boss','dng','tower','arena','train','shop','pond','lb'].includes(h)?h:(ME.stats_set?'boss':'hero'),false)}
  }catch(e){
   if(/Modulo non attivo/i.test(String(e.message)))gateOff();
   else gate(`<section class="card er-gate" style="margin-top:20px"><h2>Errore di collegamento</h2><p class="mute">${errTxt(e)}</p><button class="btn ghost" id="retry">Riprova</button></section>`)}}
@@ -970,6 +1043,12 @@ document.addEventListener('click',e=>{
  if(t.dataset.chhide){const id=Number(t.dataset.chhide);
   if(CH.hp!==id){CH.hp=id;paintChat(true);setTimeout(()=>{if(CH.hp===id){CH.hp=null;paintChat(true)}},5000);return}
   CH.hp=null;run(t,async()=>{await rpc('game_chat_hide',{p_id:id,p_reason:'Messaggio nascosto dalla moderazione'});CH.msgs=CH.msgs.filter(x=>x.id!==id);paintChat(true);say('Messaggio nascosto.','good')});return}
+ if(t.dataset.train!=null){setTab('train');window.scrollTo({top:0,behavior:'smooth'});return}
+ if(t.dataset.tstart){run(t,async()=>{const k=t.dataset.tstart;TR=await rpc('game_train_start',{p_kind:k,p_stat:k==='stat'?t.dataset.tstat:null});trAvail=true;lastTr=Date.now();trAR=null;await load(true);say(k==='stat'?`Allenamento iniziato: <b>${esc(STAT_IT[t.dataset.tstat])}</b>. Finisce tra ${fmtDur((new Date(TR.active.ends_at)-Date.now())/1000)}.`:'Allenamento amichevole iniziato: scegli contro chi combattere. Finché non lo fermi non puoi entrare nei dungeon.','good');renderTrain();trEnsureAr()});return}
+ if(t.dataset.tstop!=null){const id='tr:stop';
+  if(TR&&TR.active&&TR.active.kind==='stat'&&pending!==id){pending=id;renderTrain();setTimeout(()=>{if(pending===id){pending=null;if(tab==='train')renderTrain()}},5000);return}
+  pending=null;run(t,async()=>{const r=await rpc('game_train_stop');TR=r;lastTr=Date.now();trAR=null;await load(true);say(r.lost?'Allenamento fermato: il progresso è andato perso.':r.stopped?'Allenamento fermato.':'Allenamento completato.',r.lost?'':'good');renderTrain()});return}
+ if(t.dataset.spar){run(t,async()=>{const r=await rpc('game_spar',{p_target:t.dataset.spar});await loadTrain();if(r.point_gained)await load(true);duelModal(r)});return}
  if(t.dataset.pond!=null){setTab('pond');window.scrollTo({top:0,behavior:'smooth'});return}
  if(t.dataset.pchoose){const id='pc:'+t.dataset.pchoose;
   if(pending!==id){pending=id;renderPond();setTimeout(()=>{if(pending===id){pending=null;if(tab==='pond')renderPond()}},5000);return}
@@ -1038,6 +1117,8 @@ document.addEventListener('change',e=>{
   draft[k]=Math.min(v,draft[k]+Math.min(capNow()-draft[k],ST.me.points-used));renderHero();const f=document.querySelector(`#p-hero [data-pin="${k}"]`);if(f)f.focus();return}
  if(e.target.id==='arOpen'){const el=e.target;run(el,async()=>{await rpc('game_set_arena_open',{p_open:el.checked});say(el.checked?'Ora gli altri eroi possono sfidarti.':'Ora nessuno può sfidarti in Arena.','good');await load(false)})}});
 setInterval(()=>{if(!ST)return;document.querySelectorAll('[data-cd]').forEach(e=>e.textContent=cd());paintBat();
+ document.querySelectorAll('[data-trbar]').forEach(e=>{const x=+e.dataset.t0,y=+e.dataset.t1;e.style.width=Math.min(100,Math.max(0,100*(Date.now()-x)/Math.max(1,y-x)))+'%'});
+ if(trAvail&&TR&&TR.active&&TR.active.ends_at&&new Date(TR.active.ends_at).getTime()<=Date.now()&&Date.now()-lastTr>5000&&!busy&&!document.hidden){lastTr=Date.now();loadTrain().then(()=>{if(TR&&!TR.active)load(true)}).catch(()=>{})}
  let exp=false;document.querySelectorAll('[data-ut]').forEach(e=>{const t=new Date(e.dataset.ut).getTime()-Date.now();e.textContent=t>0?lf(t):'scaduto';if(t<=0)exp=true});
  if(exp&&Date.now()-last>5000&&!busy&&!document.hidden)load(true).catch(()=>{});
  if(tab==='arena'&&ST.energy&&(enNow()>=ST.energy.min)!==lastCan&&!busy&&!document.querySelector('.er-ov'))renderArena();
