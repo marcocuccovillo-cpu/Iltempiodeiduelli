@@ -676,5 +676,15 @@ Nuova scheda **Allenamento**: un'attività che **non costa energia e non dà XP 
 - Esecuzione: `black-market-eroi-allenamento.sql` una volta, dopo le migrazioni dello Stagno (031) e delle abilità (030); si può rieseguire. Test: `black-market-eroi-allenamento-test.sql` (su database di prova). Annullamento: `black-market-eroi-allenamento-down.sql` (rimette le tre funzioni com'erano e azzera la distribuzione dei punti degli eroi che ne avevano di troppo, che devono riassegnarli).
 - Sito: `eroi.html` e `sw.js` (cache v63). Senza la migrazione la scheda resta nascosta.
 
+## La guerra degli Eroi: correzione, cambiare oggetto non fa più perdere energia (migrazione 035, 30 ottobre 2026)
+
+**Il bug**: l'energia si calcolava come «energia salvata + ore passate × velocità di recupero di adesso». Gli strumenti con «+duelli» rendono il recupero più veloce (+25% a punto); cambiandoli, la velocità nuova veniva applicata anche a tutto il tempo già passato. Togliendo lo strumento veloce l'energia maturata «scendeva», e alla prima azione (duello, dungeon, Torre) il valore più basso veniva salvato: la perdita restava anche rimettendo l'oggetto.
+
+**La correzione**: prima di ogni cambio di equipaggiamento l'energia maturata fino a quel momento viene salvata alla velocità di allora; la velocità nuova vale solo per il tempo futuro. È un controllo del database (trigger su `game_equipped`), quindi vale per qualunque funzione cambi l'equipaggiamento; vale anche se un amministratore cambia il «+duelli» di un oggetto del catalogo (trigger su `game_items`). Nessuna colonna o tabella nuova, nessun BC.
+
+- Esecuzione: `black-market-eroi-energia-oggetti.sql` una volta (si può rieseguire). Nessuna modifica al sito. Annullamento: `black-market-eroi-energia-oggetti-down.sql`.
+- **Non recupera** l'energia già persa in passato dai giocatori: non è ricostruibile. Se vuoi risarcire qualcuno, l’energia si può rimettere a mano (colonne `energy` ed `energy_at` di `game_heroes`).
+- Provato (PostgreSQL 16 locale, **non su un Supabase vero**): `black-market-eroi-energia-oggetti-test.sql` con 8 scenari; il primo riproduce il bug senza correzione (62,5 → 50), gli altri verificano con la correzione che togliere e rimettere lo strumento non perde nulla, che il tetto resta il massimo, che vale per insert/delete diretti e per le modifiche del catalogo, e che nessun BC si muove. Il test fallisce se la funzione di salvataggio viene resa vuota.
+
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.
