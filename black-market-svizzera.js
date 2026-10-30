@@ -94,11 +94,17 @@ window.BM_SWISS = function (BM) {
   };
 
   /* ---------- pagina di un torneo svizzero ---------- */
-  let cur = null, poll = null, busy = false;
+  let cur = null, poll = null, busy = false, EL = null;
+  const getEl = async id => { try { return await rpc('swiss_elo', { p_event: id }); } catch (e) { return null; } };   // senza la migrazione 033 non c'è: la pagina resta com'era
+  const sg = n => (n > 0 ? '+' : n < 0 ? '−' : '±') + Math.abs(n);
+  const eloOf = id => { const p = EL && EL.players.find(x => x.user_id === id); return p ? p.elo : (EL ? 1000 : null); };
   const matchLine = (m, s, org) => {
     const meId = s.me.id, mine = m.a === meId || m.b === meId;
     let st = '';
-    if (m.status === 'verified') st = `<small>Concluso · vince <span class="w">${esc(m.winner === m.a ? m.a_nick : m.b_nick)}</span></small>`;
+    if (m.status === 'verified') {
+      const x = EL && EL.matches.find(y => y.match_id === m.id);
+      st = `<small>Concluso · vince <span class="w">${esc(m.winner === m.a ? m.a_nick : m.b_nick)}</span>${x ? ` · Elo ${esc(m.a_nick)} ${sg(x.a_delta)}, ${esc(m.b_nick)} ${sg(x.b_delta)}` : ''}</small>`;
+    }
     else if (m.disputed) st = '<small style="color:#ff8f9d">Risultato contestato: decide l’organizzatore</small>';
     else if (m.reported_by) st = `<small>${esc(m.reported_winner === m.a ? m.a_nick : m.b_nick)} indicato come vincitore · in attesa di conferma</small>`;
     else st = '<small>In attesa del risultato</small>';
@@ -131,8 +137,8 @@ window.BM_SWISS = function (BM) {
     const meId = s.me.id, p = s.players;
     if (!p.length) return '<p class="mute">Nessun iscritto.</p>';
     return `<div style="overflow-x:auto"><table class="sw-tbl"><thead><tr><th>#</th><th>Giocatore</th><th title="Vittorie – sconfitte">V–S</th><th>Punti</th><th title="Somma dei punti degli avversari: spareggio">Spar.</th></tr></thead><tbody>${p.map(x =>
-      `<tr class="${x.user_id === meId ? 'me' : ''} ${x.dropped ? 'out' : ''}"><td>${x.rank}</td><td>${nlink(x.user_id, x.nickname)}${x.dropped ? ' <span class="mute">(ritirato)</span>' : ''}${x.byes ? ` <span class="mute" title="riposi o vittorie a tavolino">+${x.byes}</span>` : ''}</td><td>${x.wins}–${x.losses}</td><td><b>${x.points}</b></td><td>${x.omw}</td></tr>`).join('')}</tbody></table></div>
-      <p class="mute" style="font-size:.84rem;margin:8px 0 0">3 punti a vittoria (anche per il riposo o la vittoria a tavolino), 0 a sconfitta. A parità conta la somma dei punti degli avversari affrontati.</p>`;
+      `<tr class="${x.user_id === meId ? 'me' : ''} ${x.dropped ? 'out' : ''}"><td>${x.rank}</td><td>${nlink(x.user_id, x.nickname)}${x.dropped ? ' <span class="mute">(ritirato)</span>' : ''}${eloOf(x.user_id) != null ? `<small class="mute" style="display:block;font-size:.76rem">Elo ${eloOf(x.user_id)}</small>` : ''}${x.byes ? ` <span class="mute" title="riposi o vittorie a tavolino">+${x.byes}</span>` : ''}</td><td>${x.wins}–${x.losses}</td><td><b>${x.points}</b></td><td>${x.omw}</td></tr>`).join('')}</tbody></table></div>
+      <p class="mute" style="font-size:.84rem;margin:8px 0 0">3 punti a vittoria (anche per il riposo o la vittoria a tavolino), 0 a sconfitta. A parità conta la somma dei punti degli avversari affrontati.${EL && EL.counts ? ` I match verificati contano anche per l’<b>Elo ${esc(EL.format)}</b> della Ladder.` : ''}</p>`;
   };
   const view = s => {
     const e = s.event, can = s.can, org = s.is_organizer, running = e.status === 'running', meId = s.me.id;
@@ -144,6 +150,7 @@ window.BM_SWISS = function (BM) {
     else if (e.status === 'finished') ban = `<div class="sw-ban good"><b>Torneo concluso</b>${s.players[0] ? `<p>Primo in classifica: <b>${esc(s.players[0].nickname)}</b> con ${s.players[0].points} punti.</p>` : ''}</div>`;
     else if (e.expired) ban = `<div class="sw-ban bad"><b>La durata dell’evento è terminata</b><p>Non si possono creare altri turni: i risultati in corso si registrano ancora e l’organizzatore può concludere il torneo.</p></div>`;
     else if (e.status === 'open') ban = `<div class="sw-ban"><b>Iscrizioni aperte</b><p>Iscritti: <b>${s.n_active}</b>. Il torneo parte quando l’organizzatore lo avvia. Con ${s.n_active} giocatori i turni saranno ${s.auto_rounds} (a meno che l’organizzatore ne scelga un altro numero).</p></div>`;
+    const eloNote = EL && EL.counts && e.status !== 'cancelled' ? `<p class="mute" style="margin:8px 0 0;font-size:.9rem">Ogni match verificato di questo torneo modifica anche il tuo <b>Elo ${esc(EL.format)}</b> della Ladder.</p>` : '';
 
     const join = can.join ? `<div class="sw-act"><button class="btn gold" data-act="sw_join" data-e="${e.id}">Iscriviti al torneo</button></div>` : '';
     const leave = can.leave ? `<div class="sw-act"><button class="btn ghost sm" data-act="sw_leave" data-e="${e.id}">${e.status === 'open' ? 'Annulla la mia iscrizione' : 'Ritirati dal torneo'}</button></div>` : '';
@@ -163,18 +170,19 @@ window.BM_SWISS = function (BM) {
         </div></div>`;
     }
     const extra = org && (running || e.status === 'finished') ? `<div class="sw-act"><button class="btn ghost sm" data-act="award" data-e="${e.id}">Assegna ricompense partecipazione</button></div>` : '';
-    const cancel = can.cancel ? `<div class="box" style="margin-top:14px"><h2>Annulla l’evento</h2><p class="mute" style="margin:0 0 8px;font-size:.92rem">L’evento resta in elenco come «Annullato». I match ancora da giocare vengono tolti; quelli già verificati restano.</p><button class="btn ghost sm" data-act="sw_cancel" data-e="${e.id}">Annulla evento</button></div>` : '';
+    const cancel = can.cancel ? `<div class="box" style="margin-top:14px"><h2>Annulla l’evento</h2><p class="mute" style="margin:0 0 8px;font-size:.92rem">L’evento resta in elenco come «Annullato». I match ancora da giocare vengono tolti; quelli già verificati restano.${EL && EL.counts ? ' L’Elo guadagnato in questo torneo viene tolto.' : ''}</p><button class="btn ghost sm" data-act="sw_cancel" data-e="${e.id}">Annulla evento</button></div>` : '';
 
     const rounds = s.rounds.map(r => `<div style="margin-top:6px"><h3 style="margin:10px 0 2px;font-size:1rem">Turno ${r.round}${r.round === e.current_round && running ? ' · in corso' : ''}</h3>${r.matches.map(m => matchLine(m, s, org)).join('')}${r.byes.map(b => `<div class="sw-m"><div class="g">${nlink(b.user_id, b.nickname)}<small>${b.kind === 'bye' ? 'Riposa (3 punti)' : 'Vittoria a tavolino (avversario ritirato, 3 punti)'}</small></div></div>`).join('')}</div>`).join('');
     const how = BM.fold ? BM.fold('sw_how', 'Come funziona', `<ul style="margin:0;padding-left:1.2em;line-height:1.5"><li>I giocatori si <b>iscrivono da soli</b> finché il torneo non parte. Solo l’<b>organizzatore</b> lo avvia e genera i turni.</li><li>Ogni turno sfidi un avversario con un punteggio simile; <b>nessuno incontra due volte la stessa persona</b> (se si può evitare). Con un numero dispari di giocatori uno riposa e prende comunque 3 punti.</li><li>A fine partita <b>uno dei due indica chi ha vinto e l’altro conferma</b>. Se non siete d’accordo decide l’organizzatore.</li><li>L’organizzatore genera il turno dopo solo quando <b>tutti i risultati</b> del turno sono registrati.</li><li>Se ti ritiri non vieni più accoppiato e il tuo avversario in corso vince a tavolino.</li></ul>`) : '';
-    shell(`${head}${ban}${myCard(s)}${lobby}${orgBox}
+    shell(`${head}${eloNote}${ban}${myCard(s)}${lobby}${orgBox}
       ${e.status !== 'open' && s.players.length ? `<div class="box" style="margin-top:14px"><h2>Classifica</h2>${standings(s)}${leave}</div>` : ''}
       ${s.rounds.length ? `<div class="box" style="margin-top:14px"><h2>Turni e risultati</h2>${rounds}</div>` : ''}
       ${extra}${cancel}<div style="margin-top:14px">${how}</div>`, 'events');
   };
   const draw = async (id) => {
-    const s = await rpc('swiss_state', { p_event: id });
-    cur = { id, key: JSON.stringify(s) };
+    const [s, el] = await Promise.all([rpc('swiss_state', { p_event: id }), getEl(id)]);
+    EL = el;
+    cur = { id, key: JSON.stringify([s, el]) };
     view(s);
   };
   const startPoll = id => {
@@ -185,9 +193,9 @@ window.BM_SWISS = function (BM) {
       const ae = document.activeElement;
       if (ae && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)) return;
       try {
-        const s = await rpc('swiss_state', { p_event: id });
-        const key = JSON.stringify(s);
-        if (cur && cur.id === id && cur.key !== key) { cur.key = key; view(s); }
+        const [s, el] = await Promise.all([rpc('swiss_state', { p_event: id }), getEl(id)]);
+        const key = JSON.stringify([s, el]);
+        if (cur && cur.id === id && cur.key !== key) { cur.key = key; EL = el; view(s); }
       } catch (e) { /* si riprova al giro dopo */ }
     }, 10000);
   };
@@ -252,7 +260,7 @@ window.BM_SWISS = function (BM) {
       busy = true; try { await rpc('swiss_decide', { p_match: el.dataset.m, p_winner: el.dataset.w }); toast('Risultato registrato.'); } finally { busy = false; if (cur) await after(cur.id); }
     },
     async sw_cancel(el) {
-      const r = prompt('Annullare l’evento? Scrivi un motivo (facoltativo) e conferma. Premi Annulla per lasciare tutto com’è.');
+      const r = prompt('Annullare l’evento?' + (EL && EL.counts && cur && cur.id === el.dataset.e ? ' L’Elo guadagnato in questo torneo verrà tolto.' : '') + ' Scrivi un motivo (facoltativo) e conferma. Premi Annulla per lasciare tutto com’è.');
       if (r === null) return;
       busy = true;
       try {
