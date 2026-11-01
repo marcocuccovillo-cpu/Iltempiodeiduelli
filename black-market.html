@@ -28,7 +28,6 @@ html,body{background:var(--bg)}
 .bm-tile{display:grid;justify-items:center;align-content:center;gap:5px;min-height:78px;padding:10px 6px;border:1px solid var(--line);border-radius:14px;background:var(--surf);color:var(--tx);text-decoration:none;text-align:center;font:700 .84rem/1.2 var(--ui);overflow-wrap:anywhere}
 .bm-tile i{font-style:normal;font-size:1.6rem;line-height:1}.bm-tile:hover{border-color:var(--gold);background:var(--raise)}
 .bm-tile[aria-current]{border-color:var(--gold);background:rgba(212,168,67,.16);color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
-.bm-hub{margin:0 0 22px;padding:14px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,rgba(212,168,67,.07),transparent)}.bm-hub h2{margin:0 0 4px;font-size:1.05rem;color:var(--gold)}
 @media(prefers-reduced-motion:reduce){.bm-cur .chev i{transition:none}}
 h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold)}
 .sub{color:var(--mu);margin:8px 0 0}
@@ -69,7 +68,7 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 </style></head><body>
 
 <main class="pg" id="app"><p class="mute">Caricamento…</p></main><div id="toast" hidden role="status"></div>
-<script src="tempio.js?v=13"></script>
+<script src="tempio.js?v=14"></script>
 <script src="badge.js?v=13"></script>
 <script src="black-market-moduli.js?v=21"></script>
 <script src="shop-art-extra.js?v=1"></script>
@@ -131,7 +130,7 @@ function shell(inner,cur){const items=[['','Dashboard'],['wanted','Most Wanted']
  const key=cur=='e'?'events':cur,hit=items.find(x=>x[0]==key),ic=hit?(NAVI[hit[0]]||['•'])[0]:'◈',name=hit?hit[1]:'Black Market';
  const tiles=navTiles(items,key);
  $app.innerHTML=`<nav class="bm-head" aria-label="Sezioni del Black Market"><div class="bm-bar"><button class="bm-cur" data-act="navtog" id="bmCur" aria-expanded="${navOpen}" aria-controls="bmGrid"><span class="ic" aria-hidden="true">${ic}</span><span class="tx"><small>Sei in</small><b>${esc(name)}</b></span><span class="chev">Sezioni <i aria-hidden="true">▾</i></span></button><button class="bm-out" data-act="out">Esci</button></div>
-  <div class="bm-grid" id="bmGrid" ${navOpen?'':'hidden'}>${tiles}</div></nav>${key===''?`<section class="bm-hub" aria-label="Tutte le sezioni"><h2>Dove vuoi andare?</h2>${tiles}</section>`:''}${inner}`}
+  <div class="bm-grid" id="bmGrid" ${navOpen?'':'hidden'}>${tiles}</div></nav>${inner}`}
 function navClose(focus){const g=document.getElementById('bmGrid'),b=document.getElementById('bmCur');if(!g||g.hidden)return;g.hidden=true;navOpen=false;if(b){b.setAttribute('aria-expanded','false');if(focus)b.focus()}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')navClose(true)});
 document.addEventListener('click',e=>{if(!e.target.closest('.bm-head'))navClose(false)});
