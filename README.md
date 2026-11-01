@@ -686,5 +686,22 @@ Nuova scheda **Allenamento**: un'attività che **non costa energia e non dà XP 
 - **Non recupera** l'energia già persa in passato dai giocatori: non è ricostruibile. Se vuoi risarcire qualcuno, l’energia si può rimettere a mano (colonne `energy` ed `energy_at` di `game_heroes`).
 - Provato (PostgreSQL 16 locale, **non su un Supabase vero**): `black-market-eroi-energia-oggetti-test.sql` con 8 scenari; il primo riproduce il bug senza correzione (62,5 → 50), gli altri verificano con la correzione che togliere e rimettere lo strumento non perde nulla, che il tetto resta il massimo, che vale per insert/delete diretti e per le modifiche del catalogo, e che nessun BC si muove. Il test fallisce se la funzione di salvataggio viene resa vuota.
 
+## La guerra degli Eroi: Arena a classifica, punti, leghe e stagioni (migrazione 036, 1 novembre 2026)
+
+L'Arena diventa competitiva, con una grafica nuova. **Funzionamento (scelte mie: modificabili)**:
+
+- **Punti Arena** (come l'Elo): si parte da 1000. **Cambiano solo i punti di chi sfida**: vittoria contro uno con più punti = molti punti, contro uno con meno = pochi (almeno +1); sconfitta = si perde (almeno −1, molti di più contro uno più debole). Mai sotto 0. **Chi viene sfidato non perde né guadagna nulla**: chi accetta sfide non è penalizzato quando è offline.
+- **Anti-abuso**: contro lo stesso avversario contano per i punti al massimo **3 sfide al giorno**; le altre si combattono (energia, XP) ma non cambiano i punti.
+- **Leghe**: Bronzo (da 0), Argento (900), Oro (1100), Platino (1300), Diamante (1500), Leggenda (1700). Soglie e nomi nella tabella `game_arena_leagues`.
+- **Stagioni mensili**: a ogni nuova stagione i punti tornano a metà strada verso 1000 (1600 → 1300, 600 → 800). Le stagioni passate restano; il podio dell'ultima compare come «albo d'oro». **Nessun premio in BC**: solo punti, leghe e posizioni.
+- Impostazioni modificabili: `game_arena_start` (1000), `game_arena_k` (32), `game_arena_pair_day` (3), `game_arena_soft_pct` (50). I duelli già fatti non contano: si parte da zero.
+- L'allenamento amichevole, i dungeon e il resto non toccano i punti Arena. XP, energia, vittorie e sconfitte dei duelli sono come prima.
+- Funzioni: **sostituite** `game_duel` (stesso funzionamento, in più registra i punti e li restituisce nel campo `arena`) e `game_arena_list` (in più punti, lega, punti in palio, sfide valide rimaste; ordinata per vicinanza di punti); **nuova** `game_arena_state()` (stagione, posizione, classifica, albo d'oro, ultime sfide). Tabelle nuove chiuse al browser. Nessun BC.
+
+**Grafica** (`eroi.html`): banner da colosseo con stagione, lega, punti e avanzamento verso la lega successiva; podio e classifica; **schede avversario** con avatar, lega, confronto di forza (da «Molto più debole» a «Molto più forte»), punti in palio (+/−) e sfide valide rimaste; **scena del duello** con i due combattenti che si colpiscono, numeri di danno e colpi critici, barre PV, e a fine sfida punti guadagnati/persi con la promozione o retrocessione di lega; cronologia delle ultime sfide con i punti. Con il «movimento ridotto» del dispositivo le animazioni sono spente. Se la migrazione non è stata eseguita, l'Arena resta quella di prima.
+
+- Esecuzione: `black-market-eroi-arena.sql` una volta, dopo `black-market-eroi-ricarica-livello-100.sql` (si può rieseguire; punti e stagioni restano). Annullamento: `black-market-eroi-arena-down.sql` (rimette le due funzioni com'erano; **i punti spariscono**). Sito: `eroi.html` e `sw.js` (cache v64).
+- Provato (PostgreSQL 16 locale, **non su un Supabase vero**, e Chromium a 390 e 1280 px con Supabase simulato): `black-market-eroi-arena-test.sql` con 15 scenari (formula, tetto giornaliero, stagioni e albo d'oro, classifica, permessi, cronologia, nessun BC); le funzioni tornano byte per byte come prima con l'annullamento.
+
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.

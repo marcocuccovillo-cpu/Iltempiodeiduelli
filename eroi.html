@@ -242,6 +242,67 @@ body.er-fab-on{padding-bottom:88px}
 .tr-row b{display:block}.tr-row small{color:var(--mu)}.tr-lv{display:flex;gap:3px;margin-top:5px}.tr-lv i{width:100%;max-width:22px;height:7px;border-radius:3px;background:var(--inp);border:1px solid var(--line)}.tr-lv i.on{background:var(--good);border-color:var(--good)}
 .tr-sp{display:grid;gap:4px;margin:8px 0}.tr-sp div{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .tr-two{display:grid;grid-template-columns:1fr;gap:14px}@media(min-width:760px){.tr-two{grid-template-columns:1fr 1fr}}
+
+/* ---------- Arena a classifica ---------- */
+.ar-hero{position:relative;overflow:hidden;margin:14px 0;padding:16px 16px 14px;border:1px solid color-mix(in srgb,var(--lc,#a78bfa) 55%,var(--line));border-radius:18px;
+ background:radial-gradient(120% 90% at 50% 0%,color-mix(in srgb,var(--lc,#a78bfa) 22%,transparent),transparent 62%),linear-gradient(180deg,#171024,#0a0711)}
+.ar-hero::before{content:"";position:absolute;left:0;right:0;top:0;height:30px;opacity:.5;pointer-events:none;
+ background:radial-gradient(circle at 50% 100%,transparent 0 11px,rgba(255,255,255,.13) 12px 13px,transparent 14px) 0 0/34px 30px repeat-x}
+.ar-hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:34px;opacity:.4;pointer-events:none;background:linear-gradient(0deg,rgba(232,184,74,.18),transparent)}
+.ar-torch{position:absolute;top:2px;font-size:1.3rem;filter:drop-shadow(0 0 8px rgba(255,150,40,.8));animation:arFlame 1.6s ease-in-out infinite alternate}.ar-torch.l{left:10px}.ar-torch.r{right:10px;animation-delay:.5s}
+.ar-season{position:relative;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:26px;font-size:.84rem;color:var(--mu)}.ar-season b{color:var(--tx);text-transform:capitalize}
+.ar-me{position:relative;display:flex;align-items:center;gap:14px;margin:12px 0 10px}
+.ar-emb{flex:none;width:76px;height:76px;border-radius:50%;display:grid;place-items:center;font-size:2.4rem;border:2px solid var(--lc);background:radial-gradient(circle,color-mix(in srgb,var(--lc) 30%,#0a0711),#0a0711);box-shadow:0 0 22px color-mix(in srgb,var(--lc) 45%,transparent)}
+.ar-lgname{font:700 1.15rem var(--disp);color:var(--lc)}.ar-pts{color:var(--mu);font-size:.9rem}.ar-pts b{font:700 2rem var(--disp);color:var(--tx);font-variant-numeric:tabular-nums;margin-right:4px}
+.ar-hero .er-xp i{background:linear-gradient(90deg,color-mix(in srgb,var(--lc) 60%,#000),var(--lc))}
+.ar-next{position:relative;margin:6px 0 10px;font-size:.86rem;color:var(--mu)}.ar-next b{color:var(--tx)}
+.ar-stats{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.ar-stats>div{padding:8px 4px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid var(--line);text-align:center;min-width:0}
+.ar-stats b{display:block;font:700 1.15rem var(--disp);font-variant-numeric:tabular-nums}.ar-stats small{color:var(--mu);font-size:.72rem}
+.ar-lg{display:inline-flex;align-items:center;gap:4px;padding:1px 9px 1px 6px;border-radius:99px;border:1px solid var(--lc,#888);color:var(--lc,#aaa);font-size:.76rem;font-weight:700;white-space:nowrap}.ar-lg i{font-style:normal}
+.ar-pod{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:8px;align-items:end;margin:12px 0 6px}
+.ar-pod>div{display:grid;justify-items:center;gap:3px;padding:10px 4px 8px;border:1px solid var(--line);border-radius:14px 14px 4px 4px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(0,0,0,.25));text-align:center;min-width:0}
+.ar-pod .p1{padding-top:16px;border-color:var(--gold);background:linear-gradient(180deg,rgba(232,184,74,.2),rgba(0,0,0,.25))}.ar-pod .p2{padding-top:12px}
+.ar-pod .md{font-size:1.4rem;line-height:1}.ar-pod .av{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--raise);border:2px solid var(--line);font:700 1.1rem var(--disp);color:var(--ac2);overflow:hidden}
+.ar-pod .p1 .av{width:56px;height:56px;border-color:var(--gold)}.ar-pod .av img{width:100%;height:100%;object-fit:cover;display:block}
+.ar-pod b{max-width:100%;overflow-wrap:anywhere;font-size:.88rem}.ar-pod small{color:var(--mu);font-variant-numeric:tabular-nums}
+.ar-lb{display:grid;grid-template-columns:30px 30px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 6px;border-top:1px solid var(--line)}
+.ar-lb.me{background:rgba(var(--ac-rgb),.12);border-radius:10px}.ar-lb .rk{font:700 .95rem var(--disp);color:var(--mu);text-align:center}
+.ar-lb .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--raise);border:1px solid var(--line);font:700 .8rem var(--disp);color:var(--ac2);overflow:hidden}.ar-lb .av img{width:100%;height:100%;object-fit:cover}
+.ar-lb small{display:block;color:var(--mu);font-size:.76rem}.ar-lb .pt{font:700 .98rem var(--disp);font-variant-numeric:tabular-nums;text-align:right}
+.ar-hof{margin:8px 0 0;font-size:.85rem;color:var(--mu);overflow-wrap:anywhere}.ar-hof b{color:var(--tx)}
+.ar-grid{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:700px){.ar-grid{grid-template-columns:1fr 1fr}}@media(min-width:1100px){.ar-grid{grid-template-columns:repeat(3,1fr)}}
+.ar-card{position:relative;display:grid;gap:9px;padding:13px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,.22));min-width:0}
+.ar-card .ar-top{display:flex;gap:12px;align-items:center;min-width:0}.ar-card .av{flex:none;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--raise);border:2px solid var(--line);font:700 1.3rem var(--disp);color:var(--ac2);overflow:hidden}.ar-card .av img{width:100%;height:100%;object-fit:cover;display:block}
+.ar-card .ar-sub{display:flex;gap:6px;flex-wrap:wrap;align-items:center;color:var(--mu);font-size:.8rem;margin-top:3px}
+.ar-cmp{font-size:.82rem;font-weight:700}.ar-cmp.w2,.ar-cmp.w1{color:var(--good)}.ar-cmp.eq{color:var(--warn)}.ar-cmp.s1,.ar-cmp.s2{color:var(--bad)}.ar-cmp small{color:var(--mu);font-weight:400}
+.ar-bars{display:grid;gap:3px;margin-bottom:4px}.ar-bars span{display:block;height:6px;border-radius:4px;background:var(--ac)}.ar-bars span.op{background:var(--warn)}.ar-bars span.op.w1,.ar-bars span.op.w2{background:var(--good)}.ar-bars span.op.s1,.ar-bars span.op.s2{background:var(--bad)}
+.ar-stake{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;font-variant-numeric:tabular-nums}.ar-stake .g{font:700 1.1rem var(--disp);color:var(--good)}.ar-stake .l{font:700 1.1rem var(--disp);color:var(--bad)}.ar-stake small{color:var(--mu)}
+.ar-card .btn{width:100%}
+.ar-rc{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}.ar-rc .dl{font:700 .98rem var(--disp);font-variant-numeric:tabular-nums}.ar-rc .dl.pos{color:var(--good)}.ar-rc .dl.neg{color:var(--bad)}.ar-rc .dl.nil{color:var(--mu)}.ar-rc small{display:block;color:var(--mu)}
+/* scena del duello */
+.er-md.ar-md{max-width:520px;padding:14px;background:radial-gradient(110% 70% at 50% 0%,rgba(var(--ac-rgb),.2),transparent 60%),var(--deep)}
+.ar-scene{position:relative;display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:end;margin:10px 0 6px;padding:14px 8px 10px;border-radius:14px;border:1px solid var(--line);overflow:hidden;
+ background:radial-gradient(100% 120% at 50% 100%,rgba(232,184,74,.22),transparent 65%),linear-gradient(180deg,#120c1f,#0a0711)}
+.ar-scene::before{content:"";position:absolute;left:0;right:0;bottom:0;height:26px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 2px,transparent 2px 22px),linear-gradient(0deg,rgba(214,170,90,.25),transparent);pointer-events:none}
+.ar-fgt{position:relative;display:grid;justify-items:center;gap:4px;text-align:center;min-width:0}
+.ar-fa{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;background:var(--raise);border:3px solid var(--ac);font:700 2rem var(--disp);color:var(--ac2);overflow:hidden;box-shadow:0 0 18px rgba(var(--ac-rgb),.45)}.ar-fa img{width:100%;height:100%;object-fit:cover;display:block}
+.ar-fgt.foe .ar-fa{border-color:var(--bad);box-shadow:0 0 18px rgba(255,84,104,.4)}
+.ar-fgt b{font-size:.92rem;overflow-wrap:anywhere;max-width:100%}.ar-fgt small{color:var(--mu)}.ar-fgt .er-hp{width:100%}
+.ar-vs{align-self:center;font:700 1.3rem var(--disp);color:var(--gold);text-shadow:0 0 12px rgba(232,184,74,.7)}
+.ar-fgt.lunge-a{animation:arLungeA .4s ease-out}.ar-fgt.lunge-b{animation:arLungeB .4s ease-out}.ar-fgt.hit .ar-fa{animation:arHit .4s ease-out}
+.ar-fl{position:absolute;left:50%;top:-4px;z-index:2;transform:translateX(-50%);pointer-events:none;font:700 1.25rem var(--disp);color:var(--bad);text-shadow:0 2px 6px #000;animation:arFl 1s ease-out forwards;white-space:nowrap}
+.ar-fl.crit{color:var(--gold);font-size:1.6rem}.ar-fl.dg{color:var(--mu);font-size:1rem}
+.ar-fgt.down .ar-fa{filter:grayscale(1) brightness(.6)}
+.ar-md .er-dl{max-height:104px}
+.ar-res{display:grid;gap:6px;justify-items:center;text-align:center;margin-top:6px}
+.ar-res .dl{font:700 2.4rem var(--disp);font-variant-numeric:tabular-nums;line-height:1}.ar-res .dl.pos{color:var(--good)}.ar-res .dl.neg{color:var(--bad)}.ar-res .dl.nil{color:var(--mu)}
+.ar-up{padding:6px 12px;border-radius:99px;border:1px solid var(--gold);color:var(--gold);font-weight:700;font-size:.9rem;animation:arPop .5s ease-out}.ar-up.dn{border-color:var(--bad);color:var(--bad)}
+@keyframes arFlame{from{transform:scale(1) rotate(-4deg);opacity:.85}to{transform:scale(1.15) rotate(4deg);opacity:1}}
+@keyframes arLungeA{40%{transform:translateX(26px)}100%{transform:none}}@keyframes arLungeB{40%{transform:translateX(-26px)}100%{transform:none}}
+@keyframes arHit{0%{transform:translateX(0)}20%{transform:translateX(-7px);filter:brightness(2) saturate(2)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}100%{transform:none}}
+@keyframes arFl{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}15%{opacity:1;transform:translate(-50%,0) scale(1.1)}100%{opacity:0;transform:translate(-50%,-44px) scale(1)}}
+@keyframes arPop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.12)}100%{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.ar-torch,.ar-fgt.lunge-a,.ar-fgt.lunge-b,.ar-fgt.hit .ar-fa,.ar-fl,.ar-up{animation:none}.ar-fl{opacity:0}}
 .pt-pond{position:relative;border:1px solid var(--line);border-radius:16px;padding:16px;overflow:hidden;background:linear-gradient(180deg,rgba(30,60,90,.55),rgba(14,28,52,.92)),var(--surf)}
 .pt-pond::before{content:"";position:absolute;inset:auto -10% -30px -10%;height:90px;background:radial-gradient(ellipse at 20% 50%,rgba(120,220,220,.18),transparent 60%),radial-gradient(ellipse at 75% 60%,rgba(120,220,220,.14),transparent 55%);pointer-events:none}
 .pt-hero{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;position:relative}
@@ -507,8 +568,17 @@ async function bossAct(btn,kind){
   await load(true)})}
 
 /* ---------- Arena ---------- */
-async function loadArena(){try{AR=await rpc('game_arena_list')}catch(e){AR=[];say(errTxt(e),'bad')}renderArena()}
-function renderArena(){
+let ARS=null,arAvail=null,arAll=false;
+const LG={bronzo:['Bronzo','🥉','#cd7f32'],argento:['Argento','🥈','#c3cbdc'],oro:['Oro','🥇','#e8b84a'],platino:['Platino','💠','#6fe3d6'],diamante:['Diamante','💎','#6cc7ff'],leggenda:['Leggenda','👑','#ff7ad9']};
+function lgm(k){const b=LG[k]||[k||'?','🏅','#aaa'],x=ARS&&ARS.leagues?ARS.leagues.find(l=>l.key===k):null;return [x?x.name:b[0],b[1],b[2]]}
+function lgChip(k){const l=lgm(k);return `<span class="ar-lg" style="--lc:${l[2]}"><i aria-hidden="true">${l[1]}</i>${esc(l[0])}</span>`}
+function seasonName(s){const [y,m]=String(s).split('-');return new Date(+y,+m-1,1).toLocaleDateString('it-IT',{month:'long',year:'numeric'})}
+async function arData(){
+ try{AR=await rpc('game_arena_list')}catch(e){AR=AR||[];say(errTxt(e),'bad')}
+ if(arAvail===false)return;
+ try{ARS=await rpc('game_arena_state');arAvail=true}catch(e){if(twMissing(e)){arAvail=false}else{say(errTxt(e),'bad')}}}
+async function loadArena(){await arData();renderArena()}
+function renderArenaOld(){
  const m=ST.me,S=ST.settings,d=ST.duels,en=ST.energy,ev=enNow(),canE=ev>=en.min,list=AR||[];lastCan=canE;
  $('p-arena').innerHTML=`<h2 class="er-h">Arena</h2><p class="er-sub">Sfida un altro eroe: vince chi ha più PV alla fine. Vincere ti dà <b>solo XP</b> (di più se l’avversario è più forte di te). Nessun BC in gioco, ma ogni duello consuma <b>energia</b>: ${en.win} se vinci, ${en.loss} se perdi.</p>
  <div class="card"><div class="row" style="justify-content:space-between"><span>Energia</span><b>${Math.floor(ev)} / ${en.max}</b></div>
@@ -522,21 +592,81 @@ function renderArena(){
  <h2 class="er-h">I tuoi ultimi duelli</h2>
  ${d.recent.length?d.recent.map(q=>{const mine=q.attacker_id===m.user_id,win=q.winner===(mine?q.attacker:q.defender);return `<div class="it" style="justify-content:flex-start;gap:10px"><span class="chip ${win?'s':'k'}">${win?'Vinto':'Perso'}</span><span style="min-width:0;overflow-wrap:anywhere">${mine?`Hai sfidato <b>${esc(q.defender)}</b>`:`<b>${esc(q.attacker)}</b> ti ha sfidato`}${mine&&q.xp>0?` · +${num(q.xp)} XP`:''}</span></div>`}).join(''):'<p class="mute">Nessun duello ancora.</p>'}`;
 }
-function duelModal(r){
+function arCmp(mine,theirs){const r=mine>0?theirs/mine:1;return r<0.7?['Molto più debole','w2']:r<0.9?['Più debole','w1']:r<=1.12?['Alla pari','eq']:r<=1.4?['Più forte','s1']:['Molto più forte','s2']}
+function arFace(uid,nick){return face(uid,nick)}
+function renderArena(){
+ if(arAvail===false)return renderArenaOld();
+ if(!ARS){$('p-arena').innerHTML='<h2 class="er-h">Arena</h2><p class="mute">Caricamento…</p>';return}
+ const m=ST.me,en=ST.energy,ev=enNow(),canE=ev>=en.min,list=AR||[],S=ARS,me=S.me,lg=lgm(me.league),mypw=pw(m.stats);lastCan=canE;
+ const nx=me.next_league,span=nx?nx.min_points-me.league_min:1,pct=nx?Math.max(0,Math.min(100,Math.round(100*(me.points-me.league_min)/span))):100;
+ const B=S.board||[],pod=[B[1],B[0],B[2]],med=['🥈','🥇','🥉'];
+ const hero=`<section class="ar-hero" style="--lc:${lg[2]}" aria-label="La tua posizione in Arena"><span class="ar-torch l" aria-hidden="true">🔥</span><span class="ar-torch r" aria-hidden="true">🔥</span>
+  <div class="ar-season"><span>Stagione <b>${esc(seasonName(S.season))}</b></span><span>finisce tra ${S.days_left} ${S.days_left===1?'giorno':'giorni'}</span></div>
+  <div class="ar-me"><div class="ar-emb" aria-hidden="true">${lg[1]}</div><div style="min-width:0"><div class="ar-lgname">Lega ${esc(lg[0])}</div><div class="ar-pts"><b>${num(me.points)}</b>punti Arena</div></div></div>
+  <div class="er-xp" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Avanzamento verso la lega successiva"><i style="width:${pct}%"></i></div>
+  <p class="ar-next">${nx?`Mancano <b>${num(nx.min_points-me.points)}</b> punti alla lega <b>${esc(lgm(nx.key)[0])}</b>.`:'Sei nella lega più alta.'}</p>
+  <div class="ar-stats"><div><b>${me.rank?'#'+me.rank:'—'}</b><small>${me.rank?'su '+me.ranked:'non in classifica'}</small></div><div><b>${num(me.wins)}</b><small>vittorie</small></div><div><b>${num(me.losses)}</b><small>sconfitte</small></div><div><b>${num(me.best)}</b><small>record</small></div></div></section>`;
+ const ctl=`<div class="card"><div class="row" style="justify-content:space-between"><span>Energia</span><b>${Math.floor(ev)} / ${en.max}</b></div>
+  <p class="er-note" style="margin:4px 0 0">Ogni sfida consuma energia (${en.win} se vinci, ${en.loss} se perdi): ne servono almeno ${en.min}. ${ev>=en.max?'La batteria è carica.':`Piena tra ${fmtDur((en.max-ev)/en.per_hour*3600)}.`} Duelli fatti oggi: ${ST.duels.used}.</p>
+  <div class="er-sw" style="margin-top:6px"><span>Accetto sfide in Arena</span><input type="checkbox" id="arOpen" ${m.arena_open?'checked':''} aria-label="Accetto sfide in Arena"></div>
+  <details style="margin-top:8px"><summary><b>Come funzionano i punti</b></summary><ul class="er-note" style="margin:8px 0 0;padding-left:18px;display:grid;gap:4px">
+   <li>Vince chi ha più PV alla fine. Vincere ti dà XP; <b>nessun BC</b> in gioco.</li>
+   <li>Sfidando, i tuoi <b>punti Arena</b> salgono se vinci e scendono se perdi: di più se l’avversario ha più punti di te, di meno se ne ha meno.</li>
+   <li><b>Chi viene sfidato non perde né guadagna punti.</b> Così puoi lasciare le sfide aperte senza rischi.</li>
+   <li>Contro lo stesso avversario contano al massimo <b>${S.pair_max} sfide al giorno</b>: le altre si combattono, ma non cambiano i punti.</li>
+   <li>La stagione dura un mese. Poi i punti tornano a metà strada verso ${num(S.start)} e le leghe si ricominciano a scalare. Il podio della stagione chiusa resta nell’albo d’oro.</li>
+   <li>Leghe: ${S.leagues.map(l=>`${esc(lgm(l.key)[1])} ${esc(l.name)} da ${num(l.min_points)}`).join(' · ')}.</li></ul></details></div>
+  ${!m.stats_set?'<p class="er-msg">Assegna prima i tuoi punti abilità nella scheda <b>Eroe</b>.</p>':!canE?`<p class="er-msg bad">Energia troppo bassa per sfidare: ne servono ${en.min}. Piena tra ${fmtDur((en.max-ev)/en.per_hour*3600)}.</p>`:''}`;
+ const pods=B.length?`<div class="ar-pod" role="list" aria-label="Podio della stagione">${pod.map((b,i)=>b?`<div class="p${[2,1,3][i]}" role="listitem"><span class="md" aria-hidden="true">${med[i]}</span><div class="av" aria-hidden="true">${arFace(b.user_id,b.nickname)}</div><b>${esc(b.nickname)}</b><small>${num(b.points)} pt</small></div>`:'<div style="visibility:hidden"></div>').join('')}</div>`:'';
+ const rest=B.slice(3),shown=arAll?rest:rest.slice(0,5);
+ const lb=B.length?pods+shown.map(b=>`<div class="ar-lb${b.user_id===m.user_id?' me':''}"><span class="rk">${b.rank}</span><div class="av" aria-hidden="true">${arFace(b.user_id,b.nickname)}</div><div style="min-width:0"><button class="er-link" data-hero="${esc(b.user_id)}">${esc(b.nickname)}</button><small>Liv. ${num(b.level)} · ${lgChip(b.league)} · ${b.wins}V ${b.losses}S</small></div><span class="pt">${num(b.points)}</span></div>`).join('')
+   +(rest.length>5?`<button class="btn ghost sm" style="width:100%;margin-top:8px" data-arall>${arAll?'Mostra meno':`Mostra tutta la classifica (${B.length})`}</button>`:''):'<p class="mute">Nessuna sfida valida in questa stagione: la classifica si apre con la prima. Sei in tempo per il primo posto!</p>';
+ const L=S.last_season,hof=L?`<p class="ar-hof">🏛️ <b>Albo d’oro ${esc(seasonName(L.season))}</b>: ${L.top.map((t,i)=>`${med[[1,0,2][i]]||''} ${esc(t.nickname)} (${num(t.points)})`).join(' · ')}${L.me?` · il tuo piazzamento: <b>#${L.me.rank}</b> con ${num(L.me.points)}`:''}</p>`:'';
+ const cards=AR==null?'<p class="mute">Caricamento…</p>':list.length?`<div class="ar-grid">${list.map(a=>{const c=arCmp(mypw,a.power),mx=Math.max(mypw,a.power,1),left=a.rated_left;
+   return `<article class="ar-card"><div class="ar-top"><div class="av" aria-hidden="true">${arFace(a.user_id,a.nickname)}</div><div style="min-width:0"><button class="er-link" data-hero="${esc(a.user_id)}">${esc(a.nickname)}</button><div class="ar-sub"><span>Liv. ${num(a.level)}</span>${lgChip(a.league)}</div></div></div>
+    <div><div class="ar-bars" aria-hidden="true"><span style="width:${Math.round(100*mypw/mx)}%"></span><span class="op ${c[1]}" style="width:${Math.round(100*a.power/mx)}%"></span></div><div class="ar-cmp ${c[1]}">${c[0]} <small>· potenza ${num(a.power)} contro la tua ${num(mypw)}</small></div></div>
+    <div class="ar-stake">${left>0?`<span class="g" title="Punti se vinci">+${num(a.gain)}</span><span class="l" title="Punti se perdi">−${num(Math.abs(a.loss))}</span><small>punti in palio · ${num(a.points)} pt</small>`:`<small>Oggi contro di lui non cambi più i punti (${S.pair_max}/${S.pair_max}) · ${num(a.points)} pt</small>`}</div>
+    <small class="mute">${num(a.bosses_beaten)} boss${a.fights_today>0?` · sfidato ${a.fights_today} ${a.fights_today===1?'volta':'volte'} oggi`:''}${left>0&&left<S.pair_max?` · sfide valide rimaste: ${left}`:''}</small>
+    <button class="btn sm${left>0?' gold':''}" data-duel="${esc(a.user_id)}" ${(!m.stats_set||!canE)?'disabled':''}>${!canE?'Senza energia':a.fights_today>0?'Sfida ancora':'Sfida'}</button></article>`}).join('')}</div>`:'<p class="mute">Nessun altro eroe è disponibile in Arena, per ora.</p>';
+ const rc=S.recent&&S.recent.length?S.recent.map(q=>`<div class="ar-rc"><span class="chip ${q.won?'s':'k'}">${q.won?'Vinto':'Perso'}</span><span style="min-width:0;overflow-wrap:anywhere">Hai sfidato <b>${esc(q.opponent)}</b><small>${q.counted?`punti ora: ${num(q.after)}`:'non ha cambiato i punti (limite giornaliero)'}</small></span><span class="dl ${q.counted?(q.delta>0?'pos':q.delta<0?'neg':'nil'):'nil'}">${q.counted?(q.delta>0?'+':q.delta<0?'−':'')+Math.abs(q.delta):'0'}</span></div>`).join(''):'<p class="mute">Nessuna sfida ancora.</p>';
+ $('p-arena').innerHTML=`<h2 class="er-h" style="margin-bottom:0">Arena</h2>${hero}${ctl}
+  <h2 class="er-h">Classifica della stagione</h2>${lb}${hof}
+  <h2 class="er-h">Sfidanti</h2><p class="er-sub" style="margin-top:0">Ordinati per vicinanza di punti. Il colore dice quanto è forte l’avversario rispetto a te.</p>${cards}
+  <h2 class="er-h">Le tue ultime sfide</h2>${rc}`}
+function duelModal(r,oppId){
  const me=ST.me,op=r.opponent,L=r.log||[];let i=0;
- const o=modal(`<h2>${r.friendly?(r.won?'Amichevole: vittoria':'Amichevole: sconfitta'):(r.won?'Vittoria!':'Sconfitta')}</h2>
-  <div class="er-duel"><div><b>${esc(me.nickname)}</b><small>Liv. ${num(me.level)}</small><div class="er-hp me sm" style="margin-top:6px"><i id="dA" style="width:100%"></i><span id="dAt">${num(r.max_a)}</span></div></div>
-  <div><b>${esc(op)}</b><small>Liv. ${num(r.opponent_level)}</small><div class="er-hp sm" style="margin-top:6px"><i id="dB" style="width:100%"></i><span id="dBt">${num(r.max_b)}</span></div></div></div>
+ const ttl=r.friendly?(r.won?'Amichevole: vittoria':'Amichevole: sconfitta'):(r.won?'Vittoria!':'Sconfitta');
+ const o=modal(`<h2>${ttl}</h2>
+  <div class="ar-scene" aria-label="Scena del duello">
+   <div class="ar-fgt" id="fA"><div class="ar-fa" aria-hidden="true">${face(me.user_id,me.nickname)}</div><b>${esc(me.nickname)}</b><small>Liv. ${num(me.level)}</small><div class="er-hp me sm"><i id="dA" style="width:100%"></i><span id="dAt">${num(r.max_a)}</span></div></div>
+   <div class="ar-vs" aria-hidden="true">VS</div>
+   <div class="ar-fgt foe" id="fB"><div class="ar-fa" aria-hidden="true">${oppId?face(oppId,op):ini(op)}</div><b>${esc(op)}</b><small>Liv. ${num(r.opponent_level)}</small><div class="er-hp sm"><i id="dB" style="width:100%"></i><span id="dBt">${num(r.max_b)}</span></div></div>
+  </div>
   <ul class="er-dl" id="dLog" aria-live="off"></ul><div id="dRes"></div>
   <div class="row" style="margin-top:12px"><button class="btn ghost" id="dSkip">Salta</button><button class="btn" data-close>Chiudi</button></div>`);
- const A=o.querySelector('#dA'),B=o.querySelector('#dB'),At=o.querySelector('#dAt'),Bt=o.querySelector('#dBt'),G=o.querySelector('#dLog');
- const upd=(ha,hb)=>{A.style.width=(100*ha/r.max_a)+'%';B.style.width=(100*hb/r.max_b)+'%';At.textContent=num(ha)+' / '+num(r.max_a);Bt.textContent=num(hb)+' / '+num(r.max_b)};
- const step=s=>{const w=s.w==='a'?esc(me.nickname):esc(op);G.insertAdjacentHTML('beforeend',`<li><b>${w}</b> ${s.x?'attacca ma viene schivato':`infligge ${num(s.d)} danni${s.c?' (critico!)':''}`}</li>`);G.scrollTop=G.scrollHeight;upd(s.ha,s.hb)};
- const fin=()=>{if(o._t){clearInterval(o._t);o._t=null}G.innerHTML=L.map(s=>`<li><b>${s.w==='a'?esc(me.nickname):esc(op)}</b> ${s.x?'attacca ma viene schivato':`infligge ${num(s.d)} danni${s.c?' (critico!)':''}`}</li>`).join('');upd(r.hp_a,r.hp_b);
-  o.querySelector('#dRes').innerHTML=r.friendly?`<p class="er-big ${r.won?'w':'l'}">${r.won?(r.counted?'Vittoria valida':'Vittoria'):'Sconfitta'}</p><p class="mute" style="text-align:center;margin:0">${r.won?(r.counted?`Conta per i punti abilità: ${num(r.spar_wins)} vittorie, ne mancano <b>${num(r.to_next)}</b> al prossimo punto.${r.point_gained?' <b>Hai guadagnato 1 punto abilità!</b>':''}`:(r.reason==='pair'?'Questa vittoria non conta: oggi hai già ottenuto il massimo contro questo avversario.':'Questa vittoria non conta: oggi hai raggiunto il limite di vittorie valide.')):'Nessun problema: è solo allenamento.'} Nessuna energia, XP o BC in gioco.</p>`:`<p class="er-big ${r.won?'w':'l'}">${r.won?`+${num(r.xp)} XP`:'Nessun XP'}</p><p class="mute" style="text-align:center;margin:0">${r.won?(r.levels>0?`Sei salito al livello <b>${num(r.level)}</b>! `:'Solo XP: nessun BC in palio in Arena. ')+(r.energy_full?'Energia ricaricata al <b>100%</b>!':`Energia −${r.energy_cost}.`):`Hai perso: energia −${r.energy_cost}. Riprova con un altro avversario quando la batteria si è ricaricata.`}</p>`;o.querySelector('#dSkip').hidden=true};
+ o.firstElementChild.classList.add('ar-md');
+ const A=o.querySelector('#dA'),B=o.querySelector('#dB'),At=o.querySelector('#dAt'),Bt=o.querySelector('#dBt'),G=o.querySelector('#dLog'),FA=o.querySelector('#fA'),FB=o.querySelector('#fB');
+ const upd=(ha,hb)=>{A.style.width=(100*ha/r.max_a)+'%';B.style.width=(100*hb/r.max_b)+'%';At.textContent=num(ha)+' / '+num(r.max_a);Bt.textContent=num(hb)+' / '+num(r.max_b);FA.classList.toggle('down',ha<=0);FB.classList.toggle('down',hb<=0)};
+ const line=s=>`<li><b>${s.w==='a'?esc(me.nickname):esc(op)}</b> ${s.x?'attacca ma viene schivato':`infligge ${num(s.d)} danni${s.c?' (critico!)':''}`}</li>`;
+ const fl=(el,t,k)=>{const e=document.createElement('span');e.className='ar-fl '+k;e.textContent=t;e.setAttribute('aria-hidden','true');el.appendChild(e);setTimeout(()=>e.remove(),1050)};
+ const fx=s=>{const att=s.w==='a'?FA:FB,def=s.w==='a'?FB:FA,lc=s.w==='a'?'lunge-a':'lunge-b';
+  att.classList.remove('lunge-a','lunge-b');void att.offsetWidth;att.classList.add(lc);
+  if(s.x){fl(def,'Schivata','dg')}else{def.classList.remove('hit');void def.offsetWidth;def.classList.add('hit');fl(def,(s.c?'CRITICO −':'−')+num(s.d),s.c?'crit':'dm')}};
+ const step=s=>{G.insertAdjacentHTML('beforeend',line(s));G.scrollTop=G.scrollHeight;fx(s);upd(s.ha,s.hb)};
+ const ar=r.arena;
+ const arenaHtml=()=>{
+  if(!ar)return '';
+  if(!ar.counted)return `<div class="ar-res"><div class="dl nil">0</div><p class="mute" style="margin:0">Questa sfida non cambia i punti: oggi hai già fatto le ${num(ar.pair_max)} sfide valide contro ${esc(op)}.</p></div>`;
+  const dl=ar.delta,cl=dl>0?'pos':dl<0?'neg':'nil',mn=x=>lgm(x)[0],ord=k=>{const l=ARS&&ARS.leagues?ARS.leagues.findIndex(z=>z.key===k):-1;return l};
+  const up=ar.league_changed&&ord(ar.league_after)>ord(ar.league_before);
+  return `<div class="ar-res"><div class="dl ${cl}">${dl>0?'+':dl<0?'−':''}${num(Math.abs(dl))}</div><div class="mute">punti Arena · ora <b style="color:var(--tx)">${num(ar.points)}</b> ${lgChip(ar.league_after)}</div>${ar.league_changed?`<div class="ar-up${up?'':' dn'}">${up?`Promozione! Sei salito alla lega ${esc(mn(ar.league_after))}`:`Retrocessione alla lega ${esc(mn(ar.league_after))}`}</div>`:''}</div>`};
+ const fin=()=>{if(o._t){clearInterval(o._t);o._t=null}G.innerHTML=L.map(line).join('');upd(r.hp_a,r.hp_b);
+  o.querySelector('#dRes').innerHTML=r.friendly?`<p class="er-big ${r.won?'w':'l'}">${r.won?(r.counted?'Vittoria valida':'Vittoria'):'Sconfitta'}</p><p class="mute" style="text-align:center;margin:0">${r.won?(r.counted?`Conta per i punti abilità: ${num(r.spar_wins)} vittorie, ne mancano <b>${num(r.to_next)}</b> al prossimo punto.${r.point_gained?' <b>Hai guadagnato 1 punto abilità!</b>':''}`:(r.reason==='pair'?'Questa vittoria non conta: oggi hai già ottenuto il massimo contro questo avversario.':'Questa vittoria non conta: oggi hai raggiunto il limite di vittorie valide.')):'Nessun problema: è solo allenamento.'} Nessuna energia, XP o BC in gioco.</p>`
+   :`<p class="er-big ${r.won?'w':'l'}">${r.won?`+${num(r.xp)} XP`:'Nessun XP'}</p>${arenaHtml()}<p class="mute" style="text-align:center;margin:8px 0 0">${r.won?(r.levels>0?`Sei salito al livello <b>${num(r.level)}</b>! `:'Solo XP: nessun BC in palio in Arena. ')+(r.energy_full?'Energia ricaricata al <b>100%</b>!':`Energia −${r.energy_cost}.`):`Hai perso: energia −${r.energy_cost}. Riprova con un altro avversario quando la batteria si è ricaricata.`}</p>`;
+  o.querySelector('#dSkip').hidden=true};
  o.querySelector('#dSkip').onclick=fin;
  if(matchMedia('(prefers-reduced-motion: reduce)').matches||!L.length){fin()}
- else{o._t=setInterval(()=>{if(i>=L.length){fin();return}step(L[i++])},420)}}
+ else{o._t=setInterval(()=>{if(i>=L.length){fin();return}step(L[i++])},520)}}
 
 /* ---------- Dungeon ---------- */
 const ROLES={tank:['Tank','🛡️','Più PV (+30%), attira i colpi e ne subisce meno; colpisce piano.'],dps:['Danni','⚔️','Colpisce più forte (+40%), ma regge meno.'],support:['Supporto','💚','Cura ogni round l’alleato più ferito (conta lo Spirito); colpisce poco.']};
@@ -1013,7 +1143,7 @@ async function load(keepDraft){
  try{const c=await sb.from('system_settings').select('value_int').eq('key','game_level_cap').maybeSingle();const n=c&&c.data?Number(c.data.value_int):9999;CAP=n>=100&&n<=9999?n:9999}catch(_){CAP=9999}
  try{const w=await sb.from('wallets').select('balance').eq('user_id',ME.user_id).maybeSingle();BAL=w.data?w.data.balance:null}catch(_){}
  $('gate').hidden=true;$('main').hidden=false;paint();
- if(tab==='arena'){AR=await rpc('game_arena_list').catch(()=>AR);renderArena()}}
+ if(tab==='arena'){await arData();renderArena()}}
 async function boot(){
  if(!window.supabase){gate('<section class="card er-gate" style="margin-top:20px"><h2>Collegamento non riuscito</h2><p class="mute">Impossibile caricare la libreria di accesso. Controlla la connessione e riprova.</p></section>');return}
  try{
@@ -1048,7 +1178,7 @@ document.addEventListener('click',e=>{
  if(t.dataset.tstop!=null){const id='tr:stop';
   if(TR&&TR.active&&TR.active.kind==='stat'&&pending!==id){pending=id;renderTrain();setTimeout(()=>{if(pending===id){pending=null;if(tab==='train')renderTrain()}},5000);return}
   pending=null;run(t,async()=>{const r=await rpc('game_train_stop');TR=r;lastTr=Date.now();trAR=null;await load(true);say(r.lost?'Allenamento fermato: il progresso è andato perso.':r.stopped?'Allenamento fermato.':'Allenamento completato.',r.lost?'':'good');renderTrain()});return}
- if(t.dataset.spar){run(t,async()=>{const r=await rpc('game_spar',{p_target:t.dataset.spar});await loadTrain();if(r.point_gained)await load(true);duelModal(r)});return}
+ if(t.dataset.spar){run(t,async()=>{const r=await rpc('game_spar',{p_target:t.dataset.spar});await loadTrain();if(r.point_gained)await load(true);duelModal(r,t.dataset.spar)});return}
  if(t.dataset.pond!=null){setTab('pond');window.scrollTo({top:0,behavior:'smooth'});return}
  if(t.dataset.pchoose){const id='pc:'+t.dataset.pchoose;
   if(pending!==id){pending=id;renderPond();setTimeout(()=>{if(pending===id){pending=null;if(tab==='pond')renderPond()}},5000);return}
@@ -1104,7 +1234,8 @@ document.addEventListener('click',e=>{
  if(t.dataset.djoin){dngRun(t,async()=>{await rpc('game_dungeon_join',{p_run:t.dataset.djoin,p_role:t.dataset.role});say('Sei nella lobby! Aspetta che il capo faccia partire il dungeon.','good');await loadDng(true)});return}
  if(t.id==='dgLeave'){dngRun(t,async()=>{await rpc('game_dungeon_leave',{p_run:DS.my_run.run_id});say('Sei uscito dalla lobby.');await loadDng(true)});return}
  if(t.id==='dgStart'){dngRun(t,async()=>{const r=await rpc('game_dungeon_start',{p_run:DS.my_run.run_id});clearSay();if(r.result)seenSet(r.run_id);await load(true);await loadDng(true);if(r.result)dngModal(r.result,r.dungeon_no)});return}
- if(t.dataset.duel){run(t,async()=>{const r=await rpc('game_duel',{p_target:t.dataset.duel});await load(false);duelModal(r)});return}
+ if(t.dataset.arall!=null){arAll=!arAll;renderArena();return}
+ if(t.dataset.duel){run(t,async()=>{const r=await rpc('game_duel',{p_target:t.dataset.duel});await load(false);duelModal(r,t.dataset.duel)});return}
  if(t.dataset.buy){const id=t.dataset.buy;
   if(pending!==id){pending=id;renderShop();setTimeout(()=>{if(pending===id){pending=null;if(tab==='shop')renderShop()}},5000);return}
   pending=null;run(t,async()=>{const r=await rpc('game_buy',{p_item:id});say(`Hai acquistato <b>${esc(r.item)}</b> per ${num(r.price)} BC. Lo trovi nello zaino: indossalo dalla scheda Eroe.`,'good');BAL=r.balance;await load(true)});return}
