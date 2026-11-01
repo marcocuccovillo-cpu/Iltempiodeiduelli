@@ -6,7 +6,6 @@
     ['Il Sentiero', 'sentiero.html', '✦', ''],
     ['Black Market', 'black-market.html', '◈', 'bm'],
     ['Ladder', 'black-market.html#/ladder', '⚔', 'bm'],
-    ['Black Market Shop', 'black-market.html#/shop', '❖', 'bm'],
     ['La guerra degli Eroi', 'eroi.html', '⚜', ''],
     ['Duel Simulator', 'duel-simulator.html', '♠', ''],
     ['Gestisci torneo', 'gestisci-torneo.html', '♜', ''],

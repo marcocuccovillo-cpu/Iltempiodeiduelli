@@ -14,9 +14,22 @@
   --cy:#00e5ff;--cy2:#6ff0ff;--ac-rgb:0,229,255;--mu-rgb:148,163,184;--raise-rgb:19,34,74;--inp:#050b1a;--inp-rgb:5,11,26;--deep:#030816;--deep-rgb:3,8,22;--hero-a:#162a5c;--hero-b:#0b1326;--bar-a:#0891b2}
 html,body{background:var(--bg)}
 .pg{max-width:940px}
-.bm-nav{display:flex;gap:4px;overflow-x:auto;margin:0 -16px 24px;padding:0 8px;border-bottom:1px solid var(--line);position:sticky;top:var(--bar-h);background:var(--bg);z-index:5}
-.bm-nav a,.bm-nav button{flex:none;display:flex;align-items:center;min-height:48px;padding:0 14px;border:0;background:none;color:var(--mu);font:700 .95rem var(--ui);text-decoration:none;cursor:pointer}
-.bm-nav a[aria-current]{color:var(--gold);box-shadow:inset 0 -3px var(--gold)}
+.bm-head{position:sticky;top:var(--bar-h);z-index:20;margin:0 -16px 20px;padding:8px 16px;background:rgba(0,0,0,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bm-bar{display:flex;gap:8px;align-items:stretch}
+.bm-cur{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:52px;padding:6px 12px;border:1.5px solid var(--gold);border-radius:14px;background:linear-gradient(180deg,rgba(212,168,67,.16),rgba(212,168,67,.05));color:var(--tx);font:inherit;text-align:left;cursor:pointer}
+.bm-cur:hover{background:rgba(212,168,67,.2)}.bm-cur .ic{flex:none;font-size:1.5rem;line-height:1}
+.bm-cur .tx{flex:1;min-width:0;display:grid}.bm-cur small{color:var(--mu);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}.bm-cur b{font:700 1.05rem var(--ui);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bm-cur .chev{flex:none;display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:99px;background:var(--gold);color:#1a1204;font:700 .82rem var(--ui)}.bm-cur .chev i{font-style:normal;transition:transform .2s}.bm-cur[aria-expanded=true] .chev i{transform:rotate(180deg)}
+.bm-out{flex:none;min-height:52px;padding:0 14px;border:1px solid var(--line);border-radius:14px;background:none;color:var(--mu);font:700 .9rem var(--ui);cursor:pointer}.bm-out:hover{color:var(--tx);border-color:var(--gold)}
+.bm-grid{position:absolute;left:0;right:0;top:100%;max-height:calc(100vh - var(--bar-h) - 90px);overflow-y:auto;padding:12px 16px 16px;background:#0b0b0f;border-bottom:2px solid var(--gold);box-shadow:0 18px 30px rgba(0,0,0,.7)}
+.bm-grid[hidden]{display:none}
+.bm-gt{margin:10px 0 6px;color:var(--gold);font:700 .74rem var(--ui);letter-spacing:.12em;text-transform:uppercase}.bm-gt:first-child{margin-top:0}
+.bm-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.bm-tile{display:grid;justify-items:center;align-content:center;gap:5px;min-height:78px;padding:10px 6px;border:1px solid var(--line);border-radius:14px;background:var(--surf);color:var(--tx);text-decoration:none;text-align:center;font:700 .84rem/1.2 var(--ui);overflow-wrap:anywhere}
+.bm-tile i{font-style:normal;font-size:1.6rem;line-height:1}.bm-tile:hover{border-color:var(--gold);background:var(--raise)}
+.bm-tile[aria-current]{border-color:var(--gold);background:rgba(212,168,67,.16);color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.bm-hub{margin:0 0 22px;padding:14px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,rgba(212,168,67,.07),transparent)}.bm-hub h2{margin:0 0 4px;font-size:1.05rem;color:var(--gold)}
+@media(prefers-reduced-motion:reduce){.bm-cur .chev i{transition:none}}
 h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold)}
 .sub{color:var(--mu);margin:8px 0 0}
 .grid{display:grid;gap:14px}@media(min-width:700px){.grid.c2{grid-template-columns:1fr 1fr}.grid.c3{grid-template-columns:repeat(3,1fr)}}
@@ -56,9 +69,9 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 </style></head><body>
 
 <main class="pg" id="app"><p class="mute">Caricamento…</p></main><div id="toast" hidden role="status"></div>
-<script src="tempio.js?v=12"></script>
+<script src="tempio.js?v=13"></script>
 <script src="badge.js?v=13"></script>
-<script src="black-market-moduli.js?v=20"></script>
+<script src="black-market-moduli.js?v=21"></script>
 <script src="shop-art-extra.js?v=1"></script>
 <script src="shop-art.js?v=13"></script>
 <script src="black-market-shop.js?v=13"></script>
@@ -107,8 +120,21 @@ async function core(){let ps;try{ps=await q(sb.from('profiles').select('id,nickn
  const u=(await sb.auth.getUser()).data.user;me=P.get(u.id)||null;if(!me)return false;
  const w=await q(sb.from('wallets').select('balance').eq('user_id',me.id));wallet=w[0]?.balance||0;
  const st=await q(sb.from('system_settings').select('key,value_int'));S=Object.fromEntries(st.map(s=>[s.key,s.value_int]));return true}
+const NAVI={'':['◈','Dashboard'],wanted:['🎯','Most Wanted'],new:['➕','Metti una taglia'],log:['📜','Registro'],wallet:['👛','Wallet'],events:['🏆','Eventi'],ladder:['⚔️','Ladder'],hof:['🏛️','Hall of Fame'],factions:['🚩','Faction Wars'],challenges:['🥷','Underground'],bets:['🎲','Scommesse'],shop:['🛍️','Shop'],admin:['🛡️','Admin']};
+const NAVG=[['Il mercato',['','wanted','new','log','wallet']],['Competizioni',['events','ladder','hof','factions','challenges','bets']],['Negozio e gestione',['shop','admin']]];
+let navOpen=false;
+function navTiles(items,cur){const lab=new Map(items),used=new Set();
+ const g=NAVG.map(([t,ks])=>[t,ks.filter(k=>lab.has(k))]);g.forEach(x=>x[1].forEach(k=>used.add(k)));
+ const rest=items.map(x=>x[0]).filter(k=>!used.has(k));if(rest.length)g.push(['Altro',rest]);
+ return g.filter(x=>x[1].length).map(([t,ks])=>`<p class="bm-gt">${t}</p><div class="bm-tiles">${ks.map(k=>`<a class="bm-tile" href="#/${k}" ${cur==k?'aria-current="page"':''}><i aria-hidden="true">${(NAVI[k]||['•'])[0]}</i><span>${esc(lab.get(k))}</span></a>`).join('')}</div>`).join('')}
 function shell(inner,cur){const items=[['','Dashboard'],['wanted','Most Wanted'],['new','Metti una taglia'],['log','Registro'],['wallet','Wallet'],['events','Eventi']];if(BM.navItems)items.push(...BM.navItems());if(me.role=='admin')items.push(['admin','Admin']);
- $app.innerHTML=`<nav class="bm-nav" aria-label="Black Market">${items.map(([h,l])=>`<a href="#/${h}" ${cur==h?'aria-current="page"':''}>${l}</a>`).join('')}<button data-act="out">Esci</button></nav>${inner}`}
+ const key=cur=='e'?'events':cur,hit=items.find(x=>x[0]==key),ic=hit?(NAVI[hit[0]]||['•'])[0]:'◈',name=hit?hit[1]:'Black Market';
+ const tiles=navTiles(items,key);
+ $app.innerHTML=`<nav class="bm-head" aria-label="Sezioni del Black Market"><div class="bm-bar"><button class="bm-cur" data-act="navtog" id="bmCur" aria-expanded="${navOpen}" aria-controls="bmGrid"><span class="ic" aria-hidden="true">${ic}</span><span class="tx"><small>Sei in</small><b>${esc(name)}</b></span><span class="chev">Sezioni <i aria-hidden="true">▾</i></span></button><button class="bm-out" data-act="out">Esci</button></div>
+  <div class="bm-grid" id="bmGrid" ${navOpen?'':'hidden'}>${tiles}</div></nav>${key===''?`<section class="bm-hub" aria-label="Tutte le sezioni"><h2>Dove vuoi andare?</h2>${tiles}</section>`:''}${inner}`}
+function navClose(focus){const g=document.getElementById('bmGrid'),b=document.getElementById('bmCur');if(!g||g.hidden)return;g.hidden=true;navOpen=false;if(b){b.setAttribute('aria-expanded','false');if(focus)b.focus()}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')navClose(true)});
+document.addEventListener('click',e=>{if(!e.target.closest('.bm-head'))navClose(false)});
 const card=(r,i)=>`<div class="row2">${i!=null?`<span class="rank">${i+1}</span>`:''}${av(P.get(r.id))}<div class="g"><a href="#/p/${r.id}">${esc(r.nickname)}</a><small>${r.active_count} ${r.active_count==1?'taglia attiva':'taglie attive'} · ultima ${when(r.last_at)}</small></div><span class="val">${BC(r.bounty_value)}</span>${BM.huntBtn?BM.huntBtn(r.id,'Sfida'):''}</div>`;
 const feedRow=f=>f.kind=='bounty'?`<div class="row2"><div class="g">${f.actor_id?link(f.actor_id):'Anonimo'} ha messo una taglia su ${link(f.target_id)}<small>${when(f.at)}</small></div><span class="val">${BC(f.amount)}</span></div>`
  :`<div class="row2"><div class="g">${link(f.actor_id)} ha riscosso la taglia su ${link(f.target_id)}<small>${when(f.at)}</small></div><span class="val">${BC(f.amount)}</span></div>`;
@@ -204,6 +230,7 @@ const ask=m=>{const r=prompt(m);return r&&r.trim().length>=5?r.trim():(r!==null&
 async function act(el){const a=el.dataset.act;
  try{
  if(BM.act&&await BM.act(a,el))return;
+ if(a=='navtog'){const g=document.getElementById('bmGrid');if(g){g.hidden=!g.hidden;navOpen=!g.hidden;el.setAttribute('aria-expanded',String(navOpen));if(navOpen){const c=g.querySelector('[aria-current]')||g.querySelector('a');if(c&&c.scrollIntoView)c.scrollIntoView({block:'nearest'})}}return}
  if(a=='out'){await sb.auth.signOut();return}
  if(a=='mode'){authView(el.dataset.m);return}
  if(a=='sort'){sessionStorage.setItem('bm.sort',el.dataset.v);route();return}
@@ -222,7 +249,7 @@ async function act(el){const a=el.dataset.act;
  }catch(er){toast(er.message,1)}}
 $app.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(b){if(b.tagName=='SELECT')return;act(b)}});
 $app.addEventListener('change',async e=>{const s=e.target;if(s.dataset.act=='role'){const r=ask('Motivazione del cambio ruolo:');if(!r){route();return}try{await rpc('admin_set_role',{p_user:s.dataset.u,p_role:s.value,p_reason:r});await core();route()}catch(er){toast(er.message,1);route()}}});
-async function route(){if(!me)return;const h=location.hash.replace(/^#\/?/,'').split('/'),k=h[0]||'';
+async function route(){if(!me)return;navOpen=false;const h=location.hash.replace(/^#\/?/,'').split('/'),k=h[0]||'';
  try{await (R[k]||R[''])(h[1])}catch(er){shell(`<div class="err">Qualcosa è andato storto: ${esc(er.message)}</div>`,'')}scrollTo(0,0)}
 async function boot(){const{data:{session}}=await sb.auth.getSession();if(!session){me=null;authView('in');return}
  let ok;try{ok=await core()}catch(er){$app.innerHTML=`<div class="err">Impossibile contattare il database: ${esc(er.message)}. Controlla la configurazione.</div>`;return}

@@ -113,7 +113,7 @@ Nuova migrazione **004** (`black-market-ladder-rewards.sql`): si applica dopo 00
 ## Ruolo Moderatore e Funzioni Mod (migrazione 005)
 Nuova migrazione **005** (`black-market-moderatore.sql`): si applica dopo 001–004, una volta sola. Aggiunge il ruolo **Moderatore**, che **assegni solo tu** da Admin › Utenti (menu del ruolo, con motivazione). Nessuno può nominarsi o promuoversi, nemmeno un moderatore.
 
-**Cosa può fare un moderatore** (sempre con audit; la sezione è nel menu del Black Market: **Funzioni Mod**, visibile solo a te e ai moderatori):
+**Cosa può fare un moderatore** (sempre con audit; la sezione **Funzioni Mod** è stata poi **eliminata dal sito** il 1 novembre 2026, vedi in fondo):
 - **Verificare i match ufficiali** in attesa, di qualsiasi evento (`mod_verify_match`). La verifica non si modifica più e sblocca la riscossione delle taglie.
 - **Gestire la Ladder**: decidere i match contestati o fermi e annullare le sfide abbandonate. Il risultato deciso chiude il match come una conferma normale: Elo, premio di 20 BC e match WPA seguono le regole della 004.
 - **Rimuovere un duellante**: "rimuovere" significa **sospendere** l'account (non può più agire e non si può sfidare), con possibilità di riattivarlo. Match, saldi e registro restano intatti. Non può sospendere amministratori o altri moderatori.
@@ -702,6 +702,16 @@ L'Arena diventa competitiva, con una grafica nuova. **Funzionamento (scelte mie:
 
 - Esecuzione: `black-market-eroi-arena.sql` una volta, dopo `black-market-eroi-ricarica-livello-100.sql` (si può rieseguire; punti e stagioni restano). Annullamento: `black-market-eroi-arena-down.sql` (rimette le due funzioni com'erano; **i punti spariscono**). Sito: `eroi.html` e `sw.js` (cache v64).
 - Provato (PostgreSQL 16 locale, **non su un Supabase vero**, e Chromium a 390 e 1280 px con Supabase simulato): `black-market-eroi-arena-test.sql` con 15 scenari (formula, tetto giornaliero, stagioni e albo d'oro, classifica, permessi, cronologia, nessun BC); le funzioni tornano byte per byte come prima con l'annullamento.
+
+## Menù: via «Black Market Shop» e «Funzioni Mod», nuovo menù delle sezioni del Black Market (1 novembre 2026)
+
+Solo modifiche al sito (nessuna migrazione, nessun cambiamento al database):
+
+- **Menù laterale**: tolta la voce «Black Market Shop» (lo Shop resta tra le sezioni del Black Market).
+- **Funzioni Mod eliminata**: la pagina e la sua voce di menù non esistono più (`#/mod` ora porta alla Dashboard). Resta tutto nel **Pannello amministratore**: utenti e sospensioni, taglie (revisione/annullo), contestazioni, ladder da gestire, correzione/annullo dei risultati chiusi. **Non c'è più** nel sito: la verifica di un match ufficiale da parte di un moderatore (`mod_verify_match`) e, per chi ha il ruolo *moderatore*, qualunque strumento di moderazione (non ha accesso al Pannello amministratore). Le funzioni del database della migrazione 005 restano: sono solo scollegate dal sito. Per riaverla basta rimettere i file precedenti.
+- **Nuovo menù delle sezioni del Black Market**: in alto una barra fissa mostra dove sei («Sei in Ladder») con il pulsante **Sezioni**: apre una tendina con tutte le sezioni come **tessere con icona**, raggruppate (Il mercato · Competizioni · Negozio e gestione), la sezione corrente evidenziata in oro. Si chiude con Esc, toccando fuori o scegliendo una sezione. Sulla **Dashboard** le tessere sono già in vista sotto la barra («Dove vuoi andare?»). Compaiono solo le sezioni attive per chi guarda (moduli accesi, Shop, Scommesse, Admin solo agli amministratori). Il pulsante **Esci** resta sempre a portata.
+- File: `tempio.js` (v13), `black-market.html`, `black-market-moduli.js` (v21), `sw.js` (cache v65); le altre pagine HTML cambiano solo per il numero di versione di `tempio.js`.
+- Provato con Chromium a 390 e 1280 px (Supabase simulato): barra, tendina, evidenziazione, chiusura con Esc/fuori, cambio sezione, barra fissa durante lo scorrimento, nessuno scorrimento orizzontale, nessun errore JS; con utente normale e amministratore.
 
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.
