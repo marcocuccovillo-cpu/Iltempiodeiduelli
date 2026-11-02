@@ -105,42 +105,44 @@ window.BM_INVITE = function (BM) {
   /* ---------- dashboard: riquadro invito + ultima vittoria in Ladder ---------- */
   const dash = R[''];
   R[''] = async (...a) => {
-    await autoRedeem();
+    try { await autoRedeem() } catch (er) {}
     await dash(...a);
-    const app = document.getElementById('app'), anchor = app && app.querySelector('.grid');
-    if (!anchor) return;
+    try { await dashExtras() } catch (er) { console.warn('Inviti: riquadri della dashboard non mostrati', er) }   // un extra non deve mai bloccare la dashboard
+  };
+  /* il punto d'aggancio si cerca DOPO ogni attesa: nel frattempo la pagina può essere stata ridisegnata */
+  const spot = () => { const app = document.getElementById('app'), g = app && app.querySelector('.grid'); return g && g.isConnected && g.parentNode ? g : null };
+  async function dashExtras() {
     let i = null; try { i = await load() } catch (er) { return }
     if (location.hash.replace(/^#\/?/, '') !== '') return;            // nel frattempo si è cambiata pagina
+    let anchor = spot(); if (!anchor || document.querySelector('#app .iv-pro')) return;
     const box = document.createElement('div');
     box.className = 'iv-pro';
     box.innerHTML = `<span class="e" aria-hidden="true">🤝</span><div class="g"><b>+${num(i.reward)} BC</b> per ogni amico che porti nel Tempio<br><small class="mute">${i.friends.length ? `${i.friends.filter(f => f.played).length} su ${i.friends.length} hanno già giocato` : 'Più duellanti = più sfide, più taglie, più boss abbattuti.'}</small></div><a class="btn wa sm" href="#/invita">Invita</a>`;
     anchor.parentNode.insertBefore(box, anchor);
     /* ultima vittoria in Ladder (48 ore) */
     if (BM.S.module_ladder != 1 || !window.TempioShare) return;
-    try {
-      const me = BM.me.id, since = new Date(Date.now() - 48 * 3600e3).toISOString();
-      const ms = await BM.q(BM.sb.from('ladder_matches').select('*').eq('status', 'closed').gte('closed_at', since).or(`challenger_id.eq.${me},opponent_id.eq.${me}`).order('closed_at', { ascending: false }).limit(5));
-      const w = ms.find(m => (m.reported_result === 'challenger' && m.challenger_id === me) || (m.reported_result === 'opponent' && m.opponent_id === me));
-      if (!w || read('tempio.sharedwin') === w.id) return;
-      const opp = BM.pn(w.challenger_id === me ? w.opponent_id : w.challenger_id), d = w.challenger_id === me ? w.elo_challenger_delta : w.elo_opponent_delta;
-      const sc = w.challenger_id === me ? w.reported_score : String(w.reported_score || '').split('-').reverse().join('-');
-      const vb = document.createElement('div'); vb.className = 'iv-pro'; vb.style.borderColor = 'rgba(167,139,250,.55)';
-      vb.innerHTML = `<span class="e" aria-hidden="true">⚔️</span><div class="g"><b style="color:var(--ac2,#c9b8ff)">Hai battuto ${esc(opp)}</b> in Ladder ${esc(w.format)}${sc ? ' · ' + esc(sc) : ''}<br><small class="mute">Fallo sapere al gruppo</small></div><button type="button" class="btn wa sm" data-act="ivWin" data-m="${w.id}">Condividi</button>`;
-      box.parentNode.insertBefore(vb, box.nextSibling);
-      vb.dataset.o = opp; vb.dataset.d = d == null ? '' : d; vb.dataset.s = sc || ''; vb.dataset.f = w.format;
-    } catch (er) { /* solo un extra: se non si legge, non si mostra */ }
-  };
+    const me = BM.me.id, since = new Date(Date.now() - 48 * 3600e3).toISOString();
+    const ms = await BM.q(BM.sb.from('ladder_matches').select('*').eq('status', 'closed').gte('closed_at', since).or(`challenger_id.eq.${me},opponent_id.eq.${me}`).order('closed_at', { ascending: false }).limit(5));
+    const w = ms.find(m => (m.reported_result === 'challenger' && m.challenger_id === me) || (m.reported_result === 'opponent' && m.opponent_id === me));
+    if (!w || read('tempio.sharedwin') === w.id || !box.isConnected || !box.parentNode) return;
+    const opp = BM.pn(w.challenger_id === me ? w.opponent_id : w.challenger_id), d = w.challenger_id === me ? w.elo_challenger_delta : w.elo_opponent_delta;
+    const sc = w.challenger_id === me ? w.reported_score : String(w.reported_score || '').split('-').reverse().join('-');
+    const vb = document.createElement('div'); vb.className = 'iv-pro'; vb.style.borderColor = 'rgba(167,139,250,.55)';
+    vb.innerHTML = `<span class="e" aria-hidden="true">⚔️</span><div class="g"><b style="color:var(--ac2,#c9b8ff)">Hai battuto ${esc(opp)}</b> in Ladder ${esc(w.format)}${sc ? ' · ' + esc(sc) : ''}<br><small class="mute">Fallo sapere al gruppo</small></div><button type="button" class="btn wa sm" data-act="ivWin" data-m="${w.id}">Condividi</button>`;
+    vb.dataset.o = opp; vb.dataset.d = d == null ? '' : d; vb.dataset.s = sc || ''; vb.dataset.f = w.format;
+    box.parentNode.insertBefore(vb, box.nextSibling);
+  }
 
   /* ---------- Most Wanted: condividi i ricercati ---------- */
   const wanted = R.wanted;
   R.wanted = async (...a) => {
     await wanted(...a);
     if (!window.TempioShare) return;
-    const h = document.querySelector('#app h1.t'); if (!h) return;
+    const h = document.querySelector('#app h1.t'); if (!h || !h.parentNode) return;
     const b = document.createElement('div'); b.className = 'row'; b.style.marginTop = '10px';
     b.innerHTML = '<button type="button" class="btn wa sm" data-act="ivWanted">Condividi i ricercati</button>';
     const sub = h.nextElementSibling && h.nextElementSibling.classList.contains('sub') ? h.nextElementSibling : h;
-    sub.parentNode.insertBefore(b, sub.nextSibling);
+    if (sub.parentNode) sub.parentNode.insertBefore(b, sub.nextSibling);
   };
 
   /* ---------- profilo: taglia appena pubblicata ---------- */
