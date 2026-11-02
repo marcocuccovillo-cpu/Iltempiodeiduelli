@@ -713,5 +713,11 @@ Solo modifiche al sito (nessuna migrazione, nessun cambiamento al database):
 - File: `tempio.js` (v14), `black-market.html`, `black-market-moduli.js` (v21), `sw.js` (cache v66); le altre pagine HTML cambiano solo per il numero di versione di `tempio.js`.
 - Provato con Chromium a 390 e 1280 px (Supabase simulato): barra, tendina, evidenziazione, chiusura con Esc/fuori, cambio sezione, barra fissa durante lo scorrimento, nessuno scorrimento orizzontale, nessun errore JS; con utente normale e amministratore.
 
+## Hall of Fame: avatar con la foto profilo
+- **Problema**: nella classifica della Hall of Fame (e nell'intestazione della scheda di un giocatore) gli avatar mostravano solo l'emoji o l'iniziale, mai la foto profilo.
+- **Causa**: la pagina disegnava l'avatar con i soli dati della classifica (nickname ed emoji), che non contengono la foto. La Ladder invece la legge dai profili, per questo lì si vedeva.
+- **Correzione**: ora usa gli stessi profili già caricati dal sito (foto se c'è, altrimenti emoji/iniziale). Stessa correzione per l'elenco membri di Faction Wars. Nessuna migrazione.
+- File: `black-market-moduli.js` (v22), `black-market.html`, `sw.js` (cache v67).
+
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.
