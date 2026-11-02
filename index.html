@@ -2,6 +2,10 @@
 <html lang="it"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Il Tempio Dei Duelli</title><meta name="theme-color" content="#000000">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Il Tempio Dei Duelli"><meta property="og:locale" content="it_IT">
+<meta property="og:title" content="Il Tempio Dei Duelli — Yu-Gi-Oh! Bologna"><meta property="og:description" content="La community Yu-Gi-Oh! di Bologna: Ladder con premi, taglie sui rivali, boss e dungeon da affrontare in squadra. Entra gratis con 1000 BC di benvenuto."><meta property="og:url" content="https://marcocuccovillo-cpu.github.io/Iltempiodeiduelli/">
+<meta property="og:image" content="https://marcocuccovillo-cpu.github.io/Iltempiodeiduelli/og-tempio.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Il Tempio Dei Duelli — community Yu-Gi-Oh! di Bologna">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="description" content="Community Yu-Gi-Oh! di Bologna: Black Market con 1000 BC di benvenuto, Ladder con premi in Black Credits e match WPA, La guerra degli Eroi con boss, Arena e dungeon, Sentiero con badge e traguardi.">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png?v=2" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -9,64 +13,102 @@
 <link rel="stylesheet" href="tempio.css?v=10">
 </head><body>
 <main class="pg">
- <header class="hero">
-  <img src="tempio-logo.svg?v=1" alt="" width="512" height="512">
-  <h1 class="brand">Il Tempio <span>Dei Duelli</span></h1>
-  <p class="tagline">Yu-Gi-Oh! · Bologna</p>
-  <p class="lead">Eventi, sfide a classifica, taglie e un gioco di ruolo con eroi e dungeon.</p>
-  <div class="row"><a class="btn" href="#come">Come funziona</a><a class="btn gold" href="black-market.html">Entra nel Black Market</a><a class="btn ghost" href="sentiero.html">Il Sentiero</a></div>
- </header>
-
 <style>
+.hero.sm img{width:min(44%,170px)}
+.hero.sm .lead{font-size:1.02rem}
+.ivb{margin:18px 0 0;padding:14px 16px;border-radius:16px;border:2px solid var(--good);background:linear-gradient(135deg,rgba(74,222,155,.14),rgba(232,184,74,.06));text-align:left}
+.ivb p{margin:0}.ivb p+p{margin-top:4px;color:var(--mu)}.ivb b.g{color:var(--gold)}
+.live-h{display:flex;align-items:center;gap:10px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 0 rgba(255,84,104,.7);animation:pulse 1.8s infinite;flex:none}
+@keyframes pulse{70%{box-shadow:0 0 0 10px rgba(255,84,104,0)}100%{box-shadow:0 0 0 0 rgba(255,84,104,0)}}
+@media(prefers-reduced-motion:reduce){.dot{animation:none}}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 12px}
+.stats div{padding:10px 6px;border:1px solid var(--line);border-radius:var(--r);background:var(--surf);text-align:center}
+.stats b{display:block;font:700 1.45rem/1.1 var(--disp);color:var(--tx)}.stats small{color:var(--mu);font-size:.74rem;line-height:1.2;display:block;margin-top:3px}
+@media(max-width:420px){.stats{grid-template-columns:repeat(2,1fr)}}
+.lv{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:760px){.lv{grid-template-columns:1fr 1fr}}
+.lv .card h3{font-size:1.05rem;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.lv .card h3 .more{margin-left:auto;font:600 .85rem var(--ui);color:var(--ac2);text-decoration:none}
+.boss{display:flex;gap:14px;align-items:center}
+.boss .em{font-size:3.4rem;line-height:1;flex:none;filter:drop-shadow(0 0 16px rgba(var(--ac-rgb),.6))}
+.boss b{font:700 1.15rem var(--disp)}.boss p{margin:2px 0 0;color:var(--mu);font-size:.92rem}
+.tag{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:99px;font:700 .8rem var(--ui);border:1px solid}
+.tag.ok{color:var(--good);border-color:var(--good)}.tag.fight{color:var(--warn);border-color:var(--warn)}.tag.idle{color:var(--ac2);border-color:var(--ac)}
+.pr{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
+.pr:first-of-type{border-top:0}
+.pr .n{width:1.4rem;text-align:center;font:700 .95rem var(--disp);color:var(--mu);flex:none}
+.pr .n.g1{color:var(--gold)}.pr .n.g2{color:#cfd6e0}.pr .n.g3{color:#d8955a}
+.pr .av{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;overflow:hidden;background:var(--raise);border:1px solid var(--line);font-size:1rem}
+.pr .av img{width:100%;height:100%;object-fit:cover}
+.pr .nm{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pr .nm small{display:block;font-weight:400;color:var(--mu);font-size:.8rem}
+.pr .v{font:700 .98rem var(--ui);white-space:nowrap}.pr .v.gold{color:var(--gold)}.pr .v.red{color:var(--bad)}
+.seg2{display:flex;gap:6px;margin:0 0 6px}.seg2 button{flex:1;min-height:36px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--mu);font:700 .88rem var(--ui);cursor:pointer}
+.seg2 button[aria-pressed=true]{border-color:var(--ac);color:var(--ac2);background:rgba(var(--ac-rgb),.14)}
+.res{font-size:.92rem;padding:7px 0;border-top:1px solid var(--line)}.res:first-of-type{border-top:0}
+.res b.w{color:var(--good)}.res small{color:var(--mu)}
+.sk{height:120px;border-radius:var(--r);background:linear-gradient(90deg,var(--surf),var(--raise),var(--surf));background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+.how{border:1px solid var(--line);border-radius:var(--r);background:var(--surf);margin-top:8px}
+.how>summary{list-style:none;cursor:pointer;padding:14px 16px;font:700 1.02rem var(--disp);display:flex;align-items:center;gap:10px;min-height:52px}
+.how>summary::-webkit-details-marker{display:none}
+.how>summary::after{content:"▾";margin-left:auto;color:var(--mu);transition:transform .2s}.how[open]>summary::after{transform:rotate(180deg)}
+.how>div{padding:0 16px 16px}
 .qk{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .qk li{display:flex;gap:10px;align-items:center;padding:9px 11px;border:1px solid var(--line);border-radius:var(--r);background:var(--inp);line-height:1.3}
 .qk i{font-style:normal;font-size:1.3rem;flex:none;width:1.8rem;text-align:center}
 .qk b{color:var(--gold)}
 .qk small{display:block;color:var(--mu);font-size:.85rem}
+.qk.two{grid-template-columns:1fr 1fr;gap:6px}.qk.two li{flex-direction:column;align-items:flex-start;gap:2px;padding:8px 10px;font-size:.93rem}.qk.two i{width:auto;font-size:1.25rem}
 .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px;padding:0;list-style:none}
-.flow li{padding:6px 11px;border-radius:99px;border:1px solid var(--ac);background:rgba(var(--ac-rgb),.12);font-weight:700;font-size:.92rem}
+.flow li{display:inline-flex;padding:6px 11px;border-radius:99px;border:1px solid var(--ac);background:rgba(var(--ac-rgb),.12);font-weight:700;font-size:.92rem}
 .flow li+li::before{content:"→";margin-right:8px;color:var(--mu);font-weight:400}
-.flow li{display:inline-flex}
 .pills{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0;padding:0;list-style:none}
 .pills li{padding:4px 10px;border-radius:99px;border:1px solid var(--line);font-size:.88rem;font-weight:700}
-.qk.two{grid-template-columns:1fr 1fr;gap:6px}.qk.two li{flex-direction:column;align-items:flex-start;gap:2px;padding:8px 10px;font-size:.93rem}.qk.two i{width:auto;font-size:1.25rem}
-.hm-h{display:flex;align-items:center;gap:8px}
-.hm-more{margin-top:10px;font-size:.92rem;color:var(--mu)}
-.hm-more summary{min-height:40px;color:var(--ac2);font-size:.92rem}
-.hm-more ul{margin:0 0 6px;padding-left:20px;line-height:1.5}
+.h3{font-size:1rem;margin:14px 0 8px}
+.dock .btn.wa{background:#25d366;border-color:#25d366;color:#05230f}
 </style>
 
- <section class="sec" id="come"><h2>Inizia qui</h2>
-  <ol class="flow"><li>Crea il profilo</li><li>Gioca</li><li>Guadagna BC</li><li>Metti taglie</li></ol>
-  <p style="margin:0">Profilo dal <a href="black-market.html">Black Market</a> con <b>1000 BC</b> di benvenuto. Torneo, Match Pro e Deck Analyzer funzionano anche senza account.</p>
+ <header class="hero sm">
+  <img src="tempio-logo.svg?v=1" alt="" width="512" height="512">
+  <h1 class="brand">Il Tempio <span>Dei Duelli</span></h1>
+  <p class="tagline">Yu-Gi-Oh! · Bologna</p>
+  <p class="lead">La nostra community, anche fuori dal locale: sfide a classifica, taglie sui rivali e un gioco di ruolo con boss e dungeon.</p>
+  <div id="ivb" hidden></div>
+  <div class="row" id="heroCta"><a class="btn gold" href="black-market.html">Entra gratis · 1000 BC</a><a class="btn ghost" href="#come">Come funziona</a></div>
+ </header>
+
+ <section class="sec" id="live" aria-labelledby="live-h">
+  <h2 class="live-h" id="live-h"><span class="dot" aria-hidden="true"></span>Adesso nel Tempio</h2>
+  <div id="lvBody"><div class="stats" aria-hidden="true"><div class="sk" style="height:62px"></div><div class="sk" style="height:62px"></div><div class="sk" style="height:62px"></div><div class="sk" style="height:62px"></div></div><div class="lv"><div class="sk"></div><div class="sk"></div></div></div>
  </section>
 
- <section class="sec" id="taglie" aria-labelledby="tg-h"><div class="card" style="border:2px solid var(--gold);box-shadow:0 0 30px rgba(232,184,74,.22);background:linear-gradient(180deg,rgba(232,184,74,.1),var(--surf) 70%)">
-  <h2 id="tg-h" style="margin-top:0;color:var(--gold)">🎯 Come mettere una taglia</h2>
-  <ul class="qk">
-   <li><i>1</i><span><b>Attiva «Accetto taglie su di me»</b><small>Black Market → «Il mio profilo e le taglie» → Salva</small></span></li>
-   <li><i>2</i><span><b>Il bersaglio deve averlo attivato</b><small>Elenco vuoto = nessuno l’ha ancora fatto</small></span></li>
-   <li><i>3</i><span><b>Scegli bersaglio e importo</b><small>Da 50 a 500 BC</small></span></li>
-  </ul>
-  <div class="row" style="margin-top:12px"><a class="btn gold" href="black-market.html#/new">Metti una taglia</a><a class="btn ghost" href="black-market.html">Il mio profilo</a></div>
- </div></section>
+ <section class="sec" id="come"><h2>Inizia in 3 passi</h2>
+  <ol class="flow"><li>Crea il profilo</li><li>Sfida qualcuno</li><li>Guadagna BC</li></ol>
+  <p style="margin:0">Profilo dal <a href="black-market.html">Black Market</a> con <b>1000 BC</b> di benvenuto: con lo stesso account giochi a tutto. Torneo, Match Pro e Deck Analyzer funzionano anche senza account.</p>
 
- <section class="sec" id="blackmarket"><h2>💰 Black Market</h2>
-  <div class="card bm">
+  <details class="how"><summary>🎯 Come mettere una taglia</summary><div>
+   <ul class="qk">
+    <li><i>1</i><span><b>Attiva «Accetto taglie su di me»</b><small>Black Market → «Il mio profilo e le taglie» → Salva</small></span></li>
+    <li><i>2</i><span><b>Il bersaglio deve averlo attivato</b><small>Elenco vuoto = nessuno l’ha ancora fatto</small></span></li>
+    <li><i>3</i><span><b>Scegli bersaglio e importo</b><small>Da 50 a 500 BC</small></span></li>
+   </ul>
+   <div class="row" style="margin-top:12px"><a class="btn gold sm" href="black-market.html#/new">Metti una taglia</a></div>
+  </div></details>
+
+  <details class="how"><summary>💰 Black Market</summary><div>
    <ul class="qk two">
     <li><i>🎁</i><span><b>1000 BC</b> all’ingresso</span></li>
     <li><i>🏆</i><span><b>+30 BC</b> a evento</span></li>
     <li><i>🎯</i><span>Taglie <b>50–500 BC</b></span></li>
     <li><i>💥</i><span>Batti il bersaglio: <b>incassi</b></span></li>
     <li><i>🔒</i><span>BC <b>solo virtuali</b></span></li>
-    <li><i>📒</i><span>Tutto nel <b>registro</b></span></li>
+    <li><i>🤝</i><span><b>+200 BC</b> per ogni amico invitato</span></li>
    </ul>
-   <div class="row" style="margin-top:12px"><a class="btn gold" href="black-market.html">Apri il Black Market</a></div>
-  </div>
- </section>
+   <div class="row" style="margin-top:12px"><a class="btn gold sm" href="black-market.html">Apri il Black Market</a></div>
+  </div></details>
 
- <section class="sec" id="ladder"><h2>⚔️ Ladder</h2>
-  <div class="card bm">
+  <details class="how"><summary>⚔️ Ladder</summary><div>
    <ol class="flow"><li>Sfida</li><li>Accetta</li><li>Duello</li><li>Conferma</li></ol>
    <p class="mute" style="margin:0 0 10px;font-size:.9rem">Formati <b>Advanced</b> ed <b>Edison</b>, con Elo separato.</p>
    <ul class="qk two">
@@ -77,40 +119,36 @@
     <li><i>🎯</i><span>Normale, <b>taglia</b> o entrambe</span></li>
     <li><i>⛔</i><span>Max <b>3 premi</b>/giorno</span></li>
    </ul>
-   <div class="row" style="margin-top:12px"><a class="btn gold" href="black-market.html#/ladder">Vai alla Ladder</a></div>
-  </div>
- </section>
+   <div class="row" style="margin-top:12px"><a class="btn gold sm" href="black-market.html#/ladder">Vai alla Ladder</a></div>
+  </div></details>
 
- <section class="sec" id="eroi"><h2>🛡️ La guerra degli Eroi</h2>
-  <div class="card bm">
+  <details class="how"><summary>🛡️ La guerra degli Eroi</summary><div>
    <ul class="qk two">
     <li><i>⚡</i><span><b>Energia 100</b><small>ricarica in 8 ore</small></span></li>
     <li><i>🆙</i><span><b>3 punti</b> a livello</span></li>
     <li><i>🐉</i><span><b>Boss del giorno</b><small>una lobby al giorno · XP e BC</small></span></li>
-    <li><i>🥊</i><span><b>Arena</b><small>tra eroi · solo XP</small></span></li>
+    <li><i>🥊</i><span><b>Arena</b><small>tra eroi · leghe e stagioni</small></span></li>
    </ul>
-   <h3 class="h3 hm-h">🏰 25 Dungeon <span class="mute" style="font-size:.85rem;font-weight:400">· 20 energia</span></h3>
+   <h3 class="h3">🏰 100 Dungeon e Torre Infinita</h3>
    <ul class="qk two">
     <li><i>👥</i><span><b>1–4</b> giocatori</span></li>
-    <li><i>💰</i><span><b>150 → 2.500 BC</b></span></li>
+    <li><i>💰</i><span>Premi in <b>BC</b></span></li>
     <li><i>🎖️</i><span><b>Epico</b> ogni 5</span></li>
     <li><i>🔓</i><span>Sblocco <b>in ordine</b></span></li>
    </ul>
    <ul class="pills"><li>🛡️ Tank</li><li>⚔️ Danni</li><li>💚 Supporto</li></ul>
-   <div class="row" style="margin-top:12px"><a class="btn gold" href="eroi.html#dng">Vai ai dungeon</a><a class="btn ghost" href="eroi.html">Il mio eroe</a></div>
-  </div>
- </section>
+   <div class="row" style="margin-top:12px"><a class="btn gold sm" href="eroi.html">Il mio eroe</a></div>
+  </div></details>
 
- <section class="sec" id="badge"><h2>🎖️ Badge</h2>
-  <div class="card bm">
+  <details class="how"><summary>🎖️ Badge</summary><div>
    <ul class="qk two">
-    <li><i>🏅</i><span><b>139</b> traguardi</span></li>
+    <li><i>🏅</i><span><b>140+</b> traguardi</span></li>
     <li><i>🥉</i><span>Bronzo → <b>Leggenda</b></span></li>
     <li><i>🤖</i><span>Assegnati in automatico</span></li>
-    <li><i>🚫</i><span>Niente BC, <b>solo prestigio</b></span></li>
+    <li><i>📲</i><span>Si <b>condividono</b> su WhatsApp</span></li>
    </ul>
-   <div class="row" style="margin-top:12px"><a class="btn gold" href="sentiero.html">Vai al Sentiero</a></div>
-  </div>
+   <div class="row" style="margin-top:12px"><a class="btn gold sm" href="sentiero.html">Vai al Sentiero</a></div>
+  </div></details>
  </section>
 
  <section class="sec"><h2>Gli strumenti</h2>
@@ -124,6 +162,92 @@
    <a class="tool" href="deck-analyzer.html"><h3>Deck Analyzer</h3><p>Probabilità e mani simulate.</p></a>
   </div></section>
 </main>
-<script src="tempio.js?v=14"></script>
+
+<div class="dock" id="dock" hidden></div>
+
+<script>
+/* Vetrina dal vivo: legge public_showcase (migrazione black-market-inviti.sql), che restituisce solo dati pubblici, anche senza account.
+   Stesso progetto Supabase di black-market.html. Se la funzione manca o la rete non risponde, la sezione sparisce senza errori. */
+(function () {
+  var SUPABASE_URL = 'https://ceujhsmdvbcoszehbhxp.supabase.co', SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNldWpoc21kdmJjb3N6ZWhiaHhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0MDk4OTMsImV4cCI6MjEwNzk4NTg5M30.b9qzjnHZQJTbZCVY-3xPrQPQd_HdqKqKJALZFlrNUj4';
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var num = function (n) { return Number(n || 0).toLocaleString('it-IT'); };
+  var ago = function (d) { var m = Math.round((Date.now() - new Date(d)) / 60000); return m < 60 ? (m <= 1 ? 'ora' : m + ' min fa') : m < 1440 ? Math.round(m / 60) + ' h fa' : Math.round(m / 1440) + ' g fa'; };
+  var day = function (d) { return new Date(d + 'T12:00:00').toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' }); };
+  function rpc(name, body) {
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/' + name, { method: 'POST', headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); });
+  }
+  var logged = (function () { try { return Object.keys(localStorage).some(function (k) { return /^sb-.*-auth-token$/.test(k); }); } catch (e) { return false; } })();
+  var invite = (function () { var m = /[?&]invito=([A-Za-z0-9]{6})(?:&|$)/.exec(location.search); if (m) return m[1].toUpperCase(); try { return localStorage.getItem('tempio.invito'); } catch (e) { return null; } })();
+
+  /* barra in basso: chi non ha l'account → entra; chi ce l'ha → invita */
+  var dock = document.getElementById('dock');
+  dock.innerHTML = logged
+    ? '<span class="info"><b style="color:var(--gold)">+200 BC</b> per ogni amico che porti nel Tempio</span><a class="btn wa" href="black-market.html#/invita">Invita amici</a>'
+    : '<span class="info">Entra gratis con <b style="color:var(--gold)">1000 BC</b>' + (invite ? ' <b style="color:var(--good)">+ bonus invito</b>' : '') + '</span><a class="btn gold" href="black-market.html">Crea il profilo</a>';
+  dock.hidden = false;
+  if (logged) document.getElementById('heroCta').innerHTML = '<a class="btn gold" href="black-market.html">Il mio Black Market</a><a class="btn ghost" href="eroi.html">Il mio eroe</a>';
+
+  /* arrivato da un link d'invito */
+  if (invite && !logged) rpc('invite_info', { p_code: invite }).then(function (d) {
+    if (!d) return; var b = document.getElementById('ivb'); b.className = 'ivb'; b.hidden = false;
+    b.innerHTML = '<p>🤝 <b>' + esc(d.nickname) + '</b> ti ha invitato nel Tempio!</p><p>Crea il profilo: <b class="g">' + num(d.welcome) + ' BC</b> subito e <b class="g">+' + num(d.bonus) + ' BC</b> al tuo primo match.</p>';
+  }).catch(function () {});
+
+  var people = {};
+  function av(id) { var p = people[id] || {}; return '<span class="av" aria-hidden="true">' + (p.i ? '<img src="' + esc(p.i) + '" alt="" loading="lazy">' : esc(p.a || (p.n || '?')[0].toUpperCase())) + '</span>'; }
+  function nm(id) { return esc((people[id] || {}).n || 'Duellante'); }
+  function ladderRows(rows) {
+    return rows.length ? rows.map(function (r, i) {
+      return '<div class="pr"><span class="n g' + (i + 1) + '">' + (i + 1) + '</span>' + av(r.id) + '<span class="nm">' + nm(r.id) + '<small>' + r.w + 'V · ' + r.l + 'S' + (r.d ? ' · ' + r.d + 'P' : '') + '</small></span><span class="v">' + num(r.elo) + '</span></div>';
+    }).join('') : '<p class="mute" style="margin:6px 0">Nessuna partita ancora: il primo posto è libero.</p>';
+  }
+
+  rpc('public_showcase').then(function (s) {
+    people = s.people || {};
+    var st = s.stats || {}, h = '';
+    h += '<div class="stats"><div><b>' + num(st.players) + '</b><small>duellanti</small></div><div><b>' + num(st.new_week) + '</b><small>nuovi in 7 giorni</small></div><div><b>' + num(st.matches_week) + '</b><small>match in 7 giorni</small></div><div><b>' + num(st.bounty_total) + '</b><small>BC in taglie</small></div></div><div class="lv">';
+    /* boss */
+    var b = s.boss;
+    if (b) {
+      var tag = b.status === 'defeated' ? '<span class="tag ok">Abbattuto oggi</span>' : b.heroes > 0 ? '<span class="tag fight">' + num(b.heroes) + ' eroi in battaglia</span>' : '<span class="tag idle">Nessuno l’ha ancora sfidato oggi</span>';
+      h += '<div class="card"><h3>🐉 Boss del giorno<a class="more" href="eroi.html">Combatti ›</a></h3>' + (b.name
+        ? '<div class="boss"><span class="em" aria-hidden="true">' + esc(b.emoji) + '</span><div><b>' + esc(b.name) + '</b><p>Boss n. ' + num(b.no) + ' · livello ' + num(b.level) + '</p>' + tag + '</div></div>'
+        : '<div class="boss"><span class="em" aria-hidden="true">💤</span><div><b>Il boss dorme</b><p>Si risveglia al primo eroe che entra oggi.</p></div></div>')
+        + '<p class="mute" style="margin:12px 0 0;font-size:.88rem">' + num(b.total_heroes) + ' eroi nel Tempio' + (b.top_level ? ' · il più forte è al livello ' + num(b.top_level) : '') + '</p></div>';
+    }
+    /* Ladder */
+    if (s.ladder && (s.ladder.Advanced || s.ladder.Edison)) {
+      h += '<div class="card"><h3>⚔️ Ladder<a class="more" href="black-market.html#/ladder">Sfida ›</a></h3><div class="seg2" role="group" aria-label="Formato"><button type="button" data-f="Advanced" aria-pressed="true">Advanced</button><button type="button" data-f="Edison" aria-pressed="false">Edison</button></div><div id="ldRows">' + ladderRows(s.ladder.Advanced || []) + '</div></div>';
+    }
+    /* Most Wanted */
+    h += '<div class="card"><h3>🎯 Most Wanted<a class="more" href="black-market.html#/wanted">Caccia ›</a></h3>' + ((s.wanted || []).length ? s.wanted.map(function (w, i) {
+      return '<div class="pr"><span class="n g' + (i + 1) + '">' + (i + 1) + '</span>' + av(w.id) + '<span class="nm">' + nm(w.id) + '<small>' + w.count + (w.count == 1 ? ' taglia' : ' taglie') + ' sulla testa</small></span><span class="v gold">' + num(w.value) + ' BC</span></div>';
+    }).join('') : '<p class="mute" style="margin:6px 0">Nessuna taglia attiva. Metti la prima sul tuo rivale.</p>') + '</div>';
+    /* ultimi duelli */
+    if ((s.results || []).length) {
+      h += '<div class="card"><h3>📜 Ultimi duelli</h3>' + s.results.map(function (r) {
+        var a = nm(r.a), o = nm(r.b), line = r.res === 'draw' ? a + ' e ' + o + ' pareggiano' : r.res === 'challenger' ? '<b class="w">' + a + '</b> batte ' + o : '<b class="w">' + o + '</b> batte ' + a;
+        return '<div class="res">' + line + (r.score ? ' <small>(' + esc(r.res === 'opponent' ? String(r.score).split('-').reverse().join('-') : r.score) + ')</small>' : '') + '<br><small>' + esc(r.fmt) + ' · ' + ago(r.at) + '</small></div>';
+      }).join('') + '</div>';
+    }
+    /* eventi */
+    if ((s.events || []).length) {
+      h += '<div class="card"><h3>🏆 Prossimi eventi<a class="more" href="black-market.html#/events">Iscriviti ›</a></h3>' + s.events.map(function (e) {
+        return '<div class="res"><b>' + esc(e.name) + '</b><br><small>' + day(e.date) + (e.status === 'running' ? ' · in corso' : '') + ' · ' + num(e.players) + ' iscritti</small></div>';
+      }).join('') + '</div>';
+    }
+    h += '</div>';
+    var body = document.getElementById('lvBody'); body.innerHTML = h;
+    body.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-f]'); if (!t) return;
+      body.querySelectorAll('[data-f]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === t)); });
+      document.getElementById('ldRows').innerHTML = ladderRows(s.ladder[t.dataset.f] || []);
+    });
+  }).catch(function () { document.getElementById('live').hidden = true; });
+})();
+</script>
+<script src="tempio.js?v=15"></script>
 <script src="tempio-notifiche.js?v=2"></script>
 </body></html>

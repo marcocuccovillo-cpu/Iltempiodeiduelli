@@ -5,12 +5,26 @@
     ['Home', 'index.html', '⌂', ''],
     ['Il Sentiero', 'sentiero.html', '✦', ''],
     ['Black Market', 'black-market.html', '◈', 'bm'],
+    ['Invita amici', 'black-market.html#/invita', '✉', 'inv'],
     ['La guerra degli Eroi', 'eroi.html', '⚜', ''],
     ['Duel Simulator', 'duel-simulator.html', '♠', ''],
     ['Gestisci torneo', 'gestisci-torneo.html', '♜', ''],
     ['Match Pro', 'match-pro.html', '⏱', ''],
     ['Deck Analyzer', 'deck-analyzer.html', '▤', '']
   ];
+  /* ---- link d'invito: index.html?invito=CODICE → si ricorda il codice (lo usa il Black Market alla registrazione) e si pulisce l'indirizzo ---- */
+  try {
+    var inv = /[?&]invito=([A-Za-z0-9]{6})(?:&|$)/.exec(location.search);
+    if (inv) {
+      localStorage.setItem('tempio.invito', inv[1].toUpperCase());
+      var qs = location.search.replace(/([?&])invito=[^&]*&?/, '$1').replace(/[?&]$/, '');
+      history.replaceState(null, '', location.pathname + qs + location.hash);
+    }
+  } catch (e) {}
+  /* ---- condivisione su WhatsApp (tempio-condividi.js), caricata su tutte le pagine ---- */
+  if (!window.TempioShare && !document.getElementById('tmShareJs')) {
+    var sj = document.createElement('script'); sj.id = 'tmShareJs'; sj.src = 'tempio-condividi.js?v=1'; sj.defer = true; document.head.appendChild(sj);
+  }
   /* ---- installazione sulla schermata Home ---- */
   var deferred = null;
   var standalone = function () { return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; };
@@ -59,7 +73,7 @@
     var col = document.createElement('aside');
     col.className = 'tm'; col.id = 'tmCol'; col.setAttribute('aria-label', 'Navigazione');
     col.innerHTML = '<div class="tm-h"><a class="tm-b" href="index.html"><img src="tempio-logo.svg?v=1" alt="" width="512" height="512"><span class="tm-t">Il Tempio<br>Dei Duelli</span></a><button class="tm-x" id="tmX" type="button">Chiudi menu</button></div>' +
-      '<nav class="tm-n">' + links + '<button type="button" class="tm-i" id="tmI"><i aria-hidden="true">⤓</i>Installa app</button></nav><div class="tm-f">Community Yu-Gi-Oh! · Bologna · v8</div>';
+      '<nav class="tm-n">' + links + '<button type="button" class="tm-i" id="tmI"><i aria-hidden="true">⤓</i>Installa app</button></nav><div class="tm-f">Community Yu-Gi-Oh! · Bologna · v9</div>';
     var bar = document.createElement('div');
     bar.className = 'tm-bar';
     bar.innerHTML = '<button type="button" id="tmT" aria-label="Apri il menu" aria-expanded="false" aria-controls="tmCol">☰</button><img src="tempio-mark.png" alt=""><span>Il Tempio Dei Duelli</span>';

@@ -10,7 +10,7 @@
   var TIER = ['', 'Bronzo', 'Argento', 'Oro', 'Leggenda', 'Unico'];
   var PTS = [0, 1, 3, 6, 10, 5];                       // punti Tempio per livello
   var GRADES = [[0, 'Novizio'], [6, 'Duellante'], [18, 'Veterano'], [40, 'Maestro'], [80, 'Campione'], [140, 'Leggenda del Tempio'], [240, 'Mito Vivente'], [380, 'Immortale del Tempio'], [520, 'Divinità del Tempio']];
-  var AREAS = [['market', 'Black Market'], ['duel', 'Match ufficiali'], ['ladder', 'Ladder'], ['eroi', 'Guerra degli Eroi'], ['bets', 'Scommesse'], ['sim', 'Duel Simulator'], ['special', 'Speciali']];
+  var AREAS = [['market', 'Black Market'], ['duel', 'Match ufficiali'], ['ladder', 'Ladder'], ['eroi', 'Guerra degli Eroi'], ['bets', 'Scommesse'], ['sim', 'Duel Simulator'], ['community', 'Community'], ['special', 'Speciali']];
   var n = function (v) { return Number(v || 0).toLocaleString('it-IT'); };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }); };
 
@@ -102,6 +102,9 @@
     x_tre: { t: 'Signore dei Tre Mondi', ic: 'trine', names: ['', '', '', '', 'Signore dei Tre Mondi'], thr: [3], area: 'special', sp: true,
       d: function(){return 'Vinci una scommessa, conquista un dungeon e vinci un incontro nel Duel Simulator'} }
   };
+  /* Community: amici portati nel Tempio (funzione badge_progress_invite, migrazione black-market-inviti.sql) */
+  FAMX.c_recluta = { t: 'Amici portati nel Tempio', ic: 'link', names: ['Reclutatore', 'Ambasciatore', 'Araldo del Tempio', 'Voce della Community'], thr: [1, 3, 5, 10], area: 'community',
+    d: function(v){return v==1?'Invita un amico che gioca il suo primo match':'Invita '+n(v)+' amici che giocano il loro primo match'} };
   Object.keys(FAMX).forEach(function (k) { FAM[k] = FAMX[k]; });
 
   /* Icone (24×24, tratto): disegnate a mano, nessuna dipendenza esterna */
@@ -121,6 +124,7 @@
     redo:   '<path d="M20 12a8 8 0 1 1-3-6.2M20 4v5h-5"/><path d="M12 8l-3 4h6z" fill="currentColor"/>',
     eye:    '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/>',
     duo:    '<circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/>',
+    link:   '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/>',
     hero: '<path d="M5 13a7 7 0 0 1 14 0v6H5z"/><path d="M5 13h14M12 7v6"/><path d="M12 6c1-3 4-4 7-3-2 1-3 2-3 4"/>',
     boss: '<path d="M5 3c0 4 1 6 3 7M19 3c0 4-1 6-3 7"/><path d="M7 10h10v5a5 5 0 0 1-10 0z"/><circle cx="9.5" cy="13" r="1.3" fill="currentColor"/><circle cx="14.5" cy="13" r="1.3" fill="currentColor"/><path d="M10 18v3M14 18v3"/>',
     clash: '<path d="M4 4l10 10M20 4L10 14"/><path d="M13 11l3 3M11 11l-3 3"/><path d="M3 21l4-4M21 21l-4-4"/>',
@@ -149,9 +153,10 @@
     eroi:    { o: 'M50 2 L88 14 L95 52 L50 98 L5 52 L12 14 Z',                              i: 'M50 10 L81 21 L87 51 L50 89 L13 51 L19 21 Z', c: 'crest' },
     bets:    { o: 'M50 2 L98 50 L50 98 L2 50 Z',                                             i: 'M50 11 L89 50 L50 89 L11 50 Z', c: 'dia' },
     sim:     { o: 'M24 3 H76 Q93 3 93 20 V80 Q93 97 76 97 H24 Q7 97 7 80 V20 Q7 3 24 3 Z',   i: 'M25 10 H75 Q86 10 86 21 V79 Q86 90 75 90 H25 Q14 90 14 79 V21 Q14 10 25 10 Z', c: 'card' },
-    special: { o: 'M50 3 a47 47 0 1 0 .01 0 Z',                                                    i: 'M50 11 a39 39 0 1 0 .01 0 Z', c: 'circ' }
+    special: { o: 'M50 3 a47 47 0 1 0 .01 0 Z',                                                    i: 'M50 11 a39 39 0 1 0 .01 0 Z', c: 'circ' },
+    community: { o: 'M50 2 L62 12 L78 9 L83 25 L97 34 L90 50 L97 66 L83 75 L78 91 L62 88 L50 98 L38 88 L22 91 L17 75 L3 66 L10 50 L3 34 L17 25 L22 9 L38 12 Z', i: 'M50 13 a37 37 0 1 0 .01 0 Z', c: 'sun' }
   };
-  var PLATE = { market: 'pm', duel: 'pd', ladder: 'pl', eroi: 'pe', bets: 'pb', sim: 'px', special: 'ps' };
+  var PLATE = { market: 'pm', duel: 'pd', ladder: 'pl', eroi: 'pe', bets: 'pb', sim: 'px', community: 'pc', special: 'ps' };
   var ICCOL = ['', '#ffd9b3', '#f4f8ff', '#fff3b8', '#d9fdff', '#ffffff'];
 
   var CSS = '.tdb{width:96px;height:96px;display:block;flex:none;overflow:visible;transition:transform .25s,filter .25s}.tdb.md{width:72px;height:72px}.tdb.sm{width:56px;height:56px}.tdb.xs{width:42px;height:42px}.tdb.xl{width:150px;height:150px}' +
@@ -184,10 +189,11 @@
     '<radialGradient id="tdgpe" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#c2410c"/><stop offset="1" stop-color="#2a0a02"/></radialGradient>' +
     '<radialGradient id="tdgpb" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#15803d"/><stop offset="1" stop-color="#02170b"/></radialGradient>' +
     '<radialGradient id="tdgpx" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#0e7490"/><stop offset="1" stop-color="#031a24"/></radialGradient>' +
+    '<radialGradient id="tdgpc" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#be185d"/><stop offset="1" stop-color="#2a0414"/></radialGradient>' +
     '<radialGradient id="tdgps" cx=".5" cy=".35" r=".75"><stop offset="0" stop-color="#12896a"/><stop offset="1" stop-color="#03201a"/></radialGradient>' +
     '<linearGradient id="tdgsh" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
     '<clipPath id="tdc-hex"><path d="' + SH.market.o + '"/></clipPath><clipPath id="tdc-shield"><path d="' + SH.duel.o + '"/></clipPath><clipPath id="tdc-oct"><path d="' + SH.ladder.o + '"/></clipPath><clipPath id="tdc-circ"><path d="' + SH.special.o + '"/></clipPath>' +
-    '<clipPath id="tdc-crest"><path d="' + SH.eroi.o + '"/></clipPath><clipPath id="tdc-dia"><path d="' + SH.bets.o + '"/></clipPath><clipPath id="tdc-card"><path d="' + SH.sim.o + '"/></clipPath>' +
+    '<clipPath id="tdc-crest"><path d="' + SH.eroi.o + '"/></clipPath><clipPath id="tdc-dia"><path d="' + SH.bets.o + '"/></clipPath><clipPath id="tdc-card"><path d="' + SH.sim.o + '"/></clipPath><clipPath id="tdc-sun"><path d="' + SH.community.o + '"/></clipPath>' +
     '</defs></svg>';
 
   function init() {
@@ -214,6 +220,12 @@
       '<path d="' + a.i + '" fill="url(#tdgp' + PLATE[r.area].slice(1) + ')" stroke="rgba(0,0,0,.6)" stroke-width="1.6"/>' + ring +
       '<g color="' + ICCOL[t] + '" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" transform="translate(29 24) scale(1.75)">' + (IC[m.ic] || '') + '</g>' + pips +
       '<g clip-path="url(#tdc-' + a.c + ')"><rect class="sh" x="-10" y="-5" width="30" height="110" fill="url(#tdgsh)"/></g></svg>';
+  }
+
+  /* La medaglia come SVG autonomo (con i gradienti dentro): serve per disegnarla nelle immagini da condividere */
+  function standalone(r) {
+    var defs = SPRITE.slice(SPRITE.indexOf('<defs>'), SPRITE.indexOf('</defs>') + 7);
+    return medal(r, '').replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" ').replace(/<rect class="sh"[^>]*>/, '').replace(/(<svg[^>]*>)/, '$1' + defs);
   }
 
   /* Punti e grado */
@@ -285,9 +297,15 @@
     if (r.hidden) prog = '<p>Non disponibile in questo momento.</p>';
     else if (r.earned) prog = '<p><b style="color:var(--gold,#e8b84a)">Ottenuto</b>' + (r.earned_at ? ' il ' + esc(day(r.earned_at)) : '') + '</p>';
     else prog = '<p>Progresso: <b style="color:#fff">' + n(Math.min(r.value, r.threshold)) + ' / ' + n(r.threshold) + '</b></p><div class="bar"><i style="width:' + Math.min(100, r.value / r.threshold * 100) + '%"></i></div>';
-    md.innerHTML = '<div class="tdb-mb">' + medal(r, 'xl') + '<div class="tr">' + esc(m.tier) + ' · ' + esc(m.fam) + '</div><h2>' + esc(m.name) + '</h2><p>' + esc(m.desc) + '</p>' + prog + '<button type="button" class="btn ghost">Chiudi</button></div>';
+    var canShare = r.earned && !r.hidden && window.TempioShare;
+    md.innerHTML = '<div class="tdb-mb">' + medal(r, 'xl') + '<div class="tr">' + esc(m.tier) + ' · ' + esc(m.fam) + '</div><h2>' + esc(m.name) + '</h2><p>' + esc(m.desc) + '</p>' + prog +
+      (canShare ? '<button type="button" class="btn gold tdb-sh" style="margin-bottom:8px">Condividi su WhatsApp</button>' : '') + '<button type="button" class="btn ghost tdb-cl">Chiudi</button></div>';
     document.body.appendChild(md);
-    var c = md.querySelector('.btn'); c.focus();
+    var c = md.querySelector('.tdb-cl'); c.focus();
+    if (canShare) md.querySelector('.tdb-sh').onclick = function () {
+      window.TempioShare.share({ kind: 'Badge ottenuto', title: m.name, sub: m.tier + ' · ' + m.fam, text: m.desc, svg: standalone(r),
+        msg: 'Ho sbloccato il badge «' + m.name + '» (' + m.tier + ') nel Tempio dei Duelli!' });
+    };
     function close() { md.remove(); document.removeEventListener('keydown', k) }
     function k(e) { if (e.key === 'Escape') close() }
     c.onclick = close; md.onclick = function (e) { if (e.target === md) close() }; document.addEventListener('keydown', k);
@@ -310,7 +328,12 @@
       /* nuovi traguardi (Eroi, Scommesse, Duel Simulator): senza la migrazione black-market-badge-extra.sql si vedono solo quelli di prima */
       return Promise.resolve(sb.rpc('badge_progress_extra', arg)).then(function (ex) {
         return base.concat(ex && !ex.error && ex.data ? ex.data : []);
-      }, function () { return base; });
+      }, function () { return base; }).then(function (all) {
+        /* badge Reclutatore (migrazione black-market-inviti.sql): senza la migrazione semplicemente non compaiono */
+        return Promise.resolve(sb.rpc('badge_progress_invite', arg)).then(function (iv) {
+          return all.concat(iv && !iv.error && iv.data ? iv.data : []);
+        }, function () { return all; });
+      });
     });
   }
 
@@ -324,5 +347,5 @@
     return rows;
   }
 
-  window.TDB = { init: init, medal: medal, meta: meta, summary: summary, showcase: showcase, sumBox: sumBox, wall: wall, nextUp: nextUp, detail: detail, bind: bind, load: load, preview: preview, FAM: FAM, TIER: TIER, PTS: PTS };
+  window.TDB = { init: init, medal: medal, standalone: standalone, meta: meta, summary: summary, showcase: showcase, sumBox: sumBox, wall: wall, nextUp: nextUp, detail: detail, bind: bind, load: load, preview: preview, FAM: FAM, TIER: TIER, PTS: PTS };
 })();

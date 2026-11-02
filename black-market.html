@@ -2,6 +2,11 @@
 <html lang="it"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Black Market — Il Tempio Dei Duelli</title><meta name="theme-color" content="#000000">
+<meta name="description" content="Metti una taglia sui tuoi rivali, scala la Ladder e incassa Black Credits. 1000 BC di benvenuto per chi entra.">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Il Tempio Dei Duelli"><meta property="og:locale" content="it_IT">
+<meta property="og:title" content="Black Market — Il Tempio Dei Duelli"><meta property="og:description" content="Metti una taglia sui tuoi rivali, scala la Ladder e incassa Black Credits. 1000 BC di benvenuto per chi entra."><meta property="og:url" content="https://marcocuccovillo-cpu.github.io/Iltempiodeiduelli/black-market.html">
+<meta property="og:image" content="https://marcocuccovillo-cpu.github.io/Iltempiodeiduelli/og-tempio.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Il Tempio Dei Duelli — community Yu-Gi-Oh! di Bologna">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png?v=2" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -68,9 +73,9 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 </style></head><body>
 
 <main class="pg" id="app"><p class="mute">Caricamento…</p></main><div id="toast" hidden role="status"></div>
-<script src="tempio.js?v=14"></script>
-<script src="badge.js?v=13"></script>
-<script src="black-market-moduli.js?v=22"></script>
+<script src="tempio.js?v=15"></script>
+<script src="badge.js?v=14"></script>
+<script src="black-market-moduli.js?v=21"></script>
 <script src="shop-art-extra.js?v=1"></script>
 <script src="shop-art.js?v=13"></script>
 <script src="black-market-shop.js?v=13"></script>
@@ -78,6 +83,7 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 <script src="black-market-caccia.js?v=15"></script>
 <script src="black-market-scommesse.js?v=4"></script>
 <script src="black-market-svizzera.js?v=2"></script>
+<script src="black-market-inviti.js?v=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 /* ============ CONFIGURAZIONE: incolla qui i due valori di Supabase (Project Settings > API) ============ */
@@ -89,7 +95,7 @@ const $app=document.getElementById('app'),$t=document.getElementById('toast');
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const BC=n=>Number(n||0).toLocaleString('it-IT')+' BC';
 const when=d=>new Date(d).toLocaleString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-const KIND={initial_bonus:'Bonus iniziale',bounty_stake:'Taglia pubblicata',bounty_payout:'Ricompensa riscossa',bounty_refund:'Quota restituita',participation_reward:'Partecipazione a evento',admin_adjustment:'Rettifica amministrativa',ladder_reward:'Vittoria in Ladder',shop_purchase:'Acquisto nello Shop',bet_stake:'Scommessa piazzata',bet_payout:'Scommessa vinta',bet_refund:'Puntata restituita',bet_reversal:'Scommessa ricalcolata'};
+const KIND={initial_bonus:'Bonus iniziale',bounty_stake:'Taglia pubblicata',bounty_payout:'Ricompensa riscossa',bounty_refund:'Quota restituita',participation_reward:'Partecipazione a evento',admin_adjustment:'Rettifica amministrativa',ladder_reward:'Vittoria in Ladder',shop_purchase:'Acquisto nello Shop',bet_stake:'Scommessa piazzata',bet_payout:'Scommessa vinta',bet_refund:'Puntata restituita',bet_reversal:'Scommessa ricalcolata',invite_reward:'Premio invito',invite_bonus:'Bonus invito'};
 const ROLE={user:'Duellante',organizer:'Organizzatore',moderator:'Moderatore',admin:'Amministratore'};
 let sb,me=null,wallet=0,P=new Map(),S={},tt;
 const SET_RANGE={game_level_cap:[100,9999]};   // impostazioni con un intervallo imposto (il database lo ricontrolla)
@@ -101,12 +107,13 @@ async function q(b){const{data,error}=await b;if(error)throw new Error(error.mes
 const rpc=async(n,a)=>{const{data,error}=await sb.rpc(n,a);if(error)throw new Error(error.message);return data};
 function setup(){$app.innerHTML=`<h1 class="t">Black <em>Market</em></h1><div class="box" style="margin-top:20px"><h2>Configurazione mancante</h2><p>Per attivare il Black Market servono i dati del tuo progetto Supabase. Apri <b>black-market.html</b> su GitHub, cerca le due righe <code>SUPABASE_URL</code> e <code>SUPABASE_ANON_KEY</code> in alto nello script e incolla i valori (Supabase › Project Settings › API). Le istruzioni complete sono nel file <b>LEGGIMI-BLACK-MARKET.md</b>.</p></div>`}
 /* ---------- accesso ---------- */
-function authView(mode){mode=mode||'in';$app.innerHTML=`<h1 class="t">Black <em>Market</em></h1><p class="sub">Il mercato clandestino dei duellanti. Accedi per entrare.</p>
+function authView(mode){mode=mode||'in';const ivc=(()=>{try{return localStorage.getItem('tempio.invito')}catch(e){return null}})();$app.innerHTML=`<h1 class="t">Black <em>Market</em></h1><p class="sub">Il mercato clandestino dei duellanti. Accedi per entrare.</p><div id="ivBan" hidden></div>
  <div class="box" style="margin-top:22px;max-width:460px"><div class="seg" style="margin-bottom:14px"><button data-act="mode" data-m="in" aria-pressed="${mode=='in'}">Accedi</button><button data-act="mode" data-m="up" aria-pressed="${mode=='up'}">Registrati</button></div>
  <form id="af" class="cols" style="grid-template-columns:1fr">${mode=='up'?'<div><label for="nk">Nickname pubblico</label><input id="nk" required minlength="3" maxlength="24" autocomplete="nickname"></div>':''}
  <div><label for="em">Email</label><input id="em" type="email" required autocomplete="email"></div><div><label for="pw">Password (min. 8 caratteri)</label><input id="pw" type="password" required minlength="8" autocomplete="${mode=='up'?'new-password':'current-password'}"></div>
  <button class="btn gold" type="submit">${mode=='up'?'Crea account':'Entra'}</button></form>
- ${mode=='up'?'<p class="mute" style="font-size:.9rem">Riceverai 1000 BC di benvenuto. I Black Credits sono una valuta solo virtuale: non si comprano e non si convertono in denaro.</p>':''}</div>`;
+ ${mode=='up'?'<p class="mute" style="font-size:.9rem">Riceverai '+Number(S.initial_bonus||1000).toLocaleString('it-IT')+' BC di benvenuto. I Black Credits sono una valuta solo virtuale: non si comprano e non si convertono in denaro.</p>':''}</div>`;
+ if(ivc&&sb)sb.rpc('invite_info',{p_code:ivc}).then(({data})=>{const b=document.getElementById('ivBan');if(!b||!data)return;b.hidden=false;b.className='box';b.style.cssText='margin-top:18px;max-width:460px;border:2px solid #4ade9b;background:linear-gradient(135deg,rgba(74,222,155,.14),rgba(212,168,67,.06))';b.innerHTML=`<p style="margin:0;font-size:1.05rem">🤝 <b>${esc(data.nickname)}</b> ti ha invitato nel Tempio.</p><p class="mute" style="margin:6px 0 0">Registrati: <b style="color:var(--gold)">${Number(data.welcome).toLocaleString('it-IT')} BC</b> subito e <b style="color:var(--gold)">+${Number(data.bonus).toLocaleString('it-IT')} BC</b> al tuo primo match.</p>`},()=>{});
  document.getElementById('af').onsubmit=async e=>{e.preventDefault();const em=document.getElementById('em').value.trim(),pw=document.getElementById('pw').value;
   try{if(mode=='up'){const nk=document.getElementById('nk').value.trim();localStorage.setItem('bm.nick',nk);const{data,error}=await sb.auth.signUp({email:em,password:pw});if(error)throw error;
     if(!data.session){toast('Account creato: conferma l’email, poi accedi.');authView('in');return}}
@@ -119,8 +126,8 @@ async function core(){let ps;try{ps=await q(sb.from('profiles').select('id,nickn
  const u=(await sb.auth.getUser()).data.user;me=P.get(u.id)||null;if(!me)return false;
  const w=await q(sb.from('wallets').select('balance').eq('user_id',me.id));wallet=w[0]?.balance||0;
  const st=await q(sb.from('system_settings').select('key,value_int'));S=Object.fromEntries(st.map(s=>[s.key,s.value_int]));return true}
-const NAVI={'':['◈','Dashboard'],wanted:['🎯','Most Wanted'],new:['➕','Metti una taglia'],log:['📜','Registro'],wallet:['👛','Wallet'],events:['🏆','Eventi'],ladder:['⚔️','Ladder'],hof:['🏛️','Hall of Fame'],factions:['🚩','Faction Wars'],challenges:['🥷','Underground'],bets:['🎲','Scommesse'],shop:['🛍️','Shop'],admin:['🛡️','Admin']};
-const NAVG=[['Il mercato',['','wanted','new','log','wallet']],['Competizioni',['events','ladder','hof','factions','challenges','bets']],['Negozio e gestione',['shop','admin']]];
+const NAVI={'':['◈','Dashboard'],wanted:['🎯','Most Wanted'],new:['➕','Metti una taglia'],log:['📜','Registro'],wallet:['👛','Wallet'],events:['🏆','Eventi'],ladder:['⚔️','Ladder'],hof:['🏛️','Hall of Fame'],factions:['🚩','Faction Wars'],challenges:['🥷','Underground'],bets:['🎲','Scommesse'],invita:['🤝','Invita amici'],shop:['🛍️','Shop'],admin:['🛡️','Admin']};
+const NAVG=[['Il mercato',['','wanted','new','log','wallet','invita']],['Competizioni',['events','ladder','hof','factions','challenges','bets']],['Negozio e gestione',['shop','admin']]];
 let navOpen=false;
 function navTiles(items,cur){const lab=new Map(items),used=new Set();
  const g=NAVG.map(([t,ks])=>[t,ks.filter(k=>lab.has(k))]);g.forEach(x=>x[1].forEach(k=>used.add(k)));
@@ -190,7 +197,7 @@ R.new=async tid=>{const cand=[...P.values()].filter(p=>p.wanted_enabled&&!p.susp
  const sum=()=>{const a=+document.getElementById('am').value||0,t=document.getElementById('tg').selectedOptions[0]?.text;document.getElementById('sm').innerHTML=`Saldo disponibile: <b>${BC(wallet)}</b><br>${a?`Dopo la conferma: <b class="${wallet-a<0?'neg':''}">${BC(wallet-a)}</b>${t&&document.getElementById('tg').value?` · taglia di ${BC(a)} su <b>${esc(t)}</b>`:''}`:''}`};
  ['am','tg'].forEach(i=>document.getElementById(i).oninput=sum);sum();
  document.getElementById('nb').onsubmit=async e=>{e.preventDefault();const a=+document.getElementById('am').value;if(a>wallet){toast('Saldo insufficiente.',1);return}
-  const b=e.target.querySelector('button');b.disabled=true;try{await rpc('create_bounty',{p_target:document.getElementById('tg').value,p_amount:a,p_message:document.getElementById('ms').value,p_request_id:e.target.dataset.rq});wallet-=a;toast('Taglia pubblicata.');location.hash='#/p/'+document.getElementById('tg').value}catch(er){toast(er.message,1);b.disabled=false}}};
+  const b=e.target.querySelector('button');b.disabled=true;try{await rpc('create_bounty',{p_target:document.getElementById('tg').value,p_amount:a,p_message:document.getElementById('ms').value,p_request_id:e.target.dataset.rq});wallet-=a;try{sessionStorage.setItem('bm.newbounty',JSON.stringify({target:document.getElementById('tg').value,amount:a}))}catch(x){}toast('Taglia pubblicata.');location.hash='#/p/'+document.getElementById('tg').value}catch(er){toast(er.message,1);b.disabled=false}}};
 R.log=async()=>{const fd=await q(sb.from('market_feed_v').select('*').order('at',{ascending:false}).limit(100));shell(`<h1 class="t">Registro del <em>Black Market</em></h1><p class="sub">Tutto quello che accade, in ordine cronologico.</p><div class="box" style="margin-top:18px">${fd.map(feedRow).join('')||'<p class="mute">Il registro è vuoto.</p>'}</div>`,'log')};
 R.wallet=async()=>{const[lg,bs]=await Promise.all([q(sb.from('ledger_entries').select('*').eq('user_id',me.id).order('created_at',{ascending:false}).limit(150)),q(sb.from('bounties').select('amount,status').eq('creator_id',me.id))]);
  const held=bs.filter(b=>b.status=='active'||b.status=='under_review').reduce((t,b)=>t+b.amount,0),recv=lg.filter(l=>l.kind=='bounty_payout'||l.kind=='bounty_refund').reduce((t,l)=>t+l.amount,0);
@@ -248,9 +255,11 @@ async function act(el){const a=el.dataset.act;
  }catch(er){toast(er.message,1)}}
 $app.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(b){if(b.tagName=='SELECT')return;act(b)}});
 $app.addEventListener('change',async e=>{const s=e.target;if(s.dataset.act=='role'){const r=ask('Motivazione del cambio ruolo:');if(!r){route();return}try{await rpc('admin_set_role',{p_user:s.dataset.u,p_role:s.value,p_reason:r});await core();route()}catch(er){toast(er.message,1);route()}}});
+/* inviti e condivisioni: si aggancia DOPO che tutte le pagine (R[''], R.wanted, R.p…) sono definite, perché le estende */
+try{if(window.BM_INVITE)window.BM_INVITE(BM)}catch(e){console.error('Inviti non caricati',e)}
 async function route(){if(!me)return;navOpen=false;const h=location.hash.replace(/^#\/?/,'').split('/'),k=h[0]||'';
  try{await (R[k]||R[''])(h[1])}catch(er){shell(`<div class="err">Qualcosa è andato storto: ${esc(er.message)}</div>`,'')}scrollTo(0,0)}
-async function boot(){const{data:{session}}=await sb.auth.getSession();if(!session){me=null;authView('in');return}
+async function boot(){const{data:{session}}=await sb.auth.getSession();if(!session){me=null;authView((()=>{try{return localStorage.getItem('tempio.invito')}catch(e){return null}})()?'up':'in');return}
  let ok;try{ok=await core()}catch(er){$app.innerHTML=`<div class="err">Impossibile contattare il database: ${esc(er.message)}. Controlla la configurazione.</div>`;return}
  if(!ok){const n=localStorage.getItem('bm.nick');if(n){try{await rpc('register_profile',{p_nickname:n});localStorage.removeItem('bm.nick');ok=await core()}catch(er){toast(er.message,1)}}}
  if(!ok){nickView();return}route()}

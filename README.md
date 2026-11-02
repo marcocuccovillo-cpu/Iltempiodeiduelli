@@ -713,11 +713,13 @@ Solo modifiche al sito (nessuna migrazione, nessun cambiamento al database):
 - File: `tempio.js` (v14), `black-market.html`, `black-market-moduli.js` (v21), `sw.js` (cache v66); le altre pagine HTML cambiano solo per il numero di versione di `tempio.js`.
 - Provato con Chromium a 390 e 1280 px (Supabase simulato): barra, tendina, evidenziazione, chiusura con Esc/fuori, cambio sezione, barra fissa durante lo scorrimento, nessuno scorrimento orizzontale, nessun errore JS; con utente normale e amministratore.
 
-## Hall of Fame: avatar con la foto profilo
-- **Problema**: nella classifica della Hall of Fame (e nell'intestazione della scheda di un giocatore) gli avatar mostravano solo l'emoji o l'iniziale, mai la foto profilo.
-- **Causa**: la pagina disegnava l'avatar con i soli dati della classifica (nickname ed emoji), che non contengono la foto. La Ladder invece la legge dai profili, per questo lì si vedeva.
-- **Correzione**: ora usa gli stessi profili già caricati dal sito (foto se c'è, altrimenti emoji/iniziale). Stessa correzione per l'elenco membri di Faction Wars. Nessuna migrazione.
-- File: `black-market-moduli.js` (v22), `black-market.html`, `sw.js` (cache v67).
+## Inviti, vetrina pubblica e condivisione su WhatsApp (migrazione 037, 2 novembre 2026)
+Obiettivo: portare nell'app chi è nel gruppo WhatsApp ma non si è ancora iscritto.
+- **Anteprime WhatsApp**: tutte le pagine hanno i tag Open Graph con l'immagine `og-tempio.jpg` (1200×630). Gli indirizzi puntano a `https://marcocuccovillo-cpu.github.io/Iltempiodeiduelli/`: se il sito ha un altro indirizzo, sostituiscilo nei tag `og:url` e `og:image` delle pagine.
+- **Home con la vetrina dal vivo** (`index.html`): numeri della community, boss del giorno, Ladder Advanced/Edison, Most Wanted, ultimi duelli, prossimi eventi, visibili anche **senza account** tramite `public_showcase()` (solo nickname, avatar e numeri pubblici). Le spiegazioni sono ora in riquadri apribili. Barra in basso: «Crea il profilo» per chi non è iscritto, «Invita amici» per chi lo è.
+- **Codice invito** (`black-market-inviti.sql`, `black-market-inviti.js`, pagina `#/invita` e voce «Invita amici» nel menu): link `index.html?invito=CODICE`. Al primo match dell'invitato (Ladder conclusa o match ufficiale verificato, non contro chi l'ha invitato): **+200 BC** a chi invita, **+100 BC** all'invitato. Codice valido nei primi 7 giorni e prima del primo match; massimo 10 inviti premiati a testa. Tutto regolabile da Admin › Impostazioni (`invite_*`). Nuovi movimenti `invite_reward`/`invite_bonus`, notifica a chi invita, badge **Reclutatore** (1/3/5/10, area Community).
+- **Condividi su WhatsApp** (`tempio-condividi.js`, caricato da `tempio.js` su ogni pagina): immagine quadrata generata nel telefono per badge ottenuti (Sentiero/profili), vittoria in Ladder (dashboard, 48 ore), taglia appena pubblicata, Most Wanted, boss sconfitto e dungeon superato (Eroi). Il link nel messaggio contiene il codice invito di chi condivide.
+- **Come si applica**: 1) Supabase › SQL Editor: incolla `black-market-inviti.sql` › Run (si può rieseguire). 2) Carica su GitHub i file cambiati. Il test `black-market-inviti-test.sql` va eseguito solo su un progetto di prova vuoto; `black-market-inviti-down.sql` annulla (il registro contabile resta).
 
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.

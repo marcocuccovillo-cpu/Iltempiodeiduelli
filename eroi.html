@@ -2,6 +2,11 @@
 <html lang="it"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>La guerra degli Eroi — Il Tempio Dei Duelli</title><meta name="theme-color" content="#000000">
+<meta name="description" content="Il gioco di ruolo del Tempio: crea il tuo eroe, abbatti il boss del giorno con la community, conquista 100 dungeon e scala l’Arena.">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Il Tempio Dei Duelli"><meta property="og:locale" content="it_IT">
+<meta property="og:title" content="La guerra degli Eroi — Il Tempio Dei Duelli"><meta property="og:description" content="Il gioco di ruolo del Tempio: crea il tuo eroe, abbatti il boss del giorno con la community, conquista 100 dungeon e scala l’Arena."><meta property="og:url" content="https://marcocuccovillo-cpu.github.io/Iltempiodeiduelli/eroi.html">
+<meta property="og:image" content="https://marcocuccovillo-cpu.github.io/Iltempiodeiduelli/og-tempio.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Il Tempio Dei Duelli — community Yu-Gi-Oh! di Bologna">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png?v=2" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -353,7 +358,7 @@ body.er-fab-on{padding-bottom:88px}
 
 <button id="chFab" class="er-fab" type="button" hidden aria-label="Apri la chat degli eroi" aria-expanded="false" aria-controls="chPanel">💬<em class="er-bdg" id="chBadge" hidden title="Nuovi messaggi"></em></button>
 <div id="chPanel" class="er-cp" role="dialog" aria-label="Chat degli eroi" hidden></div>
-<script src="tempio.js?v=14"></script>
+<script src="tempio.js?v=15"></script>
 <script src="tempio-notifiche.js?v=2"></script>
 <script src="eroi-torre.js?v=1"></script>
 <script src="eroi-pet.js?v=1"></script>
@@ -372,6 +377,7 @@ const SRC={start:'Base',shop:'Mercante',boss:'Boss',dungeon:'Dungeon',tower:'Tor
 const API='https://db.ygoprodeck.com/api/v7/cardinfo.php',CROP='https://images.ygoprodeck.com/images/cards_cropped/';
 let AVOK=false,AV={},avOpen=false,avQ='',avRes=null,avBusy=false,FOLD={};   // FOLD: riquadri aperti (abilità, cartelle zaino)
 const REFILL_BELOW=100;      // come nel database (_game_refill_below_level): la ricarica dell'energia al livello vale solo se si parte sotto questo livello
+const SHARE={};   /* card da condividere su WhatsApp (tempio-condividi.js) */
 let lastDngCan=true,lastCan=true,sb=null,ST=null,ME=null,BAL=null,CAP=9999,tab='hero',draft=null,heal='',LB=null,AR=null,busy=false,last=0,pending=null,flash=null,ISADM=null;
 
 /* ---------- utilità ---------- */
@@ -502,6 +508,7 @@ function renderHero(){
 function renderBoss(){
  const b=ST.boss,m=ST.me,S=ST.settings,my=b.my,pct=b.max_hp?Math.max(0,Math.min(100,100*b.hp/b.max_hp)):0,open=b.status==='open',lobby=b.status==='lobby',done=b.status==='defeated';
  const rw=ST.rewards.find(r=>r.day===ST.today);
+ if(done&&rw)SHARE.boss={kind:'Boss sconfitto',emoji:b.emoji,title:b.name,sub:`Boss ${b.no} · livello ${num(b.level)}`,stats:[['BC',`+${num(rw.bc)}`],['XP',`+${num(rw.xp)}`],['Eroi',num((b.party||[]).length)]],msg:`🐉 Oggi abbiamo abbattuto ${b.emoji} ${b.name} nella Guerra degli Eroi del Tempio! Domani arriva il prossimo boss: chi viene?`};
  let why='';
  if(!m.stats_set)why='Prima assegna i tuoi punti abilità nella scheda <b>Eroe</b>.';
  else if(done)why='Hai già sconfitto il boss di oggi con la tua lobby: torna domani per il prossimo!';
@@ -541,7 +548,7 @@ function renderBoss(){
   <div class="er-chips">${b.shield>0?`<span>🛡️ Scudo comune ${num(b.shield)}</span>`:''}${b.weak>0?`<span>🔎 Debolezza svelata +${b.weak}%</span>`:''}<span>⏳ ${lobby?'Il boss scappa tra ':open?'Resta ':'Prossimo boss tra '}<b data-cd>${cd()}</b></span></div>
   ${prev?`<p class="mute" style="margin:0;font-size:.9rem">${prev}</p>`:''}
  </div>
- ${lobby?LOBBY:done&&rw?`<div class="card er-win" style="margin-top:12px"><h3>🏆 Boss sconfitto! La tua ricompensa</h3><p style="margin:6px 0 0"><b>+${num(rw.bc)} BC</b> · <b>+${num(rw.xp)} XP</b>${rw.levels?` (sei salito di ${rw.levels} livell${rw.levels>1?'i':'o'}${ST.me&&ST.me.level<=REFILL_BELOW?': energia al 100%!':''})`:''}${rw.item?` · oggetto: <b class="r-${esc(rw.item_rarity)}" style="color:var(--rc)">${esc(rw.item)}</b>`:''}</p></div>`
+ ${lobby?LOBBY:done&&rw?`<div class="card er-win" style="margin-top:12px"><h3>🏆 Boss sconfitto! La tua ricompensa</h3><p style="margin:6px 0 0"><b>+${num(rw.bc)} BC</b> · <b>+${num(rw.xp)} XP</b>${rw.levels?` (sei salito di ${rw.levels} livell${rw.levels>1?'i':'o'}${ST.me&&ST.me.level<=REFILL_BELOW?': energia al 100%!':''})`:''}${rw.item?` · oggetto: <b class="r-${esc(rw.item_rarity)}" style="color:var(--rc)">${esc(rw.item)}</b>`:''}</p>${window.TempioShare?'<button type="button" class="btn sm" style="margin-top:10px;background:#25d366;border-color:#25d366;color:#05230f" data-er-share="boss">Condividi su WhatsApp</button>':''}</div>`
    :done?`<p class="er-msg" style="margin-top:12px">La tua lobby ha sconfitto il boss. Tornate domani!</p>`:''}
  ${lobby?WHY:ACT}
  ${NJ?'':`<h2 class="er-h">${lobby?'Nella lobby':'In battaglia oggi'} · ${b.party.length}</h2>`}
@@ -816,11 +823,13 @@ function dngModal(res,no){
    +(me.milestone?`<p class="er-msg">🏆 Traguardo raggiunto: ogni 5 dungeon completati ottieni un oggetto <b style="color:#c084fc">epico</b>!</p>`:'')}
  const others=mem.filter(x=>x!==me&&win).map(x=>`${esc(x.nickname)} +${num(x.bc)} BC`).join(' · ');
  const drop=(res.dropped||[]).length?`<p class="er-note">Non sono partiti (energia insufficiente o profilo sospeso): ${(res.dropped).map(esc).join(', ')}.</p>`:'';
+ if(win&&me)SHARE.dng={kind:res.path?'Spedizione riuscita':'Dungeon superato',emoji:d.emoji,title:d.name,sub:`Dungeon ${no}${mem.length>1?` · in ${mem.length}`:' · in solitaria'}`,stats:[['BC',`+${num(me.bc)}`],['XP',`+${num(me.xp)}`],['Stanze',`${num(res.rooms_cleared)}/${num(res.rooms_total)}`]],msg:`🏰 ${mem.length>1?'Abbiamo':'Ho'} superato il dungeon ${d.emoji} ${d.name} nella Guerra degli Eroi del Tempio!`};
  const en=res.ending,endBox=res.path&&en?`<div class="dg-end ${win?'':'l'}"><h3>${win?'🏆':'💀'} ${esc(en.title)}${win&&en.m!==100?` · ${num(en.m)}%`:''}</h3><p>${esc(en.text)}</p>${me&&me.endings_found!=null?`<p class="mute" style="margin-top:6px;font-size:.86rem">Finali scoperti in questo dungeon: <b>${num(me.endings_found)} su ${num(res.endings_total)}</b></p>`:''}</div>`:'';
  modal(`<h2>${res.path?(win?'🏆 Spedizione riuscita!':'💀 Spedizione fallita'):(win?'🏆 Dungeon superato!':'💀 Il gruppo è caduto')}</h2><p class="mute" style="margin:0 0 8px">${esc(d.emoji)} ${esc(d.name)}${res.path?` · scontri vinti ${num(res.rooms_cleared)} su ${num(res.rooms_total)}`:` · stanze superate ${num(res.rooms_cleared)} su ${num(res.rooms_total)}`} · −${num(res.cost)} energie${mem.length>1?' a testa':''}</p>${endBox}
   ${rw}${others?`<p class="er-note">Compagni: ${others}</p>`:''}${drop}
   ${rooms?`<h3 class="er-h" style="font-size:1rem;margin:14px 0 4px">Com’è andata, ${res.path?'scontro per scontro':'stanza per stanza'}</h3>${rooms}`:''}
   ${res.path&&(res.story||[]).length?`<details class="dg-rm"><summary><span>📜 Le tue scelte</span></summary><div><ul class="dg-log">${pathLog(res.story)}</ul></div></details>`:''}
+  ${win&&me&&window.TempioShare?'<button type="button" class="btn block" style="margin-top:14px;background:#25d366;border-color:#25d366;color:#05230f" data-er-share="dng">Condividi su WhatsApp</button>':''}
   <button class="btn block" style="margin-top:14px" data-close>Chiudi</button>`)}
 
 /* ---------- Mercante ---------- */
@@ -1166,6 +1175,7 @@ async function boot(){
 document.querySelector('.tabs').onclick=e=>{const b=e.target.closest('[data-t]');if(b)setTab(b.dataset.t)};
 document.addEventListener('click',e=>{
  const t=e.target.closest('button,[data-hero]');if(!t)return;
+ if(t.dataset.erShare){const o=SHARE[t.dataset.erShare];if(o&&window.TempioShare)window.TempioShare.share(o);return}
  if(t.id==='retry'){boot();return}
  if(t.id==='chFab'){if(CHOPEN)closeChat();else openChat();return}
  if(t.id==='chClose'){closeChat();return}
