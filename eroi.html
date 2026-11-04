@@ -182,6 +182,7 @@ body.er-fab-on{padding-bottom:88px}
 .er-sticky .tabs{position:static;margin:0;backdrop-filter:none;background:none}
 .er-sticky .tabs{padding:0 4px}.er-sticky .tabs button{padding:0 6px;font-size:.82rem}@media(min-width:420px){.er-sticky .tabs button{padding:0 12px;font-size:.95rem}}
 .er-bat{display:flex;align-items:center;padding:7px 16px 6px;--bc:var(--good)}.er-bat.mid{--bc:var(--gold)}.er-bat.lo{--bc:var(--bad)}
+.er-bat .er-rg{display:block;margin-top:2px;color:var(--mu)}.er-bat .er-rg.on{color:var(--gold)}.er-bat .bi .er-rg b{display:inline;font-size:inherit;color:inherit}
 .er-bat .bt{position:relative;width:80px;height:30px;border:2px solid var(--tx);border-radius:7px;overflow:hidden;background:var(--inp);flex:none}
 .er-bat .bt i{position:absolute;inset:0 auto 0 0;background:var(--bc);opacity:.92;transition:width .6s}
 .er-bat .bt b{position:absolute;inset:0;display:grid;place-items:center;font:700 1.05rem var(--disp);color:#fff;text-shadow:0 1px 3px #000,0 0 2px #000;font-variant-numeric:tabular-nums}
@@ -408,8 +409,10 @@ function capNow(){return ST.settings.cap+ST.settings.points_per_level*(ST.me.lev
 function enNow(){const e=ST&&ST.energy;if(!e)return 0;return Math.min(e.max,Number(e.value)+Number(e.per_hour)*(Date.now()-last)/3600000)}
 function paintBat(){
  const el=$('bat');if(!el||!ST||!ST.energy)return;const e=ST.energy,v=enNow(),p=Math.max(0,Math.min(100,100*v/e.max)),lv=p>=50?'hi':p>=25?'mid':'lo',secs=v>=e.max?0:(e.max-v)/e.per_hour*3600;
- const key=Math.floor(v)+'|'+Math.floor(secs/60)+'|'+lv+'|'+e.max;if(el._k===key)return;el._k=key;
- el.innerHTML=`<div class="er-bat ${lv}" role="img" aria-label="Energia ${Math.floor(v)} su ${e.max}"><div class="bt"><i style="width:${p}%"></i><b>${Math.floor(v)}</b></div><span class="nub" aria-hidden="true"></span><div class="bi"><b>Energia ${Math.floor(v)} / ${e.max}</b><small>${secs<=0?'Batteria carica':'Piena tra '+fmtDur(secs)} · duello vinto −${e.win}, perso −${e.loss}</small></div></div>`}
+ /* bonus ricarica totale (oggetti + pet): lo stesso conto del database, 25% per punto */
+ const rb=25*Number((ST.me&&ST.me.extra_fights)||0),ph=Number(e.per_hour).toLocaleString('it-IT',{maximumFractionDigits:1});
+ const key=Math.floor(v)+'|'+Math.floor(secs/60)+'|'+lv+'|'+e.max+'|'+rb+'|'+ph;if(el._k===key)return;el._k=key;
+ el.innerHTML=`<div class="er-bat ${lv}" role="img" aria-label="Energia ${Math.floor(v)} su ${e.max}"><div class="bt"><i style="width:${p}%"></i><b>${Math.floor(v)}</b></div><span class="nub" aria-hidden="true"></span><div class="bi"><b>Energia ${Math.floor(v)} / ${e.max}</b><small>${secs<=0?'Batteria carica':'Piena tra '+fmtDur(secs)} · duello vinto −${e.win}, perso −${e.loss}</small><small class="er-rg${rb>0?' on':''}">${rb>0?`⚡ Ricarica <b>+${num(rb)}%</b> (pet e oggetti) · ${ph} energia/ora`:`Ricarica ${ph} energia/ora · pet e oggetti possono velocizzarla`}</small></div></div>`}
 function bonusTags(it){const o=[];STATS.forEach(s=>{const v=it['p_'+s[0]];if(v>0)o.push(`<span>+${v}% ${s[1]}</span>`)});
  if(it.xp_pct>0)o.push(`<span class="sp">+${it.xp_pct}% XP</span>`);if(it.extra_actions>0)o.push(`<span class="sp">+${it.extra_actions} azione boss/giorno</span>`);if(it.extra_fights>0)o.push(`<span class="sp">+${it.extra_fights*25}% ricarica energia</span>`);
  return o.length?`<div class="er-bn">${o.join('')}</div>`:''}
