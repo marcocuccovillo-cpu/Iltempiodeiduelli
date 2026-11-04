@@ -33,6 +33,7 @@
 .boss{display:flex;gap:14px;align-items:center}
 .boss .em{font-size:3.4rem;line-height:1;flex:none;filter:drop-shadow(0 0 16px rgba(var(--ac-rgb),.6))}
 .boss b{font:700 1.15rem var(--disp)}.boss p{margin:2px 0 0;color:var(--mu);font-size:.92rem}
+.rbar{position:relative;height:22px;border-radius:9px;margin-top:12px;background:#12060a;border:1px solid rgba(255,84,104,.55);overflow:hidden}.rbar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#7a0f22,#ff5468)}.rbar span{position:absolute;inset:0;display:grid;place-items:center;font:700 .8rem var(--ui);color:#fff;text-shadow:0 1px 2px #000}
 .tag{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:99px;font:700 .8rem var(--ui);border:1px solid}
 .tag.ok{color:var(--good);border-color:var(--good)}.tag.fight{color:var(--warn);border-color:var(--warn)}.tag.idle{color:var(--ac2);border-color:var(--ac)}
 .pr{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
@@ -126,7 +127,7 @@
    <ul class="qk two">
     <li><i>⚡</i><span><b>Energia 100</b><small>ricarica in 8 ore</small></span></li>
     <li><i>🆙</i><span><b>3 punti</b> a livello</span></li>
-    <li><i>🐉</i><span><b>Boss del giorno</b><small>una lobby al giorno · XP e BC</small></span></li>
+    <li><i>🐉</i><span><b>Raid settimanale</b><small>un boss per tutto il Tempio · premi per danni</small></span></li>
     <li><i>🥊</i><span><b>Arena</b><small>tra eroi · leghe e stagioni</small></span></li>
    </ul>
    <h3 class="h3">🏰 100 Dungeon e Torre Infinita</h3>
@@ -208,8 +209,19 @@
     people = s.people || {};
     var st = s.stats || {}, h = '';
     h += '<div class="stats"><div><b>' + num(st.players) + '</b><small>duellanti</small></div><div><b>' + num(st.new_week) + '</b><small>nuovi in 7 giorni</small></div><div><b>' + num(st.matches_week) + '</b><small>match in 7 giorni</small></div><div><b>' + num(st.bounty_total) + '</b><small>BC in taglie</small></div></div><div class="lv">';
-    /* boss */
-    var b = s.boss;
+    /* raid settimanale (migrazione 039): prende il posto del boss del giorno */
+    var rd = s.raid, b = s.boss;
+    if (rd && rd.name) {
+      var rp = rd.max_hp ? Math.max(0, Math.min(100, 100 * rd.hp / rd.max_hp)) : 0, left = Math.max(0, new Date(rd.ends_at) - Date.now()), dd = Math.floor(left / 864e5), hh = Math.floor(left % 864e5 / 36e5);
+      h += '<div class="card"><h3>🐉 Raid della settimana<a class="more" href="eroi.html#boss">Combatti ›</a></h3><div class="boss"><span class="em" aria-hidden="true">' + esc(rd.emoji) + '</span><div><b>' + esc(rd.name) + '</b><p>'
+        + (rd.status === 'defeated' ? 'Abbattuto dal Tempio! Il prossimo arriva lunedì.' : 'Scappa tra ' + (dd > 0 ? dd + ' g ' : '') + hh + ' h · ' + num(rd.participants) + ' eroi in battaglia') + '</p></div></div>'
+        + '<div class="rbar"><i style="width:' + rp + '%"></i><span>' + (rd.status === 'defeated' ? 'Sconfitto' : num(rd.hp) + ' PV · ' + Math.round(rp) + '%') + '</span></div>'
+        + ((rd.top || []).length ? '<p class="mute" style="margin:10px 0 0;font-size:.88rem">In testa: ' + rd.top.map(function (t, i) { return (i + 1) + '. <b style="color:var(--tx)">' + esc(t.n) + '</b>'; }).join(' · ') + '</p>' : '<p class="mute" style="margin:10px 0 0;font-size:.88rem">Nessuno ha ancora colpito: il primo colpo può essere il tuo.</p>') + '</div>';
+      b = null;
+    } else if (rd && rd.status === 'waiting') {
+      h += '<div class="card"><h3>🐉 Raid della settimana<a class="more" href="eroi.html#boss">Combatti ›</a></h3><div class="boss"><span class="em" aria-hidden="true">💤</span><div><b>Un nuovo boss si avvicina</b><p>Il raid di questa settimana si risveglia al primo eroe che entra.</p></div></div></div>';
+      b = null;
+    }
     if (b) {
       var tag = b.status === 'defeated' ? '<span class="tag ok">Abbattuto oggi</span>' : b.heroes > 0 ? '<span class="tag fight">' + num(b.heroes) + ' eroi in battaglia</span>' : '<span class="tag idle">Nessuno l’ha ancora sfidato oggi</span>';
       h += '<div class="card"><h3>🐉 Boss del giorno<a class="more" href="eroi.html">Combatti ›</a></h3>' + (b.name

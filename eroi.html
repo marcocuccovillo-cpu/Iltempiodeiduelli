@@ -135,6 +135,35 @@ body.er-fab-on{padding-bottom:88px}
 .er-hp span{position:absolute;inset:0;display:grid;place-items:center;font:700 .8rem var(--ui);text-shadow:0 1px 2px #000;font-variant-numeric:tabular-nums}
 .er-hp.me i{background:linear-gradient(90deg,#1f9d63,var(--good))}.er-hp.sm{height:14px}.er-hp.sm span{font-size:.68rem}
 .er-chips{display:flex;flex-wrap:wrap;gap:8px}.er-chips span{padding:3px 10px;border-radius:99px;border:1px solid var(--line);font-size:.85rem;font-weight:600;background:var(--inp)}
+.rd-card{padding-bottom:14px}
+.rd-top{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:10px}.rd-top small{color:var(--mu)}.rd-top h2{font-size:1.3rem;margin-top:2px}
+.rd-clock{text-align:right}.rd-clock b{display:block;font:700 1.25rem/1.1 var(--disp);color:var(--gold);font-variant-numeric:tabular-nums}.rd-clock span{font-size:.78rem;color:var(--mu)}
+.rd-hp{position:relative;height:30px;border-radius:12px;background:#12060a;border:1.5px solid rgba(255,84,104,.55);overflow:hidden;margin:4px 0 10px;box-shadow:0 0 18px rgba(255,84,104,.18)}
+.rd-hp i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#7a0f22,#ff5468 70%,#ff9aa8);transition:width .6s ease-out}
+.rd-hp.won i{background:var(--good)}.rd-hp .mk{position:absolute;top:0;bottom:0;width:2px;background:rgba(0,0,0,.45)}
+.rd-hp b{position:absolute;inset:0;display:grid;place-items:center;font:700 .9rem var(--ui);color:#fff;text-shadow:0 1px 3px #000;font-variant-numeric:tabular-nums}
+.rd-field{margin-top:6px}.rd-foe{overflow:hidden}.rd-foe .nm{max-width:100%;font-size:.78rem;padding:0 4px}.rd-duel{grid-template-columns:.8fr 1.2fr;min-height:250px}
+.rd-foe .tw-body{min-height:200px}.rd-aura{position:absolute;left:50%;bottom:10px;width:78%;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,var(--zg,#ff5468) 0,transparent 68%);opacity:.38;animation:rdPulse 3.2s ease-in-out infinite;pointer-events:none}
+.rd-bs{filter:drop-shadow(0 0 14px rgba(0,0,0,.6))}
+@keyframes rdPulse{50%{opacity:.6;transform:translateX(-50%) scale(1.06)}}
+.rd-h{font-size:1rem;margin:16px 0 8px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.rd-h small{font:400 .8rem var(--ui);color:var(--mu)}
+.rd-allies{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:thin}
+.rd-ally{flex:none;width:74px;display:grid;justify-items:center;gap:4px;padding:6px 4px;border-radius:12px;border:1.5px solid var(--line);background:var(--surf);color:var(--tx);cursor:pointer}
+.rd-ally.on{border-color:var(--good);background:rgba(74,222,155,.1)}.rd-ally.ko{opacity:.65}.rd-ally.ko .av{filter:grayscale(1)}
+.rd-ally .av,.rd-row .av{width:38px;height:38px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:var(--raise);font-weight:700}
+.rd-ally .av img,.rd-row .av img{width:100%;height:100%;object-fit:cover}
+.rd-ally .hb{width:100%;height:5px;border-radius:9px;background:rgba(0,0,0,.5);overflow:hidden}.rd-ally .hb i{display:block;height:100%;background:var(--good)}
+.rd-ally small{font-size:.7rem;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rd-acts{grid-template-columns:1fr 1fr}.rd-acts .x5{border-style:dashed}
+.rd-grid{display:grid;gap:12px;margin-top:12px;grid-template-columns:1fr}@media(min-width:760px){.rd-grid{grid-template-columns:1fr 1fr}}
+.rd-me{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.rd-me div{padding:8px 4px;border:1px solid var(--line);border-radius:12px;background:var(--inp)}
+.rd-me b{display:block;font:700 1.15rem var(--disp)}.rd-me small{color:var(--mu);font-size:.75rem}
+.rd-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line)}.rd-row:first-of-type{border-top:0}.rd-row.me b{color:var(--gold)}
+.rd-row .n{width:1.4rem;text-align:center;font:700 .9rem var(--disp);color:var(--mu)}.rd-row .av{width:30px;height:30px;flex:none}
+.rd-row .g{flex:1;min-width:0}.rd-row .g b{display:block;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rd-row .bar{display:block;height:5px;border-radius:9px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:3px}.rd-row .bar i{display:block;height:100%;background:linear-gradient(90deg,#7a0f22,#ff5468)}
+.rd-row .v{font:700 .88rem var(--ui);font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){.rd-aura{animation:none}.rd-hp i{transition:none}}
 .er-acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .er-acts button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:78px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--surf);color:var(--tx);font:700 1rem var(--ui);text-align:left;cursor:pointer}
 .er-acts button small{font-weight:400;color:var(--mu);font-size:.8rem;line-height:1.25}
@@ -335,7 +364,7 @@ body.er-fab-on{padding-bottom:88px}
 
 <main class="pg">
  <header><p class="kicker">Mini gioco di ruolo</p><h1>La guerra degli Eroi</h1>
- <p class="lead">Ogni duellante è un eroe con il suo nickname. Distribuisci i punti abilità, compra le abilità dal Mercante, sfida gli altri eroi in Arena (ogni duello consuma energia), abbatti il boss del giorno da solo o con la tua lobby e affronta i 100 dungeon (dal 26 a scelte, dal 56 con prove, serrature e orologio), scala la Torre Infinita, da solo o in squadra, e fatti seguire da un compagno dello Stagno che cresce con te.</p></header>
+ <p class="lead">Ogni duellante è un eroe con il suo nickname. Distribuisci i punti abilità, compra le abilità dal Mercante, sfida gli altri eroi in Arena (ogni duello consuma energia), abbatti con tutto il Tempio il boss gigante del raid settimanale e affronta i 100 dungeon (dal 26 a scelte, dal 56 con prove, serrature e orologio), scala la Torre Infinita, da solo o in squadra, e fatti seguire da un compagno dello Stagno che cresce con te.</p></header>
 
  <section class="card er-top" id="top" aria-live="polite"><p class="mute" style="margin:0" role="status">Caricamento dell’eroe…</p></section>
 
@@ -379,6 +408,7 @@ const API='https://db.ygoprodeck.com/api/v7/cardinfo.php',CROP='https://images.y
 let AVOK=false,AV={},avOpen=false,avQ='',avRes=null,avBusy=false,FOLD={};   // FOLD: riquadri aperti (abilità, cartelle zaino)
 const REFILL_BELOW=100;      // come nel database (_game_refill_below_level): la ricarica dell'energia al livello vale solo se si parte sotto questo livello
 const SHARE={};   /* card da condividere su WhatsApp (tempio-condividi.js) */
+let RAID=null,rTarget='';   /* raid settimanale (game_raid_state); null = non installato o spento: resta il boss del giorno */
 let lastDngCan=true,lastCan=true,sb=null,ST=null,ME=null,BAL=null,CAP=9999,tab='hero',draft=null,heal='',LB=null,AR=null,busy=false,last=0,pending=null,flash=null,ISADM=null;
 
 /* ---------- utilità ---------- */
@@ -559,6 +589,96 @@ function renderBoss(){
  ${NJ?'':`<h2 class="er-h">Cronaca</h2>`}
  ${NJ?'':b.log.length?`<ul class="er-log">${b.log.map(l=>`<li>${logLine(l)}</li>`).join('')}</ul>`:'<p class="mute">Ancora nessuna azione oggi.</p>'}`;
 }
+/* ---------- Raid settimanale (migrazione 039): un boss gigante per tutto il Tempio, grafica dell'arena della Torre ---------- */
+function rLeft(){if(!RAID||!RAID.raid)return '';const t=new Date(RAID.raid.ends_at).getTime()-Date.now();if(t<=0)return 'in chiusura';const s=Math.floor(t/1000),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);return d>0?`${d} g ${pad(h)} h`:h>0?`${h} h ${pad(m)} min`:`${m} min`}
+function rPct(hp,max){return max?Math.max(0,Math.min(100,100*hp/max)):0}
+function renderRaid(){
+ const R=RAID.raid,b=R.boss,M=RAID.me,m=ST.me,open=R.status==='open',won=R.status==='defeated',pct=rPct(R.hp,R.max_hp),z=ART?ART.zone(b.zone||1):null;
+ const tb=document.querySelector('.tabs [data-t="boss"]');if(tb)tb.textContent='Raid';
+ const mine=RAID.my_reward;
+ if(won)SHARE.raid={kind:'Raid vinto',emoji:b.emoji,title:b.name,sub:`Abbattuto da ${num(R.participants)} eroi del Tempio`,stats:mine?[['Posizione',`${mine.rank}°`],['BC',`+${num(mine.bc)}`],['XP',`+${num(mine.xp)}`]]:null,msg:`🐉 Il Tempio ha abbattuto ${b.emoji} ${b.name} nel raid della settimana!${mine?` Sono arrivato ${mine.rank}° per danni.`:''} Lunedì arriva il prossimo boss: entra anche tu!`};
+ const today=RAID.today||[],others=today.filter(x=>x.user_id!==m.user_id);
+ if(!rTarget||!today.some(x=>x.user_id===rTarget))rTarget=m.user_id;
+ let why='';
+ if(!m.stats_set)why='Prima assegna i tuoi punti abilità nella scheda <b>Eroe</b>.';
+ else if(won)why='Il boss di questa settimana è caduto: il prossimo arriva lunedì.';
+ else if(!open)why='Il raid è chiuso: il prossimo arriva lunedì.';
+ else if(M.ko)why='Sei KO: un alleato deve curarti, oppure torni in forze domani.';
+ const can=!why,canS=can&&M.actions_left>0;
+ const tgt=today.find(x=>x.user_id===rTarget),tgtHurt=tgt&&tgt.hp<tgt.max_hp;
+ const hero=ART?ART.sprite('eroe',{size:104,alt:m.nickname}):'<span style="font-size:56px">🧑</span>';
+ const boss=ART?ART.sprite(b.sprite,{tier:b.tint,size:Math.max(120,Math.min(200,Math.round((($('p-boss')||{}).clientWidth||innerWidth)*0.44))),alt:b.name,cls:'rd-bs'}):`<span style="font-size:110px">${esc(b.emoji)}</span>`;
+ const ally=x=>`<button type="button" class="rd-ally ${x.user_id===rTarget?'on':''} ${x.hp<=0?'ko':''}" data-rt="${esc(x.user_id)}" title="${esc(x.nickname)}"><span class="av">${face(x.user_id,x.nickname)}</span><span class="hb"><i style="width:${rPct(x.hp,x.max_hp)}%"></i></span><small>${esc(x.nickname)}${x.user_id===m.user_id?' (tu)':''}</small></button>`;
+ const rules=RAID.rules||{},top=rules.top||[];
+ const tot=Math.max(1,Number(R.total_dmg)||0);
+ $('p-boss').innerHTML=`<div class="card rd-card ${won?'er-win':''}">
+  <div class="rd-top"><div><small>Raid della settimana · boss ${num(b.no)} di ${num(R.total_bosses)}${R.cycle>0?` · giro ${R.cycle+1}`:''}</small><h2>${esc(b.emoji)} ${esc(b.name)}</h2></div>
+   <div class="rd-clock"><b data-rcd>${won?'Caduto!':rLeft()}</b><span>${won?'prossimo lunedì':'alla fuga del boss'}</span></div></div>
+  <div class="rd-hp ${won?'won':''}" role="progressbar" aria-valuemin="0" aria-valuemax="${R.max_hp}" aria-valuenow="${R.hp}" aria-label="Punti vita del boss del raid">
+   <i id="rdHp" style="width:${pct}%"></i><span class="mk" style="left:25%"></span><span class="mk" style="left:50%"></span><span class="mk" style="left:75%"></span>
+   <b id="rdHpT">${num(R.hp)} / ${num(R.max_hp)} PV · ${pct.toLocaleString('it-IT',{maximumFractionDigits:1})}%</b></div>
+  <div class="er-chips"><span>👥 ${num(R.participants)} eroi hanno colpito</span>${R.weak>0?`<span>🔎 Debolezza +${R.weak}% per tutti</span>`:''}<span>⚔️ ${num(R.total_dmg)} danni totali</span></div>
+  <div class="tw-field rd-field" id="rdF" style="${z?ART.zoneVars(z):''}"><div class="tw-duel rd-duel">
+   <div class="tw-side me"><span class="tw-hpt" id="rdMeT">${num(M.hp)} / ${num(M.max_hp)}${M.shield>0?` · 🛡️ ${num(M.shield)}`:''}</span><div class="tw-hpb"><i id="rdMe" style="width:${rPct(M.hp,M.max_hp)}%"></i></div><div class="tw-body me ${M.ko?'ko':''}" id="rdBa"><span class="tw-av" aria-hidden="true">${face(m.user_id,m.nickname)}</span>${hero}</div><div class="nm">${esc(m.nickname)}<br><span style="font-weight:400;opacity:.8">Liv. ${num(m.level)}</span></div></div>
+   <div class="tw-side foe rd-foe"><div class="tw-body ${won?'ko':''}" id="rdBb"><div class="rd-aura" aria-hidden="true"></div>${boss}</div><div class="nm">${esc(b.name)}</div></div></div>
+   <div class="tw-log" id="rdLog" aria-live="polite"></div></div>
+  ${today.length?`<h3 class="rd-h">In battaglia oggi · ${today.length} <small>tocca un alleato per curarlo o proteggerlo</small></h3><div class="rd-allies">${ally(today.find(x=>x.user_id===m.user_id)||{user_id:m.user_id,nickname:m.nickname,hp:M.hp,max_hp:M.max_hp})}${others.map(ally).join('')}</div>`:''}
+  <h3 class="rd-h">Azioni di supporto · ${M.actions_left} su ${M.actions_max}${tgt&&tgt.user_id!==m.user_id?` <small>bersaglio: <b>${esc(tgt.nickname)}</b></small>`:''}</h3>
+  <div class="er-acts rd-acts">
+   <button class="atk" data-rb="attack" ${can?'':'disabled'}>⚔️ Attacca<small>Libero. Il boss reagisce e ti toglie PV.</small></button>
+   <button class="atk x5" data-rb="attack" data-n="5" ${can?'':'disabled'}>⚔️ Attacca ×5<small>Cinque colpi di fila (si ferma se vai KO).</small></button>
+   <button class="grd" data-rb="guard" ${canS?'':'disabled'}>🛡️ Difendi<small>Scudo a ${tgt&&tgt.user_id!==m.user_id?esc(tgt.nickname):'te'}: assorbe i contraccolpi.</small></button>
+   <button class="hel" data-rb="heal" ${canS&&(tgtHurt||(!tgt&&M.hp<M.max_hp))?'':'disabled'}>💚 Cura<small>${tgt&&tgt.user_id!==m.user_id?`Rida PV a ${esc(tgt.nickname)}${tgt.hp<=0?' (KO: lo rianimi)':''}.`:'Rida PV a te (scegli un alleato sopra).'}</small></button>
+   <button class="stu" data-rb="study" ${canS&&R.weak<40?'':'disabled'}>🔎 Studia<small>Debolezza per tutto il Tempio: più danni a tutti (max +40%).</small></button>
+  </div>
+  ${why?`<p class="er-note">${why}</p>`:''}
+ </div>
+ ${won&&mine?`<div class="card er-win" style="margin-top:12px"><h3>🏆 Raid vinto! Sei arrivato ${num(mine.rank)}° per danni</h3><p style="margin:6px 0 0"><b>+${num(mine.bc)} BC</b> · <b>+${num(mine.xp)} XP</b>${mine.item?` · oggetto: <b>${esc(mine.item)}</b>`:''}${mine.item2?` e <b>${esc(mine.item2)}</b>`:''}</p>${window.TempioShare?'<button type="button" class="btn sm" style="margin-top:10px;background:#25d366;border-color:#25d366;color:#05230f" data-er-share="raid">Condividi su WhatsApp</button>':''}</div>`:''}
+ <div class="grid2 rd-grid">
+  <div class="card"><h3 class="rd-h" style="margin-top:0">Il tuo raid</h3>
+   <div class="rd-me"><div><b>${num(M.dmg)}</b><small>danni</small></div><div><b>${M.rank?num(M.rank)+'°':'—'}</b><small>posizione</small></div><div><b>${num(M.hits)}</b><small>colpi</small></div></div>
+   <p class="er-note" style="margin-top:8px">Se il boss cade: <b>${num(rules.bc_base)} BC</b> a chi ha colpito, un montepremi di <b>${num(rules.bc_pool)} BC per partecipante</b> diviso in base ai danni, e il podio: <b>+${num(top[0])}</b> / <b>+${num(top[1])}</b> / <b>+${num(top[2])}</b>. Più XP e un oggetto (due per il podio). Se scappa: premi ridotti in base a quanti PV gli avete tolto.</p></div>
+  <div class="card"><h3 class="rd-h" style="margin-top:0">Classifica danni</h3>${(RAID.top||[]).length?(RAID.top).map((x,i)=>`<div class="rd-row ${x.user_id===m.user_id?'me':''}"><span class="n">${i+1}</span><span class="av">${face(x.user_id,x.nickname)}</span><span class="g"><b>${esc(x.nickname)}</b><span class="bar"><i style="width:${Math.max(2,100*x.dmg/tot)}%"></i></span></span><span class="v">${num(x.dmg)}</span></div>`).join(''):'<p class="mute">Nessuno ha ancora colpito: il primo colpo è tuo.</p>'}</div>
+ </div>
+ <div class="card" style="margin-top:12px"><h3 class="rd-h" style="margin-top:0">Cronaca del raid</h3>${(RAID.log||[]).length?`<ul class="er-log">${RAID.log.map(l=>`<li>${logLine(l)}<small class="mute"> · ${new Date(l.at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}</small></li>`).join('')}</ul>`:'<p class="mute">Ancora nessuna azione questa settimana.</p>'}
+  <p class="er-lore" style="margin-top:12px">${esc(b.lore)}</p>${b.trait?`<p class="er-trait"><b>Particolarità:</b> ${esc(b.trait)}</p>`:''}
+  ${RAID.previous?`<p class="mute" style="margin:8px 0 0;font-size:.9rem">La settimana scorsa ${esc(RAID.previous.emoji)} <b>${esc(RAID.previous.boss)}</b> ${RAID.previous.status==='defeated'?'è caduto':`è scappato col ${num(100-RAID.previous.pct)}% dei PV`}${RAID.previous.mine?`: eri ${num(RAID.previous.mine.rank)}° (+${num(RAID.previous.mine.bc)} BC)`:''}.</p>`:''}</div>`;
+}
+async function raidAct(btn,kind,times){
+ await run(btn,async()=>{
+  const F=$('rdF'),Ba=$('rdBa'),Bb=$('rdBb'),G=$('rdLog');
+  const anim=(el,c)=>{if(!el)return;el.classList.remove(c);void el.offsetWidth;el.classList.add(c);setTimeout(()=>el.classList.remove(c),460)};
+  const fx=(el,txt,cls)=>{if(!el)return;const n=document.createElement('span');n.className='tw-num '+(cls||'');n.textContent=txt;el.appendChild(n);setTimeout(()=>n.remove(),1000)};
+  const say2=t=>{if(!G)return;G.insertAdjacentHTML('beforeend',`<div>${t}</div>`);while(G.children.length>3)G.removeChild(G.firstChild)};
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let r=null,sum=0,n=0;
+  for(let i=0;i<(times||1);i++){
+   r=await rpc('game_raid_act',{p_action:kind,p_target:kind==='attack'||kind==='study'?null:(rTarget||null)});n++;
+   if(kind==='attack'){sum+=Number(r.amount)||0;anim(Ba,'atk-l');
+    setTimeout(()=>{anim(Bb,'hit');fx(Bb,'−'+num(r.amount)+(r.crit?'!':''),r.crit?'c':'');if(r.crit&&F){F.classList.remove('shake');void F.offsetWidth;F.classList.add('shake')}},reduce?0:140);
+    setTimeout(()=>{if(r.dodge){anim(Ba,'dodge');fx(Ba,'Schivata!','x')}else if(r.taken>0){anim(Ba,'hit');fx(Ba,'−'+num(r.taken))}else if(r.absorbed>0)fx(Ba,'🛡️ '+num(r.absorbed),'x')},reduce?0:320);
+    say2(`<b>${esc(ST.me.nickname)}</b> colpisce per ${num(r.amount)}${r.crit?' (critico!)':''}${r.dodge?' e schiva':r.taken>0?` · contraccolpo −${num(r.taken)}`:''}`)}
+   else{fx(kind==='study'?Bb:Ba,kind==='guard'?'🛡️ +'+num(r.amount):kind==='heal'?'💚 +'+num(r.amount):'🔎 +'+num(r.amount)+'%','x')}
+   const hp=$('rdHp'),ht=$('rdHpT'),me=$('rdMe'),mt=$('rdMeT');
+   if(hp){const p=rPct(r.raid_hp,r.raid_max_hp);hp.style.width=p+'%';ht.textContent=`${num(r.raid_hp)} / ${num(r.raid_max_hp)} PV · ${p.toLocaleString('it-IT',{maximumFractionDigits:1})}%`}
+   if(me&&r.target==null||me&&r.target===ST.me.user_id){me.style.width=rPct(r.my_hp,r.my_max_hp)+'%';mt.textContent=`${num(r.my_hp)} / ${num(r.my_max_hp)}${r.my_shield>0?` · 🛡️ ${num(r.my_shield)}`:''}`}
+   if(r.ko||r.defeated)break;
+   if(i<(times||1)-1)await wait(reduce?50:600);
+  }
+  if(r.defeated&&Bb)Bb.classList.add('ko');
+  let t='';
+  if(kind==='attack')t=n>1?`${n} colpi: <b>${num(sum)}</b> danni al boss.`:`Hai inflitto <b>${num(r.amount)}</b> danni${r.crit?' (critico!)':''}.${r.dodge?' Hai schivato il contraccolpo.':r.taken>0?` Contraccolpo: −${num(r.taken)} PV.`:r.absorbed>0?` Lo scudo ha assorbito ${num(r.absorbed)}.`:''}`;
+  else if(kind==='guard')t=`Scudo di <b>${num(r.amount)}</b> ${r.target&&r.target!==ST.me.user_id?'all’alleato':'per te'}.`;
+  else if(kind==='heal')t=`Hai curato di <b>${num(r.amount)}</b> PV${r.note==='rianimato'?' e rianimato l’alleato!':'.'}`;
+  else t=`Debolezza svelata: <b>+${num(r.amount)}%</b> ai danni di tutto il Tempio (totale ${r.weak}%).`;
+  if(r.ko)t+=' <b>Sei KO!</b> Serve la cura di un alleato, oppure torni domani.';
+  if(r.defeated){const w=r.reward;t=`<b>🏆 Il boss del raid è caduto!</b> ${t}`+(w?` Sei <b>${w.rank}°</b> per danni: <b>+${num(w.bc)} BC</b>, <b>+${num(w.xp)} XP</b>${w.item?`, oggetto <b>${esc(w.item)}</b>`:''}${w.item2?` e <b>${esc(w.item2)}</b>`:''}.`:'')}
+  await wait(reduce?0:700);
+  try{RAID=await rpc('game_raid_state')}catch(_){}
+  if(r.defeated||n>0&&r&&r.reward)await load(true);else paint();
+  say(t,r.ko?'bad':'good');
+ })}
 function logLine(l){const n=`<b>${esc(l.nickname)}</b>`,a=num(l.amount);
  switch(l.action){case 'attack':return `${n} attacca per ${a} danni${l.note==='colpo finale'?' — <b>colpo finale!</b>':l.note==='critico'?' (critico)':l.note==='schivata'?' e schiva il contraccolpo':''}`;
   case 'guard':return `${n} alza lo scudo di ${a}`;case 'heal':return `${n} cura ${l.target?`<b>${esc(l.target)}</b> `:''}di ${a} PV${l.note==='rianimato'?' e lo <b>rianima</b>':''}`;
@@ -1138,7 +1258,7 @@ async function sendChat(){if(CH.sending)return;const inp=$('chIn'),btn=$('chSend
 /* ---------- navigazione e caricamento ---------- */
 function paint(){
  paintTop();paintBat();
- if(tab==='hero')renderHero();else if(tab==='boss')renderBoss();else if(tab==='dng')renderDng();else if(tab==='tower')renderTower();else if(tab==='arena')renderArena();else if(tab==='train')renderTrain();else if(tab==='shop')renderShop();else if(tab==='pond')renderPond();else renderLb();
+ if(tab==='hero')renderHero();else if(tab==='boss'){if(RAID&&RAID.enabled)renderRaid();else renderBoss()}else if(tab==='dng')renderDng();else if(tab==='tower')renderTower();else if(tab==='arena')renderArena();else if(tab==='train')renderTrain();else if(tab==='shop')renderShop();else if(tab==='pond')renderPond();else renderLb();
 }
 function setTab(t,push){
  tab=t;document.querySelectorAll('.tabs [data-t]').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));const cb=document.querySelector('.tabs [data-t="'+t+'"]');if(cb&&cb.scrollIntoView)try{cb.scrollIntoView({inline:'nearest',block:'nearest'})}catch(_){}
@@ -1149,6 +1269,8 @@ function setTab(t,push){
  if(t==='arena')loadArena();if(t==='lb')loadLb();if(t==='dng')loadDng(true);if(t==='tower')loadTower(true).catch(e=>say(errTxt(e),'bad'));if(t==='pond')loadPond().catch(e=>say(errTxt(e),'bad'));if(t==='train')loadTrain().catch(e=>say(errTxt(e),'bad'))}
 async function load(keepDraft){
  ST=await rpc('game_state');ME=ST.me;last=Date.now();
+ try{RAID=await rpc('game_raid_state')}catch(_){RAID=null}
+ {const tb=document.querySelector('.tabs [data-t="boss"]');if(tb)tb.textContent=RAID&&RAID.enabled?'Raid':'Boss'}
  if(ISADM===null){try{ISADM=(await rpc('is_admin'))===true}catch(_){ISADM=false}}      // la voce admin si vede solo a chi è davvero amministratore (il database lo ricontrolla comunque)
  if(!keepDraft)draft=null;
  await loadAvatars();
@@ -1178,6 +1300,8 @@ async function boot(){
 document.querySelector('.tabs').onclick=e=>{const b=e.target.closest('[data-t]');if(b)setTab(b.dataset.t)};
 document.addEventListener('click',e=>{
  const t=e.target.closest('button,[data-hero]');if(!t)return;
+ if(t.dataset.rt){rTarget=t.dataset.rt;paint();return}
+ if(t.dataset.rb){raidAct(t,t.dataset.rb,Number(t.dataset.n)||1);return}
  if(t.dataset.erShare){const o=SHARE[t.dataset.erShare];if(o&&window.TempioShare)window.TempioShare.share(o);return}
  if(t.id==='retry'){boot();return}
  if(t.id==='chFab'){if(CHOPEN)closeChat();else openChat();return}
@@ -1260,7 +1384,7 @@ document.addEventListener('change',e=>{
  if(e.target.dataset&&e.target.dataset.pin&&draft){const k=e.target.dataset.pin,used=STATS.reduce((s,x)=>s+draft[x[0]],0),v=Math.max(0,parseInt(e.target.value,10)||0);
   draft[k]=Math.min(v,draft[k]+Math.min(capNow()-draft[k],ST.me.points-used));renderHero();const f=document.querySelector(`#p-hero [data-pin="${k}"]`);if(f)f.focus();return}
  if(e.target.id==='arOpen'){const el=e.target;run(el,async()=>{await rpc('game_set_arena_open',{p_open:el.checked});say(el.checked?'Ora gli altri eroi possono sfidarti.':'Ora nessuno può sfidarti in Arena.','good');await load(false)})}});
-setInterval(()=>{if(!ST)return;document.querySelectorAll('[data-cd]').forEach(e=>e.textContent=cd());paintBat();
+setInterval(()=>{if(!ST)return;document.querySelectorAll('[data-cd]').forEach(e=>e.textContent=cd());document.querySelectorAll('[data-rcd]').forEach(e=>{if(RAID&&RAID.raid&&RAID.raid.status==='open')e.textContent=rLeft()});paintBat();
  document.querySelectorAll('[data-trbar]').forEach(e=>{const x=+e.dataset.t0,y=+e.dataset.t1;e.style.width=Math.min(100,Math.max(0,100*(Date.now()-x)/Math.max(1,y-x)))+'%'});
  if(trAvail&&TR&&TR.active&&TR.active.ends_at&&new Date(TR.active.ends_at).getTime()<=Date.now()&&Date.now()-lastTr>5000&&!busy&&!document.hidden){lastTr=Date.now();loadTrain().then(()=>{if(TR&&!TR.active)load(true)}).catch(()=>{})}
  let exp=false;document.querySelectorAll('[data-ut]').forEach(e=>{const t=new Date(e.dataset.ut).getTime()-Date.now();e.textContent=t>0?lf(t):'scaduto';if(t<=0)exp=true});
