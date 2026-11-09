@@ -62,6 +62,47 @@
 .er-inv .btn{min-height:44px;padding:0 14px;font-size:.92rem}
 /* boss */
 /* cruscotto: 5 equipaggiati in colonna a sinistra dell'avatar */
+.er-sticky{border-bottom:1px solid var(--line)}
+.er-sticky .er-bat{padding:6px 14px 4px}.er-sticky .er-bat .bt{width:58px;height:24px;border-radius:6px}.er-sticky .er-bat .bt b{font-size:.92rem}.er-sticky .er-bat .nub{height:11px}
+.er-sticky .er-bat .bi b{font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.er-sticky .er-bat .bi .bt2{font-weight:400;color:var(--mu)}.er-sticky .er-bat .bi small{font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.er-nav{display:flex!important;gap:0;padding:2px 2px 4px!important;overflow-x:auto;border-bottom:0!important}
+.er-nav button{flex:1 1 0!important;min-width:0;min-height:48px!important;padding:3px 0!important;display:grid;justify-items:center;align-content:center;gap:1px;border-radius:12px;color:var(--mu);box-shadow:none!important}
+.er-nav button .ti{font-size:1.2rem;line-height:1.1;filter:grayscale(.55);opacity:.8;transition:transform .15s}
+.er-nav button .tl{font:700 .56rem var(--ui)!important;letter-spacing:-.03em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.er-nav button[aria-selected=true]{background:rgba(var(--ac-rgb),.18);color:var(--ac2);box-shadow:inset 0 0 0 1.5px rgba(var(--ac-rgb),.55)!important}
+.er-nav button[aria-selected=true] .ti{filter:none;opacity:1;transform:scale(1.12)}
+.er-nav button:hover .ti{filter:none;opacity:1}
+@media(min-width:520px){.er-nav button .tl{font-size:.74rem!important}.er-nav button .ti{font-size:1.35rem}}
+.iv{padding:12px}
+.iv-tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px}
+.iv-tabs button{display:grid;justify-items:center;gap:1px;padding:7px 2px;border-radius:12px;border:1.5px solid var(--line);background:var(--inp);color:var(--mu);cursor:pointer;font:inherit;min-width:0}
+.iv-tabs button span{font-size:1.25rem}.iv-tabs button b{font:700 .66rem var(--ui);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.iv-tabs button em{font-style:normal;font:700 .66rem var(--ui);color:var(--ac2)}
+.iv-tabs button[aria-selected=true]{border-color:var(--ac);background:rgba(var(--ac-rgb),.14);color:var(--tx)}
+.iv-on{position:relative;display:grid;grid-template-columns:auto 1fr;gap:10px;padding:12px;border-radius:14px;border:2px solid var(--rc,var(--ac));background:linear-gradient(135deg,rgba(var(--ac-rgb),.12),transparent 70%)}
+.iv-tag{position:absolute;top:-10px;right:12px;padding:2px 10px;border-radius:99px;background:var(--good);color:#04210f;font:700 .72rem var(--ui)}
+.iv-tot{grid-column:2;font-size:.82rem;color:var(--mu)}.iv-tot b{color:var(--gold)}
+.iv-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 2px 8px;font-size:.86rem;color:var(--mu)}
+.iv-list{display:grid;gap:8px}
+.iv-it{display:grid;gap:8px;padding:10px;border-radius:12px;border:1px solid var(--line);border-left:4px solid var(--rc,var(--line));background:var(--surf)}
+.iv-it.lock{opacity:.7}.iv-b{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
+.iv-f{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.iv-d{font:700 .95rem var(--ui);color:var(--mu)}.iv-d small{font-weight:400;font-size:.72rem;color:var(--mu)}.iv-d.up{color:var(--good)}.iv-d.dn{color:var(--bad)}
+.sh-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.sh-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;padding:4px;border-radius:14px;background:var(--inp);border:1px solid var(--line)}
+.sh-seg button{display:grid;justify-items:center;gap:2px;padding:8px 4px;border:0;border-radius:10px;background:none;color:var(--mu);font:700 .78rem var(--ui);cursor:pointer;line-height:1.15;text-align:center}
+.sh-seg button span{font-size:1.2rem}.sh-seg button em{font-style:normal;font-size:.68rem;color:var(--ac2)}
+.sh-seg button[aria-selected=true]{background:rgba(var(--ac-rgb),.2);color:var(--tx);box-shadow:inset 0 0 0 1.5px rgba(var(--ac-rgb),.5)}
+.sh-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sh-grid{display:grid;gap:10px;grid-template-columns:1fr}@media(min-width:720px){.sh-grid{grid-template-columns:1fr 1fr}}
+.sh-card{padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--surf);display:grid;gap:10px}
+.sh-ct{display:flex;gap:10px;align-items:center}.sh-ct b{display:block;font:700 1.02rem var(--disp)}.sh-ct small{display:block;color:var(--mu);font-size:.8rem}
+.sh-ic{width:42px;height:42px;flex:none;display:grid;place-items:center;font-size:1.3rem;border-radius:12px;background:var(--raise);border:1px solid var(--line)}
+.sh-pg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:3px}.sh-pg i{height:6px;border-radius:9px;background:var(--inp);border:1px solid var(--line)}.sh-pg i.on{background:linear-gradient(90deg,var(--ac),var(--gold));border-color:transparent}
+.sh-nx{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;border-radius:12px;background:var(--inp);border:1px dashed rgba(var(--ac-rgb),.45)}
+.sh-nx small{display:block;color:var(--mu);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}.sh-nx b{display:block;font-size:.95rem}.sh-p{display:block;font-size:.8rem;color:var(--ac2)}
+.sh-nx .btn{flex:none;white-space:nowrap}
+.sh-done{margin:0;color:var(--good);font-weight:700}.sh-lk{margin:0;font-size:.8rem;color:var(--mu)}
+.sh-more{justify-self:start;font-size:.84rem}.sh-all{border-top:1px solid var(--line);padding-top:4px}
 .er-dash2{display:grid;gap:12px;min-width:0}
 .er-dash2 .er-pic{cursor:pointer;padding:0}
 .er-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.er-kpi div{padding:8px 4px;text-align:center;border:1px solid var(--line);border-radius:12px;background:var(--inp);min-width:0}
@@ -410,7 +451,7 @@ body.er-fab-on{padding-bottom:88px}
 
  <div id="main" hidden>
  <div class="er-sticky"><div id="bat"></div>
- <div class="tabs" role="tablist"><button role="tab" data-t="hero" aria-selected="true">Eroe</button><button role="tab" data-t="boss" aria-selected="false">Boss</button><button role="tab" data-t="dng" aria-selected="false">Dungeon</button><button role="tab" data-t="tower" aria-selected="false">Torre</button><button role="tab" data-t="arena" aria-selected="false">Arena</button><button role="tab" data-t="train" aria-selected="false">Allenamento</button><button role="tab" data-t="shop" aria-selected="false">Mercante</button><button role="tab" data-t="pond" aria-selected="false">Stagno</button><button role="tab" data-t="lb" aria-selected="false">Classifica</button></div></div>
+ <div class="tabs er-nav" role="tablist" aria-label="Sezioni della guerra degli Eroi"><button role="tab" data-t="hero" aria-selected="true"><span class="ti" aria-hidden="true">🧙</span><span class="tl">Eroe</span></button><button role="tab" data-t="boss" aria-selected="false"><span class="ti" aria-hidden="true">🐉</span><span class="tl">Boss</span></button><button role="tab" data-t="dng" aria-selected="false"><span class="ti" aria-hidden="true">🏰</span><span class="tl">Dungeon</span></button><button role="tab" data-t="tower" aria-selected="false"><span class="ti" aria-hidden="true">🗼</span><span class="tl">Torre</span></button><button role="tab" data-t="arena" aria-selected="false"><span class="ti" aria-hidden="true">⚔️</span><span class="tl">Arena</span></button><button role="tab" data-t="train" aria-selected="false"><span class="ti" aria-hidden="true">🏋️</span><span class="tl">Allena</span></button><button role="tab" data-t="shop" aria-selected="false"><span class="ti" aria-hidden="true">🛒</span><span class="tl">Mercante</span></button><button role="tab" data-t="pond" aria-selected="false"><span class="ti" aria-hidden="true">🐸</span><span class="tl">Stagno</span></button><button role="tab" data-t="lb" aria-selected="false"><span class="ti" aria-hidden="true">🏆</span><span class="tl">Top</span></button></div></div>
  <div id="msg" role="status" aria-live="polite"></div>
  <section class="tp" id="p-hero"></section>
  <section class="tp" id="p-boss" hidden></section>
@@ -480,7 +521,7 @@ function paintBat(){
  /* bonus ricarica totale (oggetti + pet): lo stesso conto del database, 25% per punto */
  const rb=25*Number((ST.me&&ST.me.extra_fights)||0),ph=Number(e.per_hour).toLocaleString('it-IT',{maximumFractionDigits:1});
  const key=Math.floor(v)+'|'+Math.floor(secs/60)+'|'+lv+'|'+e.max+'|'+rb+'|'+ph;if(el._k===key)return;el._k=key;
- el.innerHTML=`<div class="er-bat ${lv}" role="img" aria-label="Energia ${Math.floor(v)} su ${e.max}"><div class="bt"><i style="width:${p}%"></i><b>${Math.floor(v)}</b></div><span class="nub" aria-hidden="true"></span><div class="bi"><b>Energia ${Math.floor(v)} / ${e.max}</b><small>${secs<=0?'Batteria carica':'Piena tra '+fmtDur(secs)} · duello vinto −${e.win}, perso −${e.loss}</small><small class="er-rg${rb>0?' on':''}">${rb>0?`⚡ Ricarica <b>+${num(rb)}%</b> (pet e oggetti) · ${ph} energia/ora`:`Ricarica ${ph} energia/ora · pet e oggetti possono velocizzarla`}</small></div></div>`}
+ el.innerHTML=`<div class="er-bat ${lv}" role="img" aria-label="Energia ${Math.floor(v)} su ${e.max}"><div class="bt"><i style="width:${p}%"></i><b>${Math.floor(v)}</b></div><span class="nub" aria-hidden="true"></span><div class="bi"><b>Energia ${Math.floor(v)} / ${e.max}<span class="bt2">${secs<=0?' · carica':' · piena tra '+fmtDur(secs)}</span></b><small class="er-rg${rb>0?' on':''}">${rb>0?`⚡ Ricarica <b>+${num(rb)}%</b> · ${ph}/ora`:`Ricarica ${ph}/ora`} · duello vinto −${e.win}, perso −${e.loss}</small></div></div>`}
 function bonusTags(it){const o=[];STATS.forEach(s=>{const v=it['p_'+s[0]];if(v>0)o.push(`<span>+${v}% ${s[1]}</span>`)});
  if(it.xp_pct>0)o.push(`<span class="sp">+${it.xp_pct}% XP</span>`);if(it.extra_actions>0)o.push(`<span class="sp">+${it.extra_actions} azione boss/giorno</span>`);if(it.extra_fights>0)o.push(`<span class="sp">+${it.extra_fights*25}% ricarica energia</span>`);
  return o.length?`<div class="er-bn">${o.join('')}</div>`:''}
@@ -504,7 +545,7 @@ function slotSheet(k){const m=ST.me,s=SL[k],i=m.equipped[k];
  const o=modal(`<h2 style="margin:0 0 10px">${s[2]} ${s[1]}</h2>${i?`<div class="er-sl">${itemBox(Object.assign({slot:k},i))}</div>`:`<p class="mute" style="margin:0">Nessun oggetto indossato in questo slot.</p>`}
   <div class="row" style="margin-top:14px"><button class="btn" data-goinv="${k}">Apri nello zaino</button><button class="btn ghost" data-close>Chiudi</button></div>`);
  const g=o.querySelector('[data-goinv]');if(g)g.onclick=()=>{o.close();goInv(k)}}
-function goInv(k){FOLD['inv_'+k]=true;if(tab!=='hero')setTab('hero');else renderHero();const e=$('fd-inv_'+k);if(e&&e.scrollIntoView)try{e.scrollIntoView({block:'start'})}catch(_){}}
+function goInv(k){invSlot=k;invAll=false;invMore=false;if(tab!=='hero')setTab('hero');else renderHero();const e=$('zaino');if(e&&e.scrollIntoView)try{e.scrollIntoView({block:'start'})}catch(_){}}
 
 async function heroSheet(uid){
  try{const [h,x]=await Promise.all([rpc('game_hero',{p_user:uid}),rpc('game_hero_extra',{p_user:uid}).catch(()=>null)]);
@@ -578,10 +619,7 @@ function renderHero(){
   return `<div class="er-st"><div class="nm">${nm}<small>${ds}</small></div><div class="val">${num(v)}${d?`<em style="${d<0?'color:var(--bad)':''}">${d>0?'+':''}${num(d)}</em>`:''}</div>
    <div class="er-ctl">${big?`<button class="s10" data-a="-10" data-k="${k}" aria-label="Togli 10 punti a ${nm}" ${draft[k]<10?'disabled':''}>−10</button>`:''}<button data-a="-" data-k="${k}" aria-label="Togli un punto a ${nm}" ${draft[k]<=0?'disabled':''}>−</button><div class="er-pbar" aria-hidden="true"><i style="width:${pb}%"></i></div><input type="number" inputmode="numeric" min="0" max="${cap}" step="1" value="${draft[k]}" data-pin="${k}" aria-label="Punti in ${nm}"><button data-a="+" data-k="${k}" aria-label="Aggiungi un punto a ${nm}" ${room<=0?'disabled':''}>+</button>${big?`<button class="s10" data-a="+10" data-k="${k}" aria-label="Aggiungi 10 punti a ${nm}" ${room<10?'disabled':''}>+10</button>`:''}</div></div>`}).join('');
  const hpD=50+12*Math.round((5+draft.vig*m.level)*(100+pctSum('vig'))/100);
- const inv=SLOTS.map(([k,nm,ic])=>{const L=ST.inventory.filter(i=>i.slot===k).sort(itemCmp);
-  const on=L.find(i=>i.equipped);
-  const body=L.length?L.map(i=>{const lock=m.level<i.min_level;return `<div class="er-inv">${itemBox(i,i.source==='start'?'':' · '+esc(SRC[i.source]||''))}<div>${i.equipped?'<span class="chip s">Indossato</span>':lock?`<span class="er-lock">Liv. ${num(i.min_level)}</span>`:`<button class="btn ghost" data-eq="${esc(i.id)}">Indossa</button>`}</div></div>`}).join(''):'<p class="mute" style="margin:8px 0 0">Nessun oggetto di questa categoria.</p>';
-  return fold('inv_'+k,ic,nm,on?`Indossato: ${esc(on.name)}`:'Nessuno indossato',L.length,body)}).join('');
+ const inv=invHtml(m);
  const nTemp=m.temp_skills.length;
  const skBody=`<p class="er-sub" style="margin:8px 0 12px">Le abilità si comprano dal <b>Mercante</b> con i BC: quelle permanenti restano per sempre, i potenziamenti durano ${S.temp_hours} ore.</p>
   <b>Permanenti</b>${m.perm_skills.length?`<div class="er-chipl">${m.perm_skills.map(n=>`<span>${esc(n)}</span>`).join('')}</div>`:'<p class="mute" style="margin:4px 0 0">Nessuna, per ora.</p>'}
@@ -598,7 +636,7 @@ function renderHero(){
   <p class="er-note">PV con questa distribuzione: <b>${num(hpD)}</b>.${pays?` <span style="color:var(--warn)">Togliere punti già assegnati costa <b>${S.respec_cost} BC</b>.</span>`:m.stats_set&&m.fights_total>0&&S.respec_cost>0?` Aggiungere punti nuovi è sempre gratis; togliere punti già assegnati, una volta combattuto, costa ${S.respec_cost} BC.`:' Finché non combatti puoi cambiare idea gratis.'}</p>
   <div class="row" style="margin-top:12px"><button class="btn" id="stSave" ${(!changed&&m.stats_set)||left<0||(!m.stats_set&&used===0)?'disabled':''}>${pays?`Salva (${S.respec_cost} BC)`:'Salva i punti'}</button><button class="btn ghost" id="stReset" ${changed?'':'disabled'}>Annulla</button></div></div>
  <div style="margin-top:26px">${fold('skills','✨','Abilità',`${m.perm_skills.length} permanent${m.perm_skills.length===1?'e':'i'} · ${nTemp} potenziament${nTemp===1?'o attivo':'i attivi'}`,m.perm_skills.length+nTemp,skBody)}</div>
- <h2 class="er-h">Zaino</h2>${(m.xp_pct||m.extra_actions||m.extra_fights)?`<p class="er-sub">Bonus speciali attivi: ${[m.xp_pct?`+${m.xp_pct}% XP`:'',m.extra_actions?`+${m.extra_actions} azioni boss al giorno`:'',m.extra_fights?`+${m.extra_fights*25}% ricarica energia`:''].filter(Boolean).join(' · ')}</p>`:''}<p class="er-sub">Una cartella per ogni categoria, con gli oggetti dal meno al più potente. Gli oggetti che indossi sono nella colonna a sinistra, in alto.</p>${inv}
+ <h2 class="er-h">Zaino</h2>${(m.xp_pct||m.extra_actions||m.extra_fights)?`<p class="er-sub">Bonus speciali attivi: ${[m.xp_pct?`+${m.xp_pct}% XP`:'',m.extra_actions?`+${m.extra_actions} azioni boss al giorno`:'',m.extra_fights?`+${m.extra_fights*25}% ricarica energia`:''].filter(Boolean).join(' · ')}</p>`:''}<p class="er-sub">Scegli una categoria: in alto l’oggetto che indossi, sotto quelli che lo superano. Il numero colorato dice di quanto cambiano i tuoi bonus.</p><div class="card iv" id="zaino">${inv}</div>
  ${ISADM?`<h2 class="er-h">Strumenti admin</h2><div class="card"><p class="mute" style="margin:0 0 10px">Visibile solo a te (amministratore). Riporta la tua batteria al 100%; l’uso viene registrato nell’audit.</p><button class="btn gold" id="admEn">⚡ Ricarica la mia energia</button></div>`:''}
  <h2 class="er-h">Come si gioca</h2><details class="card"><summary>Le regole in breve</summary><ul class="mute er-how" style="padding-left:20px;margin:6px 0 0">
   <li><b>Boss del giorno</b>: ogni giorno compare un boss, lo stesso per tutti. Ogni eroe ha <b>una lobby al giorno</b>: ne crea una sua (anche da solo) oppure entra in una già aperta. Quando siete pronti uno qualunque dei presenti la fa partire (dopo la partenza non si entra più). I PV del boss si calcolano sugli eroi presenti${S.min_players>1?`, e servono almeno <b>${S.min_players} eroi</b>`:''}.</li>
@@ -667,7 +705,7 @@ function rLeft(){if(!RAID||!RAID.raid)return '';const t=new Date(RAID.raid.ends_
 function rPct(hp,max){return max?Math.max(0,Math.min(100,100*hp/max)):0}
 function renderRaid(){
  const R=RAID.raid,b=R.boss,M=RAID.me,m=ST.me,open=R.status==='open',won=R.status==='defeated',pct=rPct(R.hp,R.max_hp),z=ART?ART.zone(b.zone||1):null;
- const tb=document.querySelector('.tabs [data-t="boss"]');if(tb)tb.textContent='Raid';
+ const tb=document.querySelector('.tabs [data-t="boss"] .tl');if(tb)tb.textContent='Raid';
  const mine=RAID.my_reward;
  if(won)SHARE.raid={kind:'Raid vinto',emoji:b.emoji,title:b.name,sub:`Abbattuto da ${num(R.participants)} eroi del Tempio`,stats:mine?[['Posizione',`${mine.rank}°`],['BC',`+${num(mine.bc)}`],['XP',`+${num(mine.xp)}`]]:null,msg:`🐉 Il Tempio ha abbattuto ${b.emoji} ${b.name} nel raid della settimana!${mine?` Sono arrivato ${mine.rank}° per danni.`:''} Lunedì arriva il prossimo boss: entra anche tu!`};
  const today=RAID.today||[],others=today.filter(x=>x.user_id!==m.user_id);
@@ -1231,21 +1269,55 @@ function towerModal(r){
  if(matchMedia('(prefers-reduced-motion: reduce)').matches||!L.length)fin();
  else o._t=setInterval(()=>{if(i>=L.length){fin();return}step(L[i++])},560)}
 
+/* ---------- zaino: una categoria alla volta, confronto con l'oggetto indossato ---------- */
+let invSlot='weapon',invAll=false,invMore=false,shopSec='items',shopOpen={};
+function invHtml(m){
+ const cnt=k=>ST.inventory.filter(i=>i.slot===k).length;
+ const L=ST.inventory.filter(i=>i.slot===invSlot).sort((a,b)=>itemCmp(b,a)),on=L.find(i=>i.equipped),onP=on?itemPow(on):0;
+ const better=L.filter(i=>!i.equipped&&itemPow(i)>onP),rest=L.filter(i=>!i.equipped&&itemPow(i)<=onP);
+ const all=invAll?L.filter(i=>!i.equipped):better,shown=invMore?all:all.slice(0,5);
+ const card=i=>{const lock=m.level<i.min_level,d=itemPow(i)-onP;
+  return `<div class="iv-it r-${esc(i.rarity)}${lock?' lock':''}"><div class="iv-b">${itemBox(i,i.source==='start'?'':' · '+esc(SRC[i.source]||''))}</div>
+   <div class="iv-f"><span class="iv-d ${d>0?'up':d<0?'dn':''}">${d>0?'+':''}${num(d)}%<small> rispetto all’indossato</small></span>${lock?`<span class="er-lock">Liv. ${num(i.min_level)}</span>`:`<button class="btn ${d>0?'':'ghost'} sm" data-eq="${esc(i.id)}">Indossa</button>`}</div></div>`};
+ return `<div class="iv-tabs" role="tablist" aria-label="Categoria dello zaino">${SLOTS.map(([k,nm,ic])=>`<button type="button" role="tab" data-invs="${k}" aria-selected="${k===invSlot}"><span aria-hidden="true">${ic}</span><b>${nm}</b><em>${cnt(k)}</em></button>`).join('')}</div>
+  ${on?`<div class="iv-on r-${esc(on.rarity)}"><span class="iv-tag">Indossato</span>${itemBox(on)}<div class="iv-tot">Totale bonus <b>${num(onP)}%</b></div></div>`:`<p class="mute">Nessun oggetto indossato in questa categoria.</p>`}
+  <div class="iv-bar"><span>${better.length?`<b style="color:var(--good)">${better.length}</b> ${better.length===1?'oggetto migliore':'oggetti migliori'} dell’indossato`:'Nessun oggetto migliore dell’indossato'}</span>${rest.length?`<button type="button" class="er-link" data-invall>${invAll?'Mostra solo i migliori':`Mostra tutti (${L.length-(on?1:0)})`}</button>`:''}</div>
+  <div class="iv-list">${all.length>shown.length?'':''}${shown.length?shown.map(card).join('')+(all.length>shown.length?`<button type="button" class="btn ghost block" data-invmore>Mostra altri ${all.length-shown.length}</button>`:''):`<p class="mute" style="margin:6px 0">${L.length>1?'Gli altri oggetti sono più deboli di quello che indossi.':'Nessun altro oggetto: li trovi nei dungeon, nel raid e dal Mercante.'}</p>`}</div>`}
+
+/* ---------- Mercante: tre sezioni, per ogni statistica/equipaggiamento solo il prossimo passo ---------- */
+function skPct(sk){return STATS.map(s=>[s[1],Number(sk['p_'+s[0]]||0)]).filter(x=>x[1]>0)}
 function renderShop(){
- const m=ST.me;
- $('p-shop').innerHTML=`<h2 class="er-h">Il Mercante</h2><p class="er-sub">Ogni giorno nuove offerte, le stesse per tutti. Accetta solo <b>Black Credits</b>. Hai <b style="color:var(--gold)">${BAL==null?'—':num(BAL)} BC</b>. Nuove offerte tra <b data-cd>${cd()}</b>.</p>
- ${ST.merchant.length?`<div class="er-shop">${ST.merchant.map(i=>{const lock=m.level<i.min_level,poor=BAL!=null&&BAL<i.price,armed=pending===i.id;
-  return `<div class="er-it r-${esc(i.rarity)}"><div class="hd">${itemBox(i)}</div>
-   <div class="er-pr"><b>${num(i.price)} BC</b>${i.discounted?`<s>${num(i.list_price)}</s><span class="er-tag">OFFERTA</span>`:''}</div>
-   ${i.owned?'<span class="chip s" style="justify-self:start">Già tuo</span>':lock?`<span class="er-lock">Serve il livello ${num(i.min_level)}</span>`:`<button class="btn ${armed?'gold':'ghost'}" data-buy="${esc(i.id)}" ${poor?'disabled':''}>${poor?'BC insufficienti':armed?`Conferma l’acquisto (${num(i.price)} BC)`:'Acquista'}</button>`}</div>`}).join('')}</div>`:'<p class="mute">Oggi il mercante non ha offerte.</p>'}
- <h2 class="er-h">Abilità permanenti</h2><p class="er-sub">Aumentano una statistica in percentuale, <b>per sempre</b>. Per ogni statistica si comprano in ordine, dal primo al dodicesimo grado (fino al livello 600): i gradi alti costano molto di più e si sbloccano ai livelli alti. Costano solo BC.</p>
- <div class="er-shop">${STATS.map(([k,nm])=>`<div class="er-it"><div class="hd"><div class="er-ic" aria-hidden="true">${STATICON[k]}</div><div><div class="er-rar">Permanente</div><div class="er-nm">${nm}</div></div></div>${ST.skills.filter(x=>x.kind==='perm'&&x.stat===k).sort((a,b)=>a.tier-b.tier).map(skillRow).join('')}</div>`).join('')}</div>
- <h2 class="er-h">Potenziamenti temporanei</h2><p class="er-sub">Potenziano un equipaggiamento per <b>${ST.settings.temp_hours} ore</b>. Per ogni equipaggiamento ne è attivo uno solo: puoi rinnovarlo o passare al grado più alto.</p>
- <div class="er-shop">${SLOTS.map(([k,nm,ic])=>{const L=ST.skills.filter(x=>x.kind==='temp'&&x.slot===k).sort((a,b)=>a.tier-b.tier),cur=L.filter(x=>x.active_until).sort((a,b)=>b.tier-a.tier)[0]||null;
-  return `<div class="er-it"><div class="hd"><div class="er-ic" aria-hidden="true">${ic}</div><div><div class="er-rar">Temporaneo</div><div class="er-nm">${nm}</div></div></div>${L.map(x=>skillRow(x,cur)).join('')}</div>`}).join('')}</div>
- <p class="er-note">Gli oggetti e le abilità permanenti restano tuoi per sempre. I BC spesi qui escono dal gioco: nessun altro li riceve.</p>`}
+ const m=ST.me,secs=[['items','🛒','Oggetti del giorno',ST.merchant.length],['perm','📜','Abilità permanenti',null],['temp','⏳','Potenziamenti',null]];
+ const head=`<div class="sh-hd"><div><h2 class="er-h" style="margin:0">Il Mercante</h2><p class="er-sub" style="margin:2px 0 0">Nuove offerte tra <b data-cd>${cd()}</b></p></div><div class="er-bc"><b>${BAL==null?'—':num(BAL)}</b><span>BC</span></div></div>
+  <div class="sh-seg" role="tablist" aria-label="Sezioni del Mercante">${secs.map(s=>`<button type="button" role="tab" data-shs="${s[0]}" aria-selected="${s[0]===shopSec}"><span aria-hidden="true">${s[1]}</span>${s[2]}${s[3]!=null?`<em>${s[3]}</em>`:''}</button>`).join('')}</div>`;
+ let body='';
+ if(shopSec==='items'){
+  body=ST.merchant.length?`<div class="er-shop">${ST.merchant.map(i=>{const lock=m.level<i.min_level,poor=BAL!=null&&BAL<i.price,armed=pending===i.id,eq=m.equipped[i.slot],d=itemPow(i)-(eq?itemPow(eq):0);
+   return `<div class="er-it r-${esc(i.rarity)}"><div class="hd">${itemBox(i)}</div>
+    <div class="sh-row"><div class="er-pr"><b>${num(i.price)} BC</b>${i.discounted?`<s>${num(i.list_price)}</s><span class="er-tag">OFFERTA</span>`:''}</div><span class="iv-d ${d>0?'up':d<0?'dn':''}">${d>0?'+':''}${num(d)}%<small> vs il tuo</small></span></div>
+    ${i.owned?'<span class="chip s" style="justify-self:start">Già tuo</span>':lock?`<span class="er-lock">Serve il livello ${num(i.min_level)}</span>`:`<button class="btn ${armed?'gold':'ghost'}" data-buy="${esc(i.id)}" ${poor?'disabled':''}>${poor?'BC insufficienti':armed?`Conferma l’acquisto (${num(i.price)} BC)`:'Acquista'}</button>`}</div>`}).join('')}</div>`:'<p class="mute">Oggi il mercante non ha offerte.</p>';
+ }else if(shopSec==='perm'){
+  body=`<p class="er-sub">Aumentano una statistica <b>per sempre</b>. Per ogni statistica si comprano in ordine, dal 1° al 12° grado (fino al livello 600).</p><div class="sh-grid">${STATS.map(([k,nm])=>{
+   const L=ST.skills.filter(x=>x.kind==='perm'&&x.stat===k).sort((a,b)=>a.tier-b.tier),own=L.filter(x=>x.owned),nx=L.find(x=>!x.owned),tot=own.reduce((t,x)=>t+Number(x['p_'+k]||0),0),open=!!shopOpen['p'+k];
+   return `<div class="sh-card"><div class="sh-ct"><span class="sh-ic" aria-hidden="true">${STATICON[k]}</span><div style="min-width:0"><b>${nm}</b><small>Grado ${own.length} di ${L.length} · <span style="color:var(--gold)">+${num(tot)}%</span></small></div></div>
+    <div class="sh-pg" aria-hidden="true">${L.map(x=>`<i class="${x.owned?'on':''}"></i>`).join('')}</div>
+    ${nx?`<div class="sh-nx"><div style="min-width:0"><small>Prossimo: grado ${nx.tier}</small><b>${esc(nx.name)}</b><span class="sh-p">+${num(Number(nx['p_'+k]||0))}% ${nm}${m.level<nx.min_level?` · liv. ${num(nx.min_level)}`:''}</span></div>${skillAct(nx)}</div>`:'<p class="sh-done">✓ Tutti i gradi comprati</p>'}
+    <button type="button" class="er-link sh-more" data-sho="p${k}">${open?'Nascondi i gradi':'Vedi tutti i gradi'}</button>${open?`<div class="sh-all">${L.map(x=>skillRow(x)).join('')}</div>`:''}</div>`}).join('')}</div>`;
+ }else{
+  body=`<p class="er-sub">Potenziano un equipaggiamento per <b>${ST.settings.temp_hours} ore</b>. Uno attivo per equipaggiamento: puoi rinnovarlo o passare a un grado più alto.</p><div class="sh-grid">${SLOTS.map(([k,nm,ic])=>{
+   const L=ST.skills.filter(x=>x.kind==='temp'&&x.slot===k).sort((a,b)=>a.tier-b.tier),cur=L.filter(x=>x.active_until).sort((a,b)=>b.tier-a.tier)[0]||null;
+   const best=L.filter(x=>m.level>=x.min_level).pop()||null,nextLock=L.find(x=>m.level<x.min_level),open=!!shopOpen['t'+k];
+   const pct=x=>skPct(x).map(p=>`+${p[1]}% ${p[0]}`).join(', ');
+   return `<div class="sh-card"><div class="sh-ct"><span class="sh-ic" aria-hidden="true">${ic}</span><div style="min-width:0"><b>${nm}</b><small>${cur?`<span style="color:var(--good)">Attivo: ${esc(cur.name)}</span> · ancora <b data-ut="${esc(cur.active_until)}">${lf(new Date(cur.active_until).getTime()-Date.now())}</b>`:'Nessun potenziamento attivo'}</small></div></div>
+    ${best?`<div class="sh-nx"><div style="min-width:0"><small>${cur&&cur.tier===best.tier?'Rinnova':'Il migliore per te'}: grado ${best.tier}</small><b>${esc(best.name)}</b><span class="sh-p">${pct(best)}</span></div>${skillAct(best,cur)}</div>`:''}
+    ${nextLock?`<p class="sh-lk">🔒 Grado ${nextLock.tier} «${esc(nextLock.name)}» (${pct(nextLock)}) dal livello ${num(nextLock.min_level)}</p>`:''}
+    <button type="button" class="er-link sh-more" data-sho="t${k}">${open?'Nascondi i gradi':'Vedi tutti i gradi'}</button>${open?`<div class="sh-all">${L.map(x=>skillRow(x,cur)).join('')}</div>`:''}</div>`}).join('')}</div>`;
+ }
+ $('p-shop').innerHTML=head+body+`<p class="er-note">Oggetti e abilità permanenti restano tuoi per sempre. I BC spesi qui escono dal gioco: nessun altro li riceve.</p>`}
+/* solo il pulsante (o il motivo per cui non si può) di una riga del Mercante */
+
 const STATICON={for:'💪',des:'🎯',vig:'❤️',spi:'✨',frt:'🛡️'};
-function skillRow(sk,cur){
+function skillAct(sk,cur){
  const m=ST.me,lock=m.level<sk.min_level,poor=BAL!=null&&BAL<sk.price,armed=pending===sk.id,temp=sk.kind==='temp';let act='';
  if(!temp){
   if(sk.owned)act='<span class="chip s">Tua</span>';
@@ -1258,6 +1330,9 @@ function skillRow(sk,cur){
   else if(lock)act=`<span class="er-lock">Livello ${num(sk.min_level)}</span>`;
   else act=`<button class="btn ${armed?'gold':'ghost'}" data-skill="${esc(sk.id)}" ${poor?'disabled':''}>${poor?'BC insufficienti':armed?`Conferma (${num(sk.price)} BC)`:`${same?'Rinnova':cur?'Potenzia':'Attiva'} · ${num(sk.price)} BC`}</button>`;
  }
+ if(lock&&!sk.owned&&act.indexOf('Livello')>0)act=`<span class="er-lock">Livello ${num(sk.min_level)} · ${num(sk.price)} BC</span>`;
+ return act}
+function skillRow(sk,cur){const act=skillAct(sk,cur);
  return `<div class="er-sk ${sk.active_until?'act':''}"><div style="min-width:0"><div class="nmk">${esc(sk.name)} <small class="mute">· grado ${sk.tier}</small></div>${bonusTags(sk)}${sk.active_until?`<small class="mute">Attivo ancora <b data-ut="${esc(sk.active_until)}">${lf(new Date(sk.active_until).getTime()-Date.now())}</b></small>`:''}</div><div>${act}</div></div>`}
 
 /* ---------- Classifica ---------- */
@@ -1343,7 +1418,7 @@ function setTab(t,push){
 async function load(keepDraft){
  ST=await rpc('game_state');ME=ST.me;last=Date.now();
  try{RAID=await rpc('game_raid_state')}catch(_){RAID=null}
- {const tb=document.querySelector('.tabs [data-t="boss"]');if(tb)tb.textContent=RAID&&RAID.enabled?'Raid':'Boss'}
+ {const tb=document.querySelector('.tabs [data-t="boss"] .tl');if(tb)tb.textContent=RAID&&RAID.enabled?'Raid':'Boss'}
  if(ISADM===null){try{ISADM=(await rpc('is_admin'))===true}catch(_){ISADM=false}}      // la voce admin si vede solo a chi è davvero amministratore (il database lo ricontrolla comunque)
  if(!keepDraft)draft=null;
  await loadAvatars();
@@ -1373,6 +1448,11 @@ async function boot(){
 document.querySelector('.tabs').onclick=e=>{const b=e.target.closest('[data-t]');if(b)setTab(b.dataset.t)};
 document.addEventListener('click',e=>{
  const t=e.target.closest('button,[data-hero]');if(!t)return;
+ if(t.dataset.invs){invSlot=t.dataset.invs;invAll=false;invMore=false;renderHero();return}
+ if(t.dataset.invall!==undefined){invAll=!invAll;invMore=false;renderHero();return}
+ if(t.dataset.invmore!==undefined){invMore=true;renderHero();return}
+ if(t.dataset.shs){shopSec=t.dataset.shs;pending=null;renderShop();return}
+ if(t.dataset.sho){shopOpen[t.dataset.sho]=!shopOpen[t.dataset.sho];renderShop();return}
  if(t.dataset.rt){rTarget=t.dataset.rt;paint();return}
  if(t.dataset.rb){raidAct(t,t.dataset.rb,Number(t.dataset.n)||1);return}
  if(t.dataset.erShare){const o=SHARE[t.dataset.erShare];if(o&&window.TempioShare)window.TempioShare.share(o);return}
