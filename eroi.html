@@ -62,6 +62,44 @@
 .er-inv .btn{min-height:44px;padding:0 14px;font-size:.92rem}
 /* boss */
 /* cruscotto: 5 equipaggiati in colonna a sinistra dell'avatar */
+.er-dash2{display:grid;gap:12px;min-width:0}
+.er-dash2 .er-pic{cursor:pointer;padding:0}
+.er-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.er-kpi div{padding:8px 4px;text-align:center;border:1px solid var(--line);border-radius:12px;background:var(--inp);min-width:0}
+.er-kpi small{display:block;font-size:.7rem;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}.er-kpi b{display:block;font:700 1rem var(--disp);color:var(--tx);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.er-kpi i{font-style:normal;color:var(--mu);font-size:.8em}
+.er-sts{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.er-stt{padding:8px 3px;text-align:center;border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,rgba(var(--ac-rgb),.10),transparent);min-width:0}
+.er-stt .k{display:block;font:700 .7rem var(--ui);color:var(--ac2);letter-spacing:.04em}.er-stt b{display:block;font:700 .98rem var(--disp);margin:2px 0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.er-stt small{display:block;font-size:.66rem;color:var(--gold);line-height:1.15}
+@media(max-width:420px){.er-sts{grid-template-columns:repeat(3,1fr)}.er-kpi{grid-template-columns:repeat(2,1fr)}}
+.er-spx{display:flex;flex-wrap:wrap;gap:6px}.er-spx span{padding:4px 10px;border-radius:99px;border:1px solid rgba(232,184,74,.45);background:rgba(232,184,74,.08);font:700 .8rem var(--ui);color:var(--gold)}
+.er-eqrow{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.er-eqb2{display:grid;justify-items:center;gap:3px;padding:0;border:0;background:none;color:var(--tx);cursor:pointer;min-width:0;font:inherit}
+.er-eqb2 .ic{width:100%;max-width:58px;aspect-ratio:1;border-radius:14px;display:grid;place-items:center;font-size:1.5rem;background:var(--raise);border:2px solid var(--rc,var(--line));box-shadow:0 0 14px rgba(0,0,0,.35),inset 0 0 12px rgba(255,255,255,.03)}
+.er-eqb2 small{font-size:.66rem;color:var(--rc,var(--mu));text-transform:uppercase;letter-spacing:.04em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.er-eqb2.empty .ic{border-style:dashed;opacity:.5}.er-eqb2:hover .ic,.er-eqb2:focus-visible .ic{border-color:var(--ac2)}
+.hs .hs-hd{display:flex;gap:14px;align-items:center;padding:14px;margin:-18px -18px 12px;border-radius:14px 14px 0 0;background:radial-gradient(circle at 18% 30%,rgba(var(--ac-rgb),.35),transparent 60%),linear-gradient(180deg,#1a1230,var(--deep))}
+.hs-pic{width:84px;height:84px;border-radius:50%;flex:none;display:grid;place-items:center;overflow:hidden;background:var(--raise);border:3px solid var(--ac2);box-shadow:0 0 26px rgba(var(--ac-rgb),.55);font:700 2rem var(--disp)}
+.hs-pic img{width:100%;height:100%;object-fit:cover}
+.hs h2{margin:0;font-size:1.35rem;overflow-wrap:anywhere}.hs h2 small{font-size:.8rem;color:var(--mu)}.hs-sub{color:var(--mu);font-size:.92rem}.hs-sub b{color:var(--ac2)}.hs-pw{margin-top:2px;font-size:.9rem;color:var(--mu)}.hs-pw b{color:var(--gold);font-family:var(--disp)}
+.hs-vd{display:grid;gap:2px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);margin-bottom:6px}.hs-vd b{font:700 1.05rem var(--disp)}.hs-vd span{font-size:.85rem;color:var(--mu)}
+.hs-up2,.hs-up{border-color:rgba(255,84,104,.6);background:rgba(255,84,104,.08)}.hs-up2 b,.hs-up b{color:var(--bad)}
+.hs-par{border-color:rgba(232,184,74,.5)}.hs-dn,.hs-dn2{border-color:rgba(74,222,155,.55);background:rgba(74,222,155,.07)}.hs-dn b,.hs-dn2 b{color:var(--good)}
+.hs-vd.hs-par{background:rgba(232,184,74,.07)}.hs-vd.hs-par b{color:var(--gold)}
+.hs-h{font-size:.98rem;margin:16px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.hs-h small{font:400 .75rem var(--ui);color:var(--mu);display:inline-flex;align-items:center;gap:4px}
+.lg{display:inline-block;width:10px;height:10px;border-radius:3px}.lg.t,.hs-cr .bars i.t{background:var(--ac2)}.lg.m,.hs-cr .bars i.m{background:var(--gold)}
+.hs-cmp{display:grid;gap:7px}
+.hs-cr{display:grid;grid-template-columns:4.2rem auto 1fr auto 3.2rem;align-items:center;gap:6px;font-size:.84rem}
+.hs-cr .l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hs-cr .v{font:700 .82rem var(--ui);text-align:right;font-variant-numeric:tabular-nums}.hs-cr .v.m{color:var(--gold);text-align:left}
+.hs-cr .bars{display:grid;gap:2px}.hs-cr .bars i{display:block;height:5px;border-radius:9px;min-width:2px}
+.hs-cr em{font-style:normal;font:700 .78rem var(--ui);text-align:right}.hs-dp{color:var(--bad)}.hs-dm{color:var(--good)}.hs-d0{color:var(--mu)}
+.hs-cmp.self .bars i.m,.hs-cmp.self .v.m,.hs-cmp.self em{display:none}.hs-cmp.self .hs-cr{grid-template-columns:4.2rem auto 1fr}
+.hs-pet{display:flex;gap:12px;align-items:center;padding:10px;border-radius:14px;border:1.5px solid var(--rc,var(--line));background:linear-gradient(135deg,rgba(255,255,255,.04),transparent)}
+.hs-pet .ph{flex:none;width:72px;height:72px;display:grid;place-items:center;border-radius:12px;background:var(--raise)}.hs-pet b{display:block}.hs-pet b em{font-style:normal;color:var(--ac2);font-size:.85em}
+.hs-eqs{display:grid;gap:8px}.hs-eq{position:relative;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:8px;border-radius:12px;border:1px solid var(--line);background:var(--surf)}
+.hs-eq.empty{opacity:.6}.hs-vs{grid-column:2;justify-self:start;font:700 .74rem var(--ui);padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mu)}.hs-vs.up{color:var(--bad);border-color:rgba(255,84,104,.5)}.hs-vs.dn{color:var(--good);border-color:rgba(74,222,155,.5)}
+.hs-rec{display:grid;grid-template-columns:1fr 1fr;gap:8px}.hs-rec>div{display:flex;gap:8px;align-items:flex-start;padding:8px;border-radius:12px;border:1px solid var(--line);background:var(--inp);min-width:0}
+.hs-rec .i{font-size:1.2rem}.hs-rec .k{display:block;color:var(--mu);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}.hs-rec b{display:block;font-size:.88rem;overflow-wrap:anywhere}.hs-rec b small{display:block;font-weight:400;color:var(--mu);font-size:.76rem}
+.hs-grs{display:grid;gap:6px}.hs-gr{display:grid;grid-template-columns:3.6rem 1fr 3rem;align-items:center;gap:8px;font-size:.85rem}.hs-gr .b{height:8px;border-radius:9px;background:var(--inp);border:1px solid var(--line);overflow:hidden}.hs-gr .b i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--gold))}.hs-gr b{text-align:right;font-variant-numeric:tabular-nums}
+@media(max-width:400px){.hs-rec{grid-template-columns:1fr}.hs-cr{grid-template-columns:3.8rem auto 1fr auto 2.8rem;font-size:.8rem}}
 .er-dash{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:stretch}
 .er-eqcol{display:flex;flex-direction:column;gap:6px;justify-content:space-between;width:48px}
 .er-eqb{display:grid;grid-template-columns:48px minmax(0,1fr);align-items:center;gap:0;padding:0;border:0;background:none;color:var(--tx);font:inherit;text-align:left;cursor:pointer;min-width:0;border-radius:12px}
@@ -469,24 +507,59 @@ function slotSheet(k){const m=ST.me,s=SL[k],i=m.equipped[k];
 function goInv(k){FOLD['inv_'+k]=true;if(tab!=='hero')setTab('hero');else renderHero();const e=$('fd-inv_'+k);if(e&&e.scrollIntoView)try{e.scrollIntoView({block:'start'})}catch(_){}}
 
 async function heroSheet(uid){
- try{const h=await rpc('game_hero',{p_user:uid});
-  const eq=SLOTS.map(s=>{const i=(h.equipped||{})[s[0]];return `<div class="er-sl" style="margin-top:8px">${i?itemBox(Object.assign({slot:s[0]},i)):`<div class="er-ic">${s[2]}</div><div class="mute">${s[1]}: vuoto</div>`}</div>`}).join('');
-  modal(`<div class="er-avbox" style="margin-bottom:10px"><div class="er-avbig" style="width:64px;height:64px;font-size:1.6rem" aria-hidden="true">${face(h.user_id,h.nickname)}</div><h2 style="margin:0">${esc(h.nickname)} · Lv. ${num(h.level)}</h2></div><div class="p-sheet">${STATS.map(s=>`<div><b>${num(h.stats[s[0]])}</b>${s[3]}</div>`).join('')}</div>
-   <p class="mute" style="margin:0 0 6px">Potenza <b style="color:var(--tx)">${num(pw(h.stats))}</b> · PV ${num(h.max_hp)} · Duelli vinti ${num(h.duels_won)} · Boss battuti ${num(h.bosses_beaten)}</p>${eq}<button class="btn ghost block" style="margin-top:14px" data-close>Chiudi</button>`)
+ try{const [h,x]=await Promise.all([rpc('game_hero',{p_user:uid}),rpc('game_hero_extra',{p_user:uid}).catch(()=>null)]);
+  const me=ST.me,self=h.user_id===me.user_id,hp=pw(h.stats),mp=pw(me.stats),ratio=mp>0?hp/mp:1;
+  const verdict=self?'':ratio>=1.25?['Molto più forte di te','hs-up2']:ratio>=1.05?['Più forte di te','hs-up']:ratio>0.95?['Alla pari con te','hs-par']:ratio>0.75?['Più debole di te','hs-dn']:['Molto più debole di te','hs-dn2'];
+  const dif=(a,b)=>{const d=b>0?Math.round(100*(a-b)/b):0;return d===0?'<em class="hs-d0">=</em>':`<em class="${d>0?'hs-dp':'hs-dm'}">${d>0?'+':''}${num(d)}%</em>`};
+  const statRows=STATS.map(([k,nm,ds,ab])=>{const a=Number(h.stats[k])||0,b=Number(me.stats[k])||0,mx=Math.max(a,b,1);
+   return `<div class="hs-cr"><span class="l" title="${nm}">${STATICON[k]} ${ab}</span><span class="v">${num(a)}</span><span class="bars"><i class="t" style="width:${100*a/mx}%"></i><i class="m" style="width:${100*b/mx}%"></i></span><span class="v m">${num(b)}</span>${dif(a,b)}</div>`}).join('');
+  const one=(k,nm,a,b)=>`<div class="hs-cr"><span class="l">${nm}</span><span class="v">${num(a)}</span><span class="bars"><i class="t" style="width:${100*a/Math.max(a,b,1)}%"></i><i class="m" style="width:${100*b/Math.max(a,b,1)}%"></i></span><span class="v m">${num(b)}</span>${dif(a,b)}</div>`;
+  const tot=i=>i?STATS.reduce((t,s)=>t+Number(i['p_'+s[0]]||0),0):0;
+  const eq=SLOTS.map(([k,nm,ic])=>{const i=(h.equipped||{})[k],mi=me.equipped[k],d=tot(i)-tot(mi);
+   return `<div class="hs-eq ${i?'r-'+esc(i.rarity):'empty'}">${i?itemBox(Object.assign({slot:k},i)):`<div class="er-ic" aria-hidden="true">${ic}</div><div class="mute">${nm}: vuoto</div>`}${!self&&i?`<span class="hs-vs ${d>0?'up':d<0?'dn':''}" title="Somma dei bonus rispetto al tuo oggetto">${d===0?'come il tuo':`${d>0?'+':''}${num(d)}% vs il tuo`}</span>`:''}</div>`}).join('');
+  const p=h.pet,pet=p?`<div class="hs-pet r-${prc(p.tier)}"><span class="ph">${petSprite(p,64)}</span><div style="min-width:0"><b>${esc(p.name)} <em>Lv. ${num(p.level)}</em></b>${(p.lines||[]).filter(l=>l.value>0).length?`<div class="er-bn">${p.lines.filter(l=>l.value>0).map(l=>`<span>${petLabel(l,l.value)}</span>`).join('')}</div>`:'<small class="mute">Nessun bonus attivo</small>'}</div></div>`:'<p class="mute" style="margin:0">Nessun compagno dello Stagno.</p>';
+  const G=(x&&x.grades)||{},GM=(x&&x.grades_max)||12;
+  const grades=STATS.map(([k,nm,ds,ab])=>{const g=Number(G[k])||0;return `<div class="hs-gr"><span title="${nm}">${STATICON[k]} ${ab}</span><span class="b"><i style="width:${100*g/GM}%"></i></span><b>${g}/${GM}</b></div>`}).join('');
+  const ar=x&&x.arena,tw=x&&x.tower,dg=x&&x.dungeons,rd=x&&x.raid;
+  const rec=[
+   ['⚔️','Arena',ar?`${esc(ar.league||'')} · ${num(ar.points)} punti${ar.rank?` · ${num(ar.rank)}°`:''}<small>${num(ar.wins)} vinti · ${num(ar.losses)} persi questo mese</small>`:'<small>Non ha ancora giocato questo mese</small>'],
+   ['🗼','Torre',tw&&tw.best?`Piano ${num(tw.best)}`:'<small>Mai salita</small>'],
+   ['🏰','Dungeon',dg?`${num(dg.cleared)} su ${num(dg.total)}${dg.top?`<small>il più alto: n. ${num(dg.top)}</small>`:''}`:'—'],
+   ['🐉','Raid',rd?`${num(rd.dmg)} danni · ${num(rd.rank)}°<small>questa settimana · raid vinti: ${num((x&&x.raids_won)||0)}</small>`:`<small>Non ha colpito questa settimana${x&&x.raids_won?` · raid vinti: ${num(x.raids_won)}`:''}</small>`],
+   ['🤺','Duelli',`${num(h.duels_won)} vinti · ${num(h.duels_lost||0)} persi`],
+   ['👑','Boss battuti',num(h.bosses_beaten)]];
+  modal(`<div class="hs">
+   <div class="hs-hd"><div class="hs-pic" aria-hidden="true">${face(h.user_id,h.nickname)}</div><div style="min-width:0"><h2>${esc(h.nickname)}${self?' <small>(tu)</small>':''}</h2>
+    <div class="hs-sub">Livello <b>${num(h.level)}</b>${ar&&ar.league?` · ${esc(ar.league)}`:''}</div><div class="hs-pw">Potenza <b>${num(hp)}</b> · ${num(h.max_hp)} PV</div></div></div>
+   ${verdict?`<div class="hs-vd ${verdict[1]}"><b>${verdict[0]}</b><span>${num(hp)} contro i tuoi ${num(mp)} (${ratio>=1?'+':''}${num(Math.round(100*(ratio-1)))}%)</span></div>`:''}
+   <h3 class="hs-h">${self?'Le tue statistiche':'Confronto con te'}${self?'':' <small><i class="lg t"></i>${esc(h.nickname)} · <i class="lg m"></i>tu</small>'}</h3>
+   <div class="hs-cmp ${self?'self':''}">${statRows}${one('lv','📈 LIV',h.level,me.level)}${one('hp','💗 PV',h.max_hp,me.max_hp)}</div>
+   <h3 class="hs-h">Compagno</h3>${pet}
+   <h3 class="hs-h">Equipaggiamento</h3><div class="hs-eqs">${eq}</div>
+   <h3 class="hs-h">Imprese</h3><div class="hs-rec">${rec.map(r=>`<div><span class="i" aria-hidden="true">${r[0]}</span><div><small class="k">${r[1]}</small><b>${r[2]}</b></div></div>`).join('')}</div>
+   ${x?`<h3 class="hs-h">Abilità permanenti</h3><div class="hs-grs">${grades}</div>`:''}
+   <div class="row" style="margin-top:16px">${!self&&h.arena_open!==false?'<button class="btn" data-goarena>⚔️ Sfida in Arena</button>':''}<button class="btn ghost" data-close>Chiudi</button></div></div>`);
+  const ga=document.querySelector('.er-ov [data-goarena]');if(ga)ga.onclick=()=>{ga.closest('.er-ov').close();setTab('arena')};
  }catch(e){say(errTxt(e),'bad')}}
 
 /* ---------- schermata principale ---------- */
 function paintTop(){
- const m=ST.me,pct=m.level>=CAP?100:Math.min(100,Math.round(100*m.xp/m.xp_need));
- const col=SLOTS.map(([k,nm,ic])=>{const i=m.equipped[k];
-  return i?`<button type="button" class="er-eqb r-${esc(i.rarity)}" data-slot="${k}" aria-label="${nm}: ${esc(i.name)}, ${esc(RAR[i.rarity]||i.rarity)}. Tocca per i dettagli"><span class="ic" aria-hidden="true">${ic}</span><span class="tx"><b>${esc(i.name)}</b><small>${nm} · ${esc(RAR[i.rarity]||i.rarity)}</small></span></button>`
-   :`<button type="button" class="er-eqb empty" data-slot="${k}" aria-label="${nm}: vuoto"><span class="ic" aria-hidden="true">${ic}</span><span class="tx"><b>${nm}</b><small>vuoto</small></span></button>`}).join('');
- $('top').innerHTML=`<div class="er-dash"><div class="er-eqcol" role="group" aria-label="Equipaggiamento indossato">${col}</div><div class="er-dmain">
-  <div class="er-who"><div class="er-pic" aria-hidden="true">${face(m.user_id,m.nickname)}</div><div style="min-width:0"><h2>${esc(m.nickname)}</h2><div class="er-lv">Livello <b>${num(m.level)}</b> · Potenza <b>${num(pw(m.stats))}</b> · ${num(m.max_hp)} PV</div></div><div class="er-bc"><b>${BAL==null?'—':num(BAL)}</b><span>BC</span></div></div>
+ const m=ST.me,pct=m.level>=CAP?100:Math.min(100,Math.round(100*m.xp/m.xp_need)),B=m.bonus||{};
+ const eq=SLOTS.map(([k,nm,ic])=>{const i=m.equipped[k];
+  return i?`<button type="button" class="er-eqb2 r-${esc(i.rarity)}" data-slot="${k}" aria-label="${nm}: ${esc(i.name)}, ${esc(RAR[i.rarity]||i.rarity)}. Tocca per i dettagli"><span class="ic" aria-hidden="true">${ic}</span><small>${esc(RAR[i.rarity]||i.rarity)}</small></button>`
+   :`<button type="button" class="er-eqb2 empty" data-slot="${k}" aria-label="${nm}: vuoto"><span class="ic" aria-hidden="true">${ic}</span><small>vuoto</small></button>`}).join('');
+ const st=STATS.map(([k,nm,ds,ab])=>`<div class="er-stt" title="${esc(nm)}: ${esc(ds)}"><span class="k">${STATICON[k]} ${ab}</span><b>${num(m.stats[k])}</b><small>${B[k]?`+${num(B[k])}% bonus`:'nessun bonus'}</small></div>`).join('');
+ const sp=[m.xp_pct?`<span>⭐ +${num(m.xp_pct)}% XP</span>`:'',m.extra_actions?`<span>🎯 +${num(m.extra_actions)} azioni di supporto</span>`:'',m.extra_fights?`<span>⚡ +${num(m.extra_fights*25)}% ricarica</span>`:''].filter(Boolean).join('');
+ $('top').innerHTML=`<div class="er-dash2">
+  <div class="er-who"><button type="button" class="er-pic" data-hero="${esc(m.user_id)}" aria-label="Apri la tua scheda completa">${face(m.user_id,m.nickname)}</button><div style="min-width:0"><h2>${esc(m.nickname)}</h2><div class="er-lv">Livello <b>${num(m.level)}</b>${m.stats_set&&m.points_free>0?` · <span style="color:var(--gold)">${num(m.points_free)} punti da spendere</span>`:''}</div></div><div class="er-bc"><b>${BAL==null?'—':num(BAL)}</b><span>BC</span></div></div>
   <div><div class="er-xp" role="progressbar" aria-valuemin="0" aria-valuemax="${m.xp_need}" aria-valuenow="${m.xp}" aria-label="Esperienza"><i style="width:${pct}%"></i></div><div class="er-xpt"><span>${m.level>=CAP?'XP al massimo':`${num(m.xp)} / ${num(m.xp_need)} XP`}</span><span>${m.level>=CAP?'Livello massimo':`al livello ${num(m.level+1)}`}</span></div></div>
+  <div class="er-kpi"><div><small>Potenza</small><b>${num(pw(m.stats))}</b></div><div><small>Punti vita</small><b>${num(m.max_hp)}</b></div><div><small>Duelli</small><b>${num(m.duels_won)}<i>/${num(m.duels_lost||0)}</i></b></div><div><small>Boss</small><b>${num(m.bosses_beaten)}</b></div></div>
+  <div class="er-sts" role="group" aria-label="Statistiche">${st}</div>
+  ${sp?`<div class="er-spx">${sp}</div>`:''}
+  <div class="er-eqrow" role="group" aria-label="Equipaggiamento indossato: tocca per i dettagli">${eq}</div>
   ${petStrip(m)}${trStrip(m)}
-  <div class="er-reset">Nuovo boss e nuove offerte del mercante tra <b data-cd>${cd()}</b></div>
-  ${m.stats_set&&m.points_free>0?`<div class="er-reset">✨ Hai <b>${num(m.points_free)}</b> punti abilità da spendere: scheda <b>Eroe</b></div>`:''}</div></div>`}
+  <div class="er-reset">Nuove offerte del mercante tra <b data-cd>${cd()}</b> · <button type="button" class="er-link" data-hero="${esc(m.user_id)}">la tua scheda completa</button></div></div>`}
+
 
 function gate(html){ST=null;ME=null;$('main').hidden=true;$('gate').hidden=false;$('gate').innerHTML=html}
 function gateLogin(){gate(`<section class="card er-gate" style="margin-top:20px"><h2>Entra dal Black Market</h2><p class="mute" style="max-width:34em;margin:0 auto 14px">La guerra degli Eroi usa il tuo profilo del Black Market: lo stesso nickname e lo stesso saldo di BC. Entra (o crea il profilo) dal Black Market e poi torna qui.</p><a class="btn gold" href="black-market.html">Accedi dal Black Market</a></section>`);
@@ -1165,7 +1238,7 @@ function renderShop(){
   return `<div class="er-it r-${esc(i.rarity)}"><div class="hd">${itemBox(i)}</div>
    <div class="er-pr"><b>${num(i.price)} BC</b>${i.discounted?`<s>${num(i.list_price)}</s><span class="er-tag">OFFERTA</span>`:''}</div>
    ${i.owned?'<span class="chip s" style="justify-self:start">Già tuo</span>':lock?`<span class="er-lock">Serve il livello ${num(i.min_level)}</span>`:`<button class="btn ${armed?'gold':'ghost'}" data-buy="${esc(i.id)}" ${poor?'disabled':''}>${poor?'BC insufficienti':armed?`Conferma l’acquisto (${num(i.price)} BC)`:'Acquista'}</button>`}</div>`}).join('')}</div>`:'<p class="mute">Oggi il mercante non ha offerte.</p>'}
- <h2 class="er-h">Abilità permanenti</h2><p class="er-sub">Aumentano una statistica in percentuale, <b>per sempre</b>. Per ogni statistica si comprano in ordine, dal primo all’ottavo grado: i gradi alti costano molto di più e si sbloccano ai livelli alti. Costano solo BC.</p>
+ <h2 class="er-h">Abilità permanenti</h2><p class="er-sub">Aumentano una statistica in percentuale, <b>per sempre</b>. Per ogni statistica si comprano in ordine, dal primo al dodicesimo grado (fino al livello 600): i gradi alti costano molto di più e si sbloccano ai livelli alti. Costano solo BC.</p>
  <div class="er-shop">${STATS.map(([k,nm])=>`<div class="er-it"><div class="hd"><div class="er-ic" aria-hidden="true">${STATICON[k]}</div><div><div class="er-rar">Permanente</div><div class="er-nm">${nm}</div></div></div>${ST.skills.filter(x=>x.kind==='perm'&&x.stat===k).sort((a,b)=>a.tier-b.tier).map(skillRow).join('')}</div>`).join('')}</div>
  <h2 class="er-h">Potenziamenti temporanei</h2><p class="er-sub">Potenziano un equipaggiamento per <b>${ST.settings.temp_hours} ore</b>. Per ogni equipaggiamento ne è attivo uno solo: puoi rinnovarlo o passare al grado più alto.</p>
  <div class="er-shop">${SLOTS.map(([k,nm,ic])=>{const L=ST.skills.filter(x=>x.kind==='temp'&&x.slot===k).sort((a,b)=>a.tier-b.tier),cur=L.filter(x=>x.active_until).sort((a,b)=>b.tier-a.tier)[0]||null;

@@ -732,5 +732,12 @@ Le statistiche degli oggetti del mercante seguono ora la stessa curva dei dungeo
 - **Boss del giorno spento** finché `game_raid_enabled = 1` (un trigger blocca l'ingresso nelle lobby): mettendo 0 torna com'era. I badge degli Eroi (attacchi, cure, guardie, boss sconfitti) contano anche il raid. La Home mostra il raid nella vetrina.
 - File: `black-market-eroi-raid.sql` (si può rieseguire), `black-market-eroi-raid-test.sql` (solo su un progetto di prova vuoto), `black-market-eroi-raid-down.sql` (spegne tutto, i dati del raid restano). Pagine: `eroi.html`, `index.html`.
 
+## La guerra degli Eroi: gradi fino al livello 600, potenziamenti più forti, scheda eroe e cruscotto nuovi (migrazione 040, 9 novembre 2026)
+- **Abilità permanenti dal 9° al 12° grado** (20 nuove): +30% (750.000 BC, liv. 450), +34% (1.500.000 BC, liv. 500), +38% (3.000.000 BC, liv. 550), +42% (6.000.000 BC, liv. 600). Con tutti i 12 gradi una statistica ha +253%.
+- **Potenziamenti temporanei dal 3° all'8° grado** (30 nuovi, 24 ore, uno per equipaggiamento): +18/9% (1.200 BC, liv. 40), +25/12% (4.000, liv. 100), +35/17% (10.000, liv. 200), +45/22% (20.000, liv. 300), +60/30% (35.000, liv. 400), +75/37% (60.000, liv. 500).
+- **Scheda di un eroe** (tocca un nickname): confronto statistica per statistica con te, verdetto di forza, compagno dello Stagno, equipaggiamento con differenza rispetto al tuo, imprese (Arena del mese, Torre, dungeon, raid della settimana, duelli, boss), gradi di abilità per statistica, pulsante per l'Arena. Dati extra da `game_hero_extra`.
+- **Cruscotto dell'eroe**: potenza, PV, duelli, boss; tutte e 5 le statistiche con il bonus totale; bonus speciali (XP, azioni, ricarica); equipaggiamento in riga; tocca l'avatar per la tua scheda completa.
+- File: `black-market-eroi-progressi.sql` (si può rieseguire), `black-market-eroi-progressi-test.sql` (solo su progetto di prova vuoto), `black-market-eroi-progressi-down.sql`; pagina `eroi.html`.
+
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.
