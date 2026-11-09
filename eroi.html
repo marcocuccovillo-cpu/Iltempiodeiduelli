@@ -111,17 +111,19 @@
 .mp-claim small{display:block;font-size:.74rem;color:var(--mu)}.mp-claim b{font:700 1.2rem var(--disp);color:var(--gold)}
 .mp-seg{margin-top:12px}
 .mp-tools{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0 8px}.mp-chk{display:flex;align-items:center;gap:6px;font-size:.88rem;cursor:pointer}
-.mp-wrap{--cs:calc((min(100vw,980px) - 44px) / 20);overflow:auto;border-radius:14px;border:1.5px solid var(--line);background:#0b0a12;padding:4px;max-height:76vh}
-.mp-wrap.zoom{--cs:36px}
-.mp-grid{display:grid;gap:1px;width:max-content;position:relative}
-.mp-c{position:relative;padding:0;margin:0;border:0;border-radius:3px;cursor:pointer;background:color-mix(in srgb,var(--rg) calc(80% + var(--sh)),#000);display:grid;place-items:center;overflow:hidden;font-size:calc(var(--cs) * .62);line-height:1;min-width:0}
-.mp-c:hover{filter:brightness(1.25)}.mp-c.lk{filter:saturate(.25) brightness(.55)}
-.mp-c.own{box-shadow:inset 0 0 0 2px var(--oc,#fff)}.mp-c.mine{box-shadow:inset 0 0 0 2px var(--gold);background:color-mix(in srgb,var(--rg) 70%,var(--gold))}
-.mp-c.sel{outline:2px solid #fff;outline-offset:1px;z-index:2}.mp-c.dim{opacity:.35}
-.mp-c span{filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
-.mp-tav{z-index:1;border:2px solid var(--gold);border-radius:8px;background:radial-gradient(circle,#5a3b17,#2a1a0a);color:#fff;display:grid;place-items:center;align-content:center;cursor:pointer;padding:0;box-shadow:0 0 14px rgba(232,184,74,.5)}
-.mp-tav span{font-size:calc(var(--cs) * 1.1);line-height:1}.mp-tav small{font:700 calc(var(--cs) * .32) var(--ui);color:var(--gold)}
-.mp-rl{pointer-events:none;z-index:1;align-self:start;justify-self:start;font-size:calc(var(--cs) * .7);margin:1px;padding:0 2px;border-radius:4px;background:rgba(0,0,0,.45);line-height:1.2}
+.mp-leg{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--mu);flex-wrap:wrap}.mp-leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-left:4px}.mp-leg i.me{border:2px solid var(--gold)}.mp-leg i.ot{border:2px solid hsl(200 70% 58%)}.mp-leg i.lk{background:#0b0918;border:1px solid var(--line)}
+.mp-wrap{position:relative;overflow:auto;border-radius:16px;border:2px solid #3a2a12;background:#0b0a12;box-shadow:0 0 0 1px rgba(232,184,74,.35),0 10px 30px rgba(0,0,0,.5);max-height:78vh;-webkit-overflow-scrolling:touch}
+.mp-board{position:relative;width:100%}.mp-wrap.zoom .mp-board{width:220%}
+.mp-board canvas{display:block;width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;cursor:pointer}
+.mp-board::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 40px rgba(0,0,0,.55);border-radius:14px}
+.mp-rl{position:absolute;pointer-events:none;z-index:2;margin:3px;padding:1px 5px 1px 3px;opacity:.9;border-radius:6px;background:rgba(10,8,20,.72);border:1px solid rgba(232,184,74,.4);font:700 .62rem var(--ui);color:#f3ead2;display:flex;gap:3px;align-items:center;white-space:nowrap;max-width:24%;overflow:hidden;text-overflow:ellipsis}
+.mp-rl b{font-weight:700;overflow:hidden;text-overflow:ellipsis}.mp-rl.lk{color:#a39db8;border-color:rgba(255,255,255,.15)}
+.mp-wrap:not(.zoom) .mp-rl b{display:none}
+.mp-clouds{position:absolute;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse 18% 9% at 20% 30%,rgba(255,255,255,.13),transparent 70%),radial-gradient(ellipse 22% 10% at 70% 65%,rgba(255,255,255,.10),transparent 70%),radial-gradient(ellipse 14% 7% at 45% 85%,rgba(255,255,255,.08),transparent 70%);background-size:200% 100%;animation:mpCloud 60s linear infinite}
+@keyframes mpCloud{to{background-position:-200% 0}}@media(prefers-reduced-motion:reduce){.mp-clouds{animation:none}}
+.mp-tip{position:absolute;z-index:3;pointer-events:none;padding:4px 8px;border-radius:8px;background:rgba(10,8,20,.92);border:1px solid var(--line);font:600 .75rem var(--ui);white-space:nowrap}
+.mp-mine{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}.mp-my{flex:none;display:grid;justify-items:center;gap:2px;width:64px;padding:6px 2px;border-radius:12px;border:1.5px solid var(--rg);background:color-mix(in srgb,var(--rg) 22%,var(--surf));color:var(--tx);cursor:pointer;font:inherit}
+.mp-my span{font-size:1.3rem}.mp-my small{font:700 .64rem var(--ui);color:var(--gold)}.mp-my.on{box-shadow:0 0 0 2px var(--gold)}
 .mp-hint{margin:10px 2px}
 .mp-sel{margin-top:10px;display:grid;gap:10px;border-color:var(--rg);background:linear-gradient(135deg,color-mix(in srgb,var(--rg) 22%,transparent),transparent 70%)}
 .mp-st{display:flex;gap:10px;align-items:center}.mp-st .sp{flex:none;width:60px;height:60px;display:grid;place-items:center;border-radius:12px;background:rgba(0,0,0,.35)}
@@ -1404,20 +1406,17 @@ function renderMap(){
   <div class="sh-seg mp-seg" role="tablist" aria-label="Sezioni della mappa">${[['map','🗺️','Mappa'],['tavern','🍺','Locanda',MAP.present],['top','🏆','Proprietari']].map(s=>`<button type="button" role="tab" data-mv="${s[0]}" aria-selected="${s[0]===mapView}"><span aria-hidden="true">${s[1]}</span>${s[2]}${s[3]?`<em>${s[3]} presenti</em>`:''}</button>`).join('')}</div>`;
  let body='';
  if(mapView==='map')body=mapHtml(lv);else if(mapView==='tavern')body=tavHtml();else body=topHtml();
- el.innerHTML=head+body;fitMap()}
-function fitMap(){const w=document.querySelector('.mp-wrap');if(!w)return;if(mapZoom){w.style.removeProperty('--cs');return}w.style.setProperty('--cs',Math.max(12,Math.floor((w.clientWidth-8-19)/20*10)/10)+'px')}
-addEventListener('resize',()=>{if(tab==='map')fitMap()});
+ el.innerHTML=head+body;if(mapView==='map')mapMount()}
 function mapHtml(lv){
- const W=MAP.w,H=MAP.h,T=MAP.tavern,me=ST.me.user_id;
- const cells=MAP.plots.map(p=>{const [id,rg,l,oi]=p,x=id%W,y=Math.floor(id/W),r=regOf(rg),own=oi>=0?MAP.owners[oi]:null,mine=own&&own.id===me,lock=lv<r.min_level;
-  const shade=((x*7+y*13)%5-2)*3;
-  return `<button type="button" class="mp-c${own?' own':''}${mine?' mine':''}${lock?' lk':''}${mapSel===id?' sel':''}${mapMine&&!mine?' dim':''}" style="grid-column:${x+1};grid-row:${y+1};--rg:${r.color};--sh:${shade}%;${own&&!mine?`--oc:hsl(${hue(own.id)} 70% 60%)`:''}" data-plot="${id}" aria-label="${esc(r.name)} ${x+1},${y+1}: ${own?`di ${esc(own.n)}, ${LANDLV[l][0]}`:'libero'}">${own?`<span>${LANDLV[l][1]}</span>`:''}</button>`}).join('');
- const tav=`<button type="button" class="mp-tav" style="grid-column:${T.x+1}/span ${T.w};grid-row:${T.y+1}/span ${T.h}" data-mv="tavern" aria-label="Entra nella Locanda"><span>🍺</span><small>Locanda</small></button>`;
- const labels=MAP.regions.map(r=>{const bx=((r.no-1)%4)*5,by=Math.floor((r.no-1)/4)*8;return `<span class="mp-rl${lv<r.min_level?' lk':''}" style="grid-column:${bx+1}/span 5;grid-row:${by+1}" aria-hidden="true">${r.emoji}${lv<r.min_level?' 🔒':''}</span>`}).join('');
- const sel=mapSel!=null?plotPanel(mapSel,lv):'<p class="mute mp-hint">Tocca una casella per vederla e comprarla. I terreni restano tuoi per sempre.</p>';
- return `<div class="mp-tools"><label class="mp-chk"><input type="checkbox" data-mmine ${mapMine?'checked':''}> Evidenzia i miei</label><button type="button" class="btn ghost sm" data-mzoom>${mapZoom?'🔍 Riduci':'🔍 Ingrandisci'}</button></div>
-  <div class="mp-wrap${mapZoom?' zoom':''}"><div class="mp-grid" style="grid-template-columns:repeat(${W},var(--cs));grid-template-rows:repeat(${H},var(--cs))">${cells}${labels}${tav}</div></div>
+ const W=MAP.w,H=MAP.h,me=ST.me.user_id;
+ const labels=MAP.regions.map(r=>{const bx=((r.no-1)%4)*5,by=Math.floor((r.no-1)/4)*8,lk=lv<r.min_level;
+  return `<span class="mp-rl${lk?' lk':''}" style="left:${bx/W*100}%;${by===0?`top:0`:`bottom:0`}" aria-hidden="true">${r.emoji}<b>${esc(r.name)}</b>${lk?` 🔒 ${num(r.min_level)}`:''}</span>`}).join('');
+ const mine=MAP.plots.filter(p=>p[3]>=0&&MAP.owners[p[3]].id===me).sort((a,b)=>b[1]-a[1]||b[2]-a[2]);
+ const sel=mapSel!=null?plotPanel(mapSel,lv):'<p class="mute mp-hint">Tocca un terreno sulla mappa per vederlo e comprarlo, oppure la Locanda al centro per entrarci. I terreni restano tuoi per sempre.</p>';
+ return `<div class="mp-tools"><span class="mp-leg"><i class="me"></i>i tuoi <i class="ot"></i>di altri <i class="lk"></i>bloccati</span><button type="button" class="btn ghost sm" data-mzoom>${mapZoom?'🔍 Riduci':'🔍 Ingrandisci'}</button></div>
+  <div class="mp-wrap${mapZoom?' zoom':''}"><div class="mp-board"><div id="mpCanvas"></div>${labels}<div class="mp-clouds" aria-hidden="true"></div><div class="mp-tip" id="mpTip" hidden></div></div></div>
   ${sel}
+  ${mine.length?`<h3 class="rd-h">I tuoi terreni · ${mine.length}</h3><div class="mp-mine">${mine.map(([id,rg,l])=>{const r=regOf(rg);return `<button type="button" class="mp-my${mapSel===id?' on':''}" data-plot="${id}" style="--rg:${r.color}"><span>${LANDLV[l][1]}</span><small>${r.emoji} ${num(Math.round(r.income*MAP.mults[l]))}/g</small></button>`}).join('')}</div>`:''}
   <h3 class="rd-h">Le regioni</h3><div class="mp-regs">${MAP.regions.map(r=>{const lk=lv<r.min_level;return `<div class="mp-reg${lk?' lk':''}" style="--rg:${r.color}"><span class="sp" aria-hidden="true">${ART?ART.sprite(r.sprite,{tier:r.tint,size:44,alt:''}):r.emoji}</span><div style="min-width:0"><b>${r.emoji} ${esc(r.name)}</b><small>${lk?`🔒 dal livello ${num(r.min_level)}`:`Livello ${num(r.min_level)}+`} · ${num(r.owned)}/${num(r.total)} occupati</small><small>Da ${num(plotPrice(r))} BC · rendita ${num(r.income)} BC/giorno</small></div></div>`}).join('')}</div>`}
 function plotPanel(id,lv){
  const p=plotOf(id);if(!p)return '';const [_,rg,l,oi]=p,W=MAP.w,x=id%W,y=Math.floor(id/W),r=regOf(rg),own=oi>=0?MAP.owners[oi]:null,mine=own&&own.id===ST.me.user_id;
@@ -1467,6 +1466,90 @@ async function diceJoin(btn,id){
   setTimeout(()=>{diceAnim=null},12000);
   await loadTavern(true);BAL=await balance().catch(()=>BAL);paintTop();renderMap();
   say(r.draw?'Pareggio: le poste tornano indietro.':r.won?`Hai vinto! +${num(r.pot)} BC.`:`Hai perso ${num(r.stake)} BC. Ritenta!`,r.won||r.draw?'good':'bad')})}
+
+/* ---------- Mappa in pixel-art: terreni per regione, edifici per livello, Locanda, animazioni (acqua, lava, stelle, fumo) ---------- */
+const MapArt=(()=>{
+ const T=16;
+ const hex2=(h)=>{h=h.replace('#','');return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]};
+ const sh=(h,f)=>{const c=hex2(h).map(v=>Math.max(0,Math.min(255,Math.round(f>=0?v+(255-v)*f:v*(1+f)))));return `rgb(${c[0]},${c[1]},${c[2]})`};
+ const rnd=s=>{let x=(s*2654435761)>>>0;return()=>{x^=x<<13;x>>>=0;x^=x>>17;x^=x<<5;x>>>=0;return x/4294967296}};
+ const BASE={1:'#5f9e3e',2:'#2f6d3a',3:'#4f6b4c',4:'#d6ae5c',5:'#7d8ea3',6:'#2e7fb0',7:'#3a2622',8:'#1d1440'};
+ /* edifici 16×16: o contorno, w muro, W muro scuro, g finestra accesa, d porta, r/R tetto colore proprietario, h/H paglia, t/T tenda, p palo, b bandiera, s/S pietra */
+ const SPR=[
+  ['................','................','................','.......pbbbb....','.......pbbbbb...','.......pbbbb....','.......p........','.......p........','.......p........','.......p........','......ooo.......'],
+  ['................','................','................','.......p........','......tpt.......','.....ttTtt......','....ttTTTtt.....','...ttTTooTtt....','..ttTTToooTtt...','.ttTTTToooTTtt..','.oooooooooooooo.'],
+  ['................','................','.......HH.......','......HhhH......','.....HhhhhH.....','....HhhhhhhH....','...HhhhhhhhhH...','..HHHHHHHHHHHH..','...wwwwwwwwww...','...wwwddwwggw...','...wwwddwwggw...','...WwwddwwwwW...','...oooooooooo...'],
+  ['................','..........S.....','......rrrrSr....','.....rrrrrrrr...','....rrrrrrrrrr..','...RRRRRRRRRRRR.','....wwwwwwwwww..','....wggwwwwggw..','....wggwwwwggw..','....wwwwddwwww..','....WwwwddwwwW..','....oooooooooo..'],
+  ['................','....rrrrrrrr....','...rrrrrrrrrr...','..RRRRRRRRRRRR..','..wwwwwwwwwwww..','..wggwwggwwggw..','..wwwwwwwwwwww..','.rrrrrrrrrrrrrr.','.RRRRRRRRRRRRRR.','..wwwwwwwwwwww..','..wggwwddwwggw..','..wggwwddwwggw..','..WwwwwddwwwwW..','..oooooooooooo..'],
+  ['..pb........pb..','..pbb.......pbb.','..p..........p..','.s.s.s....s.s.s.','.sssss....sssss.','.sgsss.s.ssssgs.','.sssssssssssssS.','.sSssssggssssSs.','.ssssssggssssss.','.sgssssssssssgs.','.ssssssddssssss.','.SsssssddsssssS.','.oooooooooooooo.']];
+ function spr(ctx,ox,oy,k,own){const g=SPR[k],P={o:'#1a1410',w:'#e9dcc0',W:'#b9a888',g:'#ffd36b',d:'#6b3d1f',r:own,R:sh(own,-.35),h:'#d9b45a',H:'#9c7a2f',t:own,T:sh(own,-.3),p:'#5a4632',b:own,s:'#9aa3ad',S:'#6c747d'};
+  const off=16-g.length;for(let y=0;y<g.length;y++)for(let x=0;x<16;x++){const c=g[y][x];if(c&&c!=='.'&&c!==' '&&P[c]){ctx.fillStyle=P[c];ctx.fillRect(ox+x,oy+y+off-1,1,1)}}}
+ function terrain(ctx,ox,oy,rg,seed,free){const r=rnd(seed),b=BASE[rg]||'#555';
+  ctx.fillStyle=b;ctx.fillRect(ox,oy,T,T);
+  for(let i=0;i<22;i++){const x=Math.floor(r()*T),y=Math.floor(r()*T);ctx.fillStyle=sh(b,(r()-.5)*.35);ctx.fillRect(ox+x,oy+y,1+(r()<.3?1:0),1)}
+  const v=r();
+  if(rg===1&&free){for(let i=0;i<3;i++){if(r()<.55){const x=2+Math.floor(r()*12),y=3+Math.floor(r()*11);ctx.fillStyle=['#ffe066','#ffffff','#ff8fb1'][Math.floor(r()*3)];ctx.fillRect(ox+x,oy+y,1,1);ctx.fillStyle='#3f7a28';ctx.fillRect(ox+x,oy+y+1,1,1)}}}
+  if(rg===2&&free&&v<.75){const cx=ox+4+Math.floor(r()*8),cy=oy+3+Math.floor(r()*3);ctx.fillStyle='#5a3a1e';ctx.fillRect(cx,cy+6,2,4);ctx.fillStyle='#1d4d28';ctx.fillRect(cx-3,cy+1,8,6);ctx.fillRect(cx-2,cy,6,8);ctx.fillStyle='#2f7a3c';ctx.fillRect(cx-2,cy+1,4,3);ctx.fillStyle='#4a9a4c';ctx.fillRect(cx-1,cy+1,2,1)}
+  if(rg===3){if(v<.5){ctx.fillStyle='#355150';ctx.fillRect(ox+3,oy+8,9,4);ctx.fillRect(ox+4,oy+7,7,6);ctx.fillStyle='#5f8a86';ctx.fillRect(ox+5,oy+8,3,1)}if(free&&r()<.6){ctx.fillStyle='#8fae4a';for(let i=0;i<3;i++){const x=ox+2+Math.floor(r()*12);ctx.fillRect(x,oy+9,1,5);ctx.fillStyle='#6b4a2a';ctx.fillRect(x,oy+8,1,2);ctx.fillStyle='#8fae4a'}}}
+  if(rg===4){ctx.fillStyle=sh(b,-.18);const y=4+Math.floor(r()*8);ctx.fillRect(ox+1,oy+y,6,1);ctx.fillRect(ox+7,oy+y-1,5,1);ctx.fillRect(ox+12,oy+y,3,1);if(free&&v<.3){const x=ox+6+Math.floor(r()*4);ctx.fillStyle='#3f8a3a';ctx.fillRect(x,oy+6,2,8);ctx.fillRect(x-2,oy+8,1,3);ctx.fillRect(x-2,oy+10,2,1);ctx.fillRect(x+3,oy+7,1,3);ctx.fillRect(x+2,oy+9,2,1)}}
+  if(rg===5&&free&&v<.8){const x=ox+1+Math.floor(r()*2);for(let i=0;i<8;i++){ctx.fillStyle=i<3?'#f2f6fb':(i<4?'#c9d3e0':'#56647a');ctx.fillRect(x+7-i,oy+3+i,2*i+1,1)}ctx.fillStyle='#3f4a5c';for(let i=3;i<8;i++)ctx.fillRect(x+7+Math.floor(i/2),oy+3+i,Math.ceil(i/2),1);ctx.fillStyle='#ffffff';ctx.fillRect(x+7,oy+3,1,1)}
+  if(rg===7){ctx.fillStyle='#24160f';for(let i=0;i<3;i++){ctx.fillRect(ox+Math.floor(r()*13),oy+Math.floor(r()*13),3,2)}}
+ }
+ function anim(ctx,ox,oy,rg,seed,t,free){const r=rnd(seed+((t/8)|0)*7919);
+  if(rg===6){for(let i=0;i<4;i++){const x=Math.floor(r()*13),y=Math.floor(rnd(seed+i)()*14)+1;ctx.fillStyle='rgba(220,245,255,.75)';ctx.fillRect(ox+((x+t)%14),oy+y,2,1);ctx.fillStyle='rgba(120,200,240,.6)';ctx.fillRect(ox+((x+t+3)%14),oy+y,1,1)}}
+  if(rg===7){const g=.55+.45*Math.sin(t/3+seed);ctx.fillStyle=`rgba(255,${100+Math.round(60*g)},40,${.55+.4*g})`;const q=rnd(seed);for(let i=0;i<3;i++){const x=Math.floor(q()*12),y=Math.floor(q()*12);ctx.fillRect(ox+x,oy+y,3,1);ctx.fillRect(ox+x+2,oy+y+1,1,2)}}
+  if(rg===8){const q=rnd(seed);for(let i=0;i<5;i++){const x=Math.floor(q()*15),y=Math.floor(q()*15),on=Math.sin(t/2+i*1.7+seed)>.2;if(on){ctx.fillStyle=i%2?'#ffffff':'#c9b8ff';ctx.fillRect(ox+x,oy+y,1,1)}}if(free&&rnd(seed)()<.25){ctx.fillStyle='rgba(167,139,250,.9)';const y=oy+6+Math.round(Math.sin(t/3+seed));ctx.fillRect(ox+7,y,2,4);ctx.fillRect(ox+6,y+1,4,2)}}
+ }
+ function tavern(ctx,ox,oy,t){
+  ctx.fillStyle='#6b5434';ctx.fillRect(ox,oy,32,32);ctx.fillStyle='#8a7048';for(let i=0;i<32;i+=4)ctx.fillRect(ox+i,oy+30,2,2);
+  ctx.fillStyle='#8a2f22';for(let i=0;i<10;i++)ctx.fillRect(ox+6-i/2+2,oy+4+i,20+i,1);ctx.fillStyle='#5e1f17';ctx.fillRect(ox+2,oy+14,28,1);
+  ctx.fillStyle='#c9a36b';ctx.fillRect(ox+4,oy+15,24,14);ctx.fillStyle='#7a5a32';for(let y=16;y<29;y+=3)ctx.fillRect(ox+4,oy+y,24,1);
+  const glow=.75+.25*Math.sin(t/2);ctx.fillStyle=`rgba(255,${190+Math.round(40*glow)},90,1)`;ctx.fillRect(ox+6,oy+18,5,4);ctx.fillRect(ox+21,oy+18,5,4);
+  ctx.fillStyle='#3a2410';ctx.fillRect(ox+13,oy+20,6,9);ctx.fillStyle='#e8b84a';ctx.fillRect(ox+17,oy+24,1,1);
+  ctx.fillStyle='#5a4632';ctx.fillRect(ox+24,oy+2,3,7);
+  for(let i=0;i<4;i++){const k=((t*0.6+i*3)%12);ctx.fillStyle=`rgba(210,210,220,${.55-k/24})`;ctx.fillRect(ox+25+Math.round(Math.sin((t+i*4)/3)),oy+1-k,2,2)}
+  ctx.fillStyle='#3a2410';ctx.fillRect(ox+1,oy+15,1,6);ctx.fillStyle='#e8b84a';ctx.fillRect(ox,oy+21,4,3);ctx.fillStyle='#fff';ctx.fillRect(ox+1,oy+21,2,1);
+ }
+ function make(state,myId,myLv,selRef){
+  const W=state.w,H=state.h,cv=document.createElement('canvas');cv.width=W*T;cv.height=H*T;
+  const base=document.createElement('canvas');base.width=cv.width;base.height=cv.height;const b=base.getContext('2d'),c=cv.getContext('2d');
+  const reg={};state.regions.forEach(r=>reg[r.no]=r);
+  const owners=state.owners,TV=state.tavern;
+  const col=o=>o.id===myId?'#e8b84a':`hsl(${hue(o.id)} 70% 58%)`;
+  state.plots.forEach(([id,rg,l,oi])=>{const x=id%W,y=Math.floor(id/W),ox=x*T,oy=y*T,own=oi>=0?owners[oi]:null;
+   terrain(b,ox,oy,rg,id*31+7,!own);
+   if(own){const k=col(own);if(rg===6){b.fillStyle='#7a5a32';b.fillRect(ox+1,oy+9,14,6);b.fillStyle='#5a4024';for(let i=1;i<15;i+=3)b.fillRect(ox+i,oy+9,1,6);b.fillRect(ox+2,oy+15,1,1);b.fillRect(ox+13,oy+15,1,1)}else{b.fillStyle='rgba(60,40,20,.35)';b.fillRect(ox+2,oy+11,12,4)}spr(b,ox,oy,l,k);b.fillStyle=k;b.globalAlpha=own.id===myId?.9:.65;b.fillRect(ox,oy,T,1);b.fillRect(ox,oy+T-1,T,1);b.fillRect(ox,oy,1,T);b.fillRect(ox+T-1,oy,1,T);b.globalAlpha=1}
+   if(myLv<reg[rg].min_level){b.fillStyle='rgba(8,6,18,.62)';b.fillRect(ox,oy,T,T)}
+  });
+  /* confini tra regioni */
+  b.fillStyle='rgba(0,0,0,.35)';for(let x=5;x<W;x+=5)b.fillRect(x*T-1,0,2,cv.height);b.fillRect(0,8*T-1,cv.width,2);
+  b.fillStyle='rgba(255,255,255,.04)';for(let x=1;x<W;x++)b.fillRect(x*T,0,1,cv.height);for(let y=1;y<H;y++)b.fillRect(0,y*T,cv.width,1);
+  const animated=state.plots.filter(p=>[6,7,8].includes(p[1])).map(p=>[p[0]%W*T,Math.floor(p[0]/W)*T,p[1],p[0]*31+7,p[3]<0,myLv<reg[p[1]].min_level]);
+  let t=0,raf=null,lastF=0;
+  function frame(ts){
+   if(!cv.isConnected){raf=null;return}
+   if(ts-lastF<180){raf=requestAnimationFrame(frame);return}lastF=ts;t++;
+   c.drawImage(base,0,0);
+   animated.forEach(([ox,oy,rg,s,free,lk])=>{anim(c,ox,oy,rg,s,t,free);if(lk){c.fillStyle='rgba(8,6,18,.5)';c.fillRect(ox,oy,T,T)}});
+   tavern(c,TV.x*T,TV.y*T,t);
+   const sel=selRef();if(sel!=null){const x=sel%W,y=Math.floor(sel/W),p=.5+.5*Math.sin(t/1.5);c.strokeStyle=`rgba(255,255,255,${.6+.4*p})`;c.lineWidth=1;c.strokeRect(x*T+.5,y*T+.5,T-1,T-1);c.strokeStyle=`rgba(232,184,74,${.5+.5*p})`;c.strokeRect(x*T-.5,y*T-.5,T+1,T+1)}
+   if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&!document.hidden)raf=requestAnimationFrame(frame);else raf=null}
+  return {canvas:cv,redraw(){lastF=0;if(!raf)frame(performance.now()+1000)},cell(ev){const r=cv.getBoundingClientRect(),x=Math.floor((ev.clientX-r.left)/r.width*W),y=Math.floor((ev.clientY-r.top)/r.height*H);if(x<0||y<0||x>=W||y>=H)return null;if(x>=TV.x&&x<TV.x+TV.w&&y>=TV.y&&y<TV.y+TV.h)return 'tavern';return y*W+x}};
+ }
+ return {make};
+})();
+let MAPART=null;
+function mapMount(){const host=document.getElementById('mpCanvas');if(!host||!MAP)return;
+ MAPART=MapArt.make(MAP,ST.me.user_id,ST.me.level,()=>mapSel);host.innerHTML='';host.appendChild(MAPART.canvas);MAPART.redraw();
+ MAPART.canvas.setAttribute('aria-hidden','true');
+ MAPART.canvas.onclick=ev=>{const k=MAPART.cell(ev);if(k==null)return;if(k==='tavern'){mapView='tavern';pending=null;TAV=null;renderMap();loadTavern().then(()=>{tavPoll();if(tab==='map')renderMap()});return}
+  mapSel=k;pending=null;const keep=document.querySelector('.mp-wrap'),sx=keep?keep.scrollLeft:0,sy=keep?keep.scrollTop:0;renderMap();const w=document.querySelector('.mp-wrap');if(w){w.scrollLeft=sx;w.scrollTop=sy}
+  const sp=document.querySelector('.mp-sel');if(sp&&sp.scrollIntoView)try{sp.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}};
+ MAPART.canvas.onmousemove=ev=>{const k=MAPART.cell(ev),tip=document.getElementById('mpTip');if(!tip)return;if(k==null){tip.hidden=true;return}
+  if(k==='tavern'){tip.textContent='🍺 Locanda';}else{const p=plotOf(k);if(!p){tip.hidden=true;return}const r=regOf(p[1]),o=p[3]>=0?MAP.owners[p[3]]:null;tip.textContent=`${r.emoji} ${r.name}${o?` · ${o.n} · ${LANDLV[p[2]][0]}`:' · libero'}`}
+  const rr=MAPART.canvas.parentNode.getBoundingClientRect();tip.style.left=(ev.clientX-rr.left+12)+'px';tip.style.top=(ev.clientY-rr.top+12)+'px';tip.hidden=false};
+ MAPART.canvas.onmouseleave=()=>{const tip=document.getElementById('mpTip');if(tip)tip.hidden=true};
+}
 
 /* ---------- Classifica ---------- */
 async function loadLb(){loadOnline();try{const{data,error}=await sb.from('game_leaderboard_v').select('*').order('rank',{ascending:true}).order('nickname',{ascending:true}).limit(50);if(error)throw new Error(error.message);LB=data||[]}catch(e){LB=[];say(errTxt(e),'bad')}renderLb()}
