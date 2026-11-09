@@ -739,5 +739,12 @@ Le statistiche degli oggetti del mercante seguono ora la stessa curva dei dungeo
 - **Cruscotto dell'eroe**: potenza, PV, duelli, boss; tutte e 5 le statistiche con il bonus totale; bonus speciali (XP, azioni, ricarica); equipaggiamento in riga; tocca l'avatar per la tua scheda completa.
 - File: `black-market-eroi-progressi.sql` (si può rieseguire), `black-market-eroi-progressi-test.sql` (solo su progetto di prova vuoto), `black-market-eroi-progressi-down.sql`; pagina `eroi.html`.
 
+## La guerra degli Eroi: Mappa dei terreni e Locanda (migrazione 041, 9 novembre 2026)
+- **Mappa** (nuova scheda 🗺️): griglia 20 × 16 con 8 regioni a tema e la Locanda al centro, 316 terreni. Le regioni si sbloccano col livello (1, 25, 50, 100, 150, 200, 300, 400): prezzo da 2.000 a 800.000 BC, rendita da 100 a 21.000 BC al giorno.
+- I terreni restano **per sempre** a chi li compra; il prezzo sale del 3% per ogni terreno già posseduto. 5 miglioramenti (Accampamento, Capanna, Casa, Villa, Castello: costi 60/100/160/250/400% del prezzo base, rendita fino a ×6). La rendita si accumula fino a 48 ore e si riscuote con un tocco. Classifica dei proprietari.
+- **Locanda**: chi c'è (ultimi 15 minuti, con gli sprite), riposo una volta al giorno (+25 energia), «offri un giro» (1.000 BC, +10 energia a tutti i presenti, massimo 3 al giorno ricevuti), tavolo dei dadi (posta da 100 a 200 × livello, massimo 50.000; il 5% del piatto esce dal gioco; tavoli scaduti dopo 24 ore con posta restituita).
+- Tutti i BC passano dal registro (`game_land_*`, `game_tavern_round`, `game_dice_*`). Impostazioni `game_map_enabled`, `game_land_*`, `game_tavern_*`, `game_dice_*` in Admin › Impostazioni.
+- File: `black-market-eroi-mappa.sql` (si può rieseguire), `black-market-eroi-mappa-test.sql` (solo su progetto di prova vuoto), `black-market-eroi-mappa-down.sql` (spegne, i dati restano); pagina `eroi.html`.
+
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.

@@ -67,7 +67,8 @@
 .er-sticky .er-bat .bi b{font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.er-sticky .er-bat .bi .bt2{font-weight:400;color:var(--mu)}.er-sticky .er-bat .bi small{font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .er-nav{display:flex!important;gap:0;padding:2px 2px 4px!important;overflow-x:auto;border-bottom:0!important}
 .er-nav button{flex:1 1 0!important;min-width:0;min-height:48px!important;padding:3px 0!important;display:grid;justify-items:center;align-content:center;gap:1px;border-radius:12px;color:var(--mu);box-shadow:none!important}
-.er-nav button .ti{font-size:1.2rem;line-height:1.1;filter:grayscale(.55);opacity:.8;transition:transform .15s}
+.er-nav button{overflow:hidden}.er-nav button .tl{width:100%;text-align:center}
+.er-nav button .ti{font-size:1.15rem;line-height:1.1;filter:grayscale(.55);opacity:.8;transition:transform .15s}
 .er-nav button .tl{font:700 .56rem var(--ui)!important;letter-spacing:-.03em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .er-nav button[aria-selected=true]{background:rgba(var(--ac-rgb),.18);color:var(--ac2);box-shadow:inset 0 0 0 1.5px rgba(var(--ac-rgb),.55)!important}
 .er-nav button[aria-selected=true] .ti{filter:none;opacity:1;transform:scale(1.12)}
@@ -103,6 +104,49 @@
 .sh-nx .btn{flex:none;white-space:nowrap}
 .sh-done{margin:0;color:var(--good);font-weight:700}.sh-lk{margin:0;font-size:.8rem;color:var(--mu)}
 .sh-more{justify-self:start;font-size:.84rem}.sh-all{border-top:1px solid var(--line);padding-top:4px}
+.mp-hd{display:grid;gap:10px;padding:12px}
+.mp-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.mp-kpi div{padding:8px 4px;text-align:center;border:1px solid var(--line);border-radius:12px;background:var(--inp)}
+.mp-kpi small{display:block;font-size:.7rem;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}.mp-kpi b{display:block;font:700 1.05rem var(--disp)}.mp-kpi i{font-style:normal;font-size:.7rem;color:var(--mu)}
+.mp-claim{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1.5px solid rgba(232,184,74,.45);background:rgba(232,184,74,.07)}
+.mp-claim small{display:block;font-size:.74rem;color:var(--mu)}.mp-claim b{font:700 1.2rem var(--disp);color:var(--gold)}
+.mp-seg{margin-top:12px}
+.mp-tools{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0 8px}.mp-chk{display:flex;align-items:center;gap:6px;font-size:.88rem;cursor:pointer}
+.mp-wrap{--cs:calc((min(100vw,980px) - 44px) / 20);overflow:auto;border-radius:14px;border:1.5px solid var(--line);background:#0b0a12;padding:4px;max-height:76vh}
+.mp-wrap.zoom{--cs:36px}
+.mp-grid{display:grid;gap:1px;width:max-content;position:relative}
+.mp-c{position:relative;padding:0;margin:0;border:0;border-radius:3px;cursor:pointer;background:color-mix(in srgb,var(--rg) calc(80% + var(--sh)),#000);display:grid;place-items:center;overflow:hidden;font-size:calc(var(--cs) * .62);line-height:1;min-width:0}
+.mp-c:hover{filter:brightness(1.25)}.mp-c.lk{filter:saturate(.25) brightness(.55)}
+.mp-c.own{box-shadow:inset 0 0 0 2px var(--oc,#fff)}.mp-c.mine{box-shadow:inset 0 0 0 2px var(--gold);background:color-mix(in srgb,var(--rg) 70%,var(--gold))}
+.mp-c.sel{outline:2px solid #fff;outline-offset:1px;z-index:2}.mp-c.dim{opacity:.35}
+.mp-c span{filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+.mp-tav{z-index:1;border:2px solid var(--gold);border-radius:8px;background:radial-gradient(circle,#5a3b17,#2a1a0a);color:#fff;display:grid;place-items:center;align-content:center;cursor:pointer;padding:0;box-shadow:0 0 14px rgba(232,184,74,.5)}
+.mp-tav span{font-size:calc(var(--cs) * 1.1);line-height:1}.mp-tav small{font:700 calc(var(--cs) * .32) var(--ui);color:var(--gold)}
+.mp-rl{pointer-events:none;z-index:1;align-self:start;justify-self:start;font-size:calc(var(--cs) * .7);margin:1px;padding:0 2px;border-radius:4px;background:rgba(0,0,0,.45);line-height:1.2}
+.mp-hint{margin:10px 2px}
+.mp-sel{margin-top:10px;display:grid;gap:10px;border-color:var(--rg);background:linear-gradient(135deg,color-mix(in srgb,var(--rg) 22%,transparent),transparent 70%)}
+.mp-st{display:flex;gap:10px;align-items:center}.mp-st .sp{flex:none;width:60px;height:60px;display:grid;place-items:center;border-radius:12px;background:rgba(0,0,0,.35)}
+.mp-st small{display:block;color:var(--mu);font-size:.78rem}.mp-st>div>b{display:block;font:700 1.1rem var(--disp)}
+.mp-x{margin-left:auto;align-self:flex-start;background:none;border:0;color:var(--mu);font-size:1.5rem;min-width:40px;min-height:40px;cursor:pointer}
+.mp-inc{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.88rem}.mp-inc b{color:var(--gold)}
+.mp-lvs{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}.mp-lvs span{text-align:center;padding:4px 0;border-radius:8px;background:var(--inp);opacity:.35;font-size:1.1rem}.mp-lvs span.on{opacity:1;background:rgba(232,184,74,.15)}
+.mp-regs{display:grid;gap:8px;grid-template-columns:1fr}@media(min-width:720px){.mp-regs{grid-template-columns:1fr 1fr}}
+.mp-reg{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;border:1px solid var(--line);border-left:4px solid var(--rg);background:var(--surf)}.mp-reg.lk{opacity:.6}
+.mp-reg .sp{flex:none;width:48px;height:48px;display:grid;place-items:center}.mp-reg b{display:block;font-size:.95rem}.mp-reg small{display:block;color:var(--mu);font-size:.78rem}
+.tv-sc{position:relative;overflow:hidden;padding:14px;background:linear-gradient(180deg,#3a2410,#1a0f06 70%);border-color:rgba(232,184,74,.45)}
+.tv-sign{display:inline-block;padding:4px 14px;border-radius:8px;background:#5a3b17;border:1.5px solid var(--gold);font:700 1rem var(--disp);color:var(--gold);margin-bottom:10px}
+.tv-room{display:flex;flex-wrap:wrap;gap:6px 10px;justify-content:center;min-height:110px;align-items:flex-end;padding:10px 4px;border-radius:12px;background:repeating-linear-gradient(90deg,#4a2e14 0 34px,#3f2711 34px 36px);box-shadow:inset 0 -18px 0 #2a1a0a}
+.tv-h{display:grid;justify-items:center;gap:1px;animation:tvBob 2.4s ease-in-out infinite;animation-delay:var(--d)}
+.tv-h small{font:700 .72rem var(--ui);max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:rgba(0,0,0,.5);padding:1px 6px;border-radius:99px}.tv-h em{font-style:normal;font-size:.64rem;color:var(--gold)}
+@keyframes tvBob{50%{transform:translateY(-3px)}}@media(prefers-reduced-motion:reduce){.tv-h{animation:none}}
+.tv-cnt{margin:8px 0 0;text-align:center;color:var(--mu);font-size:.85rem}
+.tv-new{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 12px}.tv-new label{display:flex;align-items:center;gap:6px;font-weight:700}.tv-new input{width:7.5rem}.tv-new small{flex-basis:100%}
+.tv-list{display:grid;gap:6px}.tv-t{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:var(--inp)}.tv-t.mine{border-color:rgba(232,184,74,.45)}
+.tv-t .av{width:34px;height:34px;flex:none;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:var(--raise)}.tv-t .av img{width:100%;height:100%;object-fit:cover}
+.tv-t>div{flex:1}.tv-t>div>b{display:block;font-size:.92rem}.tv-t small{color:var(--mu);font-size:.8rem}
+.tv-dice{display:flex;justify-content:center;align-items:center;gap:16px;padding:12px;margin-bottom:10px;border-radius:14px;background:#1b130a;border:1.5px solid var(--line);font-size:2.6rem;line-height:1}
+.tv-dice span{display:grid;justify-items:center}.tv-dice small{font:700 .75rem var(--ui);color:var(--mu);margin-top:4px}.tv-dice b{font:700 1rem var(--disp);color:var(--mu)}
+.tv-dice.win{border-color:var(--good);box-shadow:0 0 18px rgba(74,222,155,.35)}.tv-dice.lose{border-color:var(--bad)}.tv-dice.roll span{animation:tvShake .09s linear infinite}
+@keyframes tvShake{50%{transform:rotate(12deg) translateY(-2px)}}
 .er-dash2{display:grid;gap:12px;min-width:0}
 .er-dash2 .er-pic{cursor:pointer;padding:0}
 .er-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.er-kpi div{padding:8px 4px;text-align:center;border:1px solid var(--line);border-radius:12px;background:var(--inp);min-width:0}
@@ -451,7 +495,7 @@ body.er-fab-on{padding-bottom:88px}
 
  <div id="main" hidden>
  <div class="er-sticky"><div id="bat"></div>
- <div class="tabs er-nav" role="tablist" aria-label="Sezioni della guerra degli Eroi"><button role="tab" data-t="hero" aria-selected="true"><span class="ti" aria-hidden="true">🧙</span><span class="tl">Eroe</span></button><button role="tab" data-t="boss" aria-selected="false"><span class="ti" aria-hidden="true">🐉</span><span class="tl">Boss</span></button><button role="tab" data-t="dng" aria-selected="false"><span class="ti" aria-hidden="true">🏰</span><span class="tl">Dungeon</span></button><button role="tab" data-t="tower" aria-selected="false"><span class="ti" aria-hidden="true">🗼</span><span class="tl">Torre</span></button><button role="tab" data-t="arena" aria-selected="false"><span class="ti" aria-hidden="true">⚔️</span><span class="tl">Arena</span></button><button role="tab" data-t="train" aria-selected="false"><span class="ti" aria-hidden="true">🏋️</span><span class="tl">Allena</span></button><button role="tab" data-t="shop" aria-selected="false"><span class="ti" aria-hidden="true">🛒</span><span class="tl">Mercante</span></button><button role="tab" data-t="pond" aria-selected="false"><span class="ti" aria-hidden="true">🐸</span><span class="tl">Stagno</span></button><button role="tab" data-t="lb" aria-selected="false"><span class="ti" aria-hidden="true">🏆</span><span class="tl">Top</span></button></div></div>
+ <div class="tabs er-nav" role="tablist" aria-label="Sezioni della guerra degli Eroi"><button role="tab" data-t="hero" aria-selected="true"><span class="ti" aria-hidden="true">🧙</span><span class="tl">Eroe</span></button><button role="tab" data-t="boss" aria-selected="false"><span class="ti" aria-hidden="true">🐉</span><span class="tl">Boss</span></button><button role="tab" data-t="dng" aria-selected="false"><span class="ti" aria-hidden="true">🏰</span><span class="tl">Dungeon</span></button><button role="tab" data-t="tower" aria-selected="false"><span class="ti" aria-hidden="true">🗼</span><span class="tl">Torre</span></button><button role="tab" data-t="arena" aria-selected="false"><span class="ti" aria-hidden="true">⚔️</span><span class="tl">Arena</span></button><button role="tab" data-t="train" aria-selected="false"><span class="ti" aria-hidden="true">🏋️</span><span class="tl">Allena</span></button><button role="tab" data-t="shop" aria-selected="false"><span class="ti" aria-hidden="true">🛒</span><span class="tl">Mercato</span></button><button role="tab" data-t="pond" aria-selected="false"><span class="ti" aria-hidden="true">🐸</span><span class="tl">Stagno</span></button><button role="tab" data-t="map" aria-selected="false"><span class="ti" aria-hidden="true">🗺️</span><span class="tl">Mappa</span></button><button role="tab" data-t="lb" aria-selected="false"><span class="ti" aria-hidden="true">🏆</span><span class="tl">Top</span></button></div></div>
  <div id="msg" role="status" aria-live="polite"></div>
  <section class="tp" id="p-hero"></section>
  <section class="tp" id="p-boss" hidden></section>
@@ -461,6 +505,7 @@ body.er-fab-on{padding-bottom:88px}
  <section class="tp" id="p-train" hidden></section>
  <section class="tp" id="p-shop" hidden></section>
  <section class="tp" id="p-pond" hidden></section>
+ <section class="tp" id="p-map" hidden></section>
  <section class="tp" id="p-lb" hidden></section>
  </div>
 </main>
@@ -1335,6 +1380,94 @@ function skillAct(sk,cur){
 function skillRow(sk,cur){const act=skillAct(sk,cur);
  return `<div class="er-sk ${sk.active_until?'act':''}"><div style="min-width:0"><div class="nmk">${esc(sk.name)} <small class="mute">· grado ${sk.tier}</small></div>${bonusTags(sk)}${sk.active_until?`<small class="mute">Attivo ancora <b data-ut="${esc(sk.active_until)}">${lf(new Date(sk.active_until).getTime()-Date.now())}</b></small>`:''}</div><div>${act}</div></div>`}
 
+/* ---------- Mappa dei terreni e Locanda (migrazione 041) ---------- */
+let MAP=null,TAV=null,mapSel=null,mapZoom=false,mapView='map',mapMine=false,mapAvail=null,tavTimer=null,diceAnim=null;
+const LANDLV=[['Terreno','🚩'],['Accampamento','⛺'],['Capanna','🛖'],['Casa','🏠'],['Villa','🏡'],['Castello','🏰']];
+const DICE=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+function hue(id){let h=0;for(const c of String(id))h=(h*31+c.charCodeAt(0))>>>0;return h%360}
+function mapTab(){const b=document.querySelector('.tabs [data-t="map"]');if(b)b.hidden=mapAvail===false}
+async function loadMap(quiet){
+ try{MAP=await rpc('game_map_state');mapAvail=!!(MAP&&MAP.enabled)}catch(e){if(twMissing(e)){mapAvail=false;mapTab();return}if(!quiet)say(errTxt(e),'bad');return}
+ mapTab();if(mapView==='tavern')await loadTavern(true);if(tab==='map'&&!document.querySelector('.er-ov'))renderMap()}
+async function loadTavern(quiet){try{TAV=await rpc('game_tavern_state')}catch(e){if(!quiet)say(errTxt(e),'bad')}}
+function tavPoll(){clearInterval(tavTimer);tavTimer=setInterval(async()=>{if(tab!=='map'||mapView!=='tavern'||busy||document.hidden)return;await loadTavern(true);if(!document.querySelector('.er-ov')&&!diceAnim)renderMap()},20000)}
+async function balance(){const w=await sb.from('wallets').select('balance').eq('user_id',ME.user_id).maybeSingle();return w.data?w.data.balance:null}
+function plotOf(id){return MAP.plots.find(p=>p[0]===id)}
+function regOf(no){return MAP.regions.find(r=>r.no===no)}
+function plotPrice(r){return Math.ceil(r.price*MAP.me.price_mult)}
+function renderMap(){
+ const el=$('p-map');if(!MAP){el.innerHTML='<p class="mute">Caricamento della mappa…</p>';return}
+ if(!MAP.enabled){el.innerHTML='<p class="mute">La Mappa è chiusa in questo momento.</p>';return}
+ const M=MAP.me,lv=ST.me.level;
+ const head=`<div class="card mp-hd"><div class="mp-kpi"><div><small>I tuoi terreni</small><b>${num(M.plots)}</b></div><div><small>Rendita</small><b>${num(M.daily)}<i> BC/giorno</i></b></div><div><small>Classifica</small><b>${MAP.my_rank?num(MAP.my_rank)+'°':'—'}</b></div></div>
+  <div class="mp-claim"><div><small>Da riscuotere (si accumula fino a ${num(M.cap_hours)} ore)</small><b>${num(M.pending)} BC</b></div><button class="btn ${M.pending>0?'gold':'ghost'}" data-mcol ${M.pending>0?'':'disabled'}>Riscuoti</button></div></div>
+  <div class="sh-seg mp-seg" role="tablist" aria-label="Sezioni della mappa">${[['map','🗺️','Mappa'],['tavern','🍺','Locanda',MAP.present],['top','🏆','Proprietari']].map(s=>`<button type="button" role="tab" data-mv="${s[0]}" aria-selected="${s[0]===mapView}"><span aria-hidden="true">${s[1]}</span>${s[2]}${s[3]?`<em>${s[3]} presenti</em>`:''}</button>`).join('')}</div>`;
+ let body='';
+ if(mapView==='map')body=mapHtml(lv);else if(mapView==='tavern')body=tavHtml();else body=topHtml();
+ el.innerHTML=head+body;fitMap()}
+function fitMap(){const w=document.querySelector('.mp-wrap');if(!w)return;if(mapZoom){w.style.removeProperty('--cs');return}w.style.setProperty('--cs',Math.max(12,Math.floor((w.clientWidth-8-19)/20*10)/10)+'px')}
+addEventListener('resize',()=>{if(tab==='map')fitMap()});
+function mapHtml(lv){
+ const W=MAP.w,H=MAP.h,T=MAP.tavern,me=ST.me.user_id;
+ const cells=MAP.plots.map(p=>{const [id,rg,l,oi]=p,x=id%W,y=Math.floor(id/W),r=regOf(rg),own=oi>=0?MAP.owners[oi]:null,mine=own&&own.id===me,lock=lv<r.min_level;
+  const shade=((x*7+y*13)%5-2)*3;
+  return `<button type="button" class="mp-c${own?' own':''}${mine?' mine':''}${lock?' lk':''}${mapSel===id?' sel':''}${mapMine&&!mine?' dim':''}" style="grid-column:${x+1};grid-row:${y+1};--rg:${r.color};--sh:${shade}%;${own&&!mine?`--oc:hsl(${hue(own.id)} 70% 60%)`:''}" data-plot="${id}" aria-label="${esc(r.name)} ${x+1},${y+1}: ${own?`di ${esc(own.n)}, ${LANDLV[l][0]}`:'libero'}">${own?`<span>${LANDLV[l][1]}</span>`:''}</button>`}).join('');
+ const tav=`<button type="button" class="mp-tav" style="grid-column:${T.x+1}/span ${T.w};grid-row:${T.y+1}/span ${T.h}" data-mv="tavern" aria-label="Entra nella Locanda"><span>🍺</span><small>Locanda</small></button>`;
+ const labels=MAP.regions.map(r=>{const bx=((r.no-1)%4)*5,by=Math.floor((r.no-1)/4)*8;return `<span class="mp-rl${lv<r.min_level?' lk':''}" style="grid-column:${bx+1}/span 5;grid-row:${by+1}" aria-hidden="true">${r.emoji}${lv<r.min_level?' 🔒':''}</span>`}).join('');
+ const sel=mapSel!=null?plotPanel(mapSel,lv):'<p class="mute mp-hint">Tocca una casella per vederla e comprarla. I terreni restano tuoi per sempre.</p>';
+ return `<div class="mp-tools"><label class="mp-chk"><input type="checkbox" data-mmine ${mapMine?'checked':''}> Evidenzia i miei</label><button type="button" class="btn ghost sm" data-mzoom>${mapZoom?'🔍 Riduci':'🔍 Ingrandisci'}</button></div>
+  <div class="mp-wrap${mapZoom?' zoom':''}"><div class="mp-grid" style="grid-template-columns:repeat(${W},var(--cs));grid-template-rows:repeat(${H},var(--cs))">${cells}${labels}${tav}</div></div>
+  ${sel}
+  <h3 class="rd-h">Le regioni</h3><div class="mp-regs">${MAP.regions.map(r=>{const lk=lv<r.min_level;return `<div class="mp-reg${lk?' lk':''}" style="--rg:${r.color}"><span class="sp" aria-hidden="true">${ART?ART.sprite(r.sprite,{tier:r.tint,size:44,alt:''}):r.emoji}</span><div style="min-width:0"><b>${r.emoji} ${esc(r.name)}</b><small>${lk?`🔒 dal livello ${num(r.min_level)}`:`Livello ${num(r.min_level)}+`} · ${num(r.owned)}/${num(r.total)} occupati</small><small>Da ${num(plotPrice(r))} BC · rendita ${num(r.income)} BC/giorno</small></div></div>`}).join('')}</div>`}
+function plotPanel(id,lv){
+ const p=plotOf(id);if(!p)return '';const [_,rg,l,oi]=p,W=MAP.w,x=id%W,y=Math.floor(id/W),r=regOf(rg),own=oi>=0?MAP.owners[oi]:null,mine=own&&own.id===ST.me.user_id;
+ const inc=k=>Math.round(r.income*MAP.mults[k]),price=plotPrice(r),up=l<5?Math.ceil(r.price*MAP.upcost[l]):0,armed=pending==='land'+id;
+ let act='';
+ if(!own){if(lv<r.min_level)act=`<span class="er-lock">Serve il livello ${num(r.min_level)}</span>`;
+  else act=`<button class="btn ${armed?'gold':''}" data-mbuy="${id}" ${BAL!=null&&BAL<price?'disabled':''}>${BAL!=null&&BAL<price?'BC insufficienti':armed?`Conferma: ${num(price)} BC`:`Compra · ${num(price)} BC`}</button>`}
+ else if(mine){act=l>=5?'<span class="chip s">Castello: livello massimo</span>':`<button class="btn ${armed?'gold':''}" data-mup="${id}" ${BAL!=null&&BAL<up?'disabled':''}>${BAL!=null&&BAL<up?'BC insufficienti':armed?`Conferma: ${num(up)} BC`:`${LANDLV[l+1][1]} Costruisci ${LANDLV[l+1][0]} · ${num(up)} BC`}</button>`}
+ return `<div class="card mp-sel" style="--rg:${r.color}"><div class="mp-st"><span class="sp" aria-hidden="true">${ART?ART.sprite(r.sprite,{tier:r.tint,size:56,alt:''}):r.emoji}</span><div style="min-width:0"><small>${r.emoji} ${esc(r.name)} · casella ${x+1},${y+1}</small><b>${own?`${LANDLV[l][1]} ${LANDLV[l][0]}`:'Terreno libero'}</b>
+  <small>${own?`Proprietario: <b style="color:${mine?'var(--gold)':`hsl(${hue(own.id)} 70% 65%)`}">${esc(own.n)}${mine?' (tu)':''}</b>`:esc(r.lore)}</small></div><button type="button" class="mp-x" data-mclose aria-label="Chiudi">×</button></div>
+  <div class="mp-inc"><span>Rendita: <b>${num(inc(own?l:0))} BC/giorno</b></span>${mine&&l<5?`<span>dopo: <b style="color:var(--good)">${num(inc(l+1))} BC/giorno</b></span>`:''}${!own&&MAP.me.plots>0?`<span class="mute">prezzo +${num(Math.round((MAP.me.price_mult-1)*100))}% per i ${num(MAP.me.plots)} terreni che hai</span>`:''}</div>
+  ${mine?`<div class="mp-lvs" aria-label="Livello del terreno">${LANDLV.map((L,k)=>`<span class="${k<=l?'on':''}" title="${L[0]}">${L[1]}</span>`).join('')}</div>`:''}
+  <div class="row">${act}</div></div>`}
+function tavHtml(){
+ if(!TAV)return '<p class="mute">Entri nella Locanda…</p>';
+ const T=TAV,D=T.dice,me=ST.me.user_id,pr=T.present||[];
+ const heroes=pr.slice(0,8).map((h,i)=>`<div class="tv-h" style="--d:${i*0.35}s"><span class="tv-s">${ART?ART.sprite('eroe',{size:58,alt:''}):'🧙'}</span><small>${esc(h.nickname)}</small><em>Liv. ${num(h.level)}</em></div>`).join('');
+ const roundWait=T.round_next?Math.max(0,new Date(T.round_next).getTime()-Date.now()):0;
+ const open=(D.open||[]),mineOpen=open.filter(g=>g.mine).length,poor=s=>BAL!=null&&BAL<s,leftToday=Math.max(0,D.daily-D.played_today);
+ return `<div class="card tv-sc" ${ART?`style="${ART.zoneVars(ART.zone(150))}"`:''}><div class="tv-sign">🍺 La Locanda del Tempio</div>
+  <div class="tv-room">${heroes||'<p class="mute">Non c’è nessuno… sei il primo!</p>'}</div>
+  <p class="tv-cnt">${pr.length===1?'Ci sei solo tu':`${num(pr.length)} eroi in locanda`} · negli ultimi 15 minuti</p></div>
+ <div class="sh-grid" style="margin-top:12px">
+  <div class="sh-card"><div class="sh-ct"><span class="sh-ic" aria-hidden="true">🛏️</span><div><b>Riposo</b><small>Una volta al giorno: +${num(T.rest_energy)} energia</small></div></div>
+   <button class="btn ${T.rested?'ghost':''}" data-trest ${T.rested?'disabled':''}>${T.rested?'Hai già riposato oggi':`Riposa · +${num(T.rest_energy)} ⚡`}</button></div>
+  <div class="sh-card"><div class="sh-ct"><span class="sh-ic" aria-hidden="true">🍻</span><div><b>Offri un giro</b><small>+${num(T.round_energy)} energia a tutti i presenti (te compreso), massimo 3 giri ricevuti al giorno · ne hai ricevuti ${num(T.rounds_got)}</small></div></div>
+   <button class="btn ${pending==='round'?'gold':''}" data-tround ${roundWait>0||poor(T.round_cost)?'disabled':''}>${roundWait>0?`Di nuovo tra ${fmtDur(roundWait/1000)}`:poor(T.round_cost)?'BC insufficienti':pending==='round'?`Conferma: ${num(T.round_cost)} BC`:`Offri a ${num(pr.length)} · ${num(T.round_cost)} BC`}</button></div>
+ </div>
+ <div class="card" style="margin-top:12px"><h3 class="rd-h" style="margin-top:0">🎲 Tavolo dei dadi <small>2 dadi a testa, vince il più alto · la casa trattiene il ${num(D.cut)}% · oggi ti restano ${num(leftToday)} partite</small></h3>
+  <div id="diceStage">${diceAnim?diceAnim:''}</div>
+  <form class="tv-new" id="diceForm"><label>Posta <input type="number" id="diceStake" min="${D.min}" max="${D.max}" step="100" value="${Math.min(D.max,Math.max(D.min,1000))}" inputmode="numeric"></label><button class="btn" ${mineOpen>=3?'disabled':''}>${mineOpen>=3?'Hai 3 tavoli aperti':'Apri un tavolo'}</button><small class="mute">da ${num(D.min)} a ${num(D.max)} BC (200 × il tuo livello)</small></form>
+  ${open.length?`<div class="tv-list">${open.map(g=>`<div class="tv-t${g.mine?' mine':''}"><span class="av">${face(g.creator_id,g.nickname)}</span><div style="min-width:0"><b>${esc(g.nickname)}${g.mine?' (tu)':''}</b><small>posta <b style="color:var(--gold)">${num(g.stake)} BC</b> · piatto ${num(Math.floor(g.stake*2*(100-D.cut)/100))} BC</small></div>${g.mine?`<button class="btn ghost sm" data-dcan="${g.id}">Chiudi</button>`:`<button class="btn sm ${pending==='dice'+g.id?'gold':''}" data-djoin="${g.id}" ${poor(g.stake)||leftToday<=0?'disabled':''}>${leftToday<=0?'Basta per oggi':poor(g.stake)?'BC insufficienti':pending==='dice'+g.id?`Conferma: ${num(g.stake)} BC`:'Gioca'}</button>`}</div>`).join('')}</div>`:'<p class="mute">Nessun tavolo aperto: aprine uno e aspetta uno sfidante.</p>'}
+  ${(D.recent||[]).length?`<h3 class="rd-h">Ultime partite</h3><ul class="er-log">${D.recent.map(g=>`<li><b>${esc(g.a)}</b> ${DICE[g.ra[0]]}${DICE[g.ra[1]]} contro <b>${esc(g.b)}</b> ${DICE[g.rb[0]]}${DICE[g.rb[1]]} · ${g.winner?`vince <b>${esc(g.winner)}</b> (${num(g.stake)} BC)`:'pareggio'}</li>`).join('')}</ul>`:''}
+ </div>
+ ${(T.log||[]).length?`<div class="card" style="margin-top:12px"><h3 class="rd-h" style="margin-top:0">Si dice in locanda</h3><ul class="er-log">${T.log.map(l=>`<li><b>${esc(l.nickname||'Qualcuno')}</b> ${esc(l.text)}<small class="mute"> · ${new Date(l.at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}</small></li>`).join('')}</ul></div>`:''}`}
+function topHtml(){
+ const top=MAP.top||[],me=ST.me.user_id;
+ return `<div class="card"><h3 class="rd-h" style="margin-top:0">Chi possiede più terreni</h3>${top.length?top.map((x,i)=>`<div class="rd-row ${x.user_id===me?'me':''}"><span class="n">${i+1}</span><span class="av">${face(x.user_id,x.nickname)}</span><span class="g"><b>${esc(x.nickname)}</b><span class="mute" style="font-size:.78rem">${num(x.levels)} miglioramenti · ${num(x.daily)} BC/giorno</span></span><span class="v">${num(x.plots)} 🚩</span></div>`).join(''):'<p class="mute">Nessuno ha ancora comprato un terreno: il primo pezzo di mappa può essere tuo.</p>'}
+  ${MAP.my_rank>10?`<p class="mute" style="margin:10px 0 0">Tu sei ${num(MAP.my_rank)}° con ${num(MAP.me.plots)} terreni.</p>`:''}
+  <p class="er-note" style="margin-top:10px">A parità di terreni conta chi ha più miglioramenti, poi chi ha più rendita.</p></div>`}
+async function mapAct(btn,fn){await run(btn,async()=>{const r=await fn();await Promise.all([loadMap(true),(async()=>{BAL=await balance().catch(()=>BAL)})()]);paintTop();renderMap();return r})}
+async function diceJoin(btn,id){
+ await run(btn,async()=>{const r=await rpc('game_dice_join',{p_id:Number(id)});
+  const st=$('diceStage');const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(st&&!reduce){for(let i=0;i<8;i++){st.innerHTML=`<div class="tv-dice roll"><span>${DICE[1+Math.floor(Math.random()*6)]}${DICE[1+Math.floor(Math.random()*6)]}</span><b>vs</b><span>${DICE[1+Math.floor(Math.random()*6)]}${DICE[1+Math.floor(Math.random()*6)]}</span></div>`;await new Promise(z=>setTimeout(z,90))}}
+  diceAnim=`<div class="tv-dice ${r.draw?'':r.won?'win':'lose'}"><span title="${esc(r.opponent)}">${DICE[r.a[0]]}${DICE[r.a[1]]}<small>${esc(r.opponent)} · ${r.sum_a}</small></span><b>vs</b><span>${DICE[r.b[0]]}${DICE[r.b[1]]}<small>tu · ${r.sum_b}</small></span></div>`;
+  setTimeout(()=>{diceAnim=null},12000);
+  await loadTavern(true);BAL=await balance().catch(()=>BAL);paintTop();renderMap();
+  say(r.draw?'Pareggio: le poste tornano indietro.':r.won?`Hai vinto! +${num(r.pot)} BC.`:`Hai perso ${num(r.stake)} BC. Ritenta!`,r.won||r.draw?'good':'bad')})}
+
 /* ---------- Classifica ---------- */
 async function loadLb(){loadOnline();try{const{data,error}=await sb.from('game_leaderboard_v').select('*').order('rank',{ascending:true}).order('nickname',{ascending:true}).limit(50);if(error)throw new Error(error.message);LB=data||[]}catch(e){LB=[];say(errTxt(e),'bad')}renderLb()}
 function renderLb(){
@@ -1406,15 +1539,15 @@ async function sendChat(){if(CH.sending)return;const inp=$('chIn'),btn=$('chSend
 /* ---------- navigazione e caricamento ---------- */
 function paint(){
  paintTop();paintBat();
- if(tab==='hero')renderHero();else if(tab==='boss'){if(RAID&&RAID.enabled)renderRaid();else renderBoss()}else if(tab==='dng')renderDng();else if(tab==='tower')renderTower();else if(tab==='arena')renderArena();else if(tab==='train')renderTrain();else if(tab==='shop')renderShop();else if(tab==='pond')renderPond();else renderLb();
+ if(tab==='hero')renderHero();else if(tab==='boss'){if(RAID&&RAID.enabled)renderRaid();else renderBoss()}else if(tab==='map')renderMap();else if(tab==='dng')renderDng();else if(tab==='tower')renderTower();else if(tab==='arena')renderArena();else if(tab==='train')renderTrain();else if(tab==='shop')renderShop();else if(tab==='pond')renderPond();else renderLb();
 }
 function setTab(t,push){
  tab=t;document.querySelectorAll('.tabs [data-t]').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));const cb=document.querySelector('.tabs [data-t="'+t+'"]');if(cb&&cb.scrollIntoView)try{cb.scrollIntoView({inline:'nearest',block:'nearest'})}catch(_){}
- ['hero','boss','dng','tower','arena','train','shop','pond','lb'].forEach(x=>$('p-'+x).hidden=x!==t);
+ ['hero','boss','dng','tower','arena','train','shop','pond','map','lb'].forEach(x=>$('p-'+x).hidden=x!==t);
  if(push!==false)history.replaceState(null,'','#'+t);
  clearSay();pending=null;
  if(!ST)return;paint();
- if(t==='arena')loadArena();if(t==='lb')loadLb();if(t==='dng')loadDng(true);if(t==='tower')loadTower(true).catch(e=>say(errTxt(e),'bad'));if(t==='pond')loadPond().catch(e=>say(errTxt(e),'bad'));if(t==='train')loadTrain().catch(e=>say(errTxt(e),'bad'))}
+ if(t==='arena')loadArena();if(t==='lb')loadLb();if(t==='dng')loadDng(true);if(t==='tower')loadTower(true).catch(e=>say(errTxt(e),'bad'));if(t==='pond')loadPond().catch(e=>say(errTxt(e),'bad'));if(t==='train')loadTrain().catch(e=>say(errTxt(e),'bad'));if(t==='map'){loadMap();tavPoll()}}
 async function load(keepDraft){
  ST=await rpc('game_state');ME=ST.me;last=Date.now();
  try{RAID=await rpc('game_raid_state')}catch(_){RAID=null}
@@ -1439,7 +1572,7 @@ async function boot(){
   await load(false);
   beat();
   loadTower().catch(()=>{});loadPond().catch(()=>{});loadTrain().catch(()=>{});
-  if(first){const h=(location.hash||'').slice(1);setTab(['hero','boss','dng','tower','arena','train','shop','pond','lb'].includes(h)?h:(ME.stats_set?'boss':'hero'),false)}
+  if(first){const h=(location.hash||'').slice(1);setTab(['hero','boss','dng','tower','arena','train','shop','pond','map','lb'].includes(h)?h:(ME.stats_set?'boss':'hero'),false)}
  }catch(e){
   if(/Modulo non attivo/i.test(String(e.message)))gateOff();
   else gate(`<section class="card er-gate" style="margin-top:20px"><h2>Errore di collegamento</h2><p class="mute">${errTxt(e)}</p><button class="btn ghost" id="retry">Riprova</button></section>`)}}
@@ -1448,6 +1581,21 @@ async function boot(){
 document.querySelector('.tabs').onclick=e=>{const b=e.target.closest('[data-t]');if(b)setTab(b.dataset.t)};
 document.addEventListener('click',e=>{
  const t=e.target.closest('button,[data-hero]');if(!t)return;
+ if(t.dataset.plot){mapSel=Number(t.dataset.plot);pending=null;renderMap();const sp=document.querySelector('.mp-sel');if(sp&&sp.scrollIntoView)try{sp.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}return}
+ if(t.dataset.mclose!==undefined){mapSel=null;renderMap();return}
+ if(t.dataset.mv){mapView=t.dataset.mv;pending=null;if(mapView==='tavern'){TAV=null;renderMap();loadTavern().then(()=>{tavPoll();if(tab==='map')renderMap()});return}renderMap();return}
+ if(t.dataset.mzoom!==undefined){mapZoom=!mapZoom;renderMap();return}
+ if(t.dataset.mcol!==undefined){mapAct(t,async()=>{const r=await rpc('game_land_collect');say(r.collected>0?`Hai riscosso ${num(r.collected)} BC di rendita.`:'Niente da riscuotere per ora.','good')});return}
+ if(t.dataset.mbuy){const id=t.dataset.mbuy;if(pending!=='land'+id){pending='land'+id;renderMap();setTimeout(()=>{if(pending==='land'+id){pending=null;if(tab==='map')renderMap()}},5000);return}
+  pending=null;mapAct(t,async()=>{const r=await rpc('game_land_buy',{p_plot:Number(id)});say(`Terreno comprato per ${num(r.price)} BC! Ora ne hai ${num(r.plots)}.${r.collected>0?` Riscossi anche ${num(r.collected)} BC di rendita.`:''}`,'good')});return}
+ if(t.dataset.mup){const id=t.dataset.mup;if(pending!=='land'+id){pending='land'+id;renderMap();setTimeout(()=>{if(pending==='land'+id){pending=null;if(tab==='map')renderMap()}},5000);return}
+  pending=null;mapAct(t,async()=>{const r=await rpc('game_land_upgrade',{p_plot:Number(id)});say(`${LANDLV[r.level][1]} ${LANDLV[r.level][0]} costruito per ${num(r.cost)} BC.`,'good')});return}
+ if(t.dataset.trest!==undefined){run(t,async()=>{const r=await rpc('game_tavern_rest');await load(true);await loadTavern(true);renderMap();say(`Ti sei riposato: +${num(r.energy)} energia.`,'good')});return}
+ if(t.dataset.tround!==undefined){if(pending!=='round'){pending='round';renderMap();setTimeout(()=>{if(pending==='round'){pending=null;if(tab==='map')renderMap()}},5000);return}
+  pending=null;run(t,async()=>{const r=await rpc('game_tavern_round');BAL=await balance().catch(()=>BAL);await load(true);await loadTavern(true);renderMap();say(`Giro offerto: +${num(r.energy)} energia a ${num(r.recipients)} ${r.recipients===1?'eroe':'eroi'}.`,'good')});return}
+ if(t.dataset.dcan){run(t,async()=>{await rpc('game_dice_cancel',{p_id:Number(t.dataset.dcan)});BAL=await balance().catch(()=>BAL);await loadTavern(true);paintTop();renderMap();say('Tavolo chiuso: la posta ti è tornata.','good')});return}
+ if(t.dataset.djoin){const id=t.dataset.djoin;if(pending!=='dice'+id){pending='dice'+id;renderMap();setTimeout(()=>{if(pending==='dice'+id){pending=null;if(tab==='map')renderMap()}},5000);return}
+  pending=null;diceJoin(t,id);return}
  if(t.dataset.invs){invSlot=t.dataset.invs;invAll=false;invMore=false;renderHero();return}
  if(t.dataset.invall!==undefined){invAll=!invAll;invMore=false;renderHero();return}
  if(t.dataset.invmore!==undefined){invMore=true;renderHero();return}
@@ -1533,6 +1681,7 @@ document.addEventListener('click',e=>{
 document.addEventListener('input',e=>{if(e.target.id==='avQ')avQ=e.target.value});
 document.addEventListener('keydown',e=>{if(e.target.id==='avQ'&&e.key==='Enter'){e.preventDefault();avQ=e.target.value;searchCards()}});
 document.addEventListener('change',e=>{
+ if(e.target.dataset&&e.target.dataset.mmine!==undefined){mapMine=e.target.checked;renderMap();return}
  if(e.target.id==='healTo'){heal=e.target.value;return}
  if(e.target.dataset&&e.target.dataset.pin&&draft){const k=e.target.dataset.pin,used=STATS.reduce((s,x)=>s+draft[x[0]],0),v=Math.max(0,parseInt(e.target.value,10)||0);
   draft[k]=Math.min(v,draft[k]+Math.min(capNow()-draft[k],ST.me.points-used));renderHero();const f=document.querySelector(`#p-hero [data-pin="${k}"]`);if(f)f.focus();return}
@@ -1553,6 +1702,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&CHOPEN&&!document.q
 if(window.visualViewport){visualViewport.addEventListener('resize',fitPanel);visualViewport.addEventListener('scroll',fitPanel)}
 addEventListener('resize',fitPanel);
 document.addEventListener('submit',e=>{if(e.target&&e.target.id==='chForm'){e.preventDefault();sendChat()}});
+document.addEventListener('submit',e=>{if(e.target&&e.target.id==='diceForm'){e.preventDefault();const b=e.target.querySelector('button'),v=parseInt($('diceStake').value,10);
+ run(b,async()=>{const r=await rpc('game_dice_open',{p_stake:v});BAL=await balance().catch(()=>BAL);await loadTavern(true);paintTop();renderMap();say(`Tavolo aperto con ${num(r.stake)} BC: aspetta uno sfidante.`,'good')})}});
 setInterval(()=>{if(ST&&!document.hidden)beat()},40000);                                                      // «ci sono»: chi ha la pagina aperta risulta online
 setInterval(()=>{if(ST&&!document.hidden&&CHOPEN){CH.n++;loadChat(CH.n%8===0)}},4000);                  // nuovi messaggi (ogni 8 giri ricarica tutto, così spariscono i messaggi nascosti)
 setInterval(()=>{if(ST&&!document.hidden&&(CHOPEN||tab==='lb'))loadOnline()},20000);
