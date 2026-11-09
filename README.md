@@ -745,6 +745,17 @@ Le statistiche degli oggetti del mercante seguono ora la stessa curva dei dungeo
 - **Locanda**: chi c'è (ultimi 15 minuti, con gli sprite), riposo una volta al giorno (+25 energia), «offri un giro» (1.000 BC, +10 energia a tutti i presenti, massimo 3 al giorno ricevuti), tavolo dei dadi (posta da 100 a 200 × livello, massimo 50.000; il 5% del piatto esce dal gioco; tavoli scaduti dopo 24 ore con posta restituita).
 - Tutti i BC passano dal registro (`game_land_*`, `game_tavern_round`, `game_dice_*`). Impostazioni `game_map_enabled`, `game_land_*`, `game_tavern_*`, `game_dice_*` in Admin › Impostazioni.
 - File: `black-market-eroi-mappa.sql` (si può rieseguire), `black-market-eroi-mappa-test.sql` (solo su progetto di prova vuoto), `black-market-eroi-mappa-down.sql` (spegne, i dati restano); pagina `eroi.html`.
+- **Mappa illustrata** (10 novembre 2026): la griglia è diventata un'isola fantasy disegnata (coste, fiume, strade verso la Locanda, montagne, vulcano); i 316 terreni sono lotti sparsi nel paesaggio con l'edificio del loro livello; si esplora trascinando, con scorciatoie per regione. Solo `eroi.html`, nessuna migrazione.
+
+## La guerra degli Eroi: Villaggi, sindaci e invasioni (migrazione 042, 10 novembre 2026)
+- **Villaggio** (nuova sezione 🏘️ della Mappa): ogni eroe ne fonda uno su un suo terreno (10.000 BC) e ne è il sindaco; compare sulla mappa con case, torre e nome. 48 ore di tregua dopo la fondazione.
+- **Risorse**: legno, pietra e cibo da Segheria, Cava e Fattoria; il Magazzino fissa la capienza (il 20% è nascosto ai saccheggi). Il cibo mantiene i soldati (1 a fante/arciere, 2 a cavaliere all'ora); senza cibo l'esercito combatte a metà forza. Il Municipio fa maturare BC nella **cassa** del villaggio (fino a 48 ore), da riscuotere.
+- **7 edifici** fino al livello 10 (nessuno oltre il Municipio), pagati in legno e pietra (Municipio, Caserma e Mura anche in BC).
+- **Soldati** in BC + cibo: fanti, arcieri (Caserma 3), cavalieri (Caserma 5, il doppio più veloci). Sasso-carta-forbice: fanti > cavalieri > arcieri > fanti. La Caserma limita l'esercito (25 … 1.375).
+- **Guarnigione**: il sindaco sceglie chi resta a difendere (più una milizia di 5 fanti per livello di Municipio; Mura +10% a livello); solo gli altri possono partire.
+- **Invasioni**: l'esercito marcia (tempo secondo la distanza), il difensore viene avvisato subito; all'arrivo la battaglia si risolve da sola. Chi vince saccheggia risorse e fino al 25% della cassa (mai il portafoglio) nei limiti del trasporto; il bottino arriva al ritorno. Il villaggio sconfitto ha 8 ore di tregua. Massimo 5 attacchi al giorno; non si attaccano Municipi più bassi di 3 livelli. Rapporti di battaglia per entrambi.
+- Tutti i BC passano dal registro (`game_village_found`, `game_village_build`, `game_village_train`, `game_village_collect`). Impostazioni `game_village_*` in Admin › Impostazioni (interruttore `game_village_enabled`).
+- File: `black-market-eroi-villaggi.sql` (si può rieseguire), `black-market-eroi-villaggi-test.sql` (solo su progetto di prova vuoto), `black-market-eroi-villaggi-down.sql` (spegne, i dati restano); pagina `eroi.html`.
 
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.

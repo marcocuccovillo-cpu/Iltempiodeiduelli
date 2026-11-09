@@ -109,7 +109,43 @@
 .mp-kpi small{display:block;font-size:.7rem;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}.mp-kpi b{display:block;font:700 1.05rem var(--disp)}.mp-kpi i{font-style:normal;font-size:.7rem;color:var(--mu)}
 .mp-claim{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1.5px solid rgba(232,184,74,.45);background:rgba(232,184,74,.07)}
 .mp-claim small{display:block;font-size:.74rem;color:var(--mu)}.mp-claim b{font:700 1.2rem var(--disp);color:var(--gold)}
-.mp-seg{margin-top:12px}
+.mp-seg{margin-top:12px}.mp-seg.four{grid-template-columns:repeat(4,1fr)}.mp-seg em{font-style:normal}
+.vl-hd{padding:0;overflow:hidden;display:grid;gap:10px}.vl-hd>*:not(.vl-scene){margin:0 12px}.vl-hd>*:last-child{margin-bottom:12px}
+.vl-scene{position:relative;border-bottom:2px solid #6b4a22}.vl-scene canvas{display:block;width:100%;height:auto}
+.vl-name{position:absolute;right:10px;top:8px;text-align:right;padding:4px 12px 6px;border-radius:12px;background:rgba(20,12,4,.78);border:1px solid rgba(232,184,74,.55);display:grid;line-height:1.15}
+.vl-name small{font:600 .68rem var(--ui);color:#d9cba6;text-transform:uppercase;letter-spacing:.06em}.vl-name b{font-family:Cinzel,Georgia,serif;font-size:1.15rem;color:#ffe7a8}
+.vl-alarm{padding:10px 12px;border-radius:12px;background:rgba(192,57,43,.18);border:1.5px solid #e0533f;font-size:.9rem;animation:vlPulse 1.6s ease-in-out infinite}
+@keyframes vlPulse{50%{box-shadow:0 0 0 4px rgba(224,83,63,.18)}}@media(prefers-reduced-motion:reduce){.vl-alarm{animation:none}}
+.vl-res{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.vl-r{display:flex;gap:6px;align-items:flex-start;padding:8px;border-radius:12px;background:var(--inp);border:1px solid var(--line);min-width:0}
+.vl-r>span{font-size:1.25rem}.vl-r small{display:block;font-size:.68rem;color:var(--mu)}.vl-r small em{font-style:normal;color:var(--good)}.vl-r small em.bad{color:#ff7a6b}
+.vl-r b{display:block;font-size:.98rem;white-space:nowrap}.vl-r b i{font-style:normal;font-weight:500;font-size:.68rem;color:var(--mu)}
+.vl-bar{position:relative;height:6px;border-radius:9px;background:rgba(255,255,255,.08);margin-top:4px;overflow:visible}.vl-bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#c9a24a,#ffd36b)}
+.vl-bar u{position:absolute;top:-2px;bottom:-2px;width:2px;background:#9fd3ff;border-radius:2px}.vl-bar.big{height:9px;margin:2px 0 12px}
+.vl-warn{margin:0;padding:8px 10px;border-radius:10px;background:rgba(255,160,60,.14);border:1px solid rgba(255,160,60,.5);font-size:.85rem}
+.vl-chips{display:flex;gap:6px;flex-wrap:wrap}.vl-seg{margin-top:12px;grid-template-columns:repeat(4,1fr)}.vl-seg em{font-style:normal;margin-left:3px;padding:0 6px;border-radius:9px;background:var(--gold);color:#1a1206;font-size:.7rem}
+.vl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.vl-b{display:grid;gap:8px;padding:12px;border-radius:16px;background:var(--surf);border:1px solid var(--line)}
+.vl-bt{display:flex;gap:10px;align-items:center}.vl-bi{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:12px;font-size:1.5rem;background:linear-gradient(160deg,#3a2a12,#1c140a);border:1px solid rgba(232,184,74,.4)}
+.vl-bt b{display:block}.vl-bt b em{font-style:normal;color:var(--gold);font-size:.85rem}.vl-bt small{display:block;color:var(--mu);font-size:.78rem;line-height:1.3}
+.vl-ef{display:flex;gap:8px;flex-wrap:wrap;font-size:.84rem}.vl-ef b{color:var(--good)}
+.vl-cost{display:flex;gap:5px;flex-wrap:wrap}.vl-cost i{font-style:normal;font-size:.78rem;padding:2px 7px;border-radius:9px;background:var(--inp);border:1px solid var(--line)}.vl-cost i.no{color:#ff7a6b;border-color:rgba(255,122,107,.5)}
+.vl-units{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.vl-u{display:grid;gap:5px;justify-items:center;text-align:center;padding:10px 6px;border-radius:14px;background:var(--inp);border:1px solid var(--line);min-width:0}.vl-u.lk{opacity:.6}
+.vl-ui{font-size:1.7rem}.vl-u small{font-size:.7rem;color:var(--mu)}.vl-cnt{display:flex;gap:6px;font-size:.74rem;flex-wrap:wrap;justify-content:center}
+.vl-in{display:grid;gap:4px;font-size:.78rem;color:var(--mu);width:100%}.vl-in input[type=number]{width:100%;text-align:center}.vl-in span em{font-style:normal;opacity:.8}
+.vl-trrow{justify-content:space-between;align-items:center;margin-top:8px}
+.vl-def{display:grid;gap:10px;margin:8px 0}.vl-def .vl-in{grid-template-columns:1fr auto;align-items:center}.vl-def .vl-in span{grid-column:1/-1;color:var(--tx);font-size:.86rem}.vl-def output{min-width:44px;text-align:right;font-weight:700}
+.vl-def input[type=range]{width:100%;accent-color:var(--gold)}
+.vl-list{display:grid;gap:6px;margin-top:8px}.vl-t{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;border:1px solid var(--line);border-left:4px solid var(--oc);background:var(--inp);color:var(--tx);font:inherit;text-align:left;cursor:pointer}
+.vl-t.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}.vl-t.off{opacity:.55}.vl-t b{display:block}.vl-t small{display:block;color:var(--mu);font-size:.76rem}
+.vl-ti{font-size:1.5rem}.vl-tm{font-size:.74rem;text-align:right;color:var(--mu);line-height:1.35}.vl-tm i{font-style:normal}
+.vl-atk{margin-top:12px;padding:12px;border-radius:14px;border:1.5px solid var(--gold);background:rgba(232,184,74,.07)}.vl-atk h4{margin:0 0 4px;font-weight:600}
+.vl-m{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}.vl-m:last-child{border-bottom:0}.vl-m.inc{color:#ffb4a8}.vl-m small{color:var(--mu)}
+.vl-cd{font-variant-numeric:tabular-nums;color:var(--gold)}
+.vl-rep{margin-bottom:10px;border-left:4px solid var(--good)}.vl-rep.l{border-left-color:#e0533f}.vl-rh{display:flex;gap:10px;align-items:center}.vl-rh>span{font-size:1.5rem}.vl-rh small{display:block;color:var(--mu);font-size:.78rem}
+.vl-vs{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-top:10px;font-size:.84rem}.vl-vs>div{display:grid;gap:2px;padding:8px;border-radius:10px;background:var(--inp)}.vl-vs small{color:var(--mu);font-size:.72rem}.vl-vs em{font-style:normal;color:#ff9a8c;font-size:.76rem}.vl-vs i{font-style:normal;color:var(--gold);font-size:.76rem}
+.vl-loot{margin:8px 0 0;font-size:.86rem}
+.vl-found{text-align:left}.vl-hero{font-size:3rem;text-align:center}.vl-ff{display:grid;gap:10px;margin-top:10px}.vl-ff label{display:grid;gap:4px;font-size:.85rem;color:var(--mu)}
+@media(max-width:420px){.vl-res{grid-template-columns:1fr}.vl-r{align-items:center}.vl-r b{display:inline}.vl-r>div{flex:1}}
 .mp-tools{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0 8px}.mp-chk{display:flex;align-items:center;gap:6px;font-size:.88rem;cursor:pointer}
 .mp-leg{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--mu);flex-wrap:wrap}.mp-leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-left:4px}.mp-leg i.me{border:2px solid var(--gold)}.mp-leg i.ot{border:2px solid hsl(200 70% 58%)}.mp-leg i.fr{border:1.5px dashed #e8d6a8;border-radius:50%}
 .mp-wrap{position:relative;overflow:auto;border-radius:18px;border:3px solid #6b4a22;background:#1f5b91;box-shadow:0 0 0 1px rgba(232,184,74,.5),inset 0 0 0 2px #2a1a0a,0 12px 34px rgba(0,0,0,.55);height:min(72vh,620px);-webkit-overflow-scrolling:touch;overscroll-behavior:contain;cursor:grab;scrollbar-width:thin}
@@ -1389,6 +1425,7 @@ function hue(id){let h=0;for(const c of String(id))h=(h*31+c.charCodeAt(0))>>>0;
 function mapTab(){const b=document.querySelector('.tabs [data-t="map"]');if(b)b.hidden=mapAvail===false}
 async function loadMap(quiet){
  try{MAP=await rpc('game_map_state');mapAvail=!!(MAP&&MAP.enabled)}catch(e){if(twMissing(e)){mapAvail=false;mapTab();return}if(!quiet)say(errTxt(e),'bad');return}
+ if(MAP&&MAP.enabled)await loadVil(true);
  mapTab();if(mapView==='tavern')await loadTavern(true);if(tab==='map'&&!document.querySelector('.er-ov'))renderMap()}
 async function loadTavern(quiet){try{TAV=await rpc('game_tavern_state')}catch(e){if(!quiet)say(errTxt(e),'bad')}}
 function tavPoll(){clearInterval(tavTimer);tavTimer=setInterval(async()=>{if(tab!=='map'||mapView!=='tavern'||busy||document.hidden)return;await loadTavern(true);if(!document.querySelector('.er-ov')&&!diceAnim)renderMap()},20000)}
@@ -1402,10 +1439,10 @@ function renderMap(){
  const M=MAP.me,lv=ST.me.level;
  const head=`<div class="card mp-hd"><div class="mp-kpi"><div><small>I tuoi terreni</small><b>${num(M.plots)}</b></div><div><small>Rendita</small><b>${num(M.daily)}<i> BC/giorno</i></b></div><div><small>Classifica</small><b>${MAP.my_rank?num(MAP.my_rank)+'°':'—'}</b></div></div>
   <div class="mp-claim"><div><small>Da riscuotere (si accumula fino a ${num(M.cap_hours)} ore)</small><b>${num(M.pending)} BC</b></div><button class="btn ${M.pending>0?'gold':'ghost'}" data-mcol ${M.pending>0?'':'disabled'}>Riscuoti</button></div></div>
-  <div class="sh-seg mp-seg" role="tablist" aria-label="Sezioni della mappa">${[['map','🗺️','Mappa'],['tavern','🍺','Locanda',MAP.present],['top','🏆','Proprietari']].map(s=>`<button type="button" role="tab" data-mv="${s[0]}" aria-selected="${s[0]===mapView}"><span aria-hidden="true">${s[1]}</span>${s[2]}${s[3]?`<em>${s[3]} presenti</em>`:''}</button>`).join('')}</div>`;
+  <div class="sh-seg mp-seg${vilAvail===false?'':' four'}" role="tablist" aria-label="Sezioni della mappa">${[['map','🗺️','Mappa'],...(vilAvail===false?[]:[['vil','🏘️','Villaggio',VIL&&VIL.enabled&&VIL.marches.filter(m=>!m.out).length?'🚨':'']]),['tavern','🍺','Locanda',MAP.present],['top','🏆','Top']].map(s=>`<button type="button" role="tab" data-mv="${s[0]}" aria-selected="${s[0]===mapView}"><span aria-hidden="true">${s[1]}</span>${s[2]}${s[3]?`<em>${s[0]==='tavern'?s[3]+' presenti':s[3]}</em>`:''}</button>`).join('')}</div>`;
  let body='';
- if(mapView==='map')body=mapHtml(lv);else if(mapView==='tavern')body=tavHtml();else body=topHtml();
- el.innerHTML=head+body;if(mapView==='map')mapMount()}
+ if(mapView==='map')body=mapHtml(lv);else if(mapView==='vil')body=vilHtml();else if(mapView==='tavern')body=tavHtml();else body=topHtml();
+ el.innerHTML=head+body;if(mapView==='map')mapMount();if(mapView==='vil')vilMount();if(vilAvail)vilLive()}
 function mapHtml(lv){
  const W=MAP.w,H=MAP.h,me=ST.me.user_id;
  const mine=MAP.plots.filter(p=>p[3]>=0&&MAP.owners[p[3]].id===me).sort((a,b)=>b[1]-a[1]||b[2]-a[2]);
@@ -1423,6 +1460,12 @@ function plotPanel(id,lv){
  if(!own){if(lv<r.min_level)act=`<span class="er-lock">Serve il livello ${num(r.min_level)}</span>`;
   else act=`<button class="btn ${armed?'gold':''}" data-mbuy="${id}" ${BAL!=null&&BAL<price?'disabled':''}>${BAL!=null&&BAL<price?'BC insufficienti':armed?`Conferma: ${num(price)} BC`:`Compra · ${num(price)} BC`}</button>`}
  else if(mine){act=l>=5?'<span class="chip s">Castello: livello massimo</span>':`<button class="btn ${armed?'gold':''}" data-mup="${id}" ${BAL!=null&&BAL<up?'disabled':''}>${BAL!=null&&BAL<up?'BC insufficienti':armed?`Conferma: ${num(up)} BC`:`${LANDLV[l+1][1]} Costruisci ${LANDLV[l+1][0]} · ${num(up)} BC`}</button>`}
+ const VV=(MAP.villages||[]).find(x=>x.plot===id),myV=(MAP.villages||[]).some(x=>x.user_id===ST.me.user_id);
+ if(VV){const vm=VV.user_id===ST.me.user_id,sh=VV.shield_until&&new Date(VV.shield_until)>Date.now();
+  return `<div class="card mp-sel" style="--rg:${r.color}"><div class="mp-st"><span class="sp vl-ti" aria-hidden="true">${VV.hall>=7?'🏰':VV.hall>=4?'🏘️':'🛖'}</span><div style="min-width:0"><small>${r.emoji} ${esc(r.name)} · lotto n° ${id+1}</small><b>${esc(VV.name)}</b>
+   <small>Sindaco: <b style="color:${vm?'var(--gold)':`hsl(${hue(VV.user_id)} 70% 65%)`}">${esc(VV.nickname)}${vm?' (tu)':''}</b> · Municipio ${VV.hall} · Mura ${VV.wall}${sh?' · 🛡️ in tregua':''}</small></div><button type="button" class="mp-x" data-mclose aria-label="Chiudi">×</button></div>
+   <div class="row">${vm?'<button class="btn" data-mv="vil">🏘️ Entra nel villaggio</button>':myV?`<button class="btn" data-vattackfrom="${VV.user_id}" ${sh||VV.too_small?'disabled':''}>${sh?'In tregua':VV.too_small?'Troppo piccolo per te':'⚔️ Prepara un attacco'}</button>`:'<button class="btn ghost" data-mv="vil">Fonda il tuo villaggio per attaccare</button>'}</div></div>`}
+ if(mine&&!myV&&vilAvail)act+=`<button class="btn ghost" data-vfoundat="${id}">🏘️ Fonda qui un villaggio</button>`;
  return `<div class="card mp-sel" style="--rg:${r.color}"><div class="mp-st"><span class="sp" aria-hidden="true">${ART?ART.sprite(r.sprite,{tier:r.tint,size:56,alt:''}):r.emoji}</span><div style="min-width:0"><small>${r.emoji} ${esc(r.name)} · lotto n° ${id+1}</small><b>${own?`${LANDLV[l][1]} ${LANDLV[l][0]}`:'Terreno libero'}</b>
   <small>${own?`Proprietario: <b style="color:${mine?'var(--gold)':`hsl(${hue(own.id)} 70% 65%)`}">${esc(own.n)}${mine?' (tu)':''}</b>`:esc(r.lore)}</small></div><button type="button" class="mp-x" data-mclose aria-label="Chiudi">×</button></div>
   <div class="mp-inc"><span>Rendita: <b>${num(inc(own?l:0))} BC/giorno</b></span>${mine&&l<5?`<span>dopo: <b style="color:var(--good)">${num(inc(l+1))} BC/giorno</b></span>`:''}${!own&&MAP.me.plots>0?`<span class="mute">prezzo +${num(Math.round((MAP.me.price_mult-1)*100))}% per i ${num(MAP.me.plots)} terreni che hai</span>`:''}</div>
@@ -1594,19 +1637,76 @@ const MapFx=(()=>{
  let NAMES={};
  function shade(c,f){const m=c.match(/\d+(\.\d+)?/g);if(!m||c[0]==='#'){const h=c.replace('#','');const v=[0,2,4].map(i=>parseInt(h.slice(i,i+2),16));return `rgb(${v.map(x=>Math.round(f<0?x*(1+f):x+(255-x)*f)).join(',')})`}
   if(c.startsWith('hsl')){const [h,s,l]=m.map(Number);return `hsl(${h} ${s}% ${Math.max(5,Math.min(95,l*(1+f)))}%)`}return c}
+ /* villaggio sulla mappa: mura, case e torre che crescono con il Municipio */
+ function village(c,x,y,hall,col,mine,name,shield){
+  c.save();c.translate(x,y);const s=.9+Math.min(hall,10)*.05;c.scale(s,s);
+  c.fillStyle=mine?'rgba(232,184,74,.35)':'rgba(70,50,25,.4)';c.beginPath();c.ellipse(0,0,30,13,0,0,6.3);c.fill();
+  /* case */
+  const n=Math.min(6,1+Math.floor(hall/2)),spots=[[-16,-2],[14,-1],[-6,4],[6,-8],[-20,-9],[20,-10]];
+  for(let i=0;i<n;i++){const [hx,hy]=spots[i];c.fillStyle='#e9dcc0';c.fillRect(hx-5,hy-7,10,7);c.fillStyle=i%2?col:shade(col,-.3);c.beginPath();c.moveTo(hx-7,hy-6);c.lineTo(hx,hy-12);c.lineTo(hx+7,hy-6);c.fill();c.fillStyle='#5a3a1e';c.fillRect(hx-1,hy-4,2,4)}
+  /* torre del municipio */
+  c.fillStyle='#9aa3ad';c.fillRect(-4,-26,8,20);c.fillStyle='#7d8693';c.fillRect(0,-26,4,20);c.fillStyle=col;c.beginPath();c.moveTo(-6,-26);c.lineTo(0,-36);c.lineTo(6,-26);c.fill();
+  c.fillStyle='#5a4632';c.fillRect(-.5,-44,1,9);c.fillStyle=col;c.fillRect(.5,-44,8,5);
+  /* palizzata */
+  c.strokeStyle=hall>=5?'#8f98a3':'#7a5a32';c.lineWidth=hall>=5?3:2.4;c.beginPath();c.ellipse(0,0,30,13,0,.15,Math.PI-.15);c.stroke();
+  if(shield){c.strokeStyle='rgba(140,200,255,.8)';c.lineWidth=1.5;c.setLineDash([4,3]);c.beginPath();c.ellipse(0,-12,36,28,0,0,6.3);c.stroke();c.setLineDash([])}
+  c.restore();
+  /* cartello col nome */
+  c.save();c.font='700 10px Inter, sans-serif';c.textAlign='center';c.textBaseline='middle';const w=c.measureText(name).width+10;
+  c.fillStyle=mine?'rgba(90,60,10,.9)':'rgba(20,12,4,.82)';c.strokeStyle=mine?'#e8b84a':col;c.lineWidth=1;const ry=y+14*s+6;
+  c.beginPath();c.roundRect?c.roundRect(x-w/2,ry-7,w,14,4):c.rect(x-w/2,ry-7,w,14);c.fill();c.stroke();c.fillStyle='#fff4d6';c.fillText(name,x,ry+.5);c.restore()}
+ /* il villaggio da vicino: scena con tutti gli edifici al loro livello */
+ function scene(cv,M){
+  const c=cv.getContext('2d'),W=720,H=300;c.clearRect(0,0,W,H);
+  let g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#6fa8dc');g.addColorStop(.55,'#cfe6f2');g.addColorStop(.56,'#7fbf55');g.addColorStop(1,'#4f8f36');c.fillStyle=g;c.fillRect(0,0,W,H);
+  /* colline e nuvole */
+  c.fillStyle='#6aa84f';c.beginPath();c.moveTo(0,170);c.quadraticCurveTo(120,110,260,160);c.quadraticCurveTo(420,105,560,150);c.quadraticCurveTo(650,125,720,150);c.lineTo(720,180);c.lineTo(0,180);c.fill();
+  c.fillStyle='rgba(255,255,255,.85)';[[90,50,1],[420,35,1.3],[620,70,.9]].forEach(([x,y,k])=>{c.beginPath();c.arc(x,y,14*k,0,6.3);c.arc(x+16*k,y-6*k,18*k,0,6.3);c.arc(x+34*k,y,13*k,0,6.3);c.fill()});
+  const base=(x,y,w)=>{c.fillStyle='rgba(0,0,0,.22)';c.beginPath();c.ellipse(x,y+2,w,w*.28,0,0,6.3);c.fill()};
+  const roof=(x,y,w,h,col)=>{c.fillStyle=col;c.beginPath();c.moveTo(x-w/2-4,y);c.lineTo(x,y-h);c.lineTo(x+w/2+4,y);c.fill();c.fillStyle=shade(col,-.25);c.beginPath();c.moveTo(x,y-h);c.lineTo(x+w/2+4,y);c.lineTo(x+4,y);c.fill()};
+  const lvl=(x,y,l,ic)=>{c.save();c.font='700 12px Inter, sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle='rgba(20,12,4,.8)';c.beginPath();c.roundRect?c.roundRect(x-20,y-9,40,18,9):c.rect(x-20,y-9,40,18);c.fill();c.fillStyle='#ffd36b';c.fillText(ic+' '+l,x,y+1);c.restore()};
+  /* fattoria: campi */
+  const fx=95,fy=232;base(fx,fy,70);for(let i=0;i<Math.min(6,1+Math.floor(M.farm/2));i++){c.fillStyle=i%2?'#d9b45a':'#c19a3e';c.fillRect(fx-70+i*24,fy-18,20,26);c.strokeStyle='rgba(120,85,30,.6)';for(let r=0;r<4;r++){c.beginPath();c.moveTo(fx-70+i*24,fy-14+r*6);c.lineTo(fx-50+i*24,fy-14+r*6);c.stroke()}}
+  c.fillStyle='#b2462f';c.fillRect(fx+38,fy-30,24,22);roof(fx+50,fy-30,24,14,'#7a2a1f');lvl(fx,fy+22,M.farm,'🌾');
+  /* segheria */
+  const sx=120,sy=172;base(sx,sy,34);c.fillStyle='#8a6038';c.fillRect(sx-22,sy-24,44,24);roof(sx,sy-24,44,16,'#5a3a1e');c.fillStyle='#6b4a2a';for(let i=0;i<Math.min(5,M.lumber);i++){c.beginPath();c.arc(sx+30+(i%3)*9,sy-4-Math.floor(i/3)*8,4.5,0,6.3);c.fill();c.fillStyle='#c9a06a';c.beginPath();c.arc(sx+30+(i%3)*9,sy-4-Math.floor(i/3)*8,2.5,0,6.3);c.fill();c.fillStyle='#6b4a2a'}lvl(sx,sy+16,M.lumber,'🪓');
+  /* cava */
+  const qx=610,qy=176;base(qx,qy,44);c.fillStyle='#8a8f96';c.beginPath();c.moveTo(qx-46,qy);c.lineTo(qx-20,qy-40-M.quarry*2);c.lineTo(qx+10,qy-26);c.lineTo(qx+44,qy);c.fill();c.fillStyle='#6d737b';c.beginPath();c.moveTo(qx-20,qy-40-M.quarry*2);c.lineTo(qx+10,qy-26);c.lineTo(qx-4,qy);c.fill();
+  c.fillStyle='#b9bec5';for(let i=0;i<Math.min(5,M.quarry);i++)c.fillRect(qx+14+(i%3)*9,qy-8-Math.floor(i/3)*7,7,6);lvl(qx,qy+16,M.quarry,'⛏️');
+  /* magazzino */
+  const wx=600,wy=238;base(wx,wy,40);const ww=34+M.warehouse*3;c.fillStyle='#a0522d';c.fillRect(wx-ww/2,wy-30,ww,30);roof(wx,wy-30,ww,18,'#6b2f1a');c.strokeStyle='#f2e6cc';c.lineWidth=2;c.strokeRect(wx-8,wy-20,16,20);c.beginPath();c.moveTo(wx-8,wy-20);c.lineTo(wx+8,wy);c.moveTo(wx+8,wy-20);c.lineTo(wx-8,wy);c.stroke();lvl(wx,wy+22,M.warehouse,'📦');
+  /* caserma */
+  const bx=470,by=212;base(bx,by,40);c.fillStyle='#8f98a3';c.fillRect(bx-34,by-28,68,28);c.fillStyle='#6f7884';c.fillRect(bx+10,by-28,24,28);for(let i=-34;i<34;i+=8){c.fillStyle='#8f98a3';c.fillRect(i+bx,by-33,5,5)}
+  c.fillStyle='#3a2410';c.fillRect(bx-6,by-16,12,16);c.fillStyle='#5a4632';c.fillRect(bx+28,by-56,2,28);c.fillStyle='#c0392b';c.beginPath();c.moveTo(bx+30,by-56);c.lineTo(bx+46,by-51);c.lineTo(bx+30,by-46);c.fill();lvl(bx,by+18,M.barracks,'⚔️');
+  /* municipio */
+  const hx=300,hy=200,hl=M.hall;base(hx,hy,60);const hw=60+hl*4,hh=34+hl*3;c.fillStyle='#efe2c4';c.fillRect(hx-hw/2,hy-hh,hw,hh);c.fillStyle='#d2c09c';c.fillRect(hx+hw/2-18,hy-hh,18,hh);roof(hx,hy-hh,hw,22,'#2f5d8a');
+  c.fillStyle='#ffd36b';for(let i=0;i<3;i++)c.fillRect(hx-hw/2+10+i*(hw-30)/2,hy-hh+10,8,9);c.fillStyle='#6b3d1f';c.beginPath();c.moveTo(hx-8,hy);c.lineTo(hx-8,hy-16);c.quadraticCurveTo(hx,hy-24,hx+8,hy-16);c.lineTo(hx+8,hy);c.fill();
+  if(hl>=3){const th=30+hl*4;c.fillStyle='#e2d3b0';c.fillRect(hx-10,hy-hh-22-th+22,20,th);roof(hx,hy-hh-th,20,18,'#2f5d8a');c.fillStyle='#5a4632';c.fillRect(hx-.5,hy-hh-th-30,1.5,14);c.fillStyle='#e8b84a';c.fillRect(hx+1,hy-hh-th-30,12,7)}
+  lvl(hx,hy+18,hl,'🏛️');
+  /* mura davanti */
+  if(M.wall>0){const wh=8+M.wall*2.2,stone=M.wall>=4;c.fillStyle=stone?'#9aa3ad':'#8a6038';c.fillRect(0,H-wh-8,W,wh);c.fillStyle=stone?'#7d8693':'#6b4a2a';c.fillRect(0,H-10,W,4);
+   for(let x=0;x<W;x+=stone?22:9){c.fillStyle=stone?'#9aa3ad':'#8a6038';if(stone)c.fillRect(x,H-wh-16,12,9);else{c.beginPath();c.moveTo(x,H-wh-8);c.lineTo(x+4.5,H-wh-16);c.lineTo(x+9,H-wh-8);c.fill()}}
+   c.fillStyle='#3a2410';c.fillRect(W/2-18,H-wh-8,36,wh);lvl(W/2,H-wh-24,M.wall,'🧱')}
+  /* soldati davanti alle mura */
+  const army=[M.army[0],M.army[1],M.army[2]],cols=['#c0392b','#2e86c1','#d4ac0d'];let k=0;
+  for(let t=0;t<3;t++){const n=Math.min(8,Math.ceil(army[t]/15));for(let i=0;i<n;i++,k++){const x=60+k*26,y=H-4;if(x>W-20)break;c.fillStyle='#f0c8a0';c.beginPath();c.arc(x,y-20,3.5,0,6.3);c.fill();c.fillStyle=cols[t];c.fillRect(x-4,y-16,8,10);c.fillStyle='#3a2a1a';c.fillRect(x-3,y-6,2,6);c.fillRect(x+1,y-6,2,6);
+   c.strokeStyle='#ddd';c.lineWidth=1.2;c.beginPath();if(t===1){c.arc(x+5,y-12,5,-1.2,1.2)}else{c.moveTo(x+5,y-24);c.lineTo(x+5,y-4)}c.stroke()}}
+ }
  /* ---------- montaggio ---------- */
  let cache=null;
  function make(state,myId,myLv,selRef){
   NAMES={};const minLv={};state.regions.forEach(r=>{NAMES[r.no]=r.name;minLv[r.no]=r.min_level});
   const G=geo(state.plots),DPR=Math.min(2,window.devicePixelRatio||1);
-  const key=JSON.stringify(state.plots)+'|'+myLv+'|'+DPR;
+  const key=JSON.stringify(state.plots)+JSON.stringify((state.villages||[]).map(v=>[v.plot,v.hall,v.name,!!v.shield_until]))+'|'+myLv+'|'+DPR;
   let base;
   if(cache&&cache.key===key)base=cache.base;
   else{base=document.createElement('canvas');base.width=WW*DPR;base.height=WH*DPR;const b=base.getContext('2d');b.scale(DPR,DPR);
    if(!cache||cache.tkey!==myLv+'|'+DPR){const t=document.createElement('canvas');t.width=WW*DPR;t.height=WH*DPR;const tc=t.getContext('2d');tc.scale(DPR,DPR);terrain(tc,G);roads(tc,G);decor(tc,G);fog(tc,G,myLv,minLv);cache={tkey:myLv+'|'+DPR,terr:t}}
    b.drawImage(cache.terr,0,0,WW,WH);
    const own=state.owners,list=state.plots.map(p=>[p,G.lots[p[0]]]).sort((a,c)=>a[1][1]-c[1][1]);
-   list.forEach(([[id,rg,l,oi],[x,y]])=>{if(oi<0){if(myLv>=minLv[rg])freeLot(b,x,y)}else{const o=own[oi],mine=o.id===myId;building(b,x,y,l,mine?'#e8b84a':`hsl(${hue(o.id)} 65% 55%)`,mine)}});
+   const VV={};(state.villages||[]).forEach(v=>VV[v.plot]=v);
+   list.forEach(([[id,rg,l,oi],[x,y]])=>{const vv=VV[id];if(vv){const mine=vv.user_id===myId;village(b,x,y,vv.hall,mine?'#e8b84a':`hsl(${hue(vv.user_id)} 65% 55%)`,mine,vv.name,vv.shield_until&&new Date(vv.shield_until)>Date.now());return}
+    if(oi<0){if(myLv>=minLv[rg])freeLot(b,x,y)}else{const o=own[oi],mine=o.id===myId;building(b,x,y,l,mine?'#e8b84a':`hsl(${hue(o.id)} 65% 55%)`,mine)}});
    tavern(b);labels(b,myLv,minLv);cache.key=key;cache.base=base}
   const cv=document.createElement('canvas');cv.width=WW*DPR;cv.height=WH*DPR;cv.style.width=WW+'px';cv.style.height=WH+'px';const c=cv.getContext('2d');
   /* elementi animati: scintille sul mare, lava, stelle, fumo della Locanda, terreno selezionato */
@@ -1625,7 +1725,7 @@ const MapFx=(()=>{
     if((x-CX)**2/(55*55)+(y-CY+20)**2/(50*50)<1)return 'tavern';let best=null,bd=30*30;for(const id in G.lots){const [lx,ly]=G.lots[id],d=(lx-x)**2+((ly-12)-y)**2;if(d<bd){bd=d;best=+id}}return best},
    center(x,y,host,smooth){if(!host)return;const s=cv.getBoundingClientRect().width/WW;try{host.scrollTo({left:x*s-host.clientWidth/2,top:y*s-host.clientHeight/2,behavior:smooth?'smooth':'auto'})}catch(_){host.scrollLeft=x*s-host.clientWidth/2;host.scrollTop=y*s-host.clientHeight/2}}};
  }
- return {make,WW,WH,CX,CY,R,lots:()=>GEO?GEO.lots:{}};
+ return {make,scene,WW,WH,CX,CY,R,lots:()=>GEO?GEO.lots:{}};
 })();
 window.MapFx=MapFx;
 let MAPART=null,mapScroll=null;
@@ -1648,6 +1748,106 @@ function mapMount(){const host=document.getElementById('mpCanvas'),wrap=document
  MAPART.canvas.onmouseleave=()=>{const tip=document.getElementById('mpTip');if(tip)tip.hidden=true};
 }
 function mapGoto(x,y){const w=document.querySelector('.mp-wrap');if(MAPART&&w)MAPART.center(x,y,w,true)}
+
+/* ---------- Villaggi (migrazione 042): sindaco, risorse, edifici, soldati, guarnigione, invasioni ---------- */
+let vilPlotPre=null,VIL=null,vilAvail=null,vilTab='city',vilTarget=null,vilTimer=null,vilLoadedAt=0;
+const VB={hall:['🏛️','Municipio','Fa maturare BC nella cassa e permette di alzare gli altri edifici.'],lumber:['🪓','Segheria','Produce legno.'],quarry:['⛏️','Cava','Produce pietra.'],
+ farm:['🌾','Fattoria','Produce cibo, che mantiene l’esercito.'],warehouse:['📦','Magazzino','Quanto puoi tenere di ogni risorsa; il 20% è nascosto ai predoni.'],
+ barracks:['⚔️','Caserma','Quanti soldati puoi avere; sblocca arcieri (3) e cavalieri (5).'],wall:['🧱','Mura','+10% alla difesa per livello.']};
+const VU=[['inf','🗡️','Fanti','fante'],['arc','🏹','Arcieri','arciere'],['cav','🐎','Cavalieri','cavaliere']];
+const VR=[['wood','🪵','Legno'],['stone','🪨','Pietra'],['food','🍖','Cibo']];
+const vProd=k=>k<=0?0:Math.round(30*k*Math.pow(1.2,k-1)),vCap=k=>Math.round(1000*Math.pow(1.5,k)),vBc=k=>Math.round(200*k*Math.pow(1.25,k-1)),vArmy=k=>25*k*(k+1)/2;
+function vEffect(k,l){if(l<=0)return '—';switch(k){case'hall':return `${num(vBc(l))} BC/giorno`;case'lumber':case'quarry':case'farm':return `${num(vProd(l))}/ora`;case'warehouse':return `${num(vCap(l))} a risorsa`;case'barracks':return `${num(vArmy(l))} soldati`;case'wall':return `+${l*10}% difesa`}}
+async function loadVil(quiet){
+ try{VIL=await rpc('game_village_state');vilAvail=!!(VIL&&VIL.enabled);vilLoadedAt=Date.now()}catch(e){if(twMissing(e)){vilAvail=false;VIL=null;return}if(!quiet)say(errTxt(e),'bad')}
+ if(MAP)MAP.villages=VIL&&VIL.enabled?VIL.villages:[]}
+function vilLive(){/* risorse che crescono a vista e conti alla rovescia */
+ clearInterval(vilTimer);vilTimer=setInterval(()=>{if(tab!=='map'||document.hidden)return;
+  const M=VIL&&VIL.me;const hrs=(Date.now()-vilLoadedAt)/3600000;
+  if(M){document.querySelectorAll('[data-vres]').forEach(el=>{const i=+el.dataset.vres,k=VR[i][0],rate=i===2?M.prod[2]-M.upkeep:M.prod[i];let v=M[k]+rate*hrs;v=rate>=0?Math.max(M[k],Math.min(M.cap,v)):Math.max(0,v);el.textContent=num(Math.floor(v))});
+   const vb=document.querySelector('[data-vvault]');if(vb)vb.textContent=num(Math.floor(M.vault>=M.vault_cap?M.vault:Math.min(M.vault_cap,M.vault+M.bc_day*hrs/24)))}
+  let due=false;document.querySelectorAll('[data-vcd]').forEach(el=>{const s=(new Date(el.dataset.vcd).getTime()-Date.now())/1000;if(s<=0)due=true;el.textContent=s<=0?'adesso':fmtCd(s)});
+  if(due&&!busy&&!document.querySelector('.er-ov')){vilLoadedAt=Date.now()+1e9;loadVil(true).then(()=>{if(tab==='map'&&(mapView==='vil'||mapView==='map'))renderMap()})}},1000)}
+function fmtCd(s){s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}:${pad(m)}:${pad(x)}`:`${m}:${pad(x)}`}
+function vCost(c,M){const ok=[M.wood>=c[0],M.stone>=c[1],BAL==null||BAL>=c[2]];return `<span class="vl-cost">${c[0]?`<i class="${ok[0]?'':'no'}">🪵 ${num(c[0])}</i>`:''}${c[1]?`<i class="${ok[1]?'':'no'}">🪨 ${num(c[1])}</i>`:''}${c[2]?`<i class="${ok[2]?'':'no'}">🪙 ${num(c[2])}</i>`:''}</span>`}
+function vArmyLine(a){return VU.map((u,i)=>a[i]?`${u[1]} ${num(a[i])}`:'').filter(Boolean).join(' · ')||'nessuno'}
+function vilHtml(){
+ if(!VIL)return '<p class="mute">Caricamento del villaggio…</p>';
+ if(!VIL.enabled)return '<p class="mute">I Villaggi sono chiusi in questo momento.</p>';
+ const M=VIL.me;if(!M)return vilFoundHtml();
+ const inc=VIL.marches.filter(m=>!m.out);
+ const shield=M.shield_until?`<span class="chip s">🛡️ In tregua ancora <b data-vcd="${M.shield_until}">${fmtCd((new Date(M.shield_until)-Date.now())/1000)}</b></span>`:'';
+ const head=`<div class="card vl-hd"><div class="vl-scene"><canvas id="vlScene" width="720" height="300" aria-hidden="true"></canvas><div class="vl-name"><small>Sindaco ${esc(ME.nickname||'')}</small><b>${esc(M.name)}</b></div></div>
+  ${inc.length?`<div class="vl-alarm" role="alert">🚨 ${inc.map(m=>`<b>${esc(m.other)}</b> arriva tra <b data-vcd="${m.arrive_at}">${fmtCd((new Date(m.arrive_at)-Date.now())/1000)}</b>`).join('<br>')} · la guarnigione ha ${vArmyLine([M.def[0]+M.militia,M.def[1],M.def[2]])}</div>`:''}
+  <div class="vl-res">${VR.map((r,i)=>{const rate=i===2?M.prod[2]-M.upkeep:M.prod[i],pc=Math.min(100,M[r[0]]/M.cap*100);return `<div class="vl-r"><span>${r[1]}</span><div style="min-width:0"><small>${r[2]} <em class="${rate<0?'bad':''}">${rate>=0?'+':''}${num(rate)}/ora</em></small><b><span data-vres="${i}">${num(M[r[0]])}</span><i> / ${num(M.cap)}</i></b><div class="vl-bar"><i style="width:${pc}%"></i><u style="left:${M.hidden/M.cap*100}%" title="Sotto questa linea è nascosto"></u></div></div></div>`}).join('')}</div>
+  ${M.food<=0&&M.prod[2]<M.upkeep?'<p class="vl-warn">🍖 Il cibo è finito: l’esercito è affamato e combatte a metà forza. Migliora la Fattoria o riduci i soldati.</p>':''}
+  <div class="mp-claim"><div><small>Cassa del villaggio · ${num(M.bc_day)} BC/giorno, fino a ${num(M.vault_cap)}</small><b><span data-vvault>${num(M.vault)}</span> BC</b></div><button class="btn ${M.vault>=1?'gold':'ghost'}" data-vcol ${M.vault>=1?'':'disabled'}>Riscuoti</button></div>
+  <div class="vl-chips">${shield}<span class="chip">⚔️ ${num(M.stats.att_won)} vinte · ${num(M.stats.att_lost)} perse</span><span class="chip">🛡️ ${num(M.stats.def_won)} difese · ${num(M.stats.def_lost)} cadute</span></div></div>
+ <div class="sh-seg vl-seg" role="tablist" aria-label="Sezioni del villaggio">${[['city','🏗️','Edifici'],['army','🗡️','Esercito'],['war','⚔️','Guerra',VIL.marches.length],['log','📜','Rapporti']].map(s=>`<button type="button" role="tab" data-vtab="${s[0]}" aria-selected="${s[0]===vilTab}"><span aria-hidden="true">${s[1]}</span>${s[2]}${s[3]?`<em>${s[3]}</em>`:''}</button>`).join('')}</div>`;
+ let body='';
+ if(vilTab==='city')body=vilCityHtml(M);else if(vilTab==='army')body=vilArmyHtml(M);else if(vilTab==='war')body=vilWarHtml(M);else body=vilLogHtml();
+ return head+body}
+function vilFoundHtml(){
+ const P=VIL.my_plots||[],cost=VIL.rules.found_cost;
+ return `<div class="card vl-found"><div class="vl-hero" aria-hidden="true">🏘️</div><h3 class="rd-h" style="margin-top:0">Fonda il tuo villaggio</h3>
+  <p>Diventa <b>sindaco</b>: costruisci segheria, cava e fattoria per avere legno, pietra e cibo; addestra fanti, arcieri e cavalieri; lasciane qualcuno a <b>difendere</b> e manda gli altri a <b>saccheggiare</b> i villaggi vicini. Per 48 ore dopo la fondazione nessuno può attaccarti.</p>
+  ${P.length?`<form id="vilFound" class="vl-ff"><label>Nome del villaggio<input id="vilName" maxlength="24" minlength="3" required placeholder="es. Rocca del Drago"></label>
+   <label>Su quale terreno<select id="vilPlot">${P.map(p=>{const r=regOf(p.region);return `<option value="${p.id}"${p.id===vilPlotPre?' selected':''}>${r.emoji} ${esc(r.name)} · lotto n° ${p.id+1} · ${LANDLV[p.level][0]}</option>`}).join('')}</select></label>
+   <button class="btn ${pending==='vfound'?'gold':''}" ${BAL!=null&&BAL<cost?'disabled':''}>${BAL!=null&&BAL<cost?'BC insufficienti':pending==='vfound'?`Conferma: ${num(cost)} BC`:`Fonda · ${num(cost)} BC`}</button></form>`
+  :`<p class="er-lock">Prima compra un terreno sulla mappa: il villaggio nasce lì.</p><button class="btn" data-mv="map">🗺️ Vai alla mappa</button>`}</div>
+  ${VIL.villages.length?`<h3 class="rd-h">Villaggi già fondati · ${VIL.villages.length}</h3>${vilListHtml(null)}`:''}`}
+function vilCityHtml(M){
+ return `<div class="vl-grid">${M.buildings.map(b=>{const B=VB[b.k],max=b.level>=VIL.rules.max_level,lock=b.k!=='hall'&&b.level+1>M.hall,c=b.next,can=c&&!lock&&M.wood>=c[0]&&M.stone>=c[1]&&(BAL==null||BAL>=c[2]),armed=pending==='vb'+b.k;
+  return `<div class="vl-b"><div class="vl-bt"><span class="vl-bi" aria-hidden="true">${B[0]}</span><div style="min-width:0"><b>${B[1]} <em>liv. ${b.level}</em></b><small>${B[2]}</small></div></div>
+   <div class="vl-ef"><span>${vEffect(b.k,b.level)}</span>${!max?`<span>→ <b>${vEffect(b.k,b.level+1)}</b></span>`:''}</div>
+   ${max?'<span class="chip s">Livello massimo</span>':lock?`<span class="er-lock">Serve il Municipio al livello ${b.level+1}</span>`:`${vCost(c,M)}<button class="btn sm ${armed?'gold':''}" data-vbuild="${b.k}" ${can?'':'disabled'}>${armed?'Conferma':`Migliora a ${b.level+1}`}</button>`}</div>`}).join('')}</div>`}
+function vilArmyHtml(M){
+ const U=VIL.rules.units,tot=M.army[0]+M.army[1]+M.army[2]+M.away[0]+M.away[1]+M.away[2];
+ return `<div class="card"><h3 class="rd-h" style="margin-top:0">I tuoi soldati <small>${num(tot)} / ${num(M.army_cap)} posti in Caserma · mangiano ${num(M.upkeep)} cibo all’ora</small></h3>
+  <div class="vl-bar big"><i style="width:${Math.min(100,tot/M.army_cap*100)}%"></i></div>
+  <div class="vl-units">${VU.map(([k,ic,nm],i)=>{const u=U[k],lk=M.barracks<u[7];return `<div class="vl-u${lk?' lk':''}"><span class="vl-ui" aria-hidden="true">${ic}</span><b>${nm}</b>
+   <small>⚔️ ${u[2]} · 🛡️ ${u[3]} · 🎒 ${u[4]}${k==='cav'?' · veloci':''}</small>
+   <div class="vl-cnt"><span title="Al villaggio">🏠 ${num(M.army[i])}</span><span title="Di guardia">🛡️ ${num(M.def[i])}</span><span title="In marcia">🚶 ${num(M.away[i])}</span></div>
+   ${lk?`<span class="er-lock">Caserma ${u[7]}</span>`:`<label class="vl-in">Addestra<input type="number" min="0" step="1" value="0" inputmode="numeric" data-vtr="${i}"></label><small class="mute">${num(u[0])} BC + ${num(u[1])} 🍖 l’uno</small>`}</div>`}).join('')}</div>
+  <p class="er-note">I fanti battono i cavalieri, i cavalieri battono gli arcieri, gli arcieri battono i fanti.</p>
+  <div class="row vl-trrow"><span id="vlTrCost" class="mute">Scegli quanti soldati addestrare</span><button class="btn" data-vtrain>Addestra</button></div></div>
+ <div class="card" style="margin-top:12px"><h3 class="rd-h" style="margin-top:0">🛡️ Guarnigione <small>chi resta a difendere; gli altri possono partire all’attacco</small></h3>
+  <p class="er-note">Oltre alla guarnigione difende sempre una milizia di ${num(M.militia)} fanti (5 per livello di Municipio). Le Mura danno +${M.wall*10}%.</p>
+  <div class="vl-def">${VU.map(([k,ic,nm],i)=>`<label class="vl-in"><span>${ic} ${nm} <em>su ${num(M.army[i])}</em></span><input type="range" min="0" max="${M.army[i]}" value="${M.def[i]}" data-vdef="${i}"><output>${num(M.def[i])}</output></label>`).join('')}</div>
+  <div class="row"><button class="btn ghost sm" data-vdefall>Tutti a difendere</button><button class="btn ghost sm" data-vdefnone>Nessuno</button><button class="btn" data-vdefsave>Salva la guarnigione</button></div></div>`}
+function vilListHtml(M){
+ return `<div class="vl-list">${VIL.villages.filter(x=>!M||x.user_id!==ME.user_id).map(x=>{const sh=x.shield_until&&new Date(x.shield_until)>Date.now(),me=x.user_id===ME.user_id,sel=vilTarget===x.user_id;
+  return `<button type="button" class="vl-t${sel?' on':''}${sh||x.too_small?' off':''}" ${M?`data-vtarget="${x.user_id}"`:`data-vgo="${x.plot}"`} style="--oc:hsl(${hue(x.user_id)} 65% 55%)"><span class="vl-ti" aria-hidden="true">${x.hall>=7?'🏰':x.hall>=4?'🏘️':'🛖'}</span>
+   <span style="min-width:0"><b>${esc(x.name)}${me?' (tuo)':''}</b><small>${esc(x.nickname)} · Municipio ${x.hall} · Mura ${x.wall}</small></span>
+   <span class="vl-tm">${sh?`🛡️ <i data-vcd="${x.shield_until}">${fmtCd((new Date(x.shield_until)-Date.now())/1000)}</i>`:x.too_small?'troppo piccolo':x.min!=null?`🚶 ${x.min} min<br>🐎 ${x.min_cav} min`:''}</span></button>`}).join('')||'<p class="mute">Non ci sono altri villaggi, per ora.</p>'}</div>`}
+function vilWarHtml(M){
+ const out=VIL.marches.filter(m=>m.out),inc=VIL.marches.filter(m=>!m.out),left=VIL.rules.attacks_daily-M.attacks_today;
+ const free=[M.army[0]-M.def[0],M.army[1]-M.def[1],M.army[2]-M.def[2]],T=VIL.villages.find(x=>x.user_id===vilTarget);
+ const march=m=>`<div class="vl-m ${m.out?'':'inc'}"><span aria-hidden="true">${m.out?(m.status==='going'?'⚔️':'🏠'):'🚨'}</span><div style="min-width:0">${m.out?(m.status==='going'?`Verso <b>${esc(m.village||m.other)}</b> di ${esc(m.other)} · ${vArmyLine(m.army)}`:`Ritorno da <b>${esc(m.village||m.other)}</b> ${m.won?'vittorioso':'sconfitto'} · ${vArmyLine(m.back)}${m.won?`<br><small>bottino 🪵 ${num(m.loot[0])} 🪨 ${num(m.loot[1])} 🍖 ${num(m.loot[2])} 🪙 ${num(m.loot[3])}</small>`:''}`):`<b>${esc(m.other)}</b> sta attaccando il tuo villaggio`}</div><b class="vl-cd" data-vcd="${m.status==='going'?m.arrive_at:m.return_at}">${fmtCd((new Date(m.status==='going'?m.arrive_at:m.return_at)-Date.now())/1000)}</b></div>`;
+ return `${inc.length||out.length?`<div class="card"><h3 class="rd-h" style="margin-top:0">Eserciti in movimento</h3>${inc.map(march).join('')}${out.map(march).join('')}</div>`:''}
+ <div class="card" style="margin-top:12px"><h3 class="rd-h" style="margin-top:0">⚔️ Attacca un villaggio <small>oggi te ne restano ${num(Math.max(0,left))} su ${num(VIL.rules.attacks_daily)}</small></h3>
+  <p class="er-note">Scegli il bersaglio, poi i soldati. Se vinci porti via risorse e fino al ${num(VIL.rules.loot_bc_pct)}% della cassa, quanto riescono a trasportare. Attaccare toglie la tua tregua.</p>
+  ${vilListHtml(M)}
+  ${T?`<div class="vl-atk"><h4>Contro <b>${esc(T.name)}</b> di ${esc(T.nickname)}</h4>
+   <div class="vl-def">${VU.map(([k,ic,nm],i)=>`<label class="vl-in"><span>${ic} ${nm} <em>${num(free[i])} pronti</em></span><input type="range" min="0" max="${Math.max(0,free[i])}" value="${Math.max(0,free[i])}" data-vatk="${i}"><output>${num(Math.max(0,free[i]))}</output></label>`).join('')}</div>
+   <p class="mute" id="vlAtkInfo"></p>
+   <div class="row"><button class="btn ${pending==='vatk'?'gold':''}" data-vattack ${left<=0?'disabled':''}>${left<=0?'Basta attacchi per oggi':pending==='vatk'?'Conferma l’attacco':'⚔️ Manda l’esercito'}</button></div></div>`:''}
+ </div>`}
+function vilLogHtml(){
+ const R=VIL.reports||[];if(!R.length)return '<p class="mute">Nessuna battaglia, per ora.</p>';
+ return R.map(r=>{const p=r.report||{},good=r.out?r.won:!r.won;return `<div class="card vl-rep ${good?'w':'l'}"><div class="vl-rh"><span aria-hidden="true">${good?'🏆':'💀'}</span><div><b>${r.out?`Hai attaccato ${esc(p.def_village||p.def_name)}`:r.won?`${esc(p.att_name)} ha saccheggiato ${esc(p.def_village||'il villaggio')}`:`Hai respinto ${esc(p.att_name)}`}</b><small>${new Date(r.at).toLocaleString('it-IT',{weekday:'short',hour:'2-digit',minute:'2-digit'})} · ${good?'vittoria':'sconfitta'}</small></div></div>
+  <div class="vl-vs"><div><small>${esc(p.att_name)}</small>${vArmyLine(p.atk||[])}<em>persi: ${vArmyLine(p.att_lost||[])}</em><i>forza ${num(p.ap)}</i></div><b>vs</b><div><small>${esc(p.def_name)} (+ milizia ${num(p.militia)}, mura ${num(p.wall)})</small>${vArmyLine(p.def||[])}<em>persi: ${vArmyLine(p.def_lost||[])}</em><i>forza ${num(p.dp)}</i></div></div>
+  ${r.won?`<p class="vl-loot">Bottino: 🪵 ${num(r.loot[0])} · 🪨 ${num(r.loot[1])} · 🍖 ${num(r.loot[2])} · 🪙 ${num(r.loot[3])} BC</p>`:''}</div>`}).join('')}
+function vilMount(){
+ const cv=document.getElementById('vlScene');if(cv&&VIL&&VIL.me)MapFx.scene(cv,VIL.me);
+ const upd=()=>{const U=VIL.rules.units;let bc=0,f=0,n=0;document.querySelectorAll('[data-vtr]').forEach(el=>{const i=+el.dataset.vtr,v=Math.max(0,parseInt(el.value,10)||0),u=U[VU[i][0]];bc+=v*u[0];f+=v*u[1];n+=v});
+  const o=document.getElementById('vlTrCost');if(o)o.innerHTML=n?`${num(n)} soldati: <b>${num(bc)} BC</b> + <b>${num(f)} 🍖</b>`:'Scegli quanti soldati addestrare'};
+ document.querySelectorAll('[data-vtr]').forEach(el=>el.oninput=upd);
+ document.querySelectorAll('[data-vdef],[data-vatk]').forEach(el=>el.oninput=()=>{el.nextElementSibling.textContent=num(+el.value);vAtkInfo()});vAtkInfo()}
+function vAtkInfo(){const o=document.getElementById('vlAtkInfo'),T=VIL&&VIL.villages.find(x=>x.user_id===vilTarget);if(!o||!T)return;
+ const n=[...document.querySelectorAll('[data-vatk]')].map(el=>+el.value),U=VIL.rules.units,carry=n[0]*U.inf[4]+n[1]*U.arc[4]+n[2]*U.cav[4],power=n[0]*U.inf[2]+n[1]*U.arc[2]+n[2]*U.cav[2];
+ o.innerHTML=n[0]+n[1]+n[2]?`Arrivo in <b>${n[0]+n[1]?T.min:T.min_cav} min</b> · forza d’attacco circa <b>${num(power)}</b> · possono trasportare <b>${num(carry)}</b>`:'Scegli almeno un soldato.'}
+async function vilAct(btn,fn){await run(btn,async()=>{await fn();await Promise.all([loadVil(true),(async()=>{BAL=await balance().catch(()=>BAL)})()]);paintTop();renderMap()})}
 
 /* ---------- Classifica ---------- */
 async function loadLb(){loadOnline();try{const{data,error}=await sb.from('game_leaderboard_v').select('*').order('rank',{ascending:true}).order('nickname',{ascending:true}).limit(50);if(error)throw new Error(error.message);LB=data||[]}catch(e){LB=[];say(errTxt(e),'bad')}renderLb()}
@@ -1764,6 +1964,21 @@ document.addEventListener('click',e=>{
  const t=e.target.closest('button,[data-hero]');if(!t)return;
  if(t.dataset.plot){mapSel=Number(t.dataset.plot);pending=null;renderMap();if(MAPART&&MAPART.G.lots[mapSel]){const[lx,ly]=MAPART.G.lots[mapSel];mapGoto(lx,ly-10)}const sp=document.querySelector('.mp-sel');if(sp&&sp.scrollIntoView)try{sp.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}return}
  if(t.dataset.mclose!==undefined){mapSel=null;renderMap();return}
+ if(t.dataset.vtab){vilTab=t.dataset.vtab;pending=null;renderMap();return}
+ if(t.dataset.vcol!==undefined){vilAct(t,async()=>{const r=await rpc('game_village_collect');say(`Hai versato ${num(r.collected)} BC dalla cassa del villaggio.`,'good')});return}
+ if(t.dataset.vbuild){const k=t.dataset.vbuild;if(pending!=='vb'+k){pending='vb'+k;renderMap();setTimeout(()=>{if(pending==='vb'+k){pending=null;if(tab==='map')renderMap()}},5000);return}
+  pending=null;vilAct(t,async()=>{const r=await rpc('game_village_build',{p_building:k});say(`${VB[k][0]} ${VB[k][1]} portato al livello ${r.level}!`,'good')});return}
+ if(t.dataset.vtrain!==undefined){const n=[0,1,2].map(i=>{const el=document.querySelector(`[data-vtr="${i}"]`);return el?Math.max(0,parseInt(el.value,10)||0):0});if(!(n[0]+n[1]+n[2])){say('Scegli quanti soldati addestrare.','bad');return}
+  vilAct(t,async()=>{const r=await rpc('game_village_train',{p_inf:n[0],p_arc:n[1],p_cav:n[2]});say(`Addestrati ${vArmyLine(n)} per ${num(r.bc)} BC e ${num(r.food)} cibo.`,'good')});return}
+ if(t.dataset.vdefall!==undefined||t.dataset.vdefnone!==undefined){document.querySelectorAll('[data-vdef]').forEach(el=>{el.value=t.dataset.vdefall!==undefined?el.max:0;el.nextElementSibling.textContent=num(+el.value)});return}
+ if(t.dataset.vdefsave!==undefined){const n=[0,1,2].map(i=>+document.querySelector(`[data-vdef="${i}"]`).value);vilAct(t,async()=>{await rpc('game_village_defense',{p_inf:n[0],p_arc:n[1],p_cav:n[2]});say(`Guarnigione: ${vArmyLine(n)}.`,'good')});return}
+ if(t.dataset.vtarget){vilTarget=vilTarget===t.dataset.vtarget?null:t.dataset.vtarget;pending=null;renderMap();const a=document.querySelector('.vl-atk');if(a&&a.scrollIntoView)try{a.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}return}
+ if(t.dataset.vattackfrom){vilTarget=t.dataset.vattackfrom;mapView='vil';vilTab='war';pending=null;renderMap();const a=document.querySelector('.vl-atk');if(a&&a.scrollIntoView)try{a.scrollIntoView({block:'center'})}catch(_){}return}
+ if(t.dataset.vfoundat){vilPlotPre=+t.dataset.vfoundat;mapView='vil';pending=null;renderMap();return}
+ if(t.dataset.vgo){const id=+t.dataset.vgo;mapView='map';mapSel=id;renderMap();const L=MapFx.lots()[id];if(L)mapGoto(L[0],L[1]-10);return}
+ if(t.dataset.vattack!==undefined){const n=[0,1,2].map(i=>+document.querySelector(`[data-vatk="${i}"]`).value);if(!(n[0]+n[1]+n[2])){say('Scegli almeno un soldato.','bad');return}
+  if(pending!=='vatk'){pending='vatk';t.classList.add('gold');t.textContent='Conferma l’attacco';setTimeout(()=>{if(pending==='vatk'){pending=null;if(t.isConnected){t.classList.remove('gold');t.textContent='⚔️ Manda l’esercito'}}},5000);return}
+  pending=null;const tg=vilTarget;vilAct(t,async()=>{const r=await rpc('game_village_attack',{p_target:tg,p_inf:n[0],p_arc:n[1],p_cav:n[2]});vilTarget=null;say(`L’esercito è partito: arriva tra ${num(r.minutes)} minuti.`,'good')});return}
  if(t.dataset.mv){mapView=t.dataset.mv;pending=null;if(mapView==='tavern'){TAV=null;renderMap();loadTavern().then(()=>{tavPoll();if(tab==='map')renderMap()});return}renderMap();return}
  if(t.dataset.mzoom!==undefined){const w=document.querySelector('.mp-wrap'),sc=mapZoom?1.5:1,f=w?[(w.scrollLeft+w.clientWidth/2)/sc,(w.scrollTop+w.clientHeight/2)/sc]:null;mapZoom=!mapZoom;mapScroll=null;renderMap();if(f&&MAPART)MAPART.center(f[0],f[1],document.querySelector('.mp-wrap'));return}
  if(t.dataset.mgo!==undefined){const k=Number(t.dataset.mgo),pt=k?MapFx.R[k].s:[MapFx.CX,MapFx.CY];if(mapView!=='map'){mapView='map';renderMap()}mapGoto(pt[0],pt[1]);const w=document.querySelector('.mp-wrap');if(w&&w.scrollIntoView)try{w.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}return}
@@ -1884,6 +2099,10 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&CHOPEN&&!document.q
 if(window.visualViewport){visualViewport.addEventListener('resize',fitPanel);visualViewport.addEventListener('scroll',fitPanel)}
 addEventListener('resize',fitPanel);
 document.addEventListener('submit',e=>{if(e.target&&e.target.id==='chForm'){e.preventDefault();sendChat()}});
+document.addEventListener('submit',e=>{if(!e.target||e.target.id!=='vilFound')return;e.preventDefault();const b=e.target.querySelector('button'),nm=$('vilName').value.trim(),pl=+$('vilPlot').value;
+ if(nm.length<3){say('Il nome deve avere almeno 3 caratteri.','bad');return}
+ if(pending!=='vfound'){pending='vfound';b.classList.add('gold');b.textContent=`Conferma: ${num(VIL.rules.found_cost)} BC`;setTimeout(()=>{if(pending==='vfound'){pending=null;if(b.isConnected){b.classList.remove('gold');b.textContent=`Fonda · ${num(VIL.rules.found_cost)} BC`}}},5000);return}
+ pending=null;vilAct(b,async()=>{await rpc('game_village_found',{p_plot:pl,p_name:nm});vilTab='city';await loadMap(true);say(`Benvenuto, sindaco di <b>${esc(nm)}</b>! Hai 48 ore di tregua per prepararti.`,'good')})});
 document.addEventListener('submit',e=>{if(e.target&&e.target.id==='diceForm'){e.preventDefault();const b=e.target.querySelector('button'),v=parseInt($('diceStake').value,10);
  run(b,async()=>{const r=await rpc('game_dice_open',{p_stake:v});BAL=await balance().catch(()=>BAL);await loadTavern(true);paintTop();renderMap();say(`Tavolo aperto con ${num(r.stake)} BC: aspetta uno sfidante.`,'good')})}});
 setInterval(()=>{if(ST&&!document.hidden)beat()},40000);                                                      // «ci sono»: chi ha la pagina aperta risulta online
