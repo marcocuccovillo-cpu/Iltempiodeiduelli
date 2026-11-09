@@ -110,6 +110,10 @@
 .mp-claim{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1.5px solid rgba(232,184,74,.45);background:rgba(232,184,74,.07)}
 .mp-claim small{display:block;font-size:.74rem;color:var(--mu)}.mp-claim b{font:700 1.2rem var(--disp);color:var(--gold)}
 .mp-seg{margin-top:12px}.mp-seg.four{grid-template-columns:repeat(4,1fr)}.mp-seg em{font-style:normal}
+.vl-sw{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}.vl-sw::-webkit-scrollbar{display:none}
+.vl-sw button{flex:none;display:grid;grid-template-columns:auto 1fr;column-gap:6px;align-items:center;text-align:left;padding:7px 11px;border-radius:14px;border:1.5px solid var(--line);border-left:4px solid var(--rg,var(--gold));background:var(--surf);color:var(--tx);font:inherit;cursor:pointer;max-width:200px}
+.vl-sw button>span{grid-row:span 2;font-size:1.3rem}.vl-sw button b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.88rem}.vl-sw button small{color:var(--mu);font-size:.7rem;white-space:nowrap}
+.vl-sw button[aria-selected=true]{border-color:var(--gold);background:rgba(232,184,74,.12)}.vl-sw button.new{border-style:dashed;border-left-style:solid}
 .vl-hd{padding:0;overflow:hidden;display:grid;gap:10px}.vl-hd>*:not(.vl-scene){margin:0 12px}.vl-hd>*:last-child{margin-bottom:12px}
 .vl-scene{position:relative;border-bottom:2px solid #6b4a22}.vl-scene canvas{display:block;width:100%;height:auto}
 .vl-name{position:absolute;right:10px;top:8px;text-align:right;padding:4px 12px 6px;border-radius:12px;background:rgba(20,12,4,.78);border:1px solid rgba(232,184,74,.55);display:grid;line-height:1.15}
@@ -1439,7 +1443,7 @@ function renderMap(){
  const M=MAP.me,lv=ST.me.level;
  const head=`<div class="card mp-hd"><div class="mp-kpi"><div><small>I tuoi terreni</small><b>${num(M.plots)}</b></div><div><small>Rendita</small><b>${num(M.daily)}<i> BC/giorno</i></b></div><div><small>Classifica</small><b>${MAP.my_rank?num(MAP.my_rank)+'°':'—'}</b></div></div>
   <div class="mp-claim"><div><small>Da riscuotere (si accumula fino a ${num(M.cap_hours)} ore)</small><b>${num(M.pending)} BC</b></div><button class="btn ${M.pending>0?'gold':'ghost'}" data-mcol ${M.pending>0?'':'disabled'}>Riscuoti</button></div></div>
-  <div class="sh-seg mp-seg${vilAvail===false?'':' four'}" role="tablist" aria-label="Sezioni della mappa">${[['map','🗺️','Mappa'],...(vilAvail===false?[]:[['vil','🏘️','Villaggio',VIL&&VIL.enabled&&VIL.marches.filter(m=>!m.out).length?'🚨':'']]),['tavern','🍺','Locanda',MAP.present],['top','🏆','Top']].map(s=>`<button type="button" role="tab" data-mv="${s[0]}" aria-selected="${s[0]===mapView}"><span aria-hidden="true">${s[1]}</span>${s[2]}${s[3]?`<em>${s[0]==='tavern'?s[3]+' presenti':s[3]}</em>`:''}</button>`).join('')}</div>`;
+  <div class="sh-seg mp-seg${vilAvail===false?'':' four'}" role="tablist" aria-label="Sezioni della mappa">${[['map','🗺️','Mappa'],...(vilAvail===false?[]:[['vil','🏘️','Villaggio',VIL&&VIL.enabled&&VIL.marches.some(m=>!m.out)?'🚨':'']]),['tavern','🍺','Locanda',MAP.present],['top','🏆','Top']].map(s=>`<button type="button" role="tab" data-mv="${s[0]}" aria-selected="${s[0]===mapView}"><span aria-hidden="true">${s[1]}</span>${s[2]}${s[3]?`<em>${s[0]==='tavern'?s[3]+' presenti':s[3]}</em>`:''}</button>`).join('')}</div>`;
  let body='';
  if(mapView==='map')body=mapHtml(lv);else if(mapView==='vil')body=vilHtml();else if(mapView==='tavern')body=tavHtml();else body=topHtml();
  el.innerHTML=head+body;if(mapView==='map')mapMount();if(mapView==='vil')vilMount();if(vilAvail)vilLive()}
@@ -1464,8 +1468,8 @@ function plotPanel(id,lv){
  if(VV){const vm=VV.user_id===ST.me.user_id,sh=VV.shield_until&&new Date(VV.shield_until)>Date.now();
   return `<div class="card mp-sel" style="--rg:${r.color}"><div class="mp-st"><span class="sp vl-ti" aria-hidden="true">${VV.hall>=7?'🏰':VV.hall>=4?'🏘️':'🛖'}</span><div style="min-width:0"><small>${r.emoji} ${esc(r.name)} · lotto n° ${id+1}</small><b>${esc(VV.name)}</b>
    <small>Sindaco: <b style="color:${vm?'var(--gold)':`hsl(${hue(VV.user_id)} 70% 65%)`}">${esc(VV.nickname)}${vm?' (tu)':''}</b> · Municipio ${VV.hall} · Mura ${VV.wall}${sh?' · 🛡️ in tregua':''}</small></div><button type="button" class="mp-x" data-mclose aria-label="Chiudi">×</button></div>
-   <div class="row">${vm?'<button class="btn" data-mv="vil">🏘️ Entra nel villaggio</button>':myV?`<button class="btn" data-vattackfrom="${VV.user_id}" ${sh||VV.too_small?'disabled':''}>${sh?'In tregua':VV.too_small?'Troppo piccolo per te':'⚔️ Prepara un attacco'}</button>`:'<button class="btn ghost" data-mv="vil">Fonda il tuo villaggio per attaccare</button>'}</div></div>`}
- if(mine&&!myV&&vilAvail)act+=`<button class="btn ghost" data-vfoundat="${id}">🏘️ Fonda qui un villaggio</button>`;
+   <div class="row">${vm?`<button class="btn" data-vsel="${VV.plot}">🏘️ Entra nel villaggio</button>`:myV?`<button class="btn" data-vattackfrom="${VV.plot}" ${sh||VV.too_small?'disabled':''}>${sh?'In tregua':VV.too_small?'Troppo piccolo per te':'⚔️ Prepara un attacco'}</button>`:'<button class="btn ghost" data-mv="vil">Fonda il tuo villaggio per attaccare</button>'}</div></div>`}
+ if(mine&&vilAvail)act+=`<button class="btn ghost" data-vfoundat="${id}">🏘️ Fonda qui un villaggio</button>`;
  return `<div class="card mp-sel" style="--rg:${r.color}"><div class="mp-st"><span class="sp" aria-hidden="true">${ART?ART.sprite(r.sprite,{tier:r.tint,size:56,alt:''}):r.emoji}</span><div style="min-width:0"><small>${r.emoji} ${esc(r.name)} · lotto n° ${id+1}</small><b>${own?`${LANDLV[l][1]} ${LANDLV[l][0]}`:'Terreno libero'}</b>
   <small>${own?`Proprietario: <b style="color:${mine?'var(--gold)':`hsl(${hue(own.id)} 70% 65%)`}">${esc(own.n)}${mine?' (tu)':''}</b>`:esc(r.lore)}</small></div><button type="button" class="mp-x" data-mclose aria-label="Chiudi">×</button></div>
   <div class="mp-inc"><span>Rendita: <b>${num(inc(own?l:0))} BC/giorno</b></span>${mine&&l<5?`<span>dopo: <b style="color:var(--good)">${num(inc(l+1))} BC/giorno</b></span>`:''}${!own&&MAP.me.plots>0?`<span class="mute">prezzo +${num(Math.round((MAP.me.price_mult-1)*100))}% per i ${num(MAP.me.plots)} terreni che hai</span>`:''}</div>
@@ -1750,7 +1754,7 @@ function mapMount(){const host=document.getElementById('mpCanvas'),wrap=document
 function mapGoto(x,y){const w=document.querySelector('.mp-wrap');if(MAPART&&w)MAPART.center(x,y,w,true)}
 
 /* ---------- Villaggi (migrazione 042): sindaco, risorse, edifici, soldati, guarnigione, invasioni ---------- */
-let vilPlotPre=null,VIL=null,vilAvail=null,vilTab='city',vilTarget=null,vilTimer=null,vilLoadedAt=0;
+let vilPlotPre=null,vilCur=null,vilNew=false,VIL=null,vilAvail=null,vilTab='city',vilTarget=null,vilTimer=null,vilLoadedAt=0;
 const VB={hall:['🏛️','Municipio','Fa maturare BC nella cassa e permette di alzare gli altri edifici.'],lumber:['🪓','Segheria','Produce legno.'],quarry:['⛏️','Cava','Produce pietra.'],
  farm:['🌾','Fattoria','Produce cibo, che mantiene l’esercito.'],warehouse:['📦','Magazzino','Quanto puoi tenere di ogni risorsa; il 20% è nascosto ai predoni.'],
  barracks:['⚔️','Caserma','Quanti soldati puoi avere; sblocca arcieri (3) e cavalieri (5).'],wall:['🧱','Mura','+10% alla difesa per livello.']};
@@ -1759,7 +1763,7 @@ const VR=[['wood','🪵','Legno'],['stone','🪨','Pietra'],['food','🍖','Cibo
 const vProd=k=>k<=0?0:Math.round(30*k*Math.pow(1.2,k-1)),vCap=k=>Math.round(1000*Math.pow(1.5,k)),vBc=k=>Math.round(200*k*Math.pow(1.25,k-1)),vArmy=k=>25*k*(k+1)/2;
 function vEffect(k,l){if(l<=0)return '—';switch(k){case'hall':return `${num(vBc(l))} BC/giorno`;case'lumber':case'quarry':case'farm':return `${num(vProd(l))}/ora`;case'warehouse':return `${num(vCap(l))} a risorsa`;case'barracks':return `${num(vArmy(l))} soldati`;case'wall':return `+${l*10}% difesa`}}
 async function loadVil(quiet){
- try{VIL=await rpc('game_village_state');vilAvail=!!(VIL&&VIL.enabled);vilLoadedAt=Date.now()}catch(e){if(twMissing(e)){vilAvail=false;VIL=null;return}if(!quiet)say(errTxt(e),'bad')}
+ try{VIL=await rpc('game_village_state',{p_plot:vilCur});vilAvail=!!(VIL&&VIL.enabled);vilLoadedAt=Date.now();if(VIL&&VIL.enabled)vilCur=VIL.me?VIL.me.plot:null}catch(e){if(twMissing(e)){vilAvail=false;VIL=null;return}if(!quiet)say(errTxt(e),'bad')}
  if(MAP)MAP.villages=VIL&&VIL.enabled?VIL.villages:[]}
 function vilLive(){/* risorse che crescono a vista e conti alla rovescia */
  clearInterval(vilTimer);vilTimer=setInterval(()=>{if(tab!=='map'||document.hidden)return;
@@ -1775,27 +1779,34 @@ function vilHtml(){
  if(!VIL)return '<p class="mute">Caricamento del villaggio…</p>';
  if(!VIL.enabled)return '<p class="mute">I Villaggi sono chiusi in questo momento.</p>';
  const M=VIL.me;if(!M)return vilFoundHtml();
- const inc=VIL.marches.filter(m=>!m.out);
+ const sw=vilSwitch();if(vilNew)return sw+vilFoundHtml();
+ const inc=VIL.marches.filter(m=>!m.out&&m.to_plot===M.plot);
  const shield=M.shield_until?`<span class="chip s">🛡️ In tregua ancora <b data-vcd="${M.shield_until}">${fmtCd((new Date(M.shield_until)-Date.now())/1000)}</b></span>`:'';
  const head=`<div class="card vl-hd"><div class="vl-scene"><canvas id="vlScene" width="720" height="300" aria-hidden="true"></canvas><div class="vl-name"><small>Sindaco ${esc(ME.nickname||'')}</small><b>${esc(M.name)}</b></div></div>
   ${inc.length?`<div class="vl-alarm" role="alert">🚨 ${inc.map(m=>`<b>${esc(m.other)}</b> arriva tra <b data-vcd="${m.arrive_at}">${fmtCd((new Date(m.arrive_at)-Date.now())/1000)}</b>`).join('<br>')} · la guarnigione ha ${vArmyLine([M.def[0]+M.militia,M.def[1],M.def[2]])}</div>`:''}
   <div class="vl-res">${VR.map((r,i)=>{const rate=i===2?M.prod[2]-M.upkeep:M.prod[i],pc=Math.min(100,M[r[0]]/M.cap*100);return `<div class="vl-r"><span>${r[1]}</span><div style="min-width:0"><small>${r[2]} <em class="${rate<0?'bad':''}">${rate>=0?'+':''}${num(rate)}/ora</em></small><b><span data-vres="${i}">${num(M[r[0]])}</span><i> / ${num(M.cap)}</i></b><div class="vl-bar"><i style="width:${pc}%"></i><u style="left:${M.hidden/M.cap*100}%" title="Sotto questa linea è nascosto"></u></div></div></div>`}).join('')}</div>
   ${M.food<=0&&M.prod[2]<M.upkeep?'<p class="vl-warn">🍖 Il cibo è finito: l’esercito è affamato e combatte a metà forza. Migliora la Fattoria o riduci i soldati.</p>':''}
   <div class="mp-claim"><div><small>Cassa del villaggio · ${num(M.bc_day)} BC/giorno, fino a ${num(M.vault_cap)}</small><b><span data-vvault>${num(M.vault)}</span> BC</b></div><button class="btn ${M.vault>=1?'gold':'ghost'}" data-vcol ${M.vault>=1?'':'disabled'}>Riscuoti</button></div>
+  ${VIL.mine.length>1?`<button class="btn ghost sm" data-vcolall>Riscuoti le casse di tutti i villaggi · ${num(VIL.mine.reduce((a,x)=>a+x.vault,0))} BC</button>`:''}
   <div class="vl-chips">${shield}<span class="chip">⚔️ ${num(M.stats.att_won)} vinte · ${num(M.stats.att_lost)} perse</span><span class="chip">🛡️ ${num(M.stats.def_won)} difese · ${num(M.stats.def_lost)} cadute</span></div></div>
  <div class="sh-seg vl-seg" role="tablist" aria-label="Sezioni del villaggio">${[['city','🏗️','Edifici'],['army','🗡️','Esercito'],['war','⚔️','Guerra',VIL.marches.length],['log','📜','Rapporti']].map(s=>`<button type="button" role="tab" data-vtab="${s[0]}" aria-selected="${s[0]===vilTab}"><span aria-hidden="true">${s[1]}</span>${s[2]}${s[3]?`<em>${s[3]}</em>`:''}</button>`).join('')}</div>`;
  let body='';
  if(vilTab==='city')body=vilCityHtml(M);else if(vilTab==='army')body=vilArmyHtml(M);else if(vilTab==='war')body=vilWarHtml(M);else body=vilLogHtml();
- return head+body}
+ return sw+head+body}
+function vilSwitch(){
+ const mine=VIL.mine||[];if(!mine.length)return '';
+ return `<div class="vl-sw" role="tablist" aria-label="I tuoi villaggi">${mine.map(x=>{const r=regOf(x.region);return `<button type="button" role="tab" aria-selected="${!vilNew&&VIL.me&&VIL.me.plot===x.plot}" data-vsel="${x.plot}" style="--rg:${r?r.color:'#e8b84a'}"><span aria-hidden="true">${x.hall>=7?'🏰':x.hall>=4?'🏘️':'🛖'}</span><b>${esc(x.name)}</b><small>${r?r.emoji:''} Mun. ${x.hall} · ${num(x.army)} 🗡️${x.incoming?' · 🚨':''}${x.shield?' · 🛡️':''}</small></button>`}).join('')}
+  ${(VIL.my_plots||[]).length?`<button type="button" role="tab" aria-selected="${vilNew}" class="new" data-vnew><span aria-hidden="true">➕</span><b>Nuovo villaggio</b><small>${num(VIL.rules.found_cost)} BC</small></button>`:''}</div>`}
 function vilFoundHtml(){
  const P=VIL.my_plots||[],cost=VIL.rules.found_cost;
- return `<div class="card vl-found"><div class="vl-hero" aria-hidden="true">🏘️</div><h3 class="rd-h" style="margin-top:0">Fonda il tuo villaggio</h3>
+ return `<div class="card vl-found"><div class="vl-hero" aria-hidden="true">🏘️</div><h3 class="rd-h" style="margin-top:0">${(VIL.mine||[]).length?'Fonda un altro villaggio':'Fonda il tuo villaggio'}</h3>
+  <p>Ogni tuo terreno può diventare un villaggio, ognuno con edifici, risorse, cassa ed esercito suoi.${(VIL.mine||[]).length?` Hai già ${VIL.mine.length} ${VIL.mine.length===1?'villaggio':'villaggi'}: il prossimo costa <b>${num(VIL.rules.found_cost)} BC</b> (ogni villaggio in più costa 10.000 BC in più).`:''}</p>
   <p>Diventa <b>sindaco</b>: costruisci segheria, cava e fattoria per avere legno, pietra e cibo; addestra fanti, arcieri e cavalieri; lasciane qualcuno a <b>difendere</b> e manda gli altri a <b>saccheggiare</b> i villaggi vicini. Per 48 ore dopo la fondazione nessuno può attaccarti.</p>
   ${P.length?`<form id="vilFound" class="vl-ff"><label>Nome del villaggio<input id="vilName" maxlength="24" minlength="3" required placeholder="es. Rocca del Drago"></label>
    <label>Su quale terreno<select id="vilPlot">${P.map(p=>{const r=regOf(p.region);return `<option value="${p.id}"${p.id===vilPlotPre?' selected':''}>${r.emoji} ${esc(r.name)} · lotto n° ${p.id+1} · ${LANDLV[p.level][0]}</option>`}).join('')}</select></label>
    <button class="btn ${pending==='vfound'?'gold':''}" ${BAL!=null&&BAL<cost?'disabled':''}>${BAL!=null&&BAL<cost?'BC insufficienti':pending==='vfound'?`Conferma: ${num(cost)} BC`:`Fonda · ${num(cost)} BC`}</button></form>`
-  :`<p class="er-lock">Prima compra un terreno sulla mappa: il villaggio nasce lì.</p><button class="btn" data-mv="map">🗺️ Vai alla mappa</button>`}</div>
-  ${VIL.villages.length?`<h3 class="rd-h">Villaggi già fondati · ${VIL.villages.length}</h3>${vilListHtml(null)}`:''}`}
+  :`<p class="er-lock">${(VIL.mine||[]).length?'Tutti i tuoi terreni sono già villaggi: compra un altro terreno sulla mappa.':'Prima compra un terreno sulla mappa: il villaggio nasce lì.'}</p><button class="btn" data-mv="map">🗺️ Vai alla mappa</button>`}</div>
+  ${VIL.villages.length&&!(VIL.mine||[]).length?`<h3 class="rd-h">Villaggi già fondati · ${VIL.villages.length}</h3>${vilListHtml(null)}`:''}`}
 function vilCityHtml(M){
  return `<div class="vl-grid">${M.buildings.map(b=>{const B=VB[b.k],max=b.level>=VIL.rules.max_level,lock=b.k!=='hall'&&b.level+1>M.hall,c=b.next,can=c&&!lock&&M.wood>=c[0]&&M.stone>=c[1]&&(BAL==null||BAL>=c[2]),armed=pending==='vb'+b.k;
   return `<div class="vl-b"><div class="vl-bt"><span class="vl-bi" aria-hidden="true">${B[0]}</span><div style="min-width:0"><b>${B[1]} <em>liv. ${b.level}</em></b><small>${B[2]}</small></div></div>
@@ -1816,16 +1827,16 @@ function vilArmyHtml(M){
   <div class="vl-def">${VU.map(([k,ic,nm],i)=>`<label class="vl-in"><span>${ic} ${nm} <em>su ${num(M.army[i])}</em></span><input type="range" min="0" max="${M.army[i]}" value="${M.def[i]}" data-vdef="${i}"><output>${num(M.def[i])}</output></label>`).join('')}</div>
   <div class="row"><button class="btn ghost sm" data-vdefall>Tutti a difendere</button><button class="btn ghost sm" data-vdefnone>Nessuno</button><button class="btn" data-vdefsave>Salva la guarnigione</button></div></div>`}
 function vilListHtml(M){
- return `<div class="vl-list">${VIL.villages.filter(x=>!M||x.user_id!==ME.user_id).map(x=>{const sh=x.shield_until&&new Date(x.shield_until)>Date.now(),me=x.user_id===ME.user_id,sel=vilTarget===x.user_id;
-  return `<button type="button" class="vl-t${sel?' on':''}${sh||x.too_small?' off':''}" ${M?`data-vtarget="${x.user_id}"`:`data-vgo="${x.plot}"`} style="--oc:hsl(${hue(x.user_id)} 65% 55%)"><span class="vl-ti" aria-hidden="true">${x.hall>=7?'🏰':x.hall>=4?'🏘️':'🛖'}</span>
+ return `<div class="vl-list">${VIL.villages.filter(x=>!M||x.user_id!==ME.user_id).map(x=>{const sh=x.shield_until&&new Date(x.shield_until)>Date.now(),me=x.user_id===ME.user_id,sel=vilTarget===x.plot;
+  return `<button type="button" class="vl-t${sel?' on':''}${sh||x.too_small?' off':''}" ${M?`data-vtarget="${x.plot}"`:`data-vgo="${x.plot}"`} style="--oc:hsl(${hue(x.user_id)} 65% 55%)"><span class="vl-ti" aria-hidden="true">${x.hall>=7?'🏰':x.hall>=4?'🏘️':'🛖'}</span>
    <span style="min-width:0"><b>${esc(x.name)}${me?' (tuo)':''}</b><small>${esc(x.nickname)} · Municipio ${x.hall} · Mura ${x.wall}</small></span>
    <span class="vl-tm">${sh?`🛡️ <i data-vcd="${x.shield_until}">${fmtCd((new Date(x.shield_until)-Date.now())/1000)}</i>`:x.too_small?'troppo piccolo':x.min!=null?`🚶 ${x.min} min<br>🐎 ${x.min_cav} min`:''}</span></button>`}).join('')||'<p class="mute">Non ci sono altri villaggi, per ora.</p>'}</div>`}
 function vilWarHtml(M){
  const out=VIL.marches.filter(m=>m.out),inc=VIL.marches.filter(m=>!m.out),left=VIL.rules.attacks_daily-M.attacks_today;
- const free=[M.army[0]-M.def[0],M.army[1]-M.def[1],M.army[2]-M.def[2]],T=VIL.villages.find(x=>x.user_id===vilTarget);
- const march=m=>`<div class="vl-m ${m.out?'':'inc'}"><span aria-hidden="true">${m.out?(m.status==='going'?'⚔️':'🏠'):'🚨'}</span><div style="min-width:0">${m.out?(m.status==='going'?`Verso <b>${esc(m.village||m.other)}</b> di ${esc(m.other)} · ${vArmyLine(m.army)}`:`Ritorno da <b>${esc(m.village||m.other)}</b> ${m.won?'vittorioso':'sconfitto'} · ${vArmyLine(m.back)}${m.won?`<br><small>bottino 🪵 ${num(m.loot[0])} 🪨 ${num(m.loot[1])} 🍖 ${num(m.loot[2])} 🪙 ${num(m.loot[3])}</small>`:''}`):`<b>${esc(m.other)}</b> sta attaccando il tuo villaggio`}</div><b class="vl-cd" data-vcd="${m.status==='going'?m.arrive_at:m.return_at}">${fmtCd((new Date(m.status==='going'?m.arrive_at:m.return_at)-Date.now())/1000)}</b></div>`;
+ const free=[M.army[0]-M.def[0],M.army[1]-M.def[1],M.army[2]-M.def[2]],T=VIL.villages.find(x=>x.plot===vilTarget);
+ const march=m=>`<div class="vl-m ${m.out?'':'inc'}"><span aria-hidden="true">${m.out?(m.status==='going'?'⚔️':'🏠'):'🚨'}</span><div style="min-width:0">${m.out?(m.status==='going'?`Da ${esc(m.from||'')} verso <b>${esc(m.to||m.other)}</b> di ${esc(m.other)} · ${vArmyLine(m.army)}`:`Ritorno a ${esc(m.from||'')} da <b>${esc(m.to||m.other)}</b> ${m.won?'vittorioso':'sconfitto'} · ${vArmyLine(m.back)}${m.won?`<br><small>bottino 🪵 ${num(m.loot[0])} 🪨 ${num(m.loot[1])} 🍖 ${num(m.loot[2])} 🪙 ${num(m.loot[3])}</small>`:''}`):`<b>${esc(m.other)}</b> sta attaccando <b>${esc(m.to||'un tuo villaggio')}</b>`}</div><b class="vl-cd" data-vcd="${m.status==='going'?m.arrive_at:m.return_at}">${fmtCd((new Date(m.status==='going'?m.arrive_at:m.return_at)-Date.now())/1000)}</b></div>`;
  return `${inc.length||out.length?`<div class="card"><h3 class="rd-h" style="margin-top:0">Eserciti in movimento</h3>${inc.map(march).join('')}${out.map(march).join('')}</div>`:''}
- <div class="card" style="margin-top:12px"><h3 class="rd-h" style="margin-top:0">⚔️ Attacca un villaggio <small>oggi te ne restano ${num(Math.max(0,left))} su ${num(VIL.rules.attacks_daily)}</small></h3>
+ <div class="card" style="margin-top:12px"><h3 class="rd-h" style="margin-top:0">⚔️ Attacca da ${esc(M.name)} <small>oggi da qui te ne restano ${num(Math.max(0,left))} su ${num(VIL.rules.attacks_daily)}</small></h3>
   <p class="er-note">Scegli il bersaglio, poi i soldati. Se vinci porti via risorse e fino al ${num(VIL.rules.loot_bc_pct)}% della cassa, quanto riescono a trasportare. Attaccare toglie la tua tregua.</p>
   ${vilListHtml(M)}
   ${T?`<div class="vl-atk"><h4>Contro <b>${esc(T.name)}</b> di ${esc(T.nickname)}</h4>
@@ -1835,7 +1846,7 @@ function vilWarHtml(M){
  </div>`}
 function vilLogHtml(){
  const R=VIL.reports||[];if(!R.length)return '<p class="mute">Nessuna battaglia, per ora.</p>';
- return R.map(r=>{const p=r.report||{},good=r.out?r.won:!r.won;return `<div class="card vl-rep ${good?'w':'l'}"><div class="vl-rh"><span aria-hidden="true">${good?'🏆':'💀'}</span><div><b>${r.out?`Hai attaccato ${esc(p.def_village||p.def_name)}`:r.won?`${esc(p.att_name)} ha saccheggiato ${esc(p.def_village||'il villaggio')}`:`Hai respinto ${esc(p.att_name)}`}</b><small>${new Date(r.at).toLocaleString('it-IT',{weekday:'short',hour:'2-digit',minute:'2-digit'})} · ${good?'vittoria':'sconfitta'}</small></div></div>
+ return R.map(r=>{const p=r.report||{},good=r.out?r.won:!r.won;return `<div class="card vl-rep ${good?'w':'l'}"><div class="vl-rh"><span aria-hidden="true">${good?'🏆':'💀'}</span><div><b>${r.out?`${esc(p.att_village||'Il tuo villaggio')} ha attaccato ${esc(p.def_village||p.def_name)}`:r.won?`${esc(p.att_name)} ha saccheggiato ${esc(p.def_village||'il villaggio')}`:`${esc(p.def_village||'Il tuo villaggio')} ha respinto ${esc(p.att_name)}`}</b><small>${new Date(r.at).toLocaleString('it-IT',{weekday:'short',hour:'2-digit',minute:'2-digit'})} · ${good?'vittoria':'sconfitta'}</small></div></div>
   <div class="vl-vs"><div><small>${esc(p.att_name)}</small>${vArmyLine(p.atk||[])}<em>persi: ${vArmyLine(p.att_lost||[])}</em><i>forza ${num(p.ap)}</i></div><b>vs</b><div><small>${esc(p.def_name)} (+ milizia ${num(p.militia)}, mura ${num(p.wall)})</small>${vArmyLine(p.def||[])}<em>persi: ${vArmyLine(p.def_lost||[])}</em><i>forza ${num(p.dp)}</i></div></div>
   ${r.won?`<p class="vl-loot">Bottino: 🪵 ${num(r.loot[0])} · 🪨 ${num(r.loot[1])} · 🍖 ${num(r.loot[2])} · 🪙 ${num(r.loot[3])} BC</p>`:''}</div>`}).join('')}
 function vilMount(){
@@ -1844,7 +1855,7 @@ function vilMount(){
   const o=document.getElementById('vlTrCost');if(o)o.innerHTML=n?`${num(n)} soldati: <b>${num(bc)} BC</b> + <b>${num(f)} 🍖</b>`:'Scegli quanti soldati addestrare'};
  document.querySelectorAll('[data-vtr]').forEach(el=>el.oninput=upd);
  document.querySelectorAll('[data-vdef],[data-vatk]').forEach(el=>el.oninput=()=>{el.nextElementSibling.textContent=num(+el.value);vAtkInfo()});vAtkInfo()}
-function vAtkInfo(){const o=document.getElementById('vlAtkInfo'),T=VIL&&VIL.villages.find(x=>x.user_id===vilTarget);if(!o||!T)return;
+function vAtkInfo(){const o=document.getElementById('vlAtkInfo'),T=VIL&&VIL.villages.find(x=>x.plot===vilTarget);if(!o||!T)return;
  const n=[...document.querySelectorAll('[data-vatk]')].map(el=>+el.value),U=VIL.rules.units,carry=n[0]*U.inf[4]+n[1]*U.arc[4]+n[2]*U.cav[4],power=n[0]*U.inf[2]+n[1]*U.arc[2]+n[2]*U.cav[2];
  o.innerHTML=n[0]+n[1]+n[2]?`Arrivo in <b>${n[0]+n[1]?T.min:T.min_cav} min</b> · forza d’attacco circa <b>${num(power)}</b> · possono trasportare <b>${num(carry)}</b>`:'Scegli almeno un soldato.'}
 async function vilAct(btn,fn){await run(btn,async()=>{await fn();await Promise.all([loadVil(true),(async()=>{BAL=await balance().catch(()=>BAL)})()]);paintTop();renderMap()})}
@@ -1965,21 +1976,24 @@ document.addEventListener('click',e=>{
  if(t.dataset.plot){mapSel=Number(t.dataset.plot);pending=null;renderMap();if(MAPART&&MAPART.G.lots[mapSel]){const[lx,ly]=MAPART.G.lots[mapSel];mapGoto(lx,ly-10)}const sp=document.querySelector('.mp-sel');if(sp&&sp.scrollIntoView)try{sp.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}return}
  if(t.dataset.mclose!==undefined){mapSel=null;renderMap();return}
  if(t.dataset.vtab){vilTab=t.dataset.vtab;pending=null;renderMap();return}
- if(t.dataset.vcol!==undefined){vilAct(t,async()=>{const r=await rpc('game_village_collect');say(`Hai versato ${num(r.collected)} BC dalla cassa del villaggio.`,'good')});return}
+ if(t.dataset.vcol!==undefined){vilAct(t,async()=>{const r=await rpc('game_village_collect',{p_plot:vilCur});say(`Hai versato ${num(r.collected)} BC dalla cassa del villaggio.`,'good')});return}
  if(t.dataset.vbuild){const k=t.dataset.vbuild;if(pending!=='vb'+k){pending='vb'+k;renderMap();setTimeout(()=>{if(pending==='vb'+k){pending=null;if(tab==='map')renderMap()}},5000);return}
-  pending=null;vilAct(t,async()=>{const r=await rpc('game_village_build',{p_building:k});say(`${VB[k][0]} ${VB[k][1]} portato al livello ${r.level}!`,'good')});return}
+  pending=null;vilAct(t,async()=>{const r=await rpc('game_village_build',{p_plot:vilCur,p_building:k});say(`${VB[k][0]} ${VB[k][1]} portato al livello ${r.level}!`,'good')});return}
  if(t.dataset.vtrain!==undefined){const n=[0,1,2].map(i=>{const el=document.querySelector(`[data-vtr="${i}"]`);return el?Math.max(0,parseInt(el.value,10)||0):0});if(!(n[0]+n[1]+n[2])){say('Scegli quanti soldati addestrare.','bad');return}
-  vilAct(t,async()=>{const r=await rpc('game_village_train',{p_inf:n[0],p_arc:n[1],p_cav:n[2]});say(`Addestrati ${vArmyLine(n)} per ${num(r.bc)} BC e ${num(r.food)} cibo.`,'good')});return}
+  vilAct(t,async()=>{const r=await rpc('game_village_train',{p_plot:vilCur,p_inf:n[0],p_arc:n[1],p_cav:n[2]});say(`Addestrati ${vArmyLine(n)} per ${num(r.bc)} BC e ${num(r.food)} cibo.`,'good')});return}
  if(t.dataset.vdefall!==undefined||t.dataset.vdefnone!==undefined){document.querySelectorAll('[data-vdef]').forEach(el=>{el.value=t.dataset.vdefall!==undefined?el.max:0;el.nextElementSibling.textContent=num(+el.value)});return}
- if(t.dataset.vdefsave!==undefined){const n=[0,1,2].map(i=>+document.querySelector(`[data-vdef="${i}"]`).value);vilAct(t,async()=>{await rpc('game_village_defense',{p_inf:n[0],p_arc:n[1],p_cav:n[2]});say(`Guarnigione: ${vArmyLine(n)}.`,'good')});return}
- if(t.dataset.vtarget){vilTarget=vilTarget===t.dataset.vtarget?null:t.dataset.vtarget;pending=null;renderMap();const a=document.querySelector('.vl-atk');if(a&&a.scrollIntoView)try{a.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}return}
- if(t.dataset.vattackfrom){vilTarget=t.dataset.vattackfrom;mapView='vil';vilTab='war';pending=null;renderMap();const a=document.querySelector('.vl-atk');if(a&&a.scrollIntoView)try{a.scrollIntoView({block:'center'})}catch(_){}return}
- if(t.dataset.vfoundat){vilPlotPre=+t.dataset.vfoundat;mapView='vil';pending=null;renderMap();return}
+ if(t.dataset.vdefsave!==undefined){const n=[0,1,2].map(i=>+document.querySelector(`[data-vdef="${i}"]`).value);vilAct(t,async()=>{await rpc('game_village_defense',{p_plot:vilCur,p_inf:n[0],p_arc:n[1],p_cav:n[2]});say(`Guarnigione: ${vArmyLine(n)}.`,'good')});return}
+ if(t.dataset.vtarget){const pv=+t.dataset.vtarget;vilTarget=vilTarget===pv?null:pv;pending=null;renderMap();const a=document.querySelector('.vl-atk');if(a&&a.scrollIntoView)try{a.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}return}
+ if(t.dataset.vattackfrom){vilTarget=+t.dataset.vattackfrom;mapView='vil';vilTab='war';vilNew=false;pending=null;renderMap();const a=document.querySelector('.vl-atk');if(a&&a.scrollIntoView)try{a.scrollIntoView({block:'center'})}catch(_){}return}
+ if(t.dataset.vfoundat){vilPlotPre=+t.dataset.vfoundat;mapView='vil';vilNew=true;pending=null;renderMap();return}
+ if(t.dataset.vsel){const pv=+t.dataset.vsel;vilNew=false;mapView='vil';pending=null;if(VIL&&VIL.me&&VIL.me.plot===pv){renderMap();return}vilCur=pv;vilTarget=null;run(t,async()=>{await loadVil(true);renderMap();scrollTo({top:document.querySelector('.mp-seg').offsetTop-80,behavior:'smooth'})});return}
+ if(t.dataset.vnew!==undefined){vilNew=true;pending=null;renderMap();return}
+ if(t.dataset.vcolall!==undefined){vilAct(t,async()=>{const r=await rpc('game_village_collect',{p_plot:null});say(`Hai versato ${num(r.collected)} BC dalle casse di ${num(r.villages)} villaggi.`,'good')});return}
  if(t.dataset.vgo){const id=+t.dataset.vgo;mapView='map';mapSel=id;renderMap();const L=MapFx.lots()[id];if(L)mapGoto(L[0],L[1]-10);return}
  if(t.dataset.vattack!==undefined){const n=[0,1,2].map(i=>+document.querySelector(`[data-vatk="${i}"]`).value);if(!(n[0]+n[1]+n[2])){say('Scegli almeno un soldato.','bad');return}
   if(pending!=='vatk'){pending='vatk';t.classList.add('gold');t.textContent='Conferma l’attacco';setTimeout(()=>{if(pending==='vatk'){pending=null;if(t.isConnected){t.classList.remove('gold');t.textContent='⚔️ Manda l’esercito'}}},5000);return}
-  pending=null;const tg=vilTarget;vilAct(t,async()=>{const r=await rpc('game_village_attack',{p_target:tg,p_inf:n[0],p_arc:n[1],p_cav:n[2]});vilTarget=null;say(`L’esercito è partito: arriva tra ${num(r.minutes)} minuti.`,'good')});return}
- if(t.dataset.mv){mapView=t.dataset.mv;pending=null;if(mapView==='tavern'){TAV=null;renderMap();loadTavern().then(()=>{tavPoll();if(tab==='map')renderMap()});return}renderMap();return}
+  pending=null;const tg=vilTarget;vilAct(t,async()=>{const r=await rpc('game_village_attack',{p_from:vilCur,p_target:tg,p_inf:n[0],p_arc:n[1],p_cav:n[2]});vilTarget=null;say(`L’esercito è partito: arriva tra ${num(r.minutes)} minuti.`,'good')});return}
+ if(t.dataset.mv){mapView=t.dataset.mv;pending=null;if(mapView==='vil')vilNew=false;if(mapView==='tavern'){TAV=null;renderMap();loadTavern().then(()=>{tavPoll();if(tab==='map')renderMap()});return}renderMap();return}
  if(t.dataset.mzoom!==undefined){const w=document.querySelector('.mp-wrap'),sc=mapZoom?1.5:1,f=w?[(w.scrollLeft+w.clientWidth/2)/sc,(w.scrollTop+w.clientHeight/2)/sc]:null;mapZoom=!mapZoom;mapScroll=null;renderMap();if(f&&MAPART)MAPART.center(f[0],f[1],document.querySelector('.mp-wrap'));return}
  if(t.dataset.mgo!==undefined){const k=Number(t.dataset.mgo),pt=k?MapFx.R[k].s:[MapFx.CX,MapFx.CY];if(mapView!=='map'){mapView='map';renderMap()}mapGoto(pt[0],pt[1]);const w=document.querySelector('.mp-wrap');if(w&&w.scrollIntoView)try{w.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}return}
  if(t.dataset.mcol!==undefined){mapAct(t,async()=>{const r=await rpc('game_land_collect');say(r.collected>0?`Hai riscosso ${num(r.collected)} BC di rendita.`:'Niente da riscuotere per ora.','good')});return}
@@ -2102,7 +2116,7 @@ document.addEventListener('submit',e=>{if(e.target&&e.target.id==='chForm'){e.pr
 document.addEventListener('submit',e=>{if(!e.target||e.target.id!=='vilFound')return;e.preventDefault();const b=e.target.querySelector('button'),nm=$('vilName').value.trim(),pl=+$('vilPlot').value;
  if(nm.length<3){say('Il nome deve avere almeno 3 caratteri.','bad');return}
  if(pending!=='vfound'){pending='vfound';b.classList.add('gold');b.textContent=`Conferma: ${num(VIL.rules.found_cost)} BC`;setTimeout(()=>{if(pending==='vfound'){pending=null;if(b.isConnected){b.classList.remove('gold');b.textContent=`Fonda · ${num(VIL.rules.found_cost)} BC`}}},5000);return}
- pending=null;vilAct(b,async()=>{await rpc('game_village_found',{p_plot:pl,p_name:nm});vilTab='city';await loadMap(true);say(`Benvenuto, sindaco di <b>${esc(nm)}</b>! Hai 48 ore di tregua per prepararti.`,'good')})});
+ pending=null;vilAct(b,async()=>{const r=await rpc('game_village_found',{p_plot:pl,p_name:nm});vilCur=r.plot;vilNew=false;vilTab='city';await loadMap(true);say(`Benvenuto, sindaco di <b>${esc(nm)}</b>! Hai 48 ore di tregua per prepararti.`,'good')})});
 document.addEventListener('submit',e=>{if(e.target&&e.target.id==='diceForm'){e.preventDefault();const b=e.target.querySelector('button'),v=parseInt($('diceStake').value,10);
  run(b,async()=>{const r=await rpc('game_dice_open',{p_stake:v});BAL=await balance().catch(()=>BAL);await loadTavern(true);paintTop();renderMap();say(`Tavolo aperto con ${num(r.stake)} BC: aspetta uno sfidante.`,'good')})}});
 setInterval(()=>{if(ST&&!document.hidden)beat()},40000);                                                      // «ci sono»: chi ha la pagina aperta risulta online
