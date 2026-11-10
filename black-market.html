@@ -84,6 +84,7 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 <script src="black-market-scommesse.js?v=4"></script>
 <script src="black-market-svizzera.js?v=2"></script>
 <script src="black-market-inviti.js?v=2"></script>
+<script src="black-market-tessera.js?v=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 /* ============ CONFIGURAZIONE: incolla qui i due valori di Supabase (Project Settings > API) ============ */
@@ -257,6 +258,8 @@ $app.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(b){i
 $app.addEventListener('change',async e=>{const s=e.target;if(s.dataset.act=='role'){const r=ask('Motivazione del cambio ruolo:');if(!r){route();return}try{await rpc('admin_set_role',{p_user:s.dataset.u,p_role:s.value,p_reason:r});await core();route()}catch(er){toast(er.message,1);route()}}});
 /* inviti e condivisioni: si aggancia DOPO che tutte le pagine (R[''], R.wanted, R.p…) sono definite, perché le estende */
 try{if(window.BM_INVITE)window.BM_INVITE(BM)}catch(e){console.error('Inviti non caricati',e)}
+/* tessere NFC dei duellanti (#/t/<id>, #/tessere): anche questa estende #/p, quindi va dopo */
+try{if(window.BM_CARD)window.BM_CARD(BM)}catch(e){console.error('Tessere non caricate',e)}
 async function route(){if(!me)return;navOpen=false;const h=location.hash.replace(/^#\/?/,'').split('/'),k=h[0]||'';
  try{await (R[k]||R[''])(h[1])}catch(er){shell(`<div class="err">Qualcosa è andato storto: ${esc(er.message)}</div>`,'')}scrollTo(0,0)}
 async function boot(){const{data:{session}}=await sb.auth.getSession();if(!session){me=null;authView((()=>{try{return localStorage.getItem('tempio.invito')}catch(e){return null}})()?'up':'in');return}

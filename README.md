@@ -757,5 +757,11 @@ Le statistiche degli oggetti del mercante seguono ora la stessa curva dei dungeo
 - Tutti i BC passano dal registro (`game_village_found`, `game_village_build`, `game_village_train`, `game_village_collect`). Impostazioni `game_village_*` in Admin › Impostazioni (interruttore `game_village_enabled`).
 - File: `black-market-eroi-villaggi.sql` (si può rieseguire), `black-market-eroi-villaggi-test.sql` (solo su progetto di prova vuoto), `black-market-eroi-villaggi-down.sql` (spegne, i dati restano); pagina `eroi.html`. Se avevi eseguito la prima versione (un villaggio a testa) basta rieseguire la migrazione: i villaggi esistenti restano.
 
+## Tessere NFC dei duellanti (10 novembre 2026, nessuna migrazione)
+- Ogni duellante ha una **tessera**: `black-market.html#/t/<id>`, con Elo per formato (posizione, V/P/S e il tuo Elo a confronto), taglia sulla sua testa, scontri diretti con te, ultime partite in Ladder e due pulsanti grandi: **⚔️ Sfida in Ladder** e **🎯 Ladder + taglia** (attivo solo se ha taglie che puoi incassare). Si sceglie il formato (Advanced/Edison) e si conferma con un secondo tocco; la sfida passa da `ladder_challenge` come la Caccia alle taglie.
+- Il link si scrive su un **tag NFC** (va bene un NTAG213: il link è di circa 110 caratteri): chi lo tocca col telefono apre la tessera (se non è entrato nel Black Market, prima accede e poi ci arriva).
+- Dalla propria tessera ognuno vede il suo link; l'amministratore ha anche **`#/tessere`**, l'elenco di tutti i duellanti per scrivere i tag uno dopo l'altro. Con Chrome su Android il tag si scrive direttamente dall'app (📡 Scrivi, con l'opzione per bloccarlo); altrove si copia il link e lo si scrive con un'app come NFC Tools.
+- Dal profilo `#/p/<id>` c'è il pulsante «📇 Tessera». File: `black-market-tessera.js` (nuovo), `black-market.html`, `sw.js` (cache tempio-v69).
+
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.
