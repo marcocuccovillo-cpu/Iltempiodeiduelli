@@ -1,4 +1,4 @@
-/* La guerra degli Eroi — Lo stagno: grafica dei 30 pet companion.
+/* La guerra degli Eroi — Lo stagno: grafica dei 45 pet companion (30 originali + 15 dei gradi 10–14).
    Tutti gli sprite sono disegnati qui dentro, in codice (pixel art originale, nessuna immagine esterna): sono creature inventate,
    ispirate ai tipi di mostro (Drago, Incantatore, Guerriero, Bestia alata, Macchina…), non personaggi esistenti.
    Uso: PetArt.sprite('gatto', {tier:1, size:96, alt:'Gatto'}) → <img> pronto (data URI, ingrandito senza sfocare). */
@@ -426,13 +426,158 @@
     spark(p, 3, 4, W); spark(p, 28, 5, W); spark(p, 2, 27, '#ffe66b'); spark(p, 29, 28, '#ffe66b');
     return p;
   };
+  /* ---------- gradi 10–14 (livelli 420–600): 15 compagni nuovi, sempre creature originali ---------- */
+  ART.chimera = function () {            /* leone alato con criniera di fiamma e coda di serpente */
+    var p = new Px(N, N), b = '#e0a03a', dk = '#a8661c', mn = '#ff5a2a';
+    wings(p, 17, '#7a3a8a', '#d9a3ff');
+    p.tube([[22, 26, 1.6], [27, 26, 1.4], [29, 22, 1.4], [27, 19, 1.6]], '#4fae5a'); p.ell(26.5, 18.5, 2, 1.6, '#4fae5a'); p.put(26, 18, '#ffe14d');
+    p.ell(15.5, 24, 7.4, 5.4, b); p.ell(15.5, 25.4, 4, 3.2, '#ffd9a0'); p.ell2(5, 28.6, 3, 1.7, dk); p.rect2(4, 29, 1, 1, '#fff3cf', { flat: true });
+    for (var a = 0; a < 12; a++) { var r = a * .5236; p.poly([[15.5 + Math.cos(r) * 6, 14 + Math.sin(r) * 6], [15.5 + Math.cos(r + .26) * 11.5, 14 + Math.sin(r + .26) * 10.5], [15.5 + Math.cos(r + .52) * 6, 14 + Math.sin(r + .52) * 6]], a % 2 ? mn : '#ffb03a', { flat: true }); }
+    p.ell(15.5, 14, 7.4, 6.8, b); p.ell(15.5, 17.6, 4, 2.6, '#ffd9a0');
+    eyes(p, 12, 3, '#ff3b2a', true); p.rect(15, 16, 2, 1, '#6a2a14', { flat: true }); smile(p, 18, '#6a2a14');
+    p.poly2([[10, 8], [9, 4], [12, 7]], '#f2e3b3');
+    return p;
+  };
+  ART.golem_ossidiana = function () {    /* golem di vetro vulcanico con nucleo di lava */
+    var p = new Px(N, N), b = '#2c2440', lt = '#5a4a80', lv = '#ff6a1f';
+    p.rect(9, 25, 5, 5, b); p.rect(18, 25, 5, 5, b);
+    p.poly([[6, 13], [10, 9], [22, 9], [26, 13], [25, 25], [7, 25]], b); p.poly([[9, 11], [15, 9], [13, 16], [8, 18]], lt, { flat: true });
+    p.tube([[6, 14, 2.6], [3, 20, 2.8], [3, 25, 3]], b); p.tube([[26, 14, 2.6], [29, 20, 2.8], [29, 25, 3]], b);
+    p.ell(15.5, 18.5, 3.4, 3.4, '#ffb03a', { flat: true }); p.ell(15.5, 18.5, 2, 2, '#ffe66b', { flat: true });
+    p.line(15, 22, 13, 25, lv); p.line(17, 22, 20, 25, lv); p.line(12, 18, 8, 20, lv); p.line(19, 17, 23, 15, lv);
+    p.poly([[10, 9], [12, 3], [15.5, 6], [19, 3], [21, 9]], b); p.poly([[12, 4], [14, 6], [12, 8]], lt, { flat: true });
+    p.rect(11, 11, 3, 2, lv, { flat: true }); p.rect(18, 11, 3, 2, lv, { flat: true }); p.put(11, 11, '#ffe66b'); p.put(18, 11, '#ffe66b');
+    spark(p, 4, 6, '#ff9a3a'); spark(p, 28, 9, '#ff9a3a');
+    return p;
+  };
+  ART.medusa = function () {             /* medusa abissale luminosa */
+    var p = new Px(N, N), b = '#5ad1e8', dk = '#2a8fb8', gl = '#d6fbff';
+    [[8, 2], [12, 1], [16, 0], [20, 1], [24, 2]].forEach(function (c, i) { p.tube([[c[0], 17, 1.3], [c[0] + (i % 2 ? 2 : -2), 22, 1.1], [c[0], 26, 1], [c[0] + (i % 2 ? -1 : 1), 30, .7]], i % 2 ? '#ff8ad8' : '#9fe8ff'); });
+    p.ell(15.5, 12.5, 11.5, 9, b); p.rect(4, 13, 24, 6, b); p.ell(15.5, 18.5, 11.6, 2.4, dk);
+    p.ell(15.5, 10, 7.5, 5.4, '#8ae6f5'); p.ell(12, 7, 3, 2, gl, { flat: true });
+    for (var x = 5; x < 27; x += 3) p.put(x, 19, '#ff8ad8');
+    eyes(p, 13, 3.2, '#1a1030', true); blush(p, 15, 5, '#ff8ad8'); smile(p, 16, '#1a1030');
+    spark(p, 3, 4, gl); spark(p, 29, 8, gl); p.put(27, 28, gl); p.put(4, 26, gl);
+    return p;
+  };
+  ART.kirin = function () {              /* cavallo sacro con corno e criniera di fulmini */
+    var p = new Px(N, N), b = '#f2efe6', sc = '#6cc0b8', mn = '#4fb8ff';
+    p.rect(8, 23, 3, 7, b); p.rect(13, 24, 3, 6, b); p.rect(19, 24, 3, 6, b); p.rect(24, 23, 3, 7, b);
+    [8, 13, 19, 24].forEach(function (x) { p.rect(x, 29, 3, 1, '#ffd23f', { flat: true }); });
+    p.ell(17, 20, 10, 5.6, b); for (var x = 10; x < 26; x += 3) p.ell(x, 20, 1.4, 1, sc, { flat: true });
+    p.tube([[27, 18, 1.6], [30, 21, 1.4], [29, 26, 1.2]], mn);
+    p.tube([[10, 18, 3], [8, 12, 3]], b); p.ell(7.5, 9, 4.6, 3.8, b); p.ell(4.5, 10.5, 2.6, 2.2, b);
+    p.poly([[9, 6], [12, 0], [11, 6]], '#ffd23f', { flat: true }); p.put(11, 2, W);
+    p.poly([[10, 6], [15, 7], [12, 10], [16, 12], [12, 14], [14, 17], [10, 16]], mn, { flat: true }); p.line(12, 9, 15, 12, '#cfeaff');
+    p.eye(6, 8, '#4fb8ff'); p.put(3, 11, '#5a5a6a');
+    spark(p, 22, 6, '#4fb8ff'); spark(p, 28, 12, '#cfeaff');
+    return p;
+  };
+  ART.scarabeo = function () {           /* scarabeo d'ambra corazzato */
+    var p = new Px(N, N), b = '#c87a14', dk = '#8a4a0a', am = '#ffb83a';
+    [[8, 18, 2, 14], [7, 23, 1, 20], [8, 27, 2, 26]].forEach(function (l) { p.line(l[0], l[1], l[2], l[3] + 2, '#3a2410'); p.line(31 - l[0], l[1], 29 - l[2], l[3] + 2, '#3a2410'); });
+    p.ell(15.5, 20, 9.5, 9, b); p.line(15, 12, 15, 29, dk); p.line(16, 12, 16, 29, dk);
+    p.ell(11.5, 18, 3, 4, am, { flat: true }); p.ell(20.5, 18, 3, 4, am, { flat: true }); p.ell(10.5, 16.5, 1, 1.6, '#fff0b8', { flat: true }); p.ell(19.5, 16.5, 1, 1.6, '#fff0b8', { flat: true });
+    p.put(11, 19, '#6a3a0a'); p.put(21, 19, '#6a3a0a');
+    p.ell(15.5, 10, 6.4, 4.4, '#5a3410'); p.poly([[13, 7], [15.5, 0], [18, 7]], '#5a3410'); p.poly([[15, 2], [15.5, 0], [16.5, 3]], am, { flat: true });
+    p.line(11, 7, 8, 3, '#3a2410'); p.line(20, 7, 23, 3, '#3a2410');
+    eyes(p, 9, 2.8, '#ffe14d'); smile(p, 12, '#ffb83a');
+    return p;
+  };
+  ART.kitsune = function () {            /* volpe spirito a nove code, lunare */
+    var p = new Px(N, N), b = '#f4f1ff', in_ = '#b9a8ff', tip = '#7fd0ff';
+    for (var i = 0; i < 5; i++) { var a = -2.95 + i * .64, ex = 15.5 + Math.cos(a) * 14, ey = 22 + Math.sin(a) * 12; p.tube([[15.5 + Math.cos(a) * 3, 23, 1.8], [15.5 + Math.cos(a) * 9, 22 + Math.sin(a) * 8, 2.6], [ex, ey, 1.6]], b); p.ell(ex, ey, 1.8, 1.8, tip, { flat: true }); }
+    p.ell(15.5, 24.5, 6.6, 5.2, b); p.ell(15.5, 25.5, 3.4, 3, '#ffffff'); p.ell2(4, 28.7, 2.6, 1.6, in_);
+    ears(p, b, in_, 9, 6, 7, 5);
+    p.ell(15.5, 14, 7.6, 6.4, b); p.ell(15.5, 17.6, 3.6, 2.4, '#ffffff');
+    p.poly([[12, 12], [10, 11], [12, 10]], '#ff5aa0', { flat: true }); p.poly([[19, 12], [21, 11], [19, 10]], '#ff5aa0', { flat: true });
+    eyes(p, 13, 2.6, '#7a5ad8'); p.put(15, 16, K); p.put(16, 16, K); smile(p, 17);
+    p.ell(15.5, 9.5, 1.2, 1.2, '#7fd0ff', { flat: true }); spark(p, 26, 4, '#cfeaff'); spark(p, 4, 5, '#cfeaff');
+    return p;
+  };
+  ART.wyrm_magma = function () {
+    return dragon({ b: '#3a2220', dk: '#1f1210', bl: '#ff9a3a', eye: '#ffe14d', wing: '#5a1e10', wingLine: '#ff6a1f', spines: true, spike: '#ff6a1f', horn: '#ffb03a', big: true,
+      mark: function (p) { p.line(9, 15, 12, 17, '#ff6a1f'); p.line(22, 15, 19, 17, '#ff6a1f'); p.line(11, 23, 13, 27, '#ff6a1f'); p.line(20, 23, 18, 27, '#ff6a1f'); spark(p, 15.5, 4, '#ffb03a'); } });
+  };
+  ART.kraken = function () {             /* piovra delle profondità */
+    var p = new Px(N, N), b = '#a03a8a', dk = '#6a1e5a', sk = '#ffb8e8';
+    [[-11, 1], [-7, -1], [-3, 1], [3, -1], [7, 1], [11, -1]].forEach(function (t) { var x = 15.5 + t[0]; p.tube([[15.5 + t[0] * .4, 20, 2.2], [x, 24, 1.8], [x + t[1] * 3, 28, 1.3], [x + t[1] * 5, 26, .9]], b); p.put(Math.round(x), 26, sk); });
+    p.ell(15.5, 12, 10, 9.4, b); p.ell(15.5, 19, 8, 3.4, b); p.ell(12, 7, 3.6, 2.6, '#d06ab8', { flat: true });
+    [[8, 12], [23, 12], [11, 6], [20, 5], [15, 3]].forEach(function (c) { p.ell(c[0], c[1], 1, 1, sk, { flat: true }); });
+    p.ell2(4, 14, 3, 3, '#fff3cf', { flat: true }); p.ell2(4, 14.5, 1.4, 1.8, '#1a1030', { flat: true }); p.px2(4.5, 13, W);
+    p.rect(14, 18, 4, 1, dk, { flat: true });
+    spark(p, 3, 4, '#9fe8ff'); p.put(28, 5, '#9fe8ff'); p.put(27, 4, '#9fe8ff');
+    return p;
+  };
+  ART.gatto_nebulosa = function () {     /* gatto con il pelo fatto di galassia */
+    var p = new Px(N, N), b = '#2a2a7a', b2 = '#5a3ab8', st = '#ffffff';
+    p.tube([[22, 27, 2], [27, 25, 2], [29, 19, 1.8], [27, 15, 1.6]], b2); p.ell(27, 14.5, 2, 2, '#ff7ad8', { flat: true });
+    p.ell(15.5, 24, 7.6, 5.8, b); p.ell(14, 23, 4, 3, b2, { flat: true }); p.ell2(5, 28.6, 3, 1.8, b);
+    ears(p, b, '#ff7ad8', 10, 5.5, 7, 5);
+    p.ell(15.5, 14.5, 8.6, 7, b); p.ell(12.5, 12.5, 4, 3, b2, { flat: true }); p.ell(19.5, 17, 3, 2, '#7a3ab8', { flat: true });
+    [[9, 13], [20, 11], [13, 18], [22, 16], [17, 9], [8, 22], [21, 24], [13, 26], [18, 22]].forEach(function (c) { p.put(c[0], c[1], st); });
+    spark(p, 11, 21, '#ffe66b'); spark(p, 20, 27, '#9fe8ff');
+    eyes(p, 13, 3, '#ffe66b', true); p.put(15, 16, '#ff7ad8'); p.put(16, 16, '#ff7ad8'); smile(p, 17, '#ff7ad8');
+    p.line(5, 15, 9, 16, '#9fa8ff'); p.line(26, 15, 22, 16, '#9fa8ff');
+    return p;
+  };
+  ART.drago_vuoto = function () {
+    return dragon({ b: '#24123f', dk: '#12091f', bl: '#7a4ae0', eye: '#ff5aa0', wing: '#3a1a6a', wingLine: '#c9a8ff', spines: true, spike: '#c9a8ff', horn: '#c9a8ff', big: true,
+      mark: function (p) { [[10, 13], [21, 16], [14, 24], [18, 26], [12, 18]].forEach(function (c) { p.put(c[0], c[1], '#ffffff'); }); spark(p, 15.5, 4.6, '#ff5aa0'); p.ell(15.5, 1.6, 2.4, 1, '#c9a8ff', { flat: true }); } });
+  };
+  ART.behemoth = function () {           /* bestione corazzato a quattro corna */
+    var p = new Px(N, N), b = '#6a5a4a', dk = '#463a30', pl = '#b8a888', hn = '#f2e3c0';
+    p.rect(6, 24, 5, 6, dk); p.rect(21, 24, 5, 6, dk); p.rect(12, 25, 3, 5, dk); p.rect(17, 25, 3, 5, dk);
+    p.ell(16.5, 19.5, 12.5, 7.4, b); for (var i = 0; i < 5; i++) p.poly([[8 + i * 4.4, 13.5], [10 + i * 4.4, 9], [12 + i * 4.4, 13.5]], pl);
+    p.rect(7, 19, 20, 1, dk, { flat: true });
+    p.ell(8, 18, 6.4, 5.6, b); p.ell(5, 21, 3.6, 2.6, pl);
+    p.poly([[4, 14], [0, 8], [6, 12]], hn); p.poly([[10, 13], [13, 6], [12, 14]], hn); p.poly([[3, 22], [0, 24], [4, 24]], hn);
+    p.eye(5, 16, '#ff3b2a'); p.eye(9, 16, '#ff3b2a'); p.put(4, 21, dk); p.put(6, 21, dk);
+    p.tube([[29, 18, 1.6], [31, 22, 1.2]], dk);
+    return p;
+  };
+  ART.arcangelo = function () {          /* spirito di luce alato con aureola */
+    var p = new Px(N, N), b = '#fff8e6', gd = '#ffd23f', wg = '#ffffff';
+    p.poly2([[12, 16], [1, 5], [2, 12], [0, 15], [3, 18], [1, 22], [11, 22]], wg); p.line2(11, 16, 3, 8, '#e0e8ff'); p.line2(11, 19, 2, 15, '#e0e8ff'); p.line2(11, 21, 3, 20, '#e0e8ff');
+    p.poly([[10, 30], [12, 18], [20, 18], [22, 30]], b); p.rect(12, 21, 8, 1, gd, { flat: true }); p.poly([[14, 22], [18, 22], [16, 30]], '#ffe9a8', { flat: true });
+    p.ell(15.5, 12.5, 6, 6, '#ffe0c2'); p.poly([[9, 11], [15.5, 5], [22, 11], [21, 8], [15.5, 4], [10, 8]], '#ffe14d');
+    p.ell(15.5, 2.5, 5.5, 1.6, gd); p.ell(15.5, 2.5, 3.8, .6, '#fffbe0', { flat: true });
+    eyes(p, 12, 2.4, '#4fb8ff'); blush(p, 14, 3.6); smile(p, 15, '#c06a4a');
+    spark(p, 3, 26, gd); spark(p, 28, 26, gd); spark(p, 27, 2, '#cfeaff');
+    return p;
+  };
+  ART.drago_primordiale = function () {
+    return dragon({ b: '#ffd23f', dk: '#c08a14', bl: '#fff3c8', eye: '#ff3b52', wing: '#ff6ad5', wingLine: '#7fe3ff', spines: true, spike: '#7fe3ff', horn: '#ffffff', big: true,
+      mark: function (p) { p.ell(15.5, 1.6, 4, 1.2, '#fffbe0', { flat: true }); spark(p, 15.5, 4.6, '#7fe3ff'); [[9, 23], [22, 23], [15, 27]].forEach(function (c) { p.put(c[0], c[1], '#ff6ad5'); }); } });
+  };
+  ART.eclissi = function () {            /* guardiano dell'eclissi: sole e luna in armatura */
+    var p = new Px(N, N), ar = '#3a3a5a', lt = '#6a6a9a', gd = '#ffd23f';
+    for (var a = 0; a < 12; a++) { var r = a * .5236; p.line(15.5 + Math.cos(r) * 10, 13 + Math.sin(r) * 10, 15.5 + Math.cos(r) * 14.5, 13 + Math.sin(r) * 14.5, a % 2 ? '#ffb03a' : gd); }
+    p.ell(15.5, 13, 10, 10, gd); p.ell(17.5, 12, 8.4, 8.4, '#1a1030', { flat: true }); p.ell(13, 9, 2, 2, '#fff3a0', { flat: true });
+    p.poly([[8, 30], [9, 20], [22, 20], [23, 30]], ar); p.poly([[10, 21], [15, 21], [12, 29]], lt, { flat: true });
+    p.rect2(9, 19, 4, 3, lt); p.rect(14, 22, 4, 4, gd, { flat: true }); p.put(15, 23, W);
+    p.ell(15.5, 13.5, 5, 5, ar); p.rect(11, 12, 10, 3, '#12091f', { flat: true }); p.rect(12, 13, 2, 1, '#7fe3ff', { flat: true }); p.rect(18, 13, 2, 1, '#7fe3ff', { flat: true });
+    p.rect(15, 7, 2, 4, gd, { flat: true });
+    return p;
+  };
+  ART.albero_mondo = function () {       /* piccolo albero del mondo con un volto gentile */
+    var p = new Px(N, N), tr = '#8a5a2b', dk = '#5a3a1a', lf = '#4fae5a', lf2 = '#7fe07a';
+    p.poly([[5, 30], [10, 25], [12, 18], [20, 18], [22, 25], [27, 30]], tr); p.line(9, 29, 3, 31, dk); p.line(23, 29, 29, 31, dk); p.line(14, 20, 13, 29, dk);
+    p.ell(15.5, 10, 13, 8.4, lf); p.ell(9, 8, 5, 4, lf2, { flat: true }); p.ell(22, 12, 5, 3.6, '#3a8a4a', { flat: true }); p.ell(15.5, 4, 6, 3, lf2);
+    [[7, 12, '#ff7ad8'], [24, 7, '#ffe14d'], [12, 5, '#9fe8ff'], [20, 14, '#ff7ad8'], [5, 7, '#ffe14d']].forEach(function (c) { p.ell(c[0], c[1], 1, 1, c[2], { flat: true }); });
+    eyes(p, 21, 2.6, '#ffe66b'); smile(p, 24, '#3a2410'); blush(p, 23, 4.2, '#d98a6a');
+    p.ell(26.5, 22, 2.2, 1.6, '#ffffff'); p.put(28, 21, '#ffd23f');
+    spark(p, 2, 2, '#ffe66b'); spark(p, 29, 2, '#cfeaff');
+    return p;
+  };
 
   /* ---------- decorazioni per rarità: più il pet è raro, più brilla ---------- */
   function finish(p, tier) {
     if (tier >= 6) { /* ombra luminosa a terra */ }
     var sp = [[3, 3], [28, 2], [2, 15], [29, 14], [4, 28], [27, 29]];
     var n = tier >= 9 ? 6 : tier >= 7 ? 4 : tier >= 5 ? 2 : tier >= 3 ? 1 : 0;
-    for (var i = 0; i < n; i++) { var s = sp[i], c = tier >= 9 ? '#ffe66b' : tier >= 7 ? '#cfeaff' : '#ffffff'; if (!p.get(s[0], s[1])) spark(p, s[0], s[1], c); }
+    for (var i = 0; i < n; i++) { var s = sp[i], c = tier >= 12 ? (i % 2 ? '#ff9be0' : '#7fe3ff') : tier >= 9 ? '#ffe66b' : tier >= 7 ? '#cfeaff' : '#ffffff'; if (!p.get(s[0], s[1])) spark(p, s[0], s[1], c); }
+    if (tier >= 10) { /* gradi 10+: piccole stelle in più agli angoli */ [[1, 8], [30, 8], [1, 22], [30, 22]].forEach(function (s, i) { if (!p.get(s[0], s[1])) p.put(s[0], s[1], tier >= 13 ? '#ffe66b' : i % 2 ? '#cfeaff' : '#ff9be0'); }); }
     return p;
   }
   var CACHE = {};

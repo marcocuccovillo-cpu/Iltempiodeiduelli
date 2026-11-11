@@ -56,7 +56,9 @@
 .er-nm{font-weight:700;overflow-wrap:anywhere;color:var(--rc,var(--tx))}
 .er-bn{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.er-bn span{font-size:.74rem;font-weight:700;padding:1px 7px;border-radius:99px;border:1px solid var(--line);color:var(--ac2);background:rgba(var(--ac-rgb),.08)}
 .er-bn span.sp{color:var(--gold);border-color:rgba(232,184,74,.45);background:rgba(232,184,74,.08)}
-.r-base{--rc:#9ca3b8}.r-comune{--rc:#c3c8d8}.r-non_comune{--rc:#4ade9b}.r-raro{--rc:#6cb6ff}.r-epico{--rc:#c084fc}.r-leggendario{--rc:#f5b942}.r-mitico{--rc:#ff6b9d}
+.r-base{--rc:#9ca3b8}.r-comune{--rc:#c3c8d8}.r-non_comune{--rc:#4ade9b}.r-raro{--rc:#6cb6ff}.r-epico{--rc:#c084fc}.r-leggendario{--rc:#f5b942}.r-mitico{--rc:#ff6b9d}.r-divino{--rc:#7fe3ff}
+.pt-c.r-divino,.hs-pet.r-divino,.pt-strip.r-divino{border-color:transparent!important;background-image:linear-gradient(var(--surf,#15111f),var(--surf,#15111f)),linear-gradient(120deg,#7fe3ff,#ff9be0,#ffe66b,#7fe3ff);background-origin:border-box;background-clip:padding-box,border-box;background-size:100% 100%,300% 100%;animation:ptDiv 6s linear infinite}
+@keyframes ptDiv{to{background-position:0 0,300% 0}}@media(prefers-reduced-motion:reduce){.pt-c.r-divino,.hs-pet.r-divino,.pt-strip.r-divino{animation:none}}
 .er-rar{font-size:.72rem;font-weight:700;color:var(--rc,var(--mu));text-transform:uppercase;letter-spacing:.05em}
 .er-inv{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
 .er-inv .btn{min-height:44px;padding:0 14px;font-size:.92rem}
@@ -556,7 +558,7 @@ body.er-fab-on{padding-bottom:88px}
 <script src="tempio.js?v=15"></script>
 <script src="tempio-notifiche.js?v=2"></script>
 <script src="eroi-torre.js?v=1"></script>
-<script src="eroi-pet.js?v=1"></script>
+<script src="eroi-pet.js?v=2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 (function(){'use strict';
@@ -1156,9 +1158,9 @@ function dngModal(res,no){
 /* ---------- Lo stagno (pet companion) ---------- */
 const PA=window.PetArt;
 let PD=null,petAvail=null;
-const PRAR=['base','comune','non_comune','non_comune','raro','raro','epico','leggendario','leggendario','mitico'];
+const PRAR=['base','comune','non_comune','non_comune','raro','raro','epico','leggendario','leggendario','mitico','mitico','mitico','divino','divino','divino'];
 const PEFF={for:'Forza',des:'Destrezza',vig:'Vigore',spi:'Spirito',frt:'Fortezza'};
-const prc=t=>PRAR[Math.max(0,Math.min(9,Number(t)||0))];
+const prc=t=>PRAR[Math.max(0,Math.min(PRAR.length-1,Number(t)||0))];
 const pgrade=t=>Number(t)===0?'Compagno base':'Grado '+t;
 function petLabel(l,v){if(PEFF[l.effect])return `+${num(v)}% ${PEFF[l.effect]}`;if(l.effect==='xp')return `+${num(v)}% XP`;if(l.effect==='actions')return `+${num(v)} azione boss al giorno`;return `+${num(v*25)}% ricarica energia`}
 function petSprite(p,size,cls){return PA?PA.sprite(p.sprite,{tier:p.tier,size,alt:p.name,cls}):`<span style="font-size:${Math.round(size/2)}px" aria-hidden="true">🐸</span>`}
@@ -1196,17 +1198,17 @@ function renderPond(){
  const el=$('p-pond');
  if(petAvail===false){el.innerHTML=`<h2 class="er-h">Lo stagno</h2><p class="er-msg">Lo Stagno non è ancora attivo: nel database va eseguita la migrazione <b>black-market-eroi-stagno.sql</b>.</p>`;return}
  if(!PD){el.innerHTML='<p class="mute">Caricamento…</p>';return}
- const P=PD.pets,how=fold('pt_how','📖','Come funziona lo Stagno','Regole in breve',null,`<ul class="er-how"><li>Scegli <b>uno dei tre compagni base</b> (gratis, una volta sola): da quel momento ti segue ovunque.</li><li>Il compagno attivo dà <b>bonus alle tue statistiche</b> in ogni combattimento: duelli, boss, dungeon e Torre.</li><li>Guadagna il <b>${PD.xp_pct}% dell’XP</b> che ottieni tu e sale di livello (fino al livello ${PD.max_level}, mai oltre il tuo eroe). Più sale, più i bonus <b>diventano forti e numerosi</b>: se ne sbloccano di nuovi ai livelli 10, 25, 45 e 70.</li><li>Gli altri <b>27 compagni</b> si comprano con i BC, in 9 gradi: più alto è il grado, più costano e più sono forti e belli. Si compra solo dopo aver scelto il compagno base.</li><li>Puoi cambiare compagno quando vuoi: ognuno <b>conserva il suo livello</b>, ma solo quello attivo guadagna esperienza.</li></ul>`);
+ const P=PD.pets,how=fold('pt_how','📖','Come funziona lo Stagno','Regole in breve',null,`<ul class="er-how"><li>Scegli <b>uno dei tre compagni base</b> (gratis, una volta sola): da quel momento ti segue ovunque.</li><li>Il compagno attivo dà <b>bonus alle tue statistiche</b> in ogni combattimento: duelli, boss, dungeon e Torre.</li><li>Guadagna il <b>${PD.xp_pct}% dell’XP</b> che ottieni tu e sale di livello (fino al livello ${PD.max_level}, mai oltre il tuo eroe). Più sale, più i bonus <b>diventano forti e numerosi</b>: se ne sbloccano di nuovi ai livelli 10, 25, 45 e 70.</li><li>Gli altri <b>${P.filter(p=>!p.starter).length} compagni</b> si comprano con i BC, in ${Math.max(...P.map(p=>p.tier))} gradi (fino al livello ${num(Math.max(...P.map(p=>p.min_level)))}): più alto è il grado, più costano e più sono forti e belli. Si compra solo dopo aver scelto il compagno base.</li><li>Puoi cambiare compagno quando vuoi: ognuno <b>conserva il suo livello</b>, ma solo quello attivo guadagna esperienza.</li></ul>`);
  if(!PD.chosen){
   el.innerHTML=`<div class="pt-pond"><h2 class="er-h" style="position:relative">Lo stagno</h2><p class="er-sub" style="position:relative">Un compagno ti aspetta tra le ninfee. Scegli quello che ti segue: uno solo tra i tre, e ti accompagnerà in ogni battaglia crescendo con te (guadagna il ${PD.xp_pct}% della tua XP).</p></div>
   <h2 class="er-h">Scegli il tuo compagno</h2><div class="pt-grid">${P.filter(p=>p.starter).map(pChoose).join('')}</div>
   <h2 class="er-h">Gli altri compagni</h2><p class="er-sub">Dopo la scelta potrai comprare i 27 compagni dei gradi superiori con i BC. Eccoli in anteprima.</p>
   <div class="pt-grid">${P.filter(p=>!p.starter&&p.tier<=1).map(p=>`<div class="pt-c r-${prc(p.tier)}"><div class="pt-sp">${petSprite(p,80)}</div><div><div class="er-rar">${pgrade(p.tier)}</div><h3>${esc(p.name)}</h3></div><div class="er-pr"><b>${num(p.price)} BC</b></div></div>`).join('')}</div>
-  <p class="er-note">… e altri 24 compagni fino al grado 9.</p>${how}`;return}
+  <p class="er-note">… e altri ${P.filter(p=>!p.starter&&p.tier>1).length} compagni fino al grado ${Math.max(...P.map(p=>p.tier))}.</p>${how}`;return}
  const a=P.find(x=>x.active),own=P.filter(x=>x.owned),shop=P.filter(x=>!x.starter&&!x.owned);
- let g0=1;for(let t=1;t<=9;t++){if(P.some(x=>x.tier===t&&!x.owned)){g0=t;break}}
+ const TMAX=Math.max(9,...P.map(p=>p.tier));let g0=1;for(let t=1;t<=TMAX;t++){if(P.some(x=>x.tier===t&&!x.owned)){g0=t;break}}
  if(!FOLD._pt){FOLD._pt=1;FOLD['pt_g'+g0]=true}
- const groups=[];for(let t=1;t<=9;t++){const L=shop.filter(x=>x.tier===t);if(L.length)groups.push(fold('pt_g'+t,'🐾',`Grado ${t}`,`Eroe Lv. ${num(L[0].min_level)}+ · ${num(L[0].price)} BC l’uno`,L.length,`<div class="pt-grid">${L.map(pShop).join('')}</div>`))}
+ const groups=[];for(let t=1;t<=TMAX;t++){const L=shop.filter(x=>x.tier===t);if(L.length)groups.push(fold('pt_g'+t,'🐾',`Grado ${t}`,`Eroe Lv. ${num(L[0].min_level)}+ · ${num(L[0].price)} BC l’uno`,L.length,`<div class="pt-grid">${L.map(pShop).join('')}</div>`))}
  el.innerHTML=`<div class="pt-pond r-${prc(a.tier)}"><div class="pt-hero"><div class="pt-big">${petSprite(a,128)}</div><div><div class="er-rar">Il tuo compagno · ${esc(a.family)} · ${pgrade(a.tier)}</div><h2>${esc(a.name)} <em>Lv. ${num(a.level)}</em></h2>${pXp(a)}<p class="er-note" style="margin-top:6px">Guadagna il ${PD.xp_pct}% della tua esperienza.</p>${pLines(a)}</div></div></div>
  <h2 class="er-h">I tuoi compagni <small class="mute">(${own.length} su 30)</small></h2><div class="pt-grid">${own.map(pOwned).join('')}</div>
  <h2 class="er-h">In vendita</h2>${groups.length?`<p class="er-sub">Il tuo saldo: <b>${BAL==null?'—':num(BAL)} BC</b></p>${groups.join('')}`:'<p class="mute">Hai tutti i compagni dello Stagno: complimenti!</p>'}${how}`}

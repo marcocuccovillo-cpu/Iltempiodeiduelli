@@ -763,5 +763,13 @@ Le statistiche degli oggetti del mercante seguono ora la stessa curva dei dungeo
 - Dalla propria tessera ognuno vede il suo link; l'amministratore ha anche **`#/tessere`**, l'elenco di tutti i duellanti per scrivere i tag uno dopo l'altro. Con Chrome su Android il tag si scrive direttamente dall'app (📡 Scrivi, con l'opzione per bloccarlo); altrove si copia il link e lo si scrive con un'app come NFC Tools.
 - Dal profilo `#/p/<id>` c'è il pulsante «📇 Tessera». File: `black-market-tessera.js` (nuovo), `black-market.html`, `sw.js` (cache tempio-v69).
 
+## La guerra degli Eroi: nuovi compagni dello Stagno fino al livello 600 (migrazione 043, 10 novembre 2026)
+- **15 compagni nuovi** nei gradi 10–14, tre per grado (Assalto, Baluardo, Saggezza), con sprite pixel art originali:
+  grado 10 (eroe Lv. 420, 1.100.000 BC) Chimera Ruggente, Golem d’Ossidiana, Medusa Abissale · grado 11 (Lv. 460, 1.600.000) Kirin del Lampo, Scarabeo d’Ambra, Kitsune Lunare ·
+  grado 12 (Lv. 500, 2.400.000) Wyrm di Magma, Kraken Bambino, Gatto delle Nebulose · grado 13 (Lv. 550, 3.500.000) Drago del Vuoto, Behemoth Corazzato, Arcangelo di Luce ·
+  grado 14 (Lv. 600, 5.000.000) Drago Primordiale, Guardiano dell’Eclissi, Albero del Mondo.
+- I bonus continuano la scala dei gradi 1–9 (bonus principale +4 a grado: 48% … 64%); dal grado 12 c'è un 6° bonus che si sblocca al livello 90 del compagno. I gradi 12–14 hanno una cornice "divina" animata.
+- Regole dello Stagno invariate. File: `black-market-eroi-compagni.sql` (si può rieseguire), `-test.sql`, `-down.sql` (rimborsa i BC dei compagni nuovi comprati); `eroi.html`, `eroi-pet.js` (v=2), `sw.js` (cache tempio-v70).
+
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.
