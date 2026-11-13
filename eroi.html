@@ -111,10 +111,18 @@
 .mp-kpi small{display:block;font-size:.7rem;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}.mp-kpi b{display:block;font:700 1.05rem var(--disp)}.mp-kpi i{font-style:normal;font-size:.7rem;color:var(--mu)}
 .mp-claim{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1.5px solid rgba(232,184,74,.45);background:rgba(232,184,74,.07)}
 .mp-claim small{display:block;font-size:.74rem;color:var(--mu)}.mp-claim b{font:700 1.2rem var(--disp);color:var(--gold)}
+.tw-hudb{position:absolute;left:0;right:0;bottom:0;z-index:3;display:grid;gap:8px;justify-items:center;padding:28px 12px 14px;background:linear-gradient(0deg,rgba(0,0,0,.72),transparent)}
+.tw-hchips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}.tw-hchips span{padding:4px 10px;border-radius:999px;background:rgba(10,8,20,.78);border:1px solid rgba(255,255,255,.18);font:700 .8rem var(--ui);color:#fff}.tw-hchips small{font-weight:500;opacity:.75}.tw-hchips .b{background:#8a1e2e;border-color:#ff6b7a}
+.tw-climb{display:flex;align-items:center;gap:12px;width:min(100%,340px);padding:12px 18px;border-radius:16px;border:2px solid #ffd36b;background:linear-gradient(180deg,#e8b84a,#a8741e);color:#1a1206;font:inherit;text-align:left;cursor:pointer;box-shadow:0 6px 0 #6b4a12,0 10px 24px rgba(0,0,0,.5);transition:transform .1s,box-shadow .1s;animation:twClimbPulse 2s ease-in-out infinite}
+.tw-climb b{display:block;font:700 1.1rem Cinzel,Georgia,serif}.tw-climb small{display:block;font-size:.8rem;opacity:.85}.tw-climb .ar{font-size:1.6rem}
+.tw-climb:active{transform:translateY(4px);box-shadow:0 2px 0 #6b4a12,0 6px 14px rgba(0,0,0,.5)}.tw-climb.boss{border-color:#ff9aa6;background:linear-gradient(180deg,#e0533f,#8a1e2e);color:#fff;box-shadow:0 6px 0 #4a0e18,0 10px 24px rgba(0,0,0,.5)}
+.tw-climb:disabled{filter:grayscale(.8) brightness(.7);animation:none;cursor:not-allowed}
+@keyframes twClimbPulse{50%{box-shadow:0 6px 0 #6b4a12,0 0 0 6px rgba(255,211,107,.18),0 10px 24px rgba(0,0,0,.5)}}@media(prefers-reduced-motion:reduce){.tw-climb{animation:none}}
+
 .tw-pov{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--z1,#1a1030);box-shadow:0 0 0 1px rgba(0,0,0,.5),0 14px 34px rgba(0,0,0,.5)}
 .tw-pov .tw-zn{position:absolute;left:0;right:0;top:0;z-index:2;padding:10px 12px;background:linear-gradient(180deg,rgba(0,0,0,.65),transparent);pointer-events:none}
 .tw-scene{position:relative;min-height:400px}.tw-scene canvas{display:block;width:100%}
-.tw-skipb{position:absolute;right:10px;bottom:10px;z-index:3;padding:7px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(10,8,20,.75);color:#fff;font:600 .82rem var(--ui);cursor:pointer}
+.tw-skipb{position:absolute;right:10px;top:48px;z-index:3;padding:7px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(10,8,20,.75);color:#fff;font:600 .82rem var(--ui);cursor:pointer}
 .tw-foe2{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:16px;background:var(--surf)}
 .tw-foe2.boss{border-color:#b4233a;background:linear-gradient(135deg,rgba(180,35,58,.18),transparent 60%),var(--surf)}
 .tw-fs{display:grid;place-items:center;width:92px;height:92px;border-radius:14px;background:radial-gradient(circle at 50% 70%,rgba(255,255,255,.08),transparent 70%),rgba(0,0,0,.25)}
@@ -579,7 +587,7 @@ body.er-fab-on{padding-bottom:88px}
 <script src="tempio-notifiche.js?v=2"></script>
 <script src="eroi-torre.js?v=2"></script>
 <script src="eroi-pet.js?v=2"></script>
-<script src="eroi-torre-scena.js?v=1"></script>
+<script src="eroi-torre-scena.js?v=2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 (function(){'use strict';
@@ -1328,7 +1336,9 @@ function renderTower(){
  el.innerHTML=`<div class="tw-top"><div><h2>Torre Infinita</h2><small>${esc(ART.rank(TW.best_floor))} · ${num(TW.wins)} ${TW.wins===1?'piano vinto':'piani vinti'}</small></div><div class="tw-best"><b>${num(TW.best_floor)}</b><span>piano più alto${TW.rank?` · ${TW.rank}º in classifica`:''}</span></div></div>
  ${TWLAST?`<div class="tw-last">${twResHtml(TWLAST,TWLAST.enemy,TW.enemy)}<button type="button" class="mp-x" data-twlast aria-label="Chiudi">×</button></div>`:''}
  <div class="tw-pov" style="${ART.zoneVars(z)}"><div class="tw-zn"><b>${esc(z.name)}</b><span>${TW.best_floor?`Sei al piano ${num(TW.best_floor)}`:'Sei all’ingresso'} · sopra ti aspetta ${e.boss?'il BOSS':'il piano '+num(fl)}</span></div>
-  <div id="twScene" class="tw-scene">${window.TorreScena?'':`<div class="tw-grid">${ART.ladder(TW.best_floor,TW.boss_floor,z)}</div>`}</div><button type="button" class="tw-skipb" id="twSkipA" hidden>Salta ⏩</button></div>
+  <div id="twScene" class="tw-scene">${window.TorreScena?'':`<div class="tw-grid">${ART.ladder(TW.best_floor,TW.boss_floor,z)}</div>`}</div><button type="button" class="tw-skipb" id="twSkipA" hidden>Salta ⏩</button>
+  <div class="tw-hudb" id="twHud"><div class="tw-hchips"><span>⚡ ${num(Math.floor(enNow()))} <small>/ −${TW.cost}</small></span><span style="color:${ch[1]}">🎯 ${e.chance}%</span>${e.boss?'<span class="b">BOSS</span>':''}</div>
+   <button class="tw-climb ${e.boss?'boss':''}" id="twGo" ${can.ok?'':'disabled'}><span class="ar" aria-hidden="true">⬆️</span><span><b>Sali al piano ${num(fl)}</b><small>${can.ok?`affronta ${esc(e.name)}`:'energia insufficiente'}</small></span></button></div></div>
  <div class="tw-foe2 ${e.boss?'boss':''}"><div class="tw-fs">${twSprite(e,e.boss?84:68)}</div><div style="min-width:0"><div class="tw-fn">${esc(e.name)} <small class="mute">· piano ${num(fl)}</small></div>
    <div class="tw-tags">${e.boss?'<span class="tw-tag b">BOSS</span>':''}${e.affix?`<span class="tw-tag a">${esc(e.affix.name)}</span>`:''}</div>
    ${e.lore?`<p class="tw-lore">${esc(e.lore)}</p>`:''}${e.trait?`<p class="tw-lore">${esc(e.trait)}</p>`:''}${e.affix?`<p class="tw-lore">${esc(e.affix.descr)}</p>`:''}
@@ -1336,7 +1346,7 @@ function renderTower(){
  <div class="tw-info"><div class="tw-chrow"><span>Stima di vittoria</span><b style="color:${ch[1]}">${e.chance}% · ${ch[0]}</b></div><div class="tw-ch" role="img" aria-label="Probabilità stimata ${e.chance}%"><i style="width:${e.chance}%;background:${ch[1]}"></i></div>
   <p class="er-note">Stima indicativa: i dadi (colpi critici e schivate) possono sempre cambiare l’esito. Tu: PV <b>${num(m.max_hp)}</b> · FOR <b>${num(m.stats.for)}</b> · DES <b>${num(m.stats.des)}</b> · VIG <b>${num(m.stats.vig)}</b> · SPI <b>${num(m.stats.spi)}</b> · FRT <b>${num(m.stats.frt)}</b>.</p>
   <p class="er-note" style="margin-top:8px"><b>Premio del piano</b> (una sola volta):</p>${twRewards(e.reward)}
-  <button class="btn tw-go" id="twGo" ${can.ok?'':'disabled'}>⚔️ Sali al piano ${num(fl)} <small>(−${TW.cost} energia)</small></button>${can.ok?'':`<p class="er-note">${can.why}</p>`}</div>
+  ${can.ok?'':`<p class="er-note">${can.why}</p>`}</div>
  ${b?`<div class="tw-boss ${TW.boss_in<=3?'near':''}">${twSprite(b,64)}<div style="min-width:0"><small>Prossimo boss · piano ${num(TW.boss_floor)} · tra ${num(TW.boss_in)} ${TW.boss_in===1?'piano':'piani'}</small><b>${esc(b.name)}</b><small>🎁 ${b.reward&&b.reward.item?esc(b.reward.item.name):'Premio doppio in BC e XP'} · stima oggi ${b.chance}%</small></div></div>`:''}
  <h2 class="er-h" style="margin-top:20px">Prossimi piani</h2><div class="tw-up">${up}</div>
  <h2 class="er-h">Classifica e albo</h2>
@@ -2248,7 +2258,7 @@ document.addEventListener('click',e=>{
    if(r.expired){say('La spedizione è stata data per fallita: nessuno aveva più deciso.','bad')}
    if(r.result)seenSet(r.run_id);await load(true);await loadDng(true);if(r.result)dngModal(r.result,r.dungeon_no)});return}
  if(t.id==='twGo'){run(t,async()=>{const r=await rpc('game_tower_climb');clearSay();
-  if(TWS&&!matchMedia('(prefers-reduced-motion: reduce)').matches){TWLAST=null;const ol=document.querySelector('.tw-last');if(ol)ol.remove();twBusy=true;const sk=$('twSkipA');if(sk){sk.hidden=false;sk.onclick=()=>TWS&&TWS.skip()}
+  if(TWS&&!matchMedia('(prefers-reduced-motion: reduce)').matches){TWLAST=null;const ol=document.querySelector('.tw-last');if(ol)ol.remove();twBusy=true;const hud=$('twHud');if(hud)hud.hidden=true;const sk=$('twSkipA');if(sk){sk.hidden=false;sk.onclick=()=>TWS&&TWS.skip()}
    const pv=document.querySelector('.tw-pov');if(pv&&pv.scrollIntoView)try{pv.scrollIntoView({block:'center',behavior:'smooth'})}catch(_){}
    try{await TWS.play(r);await new Promise(z=>setTimeout(z,900))}finally{twBusy=false}
    await load(true);await loadTower();TWLAST=r;renderTower();const ol2=document.querySelector('.tw-last');if(ol2&&ol2.scrollIntoView)try{ol2.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}}

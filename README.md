@@ -781,8 +781,8 @@ Le statistiche degli oggetti del mercante seguono ora la stessa curva dei dungeo
 ## Torre Infinita: la scena della salita (13 novembre 2026, nessuna migrazione)
 - La scheda Torre mostra lo **spaccato della Torre**: scale a zig-zag, finestre col cielo della zona, torce che tremolano, stendardi sui piani dei boss. L'eroe (con il suo compagno dello Stagno) aspetta sul suo piano, il nemico del piano dopo lo aspetta sopra.
 - Premendo «Sali» l'eroe **sale le scale** con la telecamera che lo segue, poi la scena si avvicina e il combattimento va **colpo per colpo** come dice il server: affondi, fendenti, numeri dei danni, critici con lampo e scossa, schivate, barre dei PV. Se vince il nemico si dissolve in scintille e piovono i BC; se perde l'eroe **ruzzola giù per le scale**. Poi il riepilogo (premi, livelli, reliquie) compare sopra la scena. «Salta» porta subito alla fine.
-- La scheda del nemico (statistiche, tratto, descrizione) è sotto la scena. Con "riduci movimento" attivo nel telefono si torna al riepilogo classico senza animazione.
-- File: `eroi-torre-scena.js` (nuovo), `eroi-torre.js` (v=2), `eroi.html`, `sw.js`.
+- Il pulsante **«Sali al piano N»** è dentro la scena, in basso, con energia e stima di vittoria; durante la salita sparisce e compare «Salta». La scheda del nemico (statistiche, tratto, descrizione) è sotto la scena. Con "riduci movimento" attivo nel telefono si torna al riepilogo classico senza animazione.
+- File: `eroi-torre-scena.js` (nuovo, v=2), `eroi-torre.js` (v=2), `eroi.html`, `sw.js`.
 
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.

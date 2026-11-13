@@ -7,6 +7,9 @@
 (function (g) {
   'use strict';
   var FH = 210, SLAB = 16, IMG = {};
+  var WHITE = new WeakMap();
+  function whiteOf(I) { if (WHITE.has(I)) return WHITE.get(I); if (!I.complete || !I.naturalWidth) return null; var k = document.createElement('canvas'); k.width = I.naturalWidth; k.height = I.naturalHeight;
+    var x = k.getContext('2d'); x.drawImage(I, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = '#ffffff'; x.fillRect(0, 0, k.width, k.height); WHITE.set(I, k); return k; }
   function img(url) { if (IMG[url]) return IMG[url]; var i = new Image(); i.src = url; IMG[url] = i; return i; }
   function ease(k) { return k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; }
   function rnd(s) { var x = (s * 2654435761) >>> 0 || 1; return function () { x ^= x << 13; x >>>= 0; x ^= x >> 17; x ^= x << 5; x >>>= 0; return x / 4294967296; }; }
@@ -43,12 +46,12 @@
       hero.x = stairA(n0) + dirOf(n0) * 26; hero.y = yOf(n0); hero.dir = dirOf(n0); hero.rot = 0; hero.alpha = 1;
       var top = n0 + 1, arrive = stairB(n0);
       foe.x = W / 2 - dirOf(n0) * 28; foe.y = yOf(top); foe.dir = arrive > W / 2 ? 1 : -1; foe.alpha = en ? 1 : 0; foe.dead = 0;
-      cam.y = yOf(n0) - FH / 2 - 26; cam.s = 1;
+      cam.y = yOf(n0) - H / 2 + 150; cam.s = 1;
     }
     place();
 
     function resize() {
-      var r = host.getBoundingClientRect(); W = Math.max(280, Math.round(r.width)); H = Math.round(Math.min(520, Math.max(400, W * 1.2)));
+      var r = host.getBoundingClientRect(); W = Math.max(280, Math.round(r.width)); H = Math.round(Math.min(580, Math.max(460, W * 1.4)));
       cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cv.style.width = W + 'px'; cv.style.height = H + 'px';
       if (!busy) place(); dirty = true; kick();
     }
@@ -101,7 +104,7 @@
       var w = D.w / D.h * hpx; c.save(); c.translate(x, y); if (opt.rot) c.rotate(opt.rot); c.scale(dir, 1); c.globalAlpha = opt.alpha == null ? 1 : opt.alpha;
       if (opt.filter && 'filter' in c) c.filter = opt.filter;
       c.imageSmoothingEnabled = false; c.drawImage(I, -w / 2, -hpx, w, hpx); c.filter = 'none';
-      if (opt.white) { c.globalCompositeOperation = 'source-atop'; c.globalAlpha = opt.white * (opt.alpha == null ? 1 : opt.alpha); c.fillStyle = '#ffffff'; c.fillRect(-w / 2, -hpx, w, hpx); }
+      if (opt.white > 0) { var Wi = whiteOf(I); if (Wi) { c.globalAlpha = Math.min(1, opt.white) * (opt.alpha == null ? 1 : opt.alpha); c.drawImage(Wi, -w / 2, -hpx, w, hpx); } }
       c.restore();
     }
     function shadow(x, y, r) { c.fillStyle = 'rgba(0,0,0,.35)'; c.beginPath(); c.ellipse(x, y + 2, r, r * .28, 0, 0, 6.3); c.fill(); }
@@ -178,11 +181,11 @@
       /* 1) all'inizio delle scale */
       hero.dir = dir; var sx = hero.x; await tween(380, function (k) { hero.x = sx + (a - sx) * k; hero.bob = Math.abs(Math.sin(k * Math.PI * 2)) * 4; });
       /* 2) su per le scale, la telecamera segue */
-      var cy0 = cam.y, cy1 = y1 - 90;
+      var cy0 = cam.y, cy1 = y1 - 40;
       await tween(1500, function (k) { hero.x = a + (b - a) * k; hero.y = y0 + (y1 - y0) * k; hero.bob = Math.abs(Math.sin(k * Math.PI * 12)) * 4; cam.y = cy0 + (cy1 - cy0) * k; }, false);
       /* 3) verso il nemico, zoom sulla sfida */
       hero.dir = -dir; var fxp = foe.x + dir * (isBoss ? 92 : 78), hx0 = hero.x;
-      await tween(520, function (k) { hero.x = hx0 + (fxp - hx0) * k; hero.bob = Math.abs(Math.sin(k * Math.PI * 3)) * 3; cam.s = 1 + .22 * k; cam.y = cy1 + (y1 - 70 - cy1) * k; hp.show = k; });
+      await tween(520, function (k) { hero.x = hx0 + (fxp - hx0) * k; hero.bob = Math.abs(Math.sin(k * Math.PI * 3)) * 3; cam.s = 1 + .22 * k; cam.y = cy1 + (y1 - 50 - cy1) * k; hp.show = k; });
       hero.bob = 0; hp.ma = r.max_a; hp.mb = r.max_b; hp.a = 1; hp.b = 1;
       await wait(260);
       /* 4) colpo su colpo, dal registro del server */
@@ -216,7 +219,7 @@
         /* ruzzola giù per le scale */
         var hx1 = hero.x, cyA = cam.y, sA = cam.s;
         await tween(420, function (k) { hero.x = hx1 + (b - hx1) * k; });
-        await tween(1100, function (k) { hero.x = b + (a - b) * k; hero.y = y1 + (y0 - y1) * k; hero.rot = -dir * (k * 6.28 * 2); cam.y = cyA + (yOf(n) - FH / 2 - 26 - cyA) * k; cam.s = sA + (1 - sA) * k; hp.show = .5 * (1 - k); }, false);
+        await tween(1100, function (k) { hero.x = b + (a - b) * k; hero.y = y1 + (y0 - y1) * k; hero.rot = -dir * (k * 6.28 * 2); cam.y = cyA + (yOf(n) - H / 2 + 150 - cyA) * k; cam.s = sA + (1 - sA) * k; hp.show = .5 * (1 - k); }, false);
         hero.rot = 0; hero.dir = dir; cam.shake = 6;
       }
       busy = false; skipping = false; kick();
