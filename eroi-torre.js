@@ -513,5 +513,5 @@
   }
   function zoneVars(z) { return '--z1:' + z.sky[0] + ';--z2:' + z.sky[1] + ';--z3:' + z.sky[2] + ';--zg:' + z.glow + ';--zs:' + z.stone + ';--zst:' + [.25, .5, .65, .8, 1][z.star] + ';'; }
 
-  g.TorreArt = { ladder: ladder, zoneVars: zoneVars,  sprite: sprite, uri: uri, zone: zone, zones: ZONES, rank: rank, keys: Object.keys(ART), Px: Px, ART: ART, h2r: h2r, mix: mix };
+  g.TorreArt = { tints: TINTS, ladder: ladder, zoneVars: zoneVars,  sprite: sprite, uri: uri, zone: zone, zones: ZONES, rank: rank, keys: Object.keys(ART), Px: Px, ART: ART, h2r: h2r, mix: mix };
 })(window);
