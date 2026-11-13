@@ -771,5 +771,12 @@ Le statistiche degli oggetti del mercante seguono ora la stessa curva dei dungeo
 - I bonus continuano la scala dei gradi 1–9 (bonus principale +4 a grado: 48% … 64%); dal grado 12 c'è un 6° bonus che si sblocca al livello 90 del compagno. I gradi 12–14 hanno una cornice "divina" animata.
 - Regole dello Stagno invariate. File: `black-market-eroi-compagni.sql` (si può rieseguire), `-test.sql`, `-down.sql` (rimborsa i BC dei compagni nuovi comprati); `eroi.html`, `eroi-pet.js` (v=2), `sw.js` (cache tempio-v70).
 
+## Mappa: navigazione e animazioni (13 novembre 2026)
+- **Navigazione da app di mappe**: si trascina con inerzia, si pizzica con due dita (o rotella del mouse / doppio clic) per avvicinare e allontanare; pulsanti ＋ − 🎯 (vai ai tuoi terreni o al tuo villaggio) e ⛶ schermo intero (il terreno toccato si apre in una scheda sopra la mappa). **Minimappa** in basso a destra (tocca per spostarti) e cartiglio con la regione che stai guardando.
+- **Animazioni**: onde e luccichii sul mare, il fiume che scorre, nuvole con la loro ombra, stormi di uccelli, lucciole nella Foresta e nelle Paludi, vulcano con bagliore, braci e fumo, fumo dalla Locanda e dai camini, freccia che rimbalza sul terreno scelto, scintille quando compri (🚩) o costruisci (⬆️).
+- **Giorno e notte con l'ora vera**: alba e tramonto colorati, di notte l'isola si scurisce e si accendono le finestre di case, ville, castelli, villaggi e della Locanda.
+- **Eserciti in marcia** visibili sulla mappa (scudo con ⚔️ all'andata, 💰 al ritorno; tratteggio oro i tuoi, rosso chi attacca te). Per questo `black-market-eroi-villaggi.sql` va **rieseguito** (aggiunge gli eserciti allo stato dei villaggi; i dati restano).
+- Si disegna solo la parte visibile, a 30 fotogrammi al secondo, e l'animazione si ferma quando la mappa non è sullo schermo; con "riduci movimento" attivo nel telefono la mappa resta ferma.
+
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.

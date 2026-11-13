@@ -31,7 +31,8 @@
 --   * ogni villaggio parte da sé: massimo 5 attacchi al giorno PER VILLAGGIO; non si attaccano villaggi con il Municipio più basso
 --     di 3 livelli di quello che attacca (protezione dei nuovi); non si attaccano i propri villaggi; attaccare toglie la tregua a chi parte.
 -- Tutti i BC passano dal registro contabile (movimenti game_village_*), con chiave d'idempotenza.
--- Se avevi già eseguito la prima versione di questa migrazione (un villaggio a testa), rieseguila: i villaggi esistenti restano com'erano.
+-- Se avevi già eseguito una versione precedente di questa migrazione, rieseguila: i villaggi esistenti restano com'erano
+-- (13 novembre 2026: lo stato include anche gli eserciti in marcia, per vederli muoversi sulla mappa).
 -- Interruttore: game_village_enabled (Admin › Impostazioni). Si può rieseguire. Annullamento: black-market-eroi-villaggi-down.sql.
 -- Test (solo su un progetto di prova vuoto): black-market-eroi-villaggi-test.sql.
 -- =====================================================================
@@ -389,6 +390,10 @@ begin
                 from public.game_village_marches m join public.profiles pa on pa.id = m.attacker_id join public.profiles pd on pd.id = m.defender_id
                 left join public.game_villages va on va.plot_id = m.attacker_plot left join public.game_villages vd on vd.plot_id = m.defender_plot
                where (m.attacker_id = v and m.status <> 'done') or (m.defender_id = v and m.status = 'going')), '[]'::jsonb),
+    -- tutti gli eserciti in marcia sull'isola (per vederli muoversi sulla mappa; senza dire quanti sono)
+    'armies', coalesce((select jsonb_agg(jsonb_build_object('attacker_id', m.attacker_id, 'from_plot', m.attacker_plot, 'to_plot', m.defender_plot, 'status', m.status,
+                  'depart_at', m.depart_at, 'arrive_at', m.arrive_at, 'return_at', m.return_at, 'inc', m.defender_id = v and m.status = 'going'))
+                from (select * from public.game_village_marches where status <> 'done' order by depart_at desc limit 80) m), '[]'::jsonb),
     'reports', coalesce((select jsonb_agg(jsonb_build_object('id', y.id, 'out', y.attacker_id = v, 'won', y.won, 'at', y.arrive_at, 'report', y.report,
                   'loot', jsonb_build_array(y.loot_wood, y.loot_stone, y.loot_food, y.loot_bc)) order by y.arrive_at desc)
                 from (select * from public.game_village_marches where (attacker_id = v or defender_id = v) and status <> 'going' order by arrive_at desc limit 20) y), '[]'::jsonb),
