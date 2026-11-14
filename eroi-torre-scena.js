@@ -30,6 +30,13 @@
     var heroD = TA.uri('eroe', (o.hero && o.hero.look) || {}), enD = en ? TA.uri(en.sprite) : null;
     var petD = o.hero && o.hero.pet && PA && PA.uri ? PA.uri(o.hero.pet.sprite, o.hero.pet.tier || 0) : null;
     var heroI = img(heroD.url), enI = enD ? img(enD.url) : null, petI = petD ? img(petD.url) : null;
+    /* compagni di piano (salgono e combattono con l'eroe) e altri scalatori (fermi sul loro piano) */
+    var mk = function (p) { var d = TA.uri('eroe', p.look || {}); return { n: String(p.name || '').slice(0, 12), d: d, i: img(d.url) }; };
+    var allies = (o.allies || []).slice(0, 3).map(mk), others = {};
+    Object.keys(o.others || {}).forEach(function (k) { others[k] = o.others[k].slice(0, 4).map(mk); });
+    allies.concat.apply(allies, Object.keys(others).map(function (k) { return others[k]; })).forEach(function (p) { if (!p.i.complete) p.i.addEventListener('load', function () { dirty = true; kick(); }); });
+    function tagName(txt, x, y, me) { c.font = '700 10px Inter, system-ui, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; var w = c.measureText(txt).width + 10;
+      c.fillStyle = me ? 'rgba(40,26,6,.85)' : 'rgba(10,8,20,.72)'; c.beginPath(); if (c.roundRect) c.roundRect(x - w / 2, y - 7, w, 14, 7); else c.rect(x - w / 2, y - 7, w, 14); c.fill(); c.fillStyle = me ? '#ffe7a8' : '#e8e4f5'; c.fillText(txt, x, y + .5); }
     [heroI, enI, petI].forEach(function (i) { if (i && !i.complete) i.addEventListener('load', function () { dirty = true; kick(); }); });
     var R = rnd(n0 * 31 + 7), dust = []; for (var i = 0; i < 26; i++) dust.push([R(), R(), R() * 6.3, .3 + R() * .7]);
 
@@ -51,7 +58,7 @@
     place();
 
     function resize() {
-      var r = host.getBoundingClientRect(); W = Math.max(280, Math.round(r.width)); H = Math.round(Math.min(580, Math.max(460, W * 1.4)));
+      var r = host.getBoundingClientRect(); W = Math.max(280, Math.round(r.width)); H = Math.round(Math.min(820, Math.max(500, (window.innerHeight || 700) - (o.pad == null ? 170 : o.pad))));   // alta quasi quanto lo schermo
       cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cv.style.width = W + 'px'; cv.style.height = H + 'px';
       if (!busy) place(); dirty = true; kick();
     }
@@ -129,6 +136,13 @@
         drawSprite(enI, enD, fx + foe.hit * -foe.dir * 6, fy + bob - foe.dead * 10, EH, foe.dir, { alpha: foe.alpha, white: Math.max(foe.flash, foe.dead), filter: tint.h ? 'hue-rotate(' + tint.h + 'deg) saturate(' + tint.s + ') brightness(' + tint.b + ')' : null });
         if (hp.show > 0) { c.globalAlpha = hp.show; bar(fx, fy - EH - 18, 74, hp.b, isBoss ? '#ff4d6a' : '#ff8a5c'); c.globalAlpha = 1; }
       }
+      /* altri scalatori, fermi sul loro piano */
+      for (var on = Math.max(1, bot - 1); on <= top + 1; on++) { var ol = others[on]; if (!ol) continue;
+        ol.forEach(function (p, i) { var side = on === n0 + 1 ? dirOf(n0) : -dirOf(on), ox = W / 2 + side * (70 + i * 34), oy = yOf(on), ob = reduce ? 0 : Math.abs(Math.sin(t * 1.6 + i * 1.7 + on)) * 1.5;
+          if (ox < 24 || ox > W - 24) return; shadow(ox, oy, 15); drawSprite(p.i, p.d, ox, oy - ob, 58, -side, { alpha: .95 }); tagName(p.n, ox, oy - 68); }); }
+      /* compagni di piano: seguono l'eroe e colpiscono con lui */
+      allies.forEach(function (p, i) { var ax = Math.max(16, Math.min(W - 16, hero.x - hero.dir * (36 + i * 24))) + hero.lunge * hero.dir * 22, ab = reduce ? 0 : Math.abs(Math.sin(t * 5 + i * 1.3)) * (busy ? 3 : 1.5);
+        if (hero.alpha <= 0) return; shadow(ax, hero.y, 17); drawSprite(p.i, p.d, ax, hero.y - ab, 70, hero.dir, { alpha: hero.alpha, rot: hero.rot * .7 }); if (!hero.rot) tagName(p.n, ax, hero.y - 80 - i * 14); });
       /* compagno che segue l'eroe */
       if (petI && petI.complete && hero.alpha > 0) { var pdx = -hero.dir * 30, pb = reduce ? 0 : Math.abs(Math.sin(t * 5)) * 4; drawSprite(petI, petD, hero.x + pdx, hero.y - pb - (hero.bob * .6), 40, hero.dir, { alpha: hero.alpha, rot: hero.rot * .5 }); }
       /* eroe */
@@ -147,7 +161,7 @@
       /* vignetta e lampo dei critici */
       var vg = c.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .75); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.5)'); c.fillStyle = vg; c.fillRect(0, 0, W, H);
       if (flash > 0) { c.fillStyle = 'rgba(255,255,255,' + flash + ')'; c.fillRect(0, 0, W, H); }
-      if (banner) { var bk = Math.min(1, (ts - banner.t0) / 400), by = H * .2; c.save(); c.globalAlpha = bk; c.translate(W / 2, by); c.scale(.8 + .2 * bk, .8 + .2 * bk);
+      if (banner) { var bk = Math.min(1, (ts - banner.t0) / 400), by = Math.max(120, H * .2); c.save(); c.globalAlpha = bk; c.translate(W / 2, by); c.scale(.8 + .2 * bk, .8 + .2 * bk);
         c.font = '700 22px Cinzel, Georgia, serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; var bw = Math.min(W - 20, c.measureText(banner.txt).width + 40);
         c.fillStyle = banner.win ? 'rgba(40,26,6,.9)' : 'rgba(40,6,10,.9)'; c.strokeStyle = banner.win ? '#ffd36b' : '#ff6b7a'; c.lineWidth = 2; c.beginPath(); if (c.roundRect) c.roundRect(-bw / 2, -22, bw, 44, 12); else c.rect(-bw / 2, -22, bw, 44); c.fill(); c.stroke();
         c.fillStyle = banner.win ? '#ffe7a8' : '#ffb4bc'; c.fillText(banner.txt, 0, 1); if (banner.sub) { c.font = '600 13px Inter, sans-serif'; c.fillStyle = '#f3ead2'; c.fillText(banner.sub, 0, 36); } c.restore(); }
