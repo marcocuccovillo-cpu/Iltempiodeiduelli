@@ -163,6 +163,14 @@ window.BM_MODULES = function (BM) {
   const chHead = '<h1 class="t">Underground <em>Challenges</em></h1><p class="sub">Sfide dirette tra duellanti. <b>Una sfida non è un match ufficiale</b>: accettarla non assegna vittorie, punti fazione o Black Credits. Conta solo se il match collegato viene verificato da un organizzatore.</p>';
   const chRow = (c, extra) => `<div class="row2"><div class="g" style="flex-basis:210px">${hl(c.challenger_id)} <span class="mute">sfida</span> ${hl(c.opponent_id)}<small>${day(c.created_at)}${c.message ? ' · “' + esc(c.message) + '”' : ''}${c.status === 'pending' ? ' · scade ' + day(c.expires_at) : ''}${c.match_status ? ' · match ' + (c.match_status === 'verified' ? 'verificato, vincitore ' + esc(pn(c.match_winner_id)) : 'in attesa di verifica') : ''}${c.cancel_reason ? ' · ' + esc(c.cancel_reason) : ''}</small></div>${tag(CST[c.status][0], CST[c.status][1])}${extra || ''}</div>`;
 
+  /* tab Sfide: le sfide Underground aperte compaiono insieme a quelle della Ladder */
+  BM.sfideExtra = async () => {
+    if (!on('underground')) return '';
+    const me = BM.me, ch = await q(BM.sb.from('challenges_v').select('*').in('status', ['pending', 'accepted', 'in_progress']).or(`challenger_id.eq.${me.id},opponent_id.eq.${me.id}`).order('created_at', { ascending: false }).limit(20));
+    if (!ch.length) return '';
+    const inc = ch.filter(c => c.status === 'pending' && c.opponent_id === me.id), rest = ch.filter(c => !inc.includes(c));
+    return `<div class="box" style="margin-top:14px"><h2 style="margin-top:0">Underground <span class="mute" style="font-size:.85rem">· conta solo se giocata a un evento</span></h2>${inc.map(c => chRow(c, `<button class="btn gold sm" data-act="chAcc" data-c="${c.id}">Accetta</button><button class="btn ghost sm" data-act="chDec" data-c="${c.id}">Rifiuta</button>`)).join('')}${rest.map(c => chRow(c)).join('')}<p style="margin:10px 0 0"><a class="btn ghost sm" href="#/challenges">Gestisci le sfide Underground</a></p></div>`;
+  };
   R.challenges = async () => {
     if (!on('underground')) return off('Underground <em>Challenges</em>', 'challenges');
     shell(chHead + loading, 'challenges');
@@ -311,9 +319,11 @@ window.BM_MODULES = function (BM) {
   /* pannello "Ti hanno sfidato": usato nella pagina Ladder e in dashboard; i pulsanti restano gli stessi (ldAcc / ldDec) */
   BM.incomingBox = (incoming, vals, opt) => incoming.length ? `<div class="box" id="ldin" style="margin-top:${(opt && opt.mt) || 18}px;border-color:var(--gold)"><h2 style="margin-top:0">${incoming.length === 1 ? 'Hai 1 sfida da accettare' : 'Hai ' + incoming.length + ' sfide da accettare'}</h2><p class="mute" style="font-size:.9rem;margin-top:0">Puoi accettare o rifiutare. Se non rispondi la sfida scade da sola dopo ${(BM.S && BM.S.ladder_expiry_days) || 7} giorni.</p>${incoming.map(m => `<div class="row2" style="align-items:flex-start"><div class="g"><b>${esc(pn(m.challenger_id))}</b> ti sfida in <b>${esc(m.format)}</b><small style="display:block;color:var(--tx);opacity:.9;margin:3px 0">${stake(m, vals && vals.get(m.opponent_id))}</small><small>${when(m.created_at)}${m.message ? ' · “' + esc(m.message) + '”' : ''}</small></div><div class="row" style="gap:8px;flex:none"><button class="btn gold sm" data-act="ldAcc" data-c="${m.id}">Accetta</button><button class="btn ghost sm" data-act="ldDec" data-c="${m.id}">Rifiuta</button></div></div>`).join('')}</div>` : '';
 
-  R.ladder = async () => {
-    if (!on('ladder')) return off('La <em>Ladder</em>', 'ladder');
-    shell(ldHead() + loading, 'ladder');
+  /* una sola pagina, due viste: «sfide» (tab Sfide: da accettare, da giocare, da confermare) e «rank» (tab Classifiche: Elo, classifica, risultati) */
+  const ladderPage = async (mode) => {
+    const RK = mode === 'rank', cur = RK ? 'rank' : 'sfide', head = RK ? '<h1 class="t">Classifica <em>Ladder</em></h1>' : '<h1 class="t">Le tue <em>sfide</em></h1>';
+    if (!on('ladder')) return off(RK ? 'Classifica <em>Ladder</em>' : 'Le tue <em>sfide</em>', cur);
+    shell(head + loading, cur);
     try {
       try { await rpc('ladder_expire', {}) } catch (e) { /* manutenzione */ }
       const sb = BM.sb, me = BM.me, V = await hasV11();
@@ -341,10 +351,18 @@ window.BM_MODULES = function (BM) {
       const stRows = f => stF(f).map(r => `<div class="row2 ldr" data-n="${esc(r.nickname.toLowerCase())}"><span class="rank">${r.rank}</span>${av(BM.P.get(r.user_id) || { nickname: r.nickname, avatar: r.avatar })}<div class="g"><a href="#/p/${r.user_id}">${esc(r.nickname)}</a><small>${r.wins}V · ${r.draws}P · ${r.losses}S</small></div><span class="val">${r.elo}</span>${r.user_id !== me.id ? `<button class="btn ghost sm" data-act="ldPick" data-u="${r.user_id}"${f ? ` data-f="${f}"` : ''}>Sfida</button>` : ''}</div>`).join('') || empty(V ? `Nessuna partita conclusa in ${f}: la classifica comparirà dopo il primo risultato confermato.` : 'Nessun match concluso: la classifica comparirà dopo il primo risultato confermato.');
       const resRows = f => closed(f).map(m => resLine(m)).join('') || empty(V ? `Ancora nessun risultato in ${f}.` : 'Ancora nessun risultato.');
       const tabs = V ? seg('ldfmt', fsel, FMT.map(f => [f, f]), 'store') : '';
-      shell(`${ldHead()}
+      const howTo = () => `<ul class="mute" style="margin:0;padding-left:20px;font-size:.92rem;line-height:1.5">${V ? `<li><b>Ladder normale</b>: conta per l'Elo del formato${rw.on ? ` e dà <b>+${rw.bc} BC</b> al vincitore` : ''}. Le taglie non c'entrano.</li><li><b>Per la taglia</b>: se vinci, ${rw.hold > 0 ? `la riscuoti dopo ${rw.hold} ore` : '<b>la taglia è tua subito</b>, appena l\'avversario conferma il risultato'}. Nessun Elo e nessun premio Ladder. Disponibile solo se l'avversario ha una taglia che puoi incassare.</li><li><b>Ladder + taglia</b>: tutte e due le cose insieme: taglia, Elo del formato e premio Ladder.</li>` : (rw.on ? `<li><b>+${rw.bc} BC</b> per ogni vittoria confermata (pareggi e sconfitte non danno BC).</li>` : '')}${rw.on ? `<li>Premio Ladder: massimo ${rw.day} vittorie premiate nelle 24 ore e ${rw.pair} per avversario.</li>` : '<li>I premi in BC sono al momento sospesi.</li>'}${rw.wpa ? `<li>La vittoria è registrata come <b>match WPA ufficiale</b>: conta per Hall of Fame e Faction Wars. Conta un solo match ufficiale al giorno per coppia.${rw.hold > 0 ? ` Per evitare accordi, una taglia vinta con un match Ladder si riscuote dopo ${rw.hold} ore.` : ''}</li>` : ''}<li>Il pareggio e le partite oltre i limiti contano comunque per l'Elo.</li></ul>${rw.on ? `<p style="margin:10px 0 0"><b>Le tue vittorie premiate nelle ultime 24 ore:</b> ${rewardedToday}/${rw.day}</p>` : ''}`;
+      const extra = RK || !BM.sfideExtra ? '' : await BM.sfideExtra().catch(() => '');
+      const nothing = !incoming.length && !toPlay.length && !toConfirm.length && !disputed.length && !outgoing.length && !extra;
+      shell(RK ? `${head}
+      <div class="box" style="margin-top:14px"><h2 style="margin-top:0">Il tuo Elo</h2>${eloBox}</div>
+      ${tabs}
+      <div class="box" style="margin-top:${V ? 0 : 14}px"><h2 style="margin-top:0">Classifica${V ? ' ' + fsel : ''}</h2><input id="lds" type="search" placeholder="Cerca giocatore…" aria-label="Cerca giocatore" style="margin-bottom:8px">${stRows(V ? fsel : null)}</div>
+      <div class="box" style="margin-top:14px"><h2 style="margin-top:0">Ultimi risultati${V ? ' ' + fsel : ''}</h2>${resRows(V ? fsel : null)}</div>
+      <details class="box bm-fold" style="margin-top:14px"><summary><h2>Come funzionano premi e taglie</h2></summary>${howTo()}</details>` : `${head}
+      <a class="bm-cta" href="#/sfida"><i aria-hidden="true">⚔️</i><span><b>Lancia una sfida</b><small>Scegli avversario, formato e cosa c'è in palio</small></span></a>
       ${BM.incomingBox(incoming, myVal)}
-      <div class="box" style="margin-top:18px"><h2 style="margin-top:0">Il tuo Elo</h2>${eloBox}</div>
-      <form id="ldnew" class="box" style="margin-top:14px;display:grid;gap:10px" data-rq="${crypto.randomUUID()}"><h2 style="margin:0">Lancia una sfida</h2>
+      <form hidden id="ldnew" class="box" style="margin-top:14px;display:grid;gap:10px" data-rq="${crypto.randomUUID()}"><h2 style="margin:0">Lancia una sfida</h2>
         <div class="row" style="gap:10px;flex-wrap:wrap"><select id="ldo" required aria-label="Avversario" style="flex:2;min-width:180px"><option value="">Scegli il duellante…</option>${cand.map(p => `<option value="${p.id}">${esc(p.nickname)}${V ? '' : ' · ' + (eloOf(null, p.id) ? eloOf(null, p.id) + ' Elo' : 'non classificato')}${claim(p.id) > 0 ? ' · taglia ' + claim(p.id) + ' BC' : ''}</option>`).join('')}</select>
         ${V ? `<select id="ldf" aria-label="Formato" required style="flex:1;min-width:120px">${FMT.map(f => `<option${f === fsel ? ' selected' : ''}>${f}</option>`).join('')}</select>` : `<input type="hidden" id="ldf" value="Advanced">`}</div>
         ${V ? `<div><label for="ldk">Tipo di sfida</label><select id="ldk" required style="width:100%"><option value="">Scegli prima il duellante…</option></select><p id="ldkh" class="mute" style="font-size:.88rem;margin:6px 0 0"></p></div>` : '<p class="mute" style="font-size:.88rem;margin:0">Per scegliere il formato e il tipo di sfida un amministratore deve eseguire la migrazione <b>black-market-ladder-formati.sql</b>.</p>'}
@@ -353,10 +371,8 @@ window.BM_MODULES = function (BM) {
       ${toConfirm.length ? `<div class="box" style="margin-top:14px"><h2>Risultati da confermare (${toConfirm.length})</h2><p class="mute" style="font-size:.9rem;margin-top:0">Il risultato lo conferma <b>l'altro giocatore</b>, non chi l'ha inserito. Se è giusto premi «Confermo»; se no «Non è corretto» e decide un amministratore.</p>${toConfirm.map(m => lrow(m, m.reported_by === me.id ? `<span class="tag">Aspetti ${esc(oppOf(m))}</span>` : `<span class="tag g">Tocca a te</span><button class="btn gold sm" data-act="ldConf" data-c="${m.id}" data-k="${m.kind || ''}">Confermo</button><button class="btn ghost sm" data-act="ldDisp" data-c="${m.id}">Non è corretto</button>`)).join('')}</div>` : ''}
       ${disputed.length ? `<div class="box" style="margin-top:14px"><h2>Contestati</h2><p class="mute" style="font-size:.9rem;margin-top:0">Decide un amministratore.</p>${disputed.map(m => lrow(m)).join('')}</div>` : ''}
       ${outgoing.length ? `<div class="box" style="margin-top:14px"><h2>Sfide inviate</h2>${outgoing.map(m => lrow(m, `<button class="btn ghost sm" data-act="ldCan" data-c="${m.id}">Annulla</button>`)).join('')}</div>` : ''}
-      ${tabs}
-      <div class="box" style="margin-top:${V ? 0 : 14}px"><h2 style="margin-top:0">Classifica${V ? ' ' + fsel : ''}</h2><input id="lds" type="search" placeholder="Cerca giocatore…" aria-label="Cerca giocatore" style="margin-bottom:8px">${stRows(V ? fsel : null)}</div>
-      <div class="box" style="margin-top:14px"><h2 style="margin-top:0">Ultimi risultati${V ? ' ' + fsel : ''}</h2>${resRows(V ? fsel : null)}</div>
-      <div class="box" style="margin-top:14px"><h2 style="margin-top:0">Come funzionano premi e taglie</h2><ul class="mute" style="margin:0;padding-left:20px;font-size:.92rem;line-height:1.5">${V ? `<li><b>Ladder normale</b>: conta per l'Elo del formato${rw.on ? ` e dà <b>+${rw.bc} BC</b> al vincitore` : ''}. Le taglie non c'entrano.</li><li><b>Per la taglia</b>: se vinci, ${rw.hold > 0 ? `la riscuoti dopo ${rw.hold} ore` : '<b>la taglia è tua subito</b>, appena l\'avversario conferma il risultato'}. Nessun Elo e nessun premio Ladder. Disponibile solo se l'avversario ha una taglia che puoi incassare.</li><li><b>Ladder + taglia</b>: tutte e due le cose insieme: taglia, Elo del formato e premio Ladder.</li>` : (rw.on ? `<li><b>+${rw.bc} BC</b> per ogni vittoria confermata (pareggi e sconfitte non danno BC).</li>` : '')}${rw.on ? `<li>Premio Ladder: massimo ${rw.day} vittorie premiate nelle 24 ore e ${rw.pair} per avversario.</li>` : '<li>I premi in BC sono al momento sospesi.</li>'}${rw.wpa ? `<li>La vittoria è registrata come <b>match WPA ufficiale</b>: conta per Hall of Fame e Faction Wars. Conta un solo match ufficiale al giorno per coppia.${rw.hold > 0 ? ` Per evitare accordi, una taglia vinta con un match Ladder si riscuote dopo ${rw.hold} ore.` : ''}</li>` : ''}<li>Il pareggio e le partite oltre i limiti contano comunque per l'Elo.</li></ul>${rw.on ? `<p style="margin:10px 0 0"><b>Le tue vittorie premiate nelle ultime 24 ore:</b> ${rewardedToday}/${rw.day}</p>` : ''}</div>`, 'ladder');
+      ${extra}
+      ${nothing ? `<div class="box bm-none" style="margin-top:14px"><p style="margin:0"><b>Nessuna sfida in corso.</b></p><p class="mute" style="margin:6px 0 0">Sfida qualcuno dalla <a href="#/classifiche">classifica</a> o dai <a href="#/wanted">ricercati</a>.</p></div>` : ''}`, cur);
       const f = document.getElementById('ldnew');
       /* tipo di sfida: le voci dipendono da quante taglie incassabili ha l'avversario (il database ricontrolla tutto) */
       const fillKinds = () => {
@@ -368,17 +384,20 @@ window.BM_MODULES = function (BM) {
         const h = document.getElementById('ldkh');
         if (h) h.innerHTML = !id ? '' : c > 0 ? `${nick} ha addosso ${val.get(id)} BC di taglie${own.get(id) ? `, di cui ${own.get(id)} tuoi (ti tornano indietro, non sono un guadagno)` : ''}: potresti incassarne ${c}.` : `${nick} non ha taglie che tu possa incassare: la sfida può essere solo una Ladder normale.`;
       };
-      f.ldo.onchange = fillKinds; fillKinds();
-      f.onsubmit = async e => { e.preventDefault(); const b = f.querySelector('button[type=submit]'); b.disabled = true;
+      if (f) { f.ldo.onchange = fillKinds; fillKinds(); }
+      if (f) f.onsubmit = async e => { e.preventDefault(); const b = f.querySelector('button[type=submit]'); b.disabled = true;
         try {
           const a = { p_opponent: f.ldo.value, p_format: f.ldf.value, p_message: f.ldm.value || null, p_request_id: f.dataset.rq };
           const kn = document.getElementById('ldk'); if (kn) { if (!kn.value) throw new Error('Scegli il tipo di sfida'); a.p_kind = kn.value }
           await rpc('ladder_challenge', a); toast('Sfida lanciata: l\'avversario riceverà una notifica.'); BM.route() }
         catch (er) { toast(er.message, 1); b.disabled = false } };
       const sInp = document.getElementById('lds');
-      sInp.oninput = () => { const t = sInp.value.trim().toLowerCase(); document.querySelectorAll('.ldr').forEach(r => r.hidden = !!t && !r.dataset.n.includes(t)) };
-    } catch (er) { fail(er, 'ladder') }
+      if (sInp) sInp.oninput = () => { const t = sInp.value.trim().toLowerCase(); document.querySelectorAll('.ldr').forEach(r => r.hidden = !!t && !r.dataset.n.includes(t)) };
+    } catch (er) { fail(er, cur) }
   };
+  R.ladder = () => ladderPage('sfide');
+  R.sfide = R.ladder;
+  R.classifiche = () => ladderPage('rank');
 
   /* ============================== AZIONI (clic) ============================== */
   const done = async (msg) => { toast(msg); await BM.core(); BM.route() };
@@ -405,7 +424,7 @@ window.BM_MODULES = function (BM) {
     ldRep: async el => { const v = document.getElementById('lr-' + el.dataset.c).value; if (!v) throw new Error('Scegli com\'è finita la partita'); const [r, sc] = v.split('|'); await rpc('ladder_report', { p_id: el.dataset.c, p_result: r, p_score: sc }); await done(`Risultato inviato. Ora deve confermarlo ${el.dataset.o || 'l\'avversario'}: avvisalo! Quando conferma è tutto registrato.`) },
     ldConf: async el => { const r = await rpc('ladder_confirm', { p_id: el.dataset.c }); await done('Risultato confermato.' + (r.kind === 'bounty' ? '' : ` Elo: ${r.challenger_delta >= 0 ? '+' : ''}${r.challenger_delta} / ${r.opponent_delta >= 0 ? '+' : ''}${r.opponent_delta}.`) + (r.reward > 0 ? ` Il vincitore riceve +${r.reward} BC.` : r.reward_note ? ` Nessun premio in BC: ${r.reward_note}.` : '') + (r.official_match ? ' Registrato come match WPA: non devi inserirlo altrove.' : '') + bountyMsg(r)) },
     ldDisp: async el => { const r = ask('Perché contesti il risultato? (almeno 5 caratteri)'); if (!r) return; await rpc('ladder_dispute', { p_id: el.dataset.c, p_reason: r }); await done('Contestazione inviata: deciderà un amministratore.') },
-    ldPick: async el => { const f = document.getElementById('ldo'); if (f) { f.value = el.dataset.u; const ff = document.getElementById('ldf'); if (ff && el.dataset.f) ff.value = el.dataset.f; f.dispatchEvent(new Event('change')); f.scrollIntoView({ behavior: 'smooth', block: 'center' }); f.focus() } },
+    ldPick: async el => { const f = document.getElementById('ldo'); if (!f || f.closest('[hidden]')) { location.hash = '#/sfida/' + el.dataset.u + (el.dataset.f ? '?f=' + el.dataset.f : ''); return } if (f) { f.value = el.dataset.u; const ff = document.getElementById('ldf'); if (ff && el.dataset.f) ff.value = el.dataset.f; f.dispatchEvent(new Event('change')); f.scrollIntoView({ behavior: 'smooth', block: 'center' }); f.focus() } },
     ldAdmRes: async el => { const sel = document.getElementById('lar-' + el.dataset.c).value.split('|'); const r = ask('Motivazione della decisione:'); if (!r) return; const res = await rpc('admin_ladder_resolve', { p_id: el.dataset.c, p_result: sel[0], p_score: sel[1], p_reason: r }); await done('Match risolto e Elo aggiornato.' + (res.reward > 0 ? ` Premio di ${res.reward} BC al vincitore.` : '') + (res.official_match ? ' Registrato come match WPA.' : '') + (res.bounty_claim ? ` Taglia riscossa dal vincitore: ${res.bounty_claim.payout} BC.` : res.bounty_note ? ` Taglia non riscossa: ${res.bounty_note}.` : '')) },
     ldCorrOpen: el => { const f = document.getElementById('lcf-' + el.dataset.c); if (f) { const open = f.hidden; f.hidden = !open; f.style.display = open ? 'flex' : 'none' } },
     ldCorrGo: async el => { const id = el.dataset.c, sel = document.getElementById('lcs-' + id).value.split('|');

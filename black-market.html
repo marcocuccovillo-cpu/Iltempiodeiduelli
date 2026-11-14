@@ -102,12 +102,53 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 .bmd #bdBox{margin-top:0!important;border-radius:16px}
 .bmd-help{margin:2px 0 0;text-align:center;color:var(--mu);font-size:.85rem}.bmd-help a{color:var(--gold)}
 @media(max-width:380px){.bmd-me{grid-template-columns:1fr}.bmd-bal{justify-items:start;grid-template-columns:auto auto 1fr;align-items:baseline;gap:8px}}
+
+/* ===== navigazione semplificata: 4 schede ===== */
+html.bm-page .tm-tb{display:none!important}
+.bm-tb{display:flex;gap:6px;position:sticky;top:0;z-index:40;margin:0 0 14px;padding:8px 0;background:rgba(var(--deep-rgb,3,8,22),.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bm-tb a{position:relative;display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:12px;color:var(--mu);text-decoration:none;font:700 .95rem var(--ui)}
+.bm-tb a i{font-style:normal;font-size:1.1rem}.bm-tb a:hover{color:var(--tx);background:var(--surf)}
+.bm-tb a[aria-current]{color:var(--gold);background:rgba(212,168,67,.14)}
+.bm-tb .bm-home{display:none}
+.bm-dot{position:static;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--ac2,#e0626f);color:#fff;font:800 .68rem/18px var(--ui);text-align:center}
+.bm-dot[hidden]{display:none}
+@media(max-width:719px){
+ .bm-tb{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:950;margin:0;padding:0 4px env(safe-area-inset-bottom,0px);height:var(--tb-h);display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-bottom:0;border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(0,0,0,.5)}
+ .bm-tb a,.bm-tb .bm-home{display:flex;flex-direction:column;justify-content:center;gap:2px;height:62px;padding:0;border-radius:0;background:none!important;font:600 .7rem var(--ui);min-width:0}
+ .bm-tb a i{display:grid;place-items:center;width:46px;height:30px;border-radius:16px;font-size:1.2rem;line-height:1;transition:background .2s}
+ .bm-tb a span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+ .bm-tb a[aria-current] i{background:rgba(212,168,67,.2)}
+ .bm-tb .bm-home{border-right:1px solid var(--line)}
+ .bm-dot{position:absolute;top:4px;right:calc(50% - 26px)}
+}
+html.bm-page h1.t{font-size:clamp(1.6rem,6vw,2.3rem)}
+html.bm-page .sub{font-size:.92rem}
+.bm-head{display:none}
+.bm-back{display:inline-flex;align-items:center;gap:4px;margin:0 0 6px;padding:6px 2px;border:0;background:none;color:var(--gold);font:700 .9rem var(--ui);cursor:pointer}
+.bm-sub{display:flex;gap:6px;overflow-x:auto;margin:0 0 10px;padding-bottom:2px;scrollbar-width:none}.bm-sub::-webkit-scrollbar{display:none}
+.bm-sub a{flex:none;padding:8px 14px;border:1px solid var(--line);border-radius:99px;color:var(--mu);text-decoration:none;font:700 .85rem var(--ui);white-space:nowrap}
+.bm-sub a[aria-current]{color:#16120a;background:var(--gold);border-color:var(--gold)}
+.bm-cta{display:flex;align-items:center;gap:12px;padding:14px 16px;margin-top:14px;border:1.5px solid var(--gold);border-radius:16px;background:linear-gradient(135deg,rgba(212,168,67,.28),rgba(212,168,67,.06));color:var(--tx);text-decoration:none}
+.bm-cta i{font-style:normal;font-size:1.7rem;flex:none}.bm-cta b{display:block;color:var(--gold);font:700 1.05rem var(--ui)}.bm-cta small{display:block;color:var(--mu);font-size:.82rem}
+.bm-cta.alt{border-color:var(--line);background:var(--surf)}.bm-cta.alt b{color:var(--tx)}
+.bm-cta:hover{filter:brightness(1.1)}
+.bmd-cta{display:grid;grid-template-columns:1fr 1fr;gap:10px}.bmd-cta .bm-cta{margin:0;padding:12px;gap:10px}.bmd-cta .bm-cta i{font-size:1.4rem}.bmd-cta .bm-cta b{font-size:.95rem}
+@media(max-width:380px){.bmd-cta{grid-template-columns:1fr}}
+.bmd-onb:empty{display:none}
+.bm-lh{margin:20px 0 8px;color:var(--mu);font:700 .74rem var(--ui);letter-spacing:.12em;text-transform:uppercase}
+.bm-list{display:grid;border:1px solid var(--line);border-radius:16px;background:var(--surf);overflow:hidden}
+.bm-li{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:0;border-top:1px solid var(--line);background:none;color:var(--tx);text-decoration:none;text-align:left;font:inherit;cursor:pointer}
+.bm-li:first-child{border-top:0}.bm-li:hover{background:var(--raise)}
+.bm-li i{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:11px;background:var(--raise);font-style:normal;font-size:1.15rem}
+.bm-li span{flex:1;min-width:0}.bm-li b{display:block;font:700 .98rem var(--ui)}.bm-li small{display:block;color:var(--mu);font-size:.8rem}
+.bm-li em{font-style:normal;color:var(--mu);font-size:1.3rem}
+.bm-li.off{opacity:.55;cursor:default}.bm-li.off:hover{background:none}
 </style></head><body>
 
 <main class="pg" id="app"><p class="mute">Caricamento…</p></main><div id="toast" hidden role="status"></div>
 <script src="tempio.js?v=16"></script>
 <script src="badge.js?v=14"></script>
-<script src="black-market-moduli.js?v=22"></script>
+<script src="black-market-moduli.js?v=23"></script>
 <script src="shop-art-extra.js?v=1"></script>
 <script src="shop-art.js?v=13"></script>
 <script src="black-market-shop.js?v=13"></script>
@@ -117,6 +158,7 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 <script src="black-market-svizzera.js?v=2"></script>
 <script src="black-market-inviti.js?v=3"></script>
 <script src="black-market-tessera.js?v=1"></script>
+<script src="black-market-semplice.js?v=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 /* ============ CONFIGURAZIONE: incolla qui i due valori di Supabase (Project Settings > API) ============ */
@@ -128,7 +170,7 @@ const $app=document.getElementById('app'),$t=document.getElementById('toast');
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const BC=n=>Number(n||0).toLocaleString('it-IT')+' BC';
 const when=d=>new Date(d).toLocaleString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-const KIND={initial_bonus:'Bonus iniziale',bounty_stake:'Taglia pubblicata',bounty_payout:'Ricompensa riscossa',bounty_refund:'Quota restituita',participation_reward:'Partecipazione a evento',admin_adjustment:'Rettifica amministrativa',ladder_reward:'Vittoria in Ladder',shop_purchase:'Acquisto nello Shop',bet_stake:'Scommessa piazzata',bet_payout:'Scommessa vinta',bet_refund:'Puntata restituita',bet_reversal:'Scommessa ricalcolata',invite_reward:'Premio invito',invite_bonus:'Bonus invito'};
+const KIND={initial_bonus:'Bonus iniziale',bounty_stake:'Taglia pubblicata',bounty_payout:'Ricompensa riscossa',bounty_refund:'Quota restituita',participation_reward:'Partecipazione a evento',admin_adjustment:'Rettifica amministrativa',ladder_reward:'Vittoria in Ladder',shop_purchase:'Acquisto nello Shop',bet_stake:'Scommessa piazzata',bet_payout:'Scommessa vinta',bet_refund:'Puntata restituita',bet_reversal:'Scommessa ricalcolata',invite_reward:'Premio invito',invite_bonus:'Bonus invito',onboarding_bonus:'Primi passi'};
 const ROLE={user:'Duellante',organizer:'Organizzatore',moderator:'Moderatore',admin:'Amministratore'};
 let sb,me=null,wallet=0,P=new Map(),S={},tt;
 const SET_RANGE={game_level_cap:[100,9999]};   // impostazioni con un intervallo imposto (il database lo ricontrolla)
@@ -140,12 +182,15 @@ async function q(b){const{data,error}=await b;if(error)throw new Error(error.mes
 const rpc=async(n,a)=>{const{data,error}=await sb.rpc(n,a);if(error)throw new Error(error.message);return data};
 function setup(){$app.innerHTML=`<h1 class="t">Black <em>Market</em></h1><div class="box" style="margin-top:20px"><h2>Configurazione mancante</h2><p>Per attivare il Black Market servono i dati del tuo progetto Supabase. Apri <b>black-market.html</b> su GitHub, cerca le due righe <code>SUPABASE_URL</code> e <code>SUPABASE_ANON_KEY</code> in alto nello script e incolla i valori (Supabase › Project Settings › API). Le istruzioni complete sono nel file <b>LEGGIMI-BLACK-MARKET.md</b>.</p></div>`}
 /* ---------- accesso ---------- */
-function authView(mode){mode=mode||'in';const ivc=(()=>{try{return localStorage.getItem('tempio.invito')}catch(e){return null}})();$app.innerHTML=`<h1 class="t">Black <em>Market</em></h1><p class="sub">Il mercato clandestino dei duellanti. Accedi per entrare.</p><div id="ivBan" hidden></div>
- <div class="box" style="margin-top:22px;max-width:460px"><div class="seg" style="margin-bottom:14px"><button data-act="mode" data-m="in" aria-pressed="${mode=='in'}">Accedi</button><button data-act="mode" data-m="up" aria-pressed="${mode=='up'}">Registrati</button></div>
+function authView(mode){mode=mode||'in';document.documentElement.classList.remove('bm-page');const ivc=(()=>{try{return localStorage.getItem('tempio.invito')}catch(e){return null}})();$app.innerHTML=`<h1 class="t">Black <em>Market</em></h1><p class="sub">Sfida i duellanti del Tempio, scala la classifica e metti taglie sui tuoi rivali. Chi vince incassa.</p><div id="ivBan" hidden></div>
+ <div class="row" style="gap:10px;margin-top:16px"><button type="button" class="btn gold" data-act="mode" data-m="up" data-go="1">Registrati gratis</button><button type="button" class="btn ghost" data-act="mode" data-m="in" data-go="1">Ho già un account</button></div>
+ <div id="bmShow"></div>
+ <div class="box" id="afb" style="margin-top:22px;max-width:460px"><div class="seg" style="margin-bottom:14px"><button data-act="mode" data-m="in" aria-pressed="${mode=='in'}">Accedi</button><button data-act="mode" data-m="up" aria-pressed="${mode=='up'}">Registrati</button></div>
  <form id="af" class="cols" style="grid-template-columns:1fr">${mode=='up'?'<div><label for="nk">Nickname pubblico</label><input id="nk" required minlength="3" maxlength="24" autocomplete="nickname"></div>':''}
  <div><label for="em">Email</label><input id="em" type="email" required autocomplete="email"></div><div><label for="pw">Password (min. 8 caratteri)</label><input id="pw" type="password" required minlength="8" autocomplete="${mode=='up'?'new-password':'current-password'}"></div>
  <button class="btn gold" type="submit">${mode=='up'?'Crea account':'Entra'}</button></form>
  ${mode=='up'?'<p class="mute" style="font-size:.9rem">Riceverai '+Number(S.initial_bonus||1000).toLocaleString('it-IT')+' BC di benvenuto. I Black Credits sono una valuta solo virtuale: non si comprano e non si convertono in denaro.</p>':''}</div>`;
+ if(window.BM_SHOWCASE&&sb)window.BM_SHOWCASE(sb,document.getElementById('bmShow'),{esc,mode});
  if(ivc&&sb)sb.rpc('invite_info',{p_code:ivc}).then(({data})=>{const b=document.getElementById('ivBan');if(!b||!data)return;b.hidden=false;b.className='box';b.style.cssText='margin-top:18px;max-width:460px;border:2px solid #4ade9b;background:linear-gradient(135deg,rgba(74,222,155,.14),rgba(212,168,67,.06))';b.innerHTML=`<p style="margin:0;font-size:1.05rem">🤝 <b>${esc(data.nickname)}</b> ti ha invitato nel Tempio.</p><p class="mute" style="margin:6px 0 0">Registrati: <b style="color:var(--gold)">${Number(data.welcome).toLocaleString('it-IT')} BC</b> subito e <b style="color:var(--gold)">+${Number(data.bonus).toLocaleString('it-IT')} BC</b> al tuo primo match.</p>`},()=>{});
  document.getElementById('af').onsubmit=async e=>{e.preventDefault();const em=document.getElementById('em').value.trim(),pw=document.getElementById('pw').value;
   try{if(mode=='up'){const nk=document.getElementById('nk').value.trim();localStorage.setItem('bm.nick',nk);const{data,error}=await sb.auth.signUp({email:em,password:pw});if(error)throw error;
@@ -167,11 +212,15 @@ function navTiles(items,cur){const lab=new Map(items),used=new Set();
  const rest=items.map(x=>x[0]).filter(k=>!used.has(k));if(rest.length)g.push(['Altro',rest]);
  return g.filter(x=>x[1].length).map(([t,ks])=>`<p class="bm-gt">${t}</p><div class="bm-tiles">${ks.map(k=>`<a class="bm-tile" href="${k=='sentiero'?'sentiero.html':'#/'+k}" ${cur==k?'aria-current="page"':''}><i aria-hidden="true">${(NAVI[k]||['•'])[0]}</i><span>${esc(lab.get(k))}</span></a>`).join('')}</div>`).join('')}
 function navAll(){const items=[['','Dashboard'],['wanted','Most Wanted'],['new','Metti una taglia'],['log','Registro'],['wallet','Wallet'],['events','Eventi'],['sentiero','Il Sentiero']];if(BM.navItems)items.push(...BM.navItems());if(me.role=='admin')items.push(['admin','Admin']);return items}
-function shell(inner,cur){const items=navAll();
- const key=cur=='e'?'events':cur,hit=items.find(x=>x[0]==key),ic=hit?(NAVI[hit[0]]||['•'])[0]:'◈',name=hit?hit[1]:'Black Market';
- const tiles=navTiles(items,key);
- $app.innerHTML=`<nav class="bm-head" aria-label="Sezioni del Black Market"><div class="bm-bar"><button class="bm-cur" data-act="navtog" id="bmCur" aria-expanded="${navOpen}" aria-controls="bmGrid"><span class="ic" aria-hidden="true">${ic}</span><span class="tx"><small>Sei in</small><b>${esc(name)}</b></span><span class="chev">Sezioni <i aria-hidden="true">▾</i></span></button><button class="bm-out" data-act="out">Esci</button></div>
-  <div class="bm-grid" id="bmGrid" ${navOpen?'':'hidden'}>${tiles}</div></nav>${inner}`}
+/* navigazione a 4 schede (Oggi, Sfide, Classifiche, Tu): in basso sul telefono, in alto sul computer */
+const TABS=[['','◈','Oggi'],['sfide','⚔️','Sfide'],['classifiche','🏆','Classifiche'],['tu','👤','Tu']];
+const TAB_OF=k=>({'':'',sfide:'sfide',sfida:'sfide',ladder:'sfide',challenges:'sfide',hunt:'sfide',notifiche:'sfide',classifiche:'classifiche',wanted:'classifiche',hof:'classifiche',factions:'classifiche'})[k]??'tu';
+function shell(inner,cur){const key=cur=='e'?'events':cur=='rank'?'classifiche':cur,tab=TAB_OF(key);
+ document.documentElement.classList.add('bm-page');
+ const cls=tab=='classifiche'?`<nav class="bm-sub" aria-label="Classifiche">${[['classifiche','Ladder',S.module_ladder==1],['wanted','Most Wanted',1],['hof','Hall of Fame',S.module_hall_of_fame==1],['factions','Fazioni',S.module_faction_wars==1]].filter(x=>x[2]).map(([k,l])=>`<a href="#/${k}"${k==key?' aria-current="page"':''}>${l}</a>`).join('')}</nav>`:'';
+ const hist=['p','e','t'].includes(key),back=hist||(tab=='tu'&&key!='tu')||(tab=='sfide'&&!['sfide','ladder'].includes(key))?`<button type="button" class="bm-back" data-act="back" data-to="${tab=='sfide'?'#/sfide':'#/tu'}">‹ ${hist?'Indietro':tab=='sfide'?'Sfide':'Tu'}</button>`:'';
+ $app.innerHTML=`<nav class="bm-tb" aria-label="Black Market"><a class="bm-home" href="index.html"><i aria-hidden="true">⌂</i><span>Tempio</span></a>${TABS.map(([k,i,l])=>`<a href="#/${k}"${tab==k?' aria-current="page"':''}><i aria-hidden="true">${i}</i><span>${l}</span>${k=='sfide'?'<b class="bm-dot" hidden></b>':''}</a>`).join('')}</nav>${back}${cls}${inner}`;
+ if(BM.afterShell)try{BM.afterShell()}catch(e){}}
 function navClose(focus){const g=document.getElementById('bmGrid'),b=document.getElementById('bmCur');if(!g||g.hidden)return;g.hidden=true;navOpen=false;if(b){b.setAttribute('aria-expanded','false');if(focus)b.focus()}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')navClose(true)});
 document.addEventListener('click',e=>{if(!e.target.closest('.bm-head'))navClose(false)});
@@ -200,8 +249,6 @@ R['']=async()=>{const[mw,fd,hp]=await Promise.all([q(sb.from('most_wanted_v').se
  const bn=fd.filter(f=>f.kind=='bounty').slice(0,6),cl=fd.filter(f=>f.kind=='claim').slice(0,6);
  const avx=h.avatar||av(me).replace('class="av"','class="av xl"');
  const kpi=(h.key||[]).map(([i,v,l])=>`<div class="bmd-k"><b>${v}</b><span><i aria-hidden="true">${i}</i> ${esc(l)}</span></div>`).join('');
- const lab=new Map(navAll()),go=[['new','➕','Metti taglia'],['wanted','🎯','Most Wanted'],BM.huntBtn?['hunt','🗡️','Caccia']:null,['ladder','⚔️','Ladder'],['wallet','👛','Wallet'],['shop','🛍️','Shop'],['bets','🎲','Scommesse'],['events','🏆','Eventi'],['sentiero','✦','Sentiero'],['invita','🤝','Invita']]
-  .filter(x=>x&&(x[0]=='hunt'||lab.has(x[0]))).slice(0,8);
  const sec=(t,more,body)=>`<section class="bmd-s"><div class="bmd-h"><h2>${t}</h2>${more||''}</div>${body}</section>`;
  const pend=h.pending||'',lk=`<div class="bmd-lk"><a href="#/p/${me.id}">Profilo e taglie ›</a><button type="button" data-act="avPick">${me.avatar_img?'Cambia foto':'Aggiungi foto'}</button>${me.avatar_img?'<button type="button" data-act="avDel">Rimuovi</button>':''}<input id="avf" type="file" accept="image/*" hidden></div>`;
  const idh=BM.shopHead&&h.eq&&Object.keys(h.eq).length?`<div class="bmd-id bmd-shop">${BM.shopHead(me,h.eq,{avatar:avx,h:'h1',tag:`<span class="tag">${ROLE[me.role]}</span>`,extra:lk,petSize:72})}</div>`
@@ -211,7 +258,8 @@ R['']=async()=>{const[mw,fd,hp]=await Promise.all([q(sb.from('most_wanted_v').se
   <a class="bmd-bal" href="#/wallet"><small>Saldo</small><b>${Number(wallet).toLocaleString('it-IT')}</b><span>BC</span></a>
   ${kpi?`<div class="bmd-ks">${kpi}</div>`:''}</section>
  ${pend?`<section class="bmd-todo">${pend}</section>`:''}
- <nav class="bmd-go" aria-label="Scorciatoie">${go.map(([k,i,l])=>`<a href="${k=='sentiero'?'sentiero.html':'#/'+k}"${k=='new'?' class="hot"':''}><i aria-hidden="true">${i}</i><span>${l}</span></a>`).join('')}</nav>
+ <div class="bmd-onb"></div>
+ <div class="bmd-cta">${S.module_ladder==1?'<a class="bm-cta" href="#/sfida"><i aria-hidden="true">⚔️</i><span><b>Lancia una sfida</b><small>Elo, premi e taglie</small></span></a>':''}<a class="bm-cta alt" href="#/new"><i aria-hidden="true">🎯</i><span><b>Metti una taglia</b><small>Chi lo batte incassa</small></span></a></div>
  <div class="bmd-slot"></div>
  <div class="bmd-cols">
  ${sec('🎯 Più ricercati','<a class="bmd-more" href="#/wanted">Tutti ›</a>',mw.length?mw.map((r,i)=>card(r,i)).join(''):'<p class="mute bmd-empty">Nessuna taglia attiva. <a href="#/new">Mettine una</a>.</p>')}
@@ -223,6 +271,17 @@ R['']=async()=>{const[mw,fd,hp]=await Promise.all([q(sb.from('most_wanted_v').se
  ${h.badges||''}
  <p class="bmd-help">Come funziona il Black Market? <a href="faq.html#taglie">Leggi le FAQ</a></p>
  </div>`,'')};
+/* ===== TU: account, portafoglio e tutte le sezioni secondarie in un solo elenco ===== */
+R.tu=async()=>{const has=new Map(navAll()),ob=BM.onb?await BM.onb().catch(()=>null):null,staff=me.role=='admin'||me.role=='organizer';
+ const need=ob&&ob.unlock>0&&!staff?ob.unlock:0,lockd=k=>need&&['bets','factions','challenges'].includes(k)&&ob.played<need;
+ const G=[['Il tuo account',[['p/'+me.id,'🪪','Profilo pubblico','Foto, taglie su di te, statistiche'],['wallet','👛','Wallet',BC(wallet)+' · tutti i movimenti'],R.notifiche&&['notifiche','🔔','Notifiche','Sfide, taglie e risposte'],has.has('invita')&&['invita','🤝','Invita amici','Guadagnate BC tutti e due']]],
+  ['Spendi e colleziona',[has.has('shop')&&['shop','🛍️','Shop','Premi permanenti per il profilo'],['sentiero','✦','Il Sentiero','Traguardi e badge']]],
+  ['Altro',[['new','🎯','Metti una taglia','Chi batte il bersaglio incassa'],['events','🏆','Eventi e tornei','Match ufficiali WPA'],has.has('bets')&&['bets','🎲','Scommesse','Punta BC sulle sfide'],has.has('factions')&&['factions','🚩','Faction Wars','Squadre e stagioni'],has.has('challenges')&&['challenges','🥷','Underground','Sfide libere agli eventi'],['log','📜','Registro','Tutto quello che succede'],staff&&R.tessere&&['tessere','🏷️','Tessere NFC','Scrivi le tessere dei duellanti'],me.role=='admin'&&['admin','🛡️','Admin','Impostazioni e controlli']]]];
+ const row=([k,i,l,d])=>lockd(k)?`<div class="bm-li off"><i aria-hidden="true">🔒</i><span><b>${l}</b><small>Si sblocca dopo ${need} sfide concluse (${ob.played}/${need})</small></span></div>`
+  :`<a class="bm-li" href="${k=='sentiero'?'sentiero.html':'#/'+k}"><i aria-hidden="true">${i}</i><span><b>${l}</b><small>${d}</small></span><em aria-hidden="true">›</em></a>`;
+ shell(`<section class="bmd-me" style="margin-top:6px"><div class="bmd-id">${av(me).replace('class="av"','class="av xl"')}<div class="bmd-nm"><h1>${esc(me.nickname)}</h1><span class="tag">${ROLE[me.role]}</span></div></div><a class="bmd-bal" href="#/wallet"><small>Saldo</small><b>${Number(wallet).toLocaleString('it-IT')}</b><span>BC</span></a></section>
+ ${G.map(([t,l])=>{l=l.filter(Boolean);return l.length?`<h2 class="bm-lh">${t}</h2><div class="bm-list">${l.map(row).join('')}</div>`:''}).join('')}
+ <div class="bm-list" style="margin-top:18px"><a class="bm-li" href="faq.html#taglie"><i aria-hidden="true">?</i><span><b>Come funziona</b><small>Domande frequenti</small></span><em aria-hidden="true">›</em></a><button type="button" class="bm-li" data-act="out"><i aria-hidden="true">⎋</i><span><b>Esci</b><small>Disconnetti questo dispositivo</small></span></button></div>`,'tu')};
 R.wanted=async()=>{const rows=await q(sb.from('most_wanted_v').select('*'));const k=sessionStorage.getItem('bm.sort')||'value';
  rows.sort((a,b)=>k=='recent'?new Date(b.last_at)-new Date(a.last_at):k=='activity'?b.active_count-a.active_count||b.bounty_value-a.bounty_value:b.bounty_value-a.bounty_value);
  shell(`<h1 class="t">Most <em>Wanted</em></h1><p class="sub">I duellanti con le taglie più alte. Non è la classifica dei risultati WPA.</p>${BM.huntBtn?'<div class="row" style="gap:10px;margin-top:12px"><a class="btn gold sm" href="#/hunt">Caccia alle taglie: sfida e riscuoti</a></div>':''}<div class="seg" style="margin:18px 0">${[['value','Valore'],['recent','Più recenti'],['activity','Attività']].map(([v,l])=>`<button data-act="sort" data-v="${v}" aria-pressed="${k==v}">${l}</button>`).join('')}</div>
@@ -295,7 +354,8 @@ async function act(el){const a=el.dataset.act;
  if(BM.act&&await BM.act(a,el))return;
  if(a=='navtog'){const g=document.getElementById('bmGrid');if(g){g.hidden=!g.hidden;navOpen=!g.hidden;el.setAttribute('aria-expanded',String(navOpen));if(navOpen){const c=g.querySelector('[aria-current]')||g.querySelector('a');if(c&&c.scrollIntoView)c.scrollIntoView({block:'nearest'})}}return}
  if(a=='out'){await sb.auth.signOut();return}
- if(a=='mode'){authView(el.dataset.m);return}
+ if(a=='back'){const r=document.referrer;if(history.length>1&&!(r&&!r.includes(location.host)))history.back();else location.hash=el.dataset.to;return}
+ if(a=='mode'){const go=el.dataset.go;authView(el.dataset.m);if(go){const b=document.getElementById('afb');if(b){b.scrollIntoView({behavior:'smooth',block:'center'});const i=b.querySelector('input');if(i)setTimeout(()=>i.focus({preventScroll:true}),350)}}return}
  if(a=='dtab'){sessionStorage.setItem('bm.dtab',el.dataset.v);el.parentNode.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b===el));document.querySelectorAll('#app [data-dt]').forEach(d=>d.hidden=d.dataset.dt!=el.dataset.v);return}
  if(a=='sort'){sessionStorage.setItem('bm.sort',el.dataset.v);route();return}
  if(a=='saveprof'){await rpc('update_my_profile',{p_avatar:document.getElementById('avi').value.trim()||null,p_wanted:document.getElementById('wn').checked});await core();toast('Profilo aggiornato.');route();return}
@@ -317,6 +377,8 @@ $app.addEventListener('change',async e=>{const s=e.target;if(s.dataset.act=='rol
 try{if(window.BM_INVITE)window.BM_INVITE(BM)}catch(e){console.error('Inviti non caricati',e)}
 /* tessere NFC dei duellanti (#/t/<id>, #/tessere): anche questa estende #/p, quindi va dopo */
 try{if(window.BM_CARD)window.BM_CARD(BM)}catch(e){console.error('Tessere non caricate',e)}
+/* struttura semplificata: sfida unica, primi passi, avvisi sulla scheda Sfide (va per ultima) */
+try{if(window.BM_SIMPLE)window.BM_SIMPLE(BM)}catch(e){console.error('Struttura semplificata non caricata',e)}
 async function route(){if(!me)return;navOpen=false;const h=location.hash.replace(/^#\/?/,'').split('/'),k=h[0]||'';
  try{await (R[k]||R[''])(h[1])}catch(er){shell(`<div class="err">Qualcosa è andato storto: ${esc(er.message)}</div>`,'')}scrollTo(0,0)}
 async function boot(){const{data:{session}}=await sb.auth.getSession();if(!session){me=null;authView((()=>{try{return localStorage.getItem('tempio.invito')}catch(e){return null}})()?'up':'in');return}
