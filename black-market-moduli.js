@@ -220,9 +220,9 @@ window.BM_MODULES = function (BM) {
 
   /* ============== PROFILO IN DASHBOARD: avatar + statistiche personali ============== */
   const tile = (v, l) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`;
-  BM.dashHero = async () => {
+  BM.dashHero = async (opt) => {
     const me = BM.me, sb = BM.sb, id = me.id;
-    let tiles = '', note = '', pend = [], pendVal = new Map();
+    let tiles = '', note = '', pend = [], pendVal = new Map(); const K = [];   // K: le statistiche principali, per la dashboard compatta
     try {
       const [ms, bs, ss, mw, lad, lrw, pend0] = await Promise.all([
         q(sb.from('matches').select('event_id,winner_id').eq('status', 'verified').or(`player_a.eq.${id},player_b.eq.${id}`)),
@@ -235,6 +235,7 @@ window.BM_MODULES = function (BM) {
       pend = pend0.filter(m => !m.expires_at || new Date(m.expires_at) > Date.now()); pendVal = new Map([[id, mw[0] ? mw[0].bounty_value : 0]]);
       const w = ms.filter(m => m.winner_id === id).length, l = ms.length - w, ev = new Set(ms.map(m => m.event_id)).size;
       const placed = bs.filter(b => b.status !== 'cancelled'), got = ss.reduce((t, x) => t + x.payout, 0);
+      K.push(['⚔️', ms.length ? `${w}V · ${l}S` : '—', 'Match ufficiali'], ['🎯', mw[0] ? BC(mw[0].bounty_value) : '0 BC', 'Taglie su di te']);
       tiles = tile(BC(BM.wallet), 'Saldo') +
         tile(ms.length ? `${w}V · ${l}S` : 'n/d', 'Match ufficiali' + (ms.length ? ` · ${pct(w, l)}` : '')) +
         tile(ev || 'n/d', 'Eventi giocati') +
@@ -243,7 +244,7 @@ window.BM_MODULES = function (BM) {
         tile(ss.length, 'Taglie riscosse' + (ss.length ? ` · ${BC(got)}` : ''));
       if (on('ladder')) {
         const fm = (await BM.hasV11()) ? ['Advanced', 'Edison'] : [null];   // con la migrazione 011 c'è un Elo per formato
-        fm.forEach(f => { const r = f ? lad.find(x => x.format === f) : lad[0]; tiles += tile(r ? r.elo : 'n/d', 'Elo ' + (f || 'Ladder') + (r ? ` · #${r.rank} · ${r.wins}V ${r.draws}P ${r.losses}S` : ' · non ancora classificato')) });
+        let ke = 0; fm.forEach(f => { const r = f ? lad.find(x => x.format === f) : lad[0]; K.splice(ke++, 0, ['📈', r ? r.elo : '—', 'Elo ' + (f || 'Ladder') + (r ? ` · #${r.rank}` : '')]); tiles += tile(r ? r.elo : 'n/d', 'Elo ' + (f || 'Ladder') + (r ? ` · #${r.rank} · ${r.wins}V ${r.draws}P ${r.losses}S` : ' · non ancora classificato')) });
       }
       if (on('ladder')) tiles += tile(BC(lrw.reduce((t, x) => t + x.amount, 0)), 'Guadagnati in Ladder' + (lrw.length ? ` · ${lrw.length} vittorie premiate` : ''));
     } catch (er) { note = `<p class="mute">Statistiche non disponibili: ${esc(er.message)}</p>` }
@@ -252,6 +253,8 @@ window.BM_MODULES = function (BM) {
     const who = BM.shopHead && eq && Object.keys(eq).length
       ? BM.shopHead(me, eq, { avatar: av(me).replace('class="av"', 'class="av xl"'), h: 'h2', tag: `<span class="tag">${ROLE[me.role]}</span>`, extra: btns, petSize: 104 })
       : `<div style="display:flex;gap:16px;align-items:center">${av(me).replace('class="av"', 'class="av xl"')}<div style="min-width:0;flex:1"><h2 style="margin:0;font-size:1.6rem;color:var(--tx);overflow-wrap:anywhere">${esc(me.nickname)}</h2><span class="tag">${ROLE[me.role]}</span>${btns}</div></div>`;
+    if (opt && opt.parts) return { pending: BM.incomingBox(pend, pendVal, { mt: 0 }), key: K.slice(0, 4), tiles, note, eq,
+      avatar: av(me).replace('class="av"', 'class="av xl"'), badges: await BM.badgeBox(id, true) };
     return BM.incomingBox(pend, pendVal, { mt: 22 }) + `<div class="box" style="margin-top:22px">${who}
       <div class="stats" style="margin-top:16px">${tiles}</div>${note}<p class="mute" style="font-size:.85rem;margin:12px 0 0">Statistiche calcolate dai match ufficiali verificati, dalle taglie e dalla Ladder. Dove non ci sono dati compare “n/d”.</p></div>` + await BM.badgeBox(id, true);
   };

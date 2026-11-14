@@ -110,7 +110,7 @@ window.BM_INVITE = function (BM) {
     try { await dashExtras() } catch (er) { console.warn('Inviti: riquadri della dashboard non mostrati', er) }   // un extra non deve mai bloccare la dashboard
   };
   /* il punto d'aggancio si cerca DOPO ogni attesa: nel frattempo la pagina può essere stata ridisegnata */
-  const spot = () => { const app = document.getElementById('app'), g = app && app.querySelector('.grid'); return g && g.isConnected && g.parentNode ? g : null };
+  const spot = () => { const app = document.getElementById('app'), g = app && (app.querySelector('.bmd-slot') || app.querySelector('.grid')); return g && g.isConnected && g.parentNode ? g : null };
   async function dashExtras() {
     let i = null; try { i = await load() } catch (er) { return }
     if (location.hash.replace(/^#\/?/, '') !== '') return;            // nel frattempo si è cambiata pagina

@@ -70,12 +70,44 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 #toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);max-width:90vw;padding:12px 18px;border-radius:10px;background:var(--raise);border:1px solid var(--gold);z-index:2000;font-weight:600}
 #toast.bad{border-color:var(--ac2)}#toast[hidden]{display:none}
 .cols{display:grid;gap:12px}@media(min-width:620px){.cols{grid-template-columns:1fr 1fr}}
+
+/* dashboard */
+.bmd{display:grid;gap:14px;margin-top:6px}
+.bmd-me{display:grid;grid-template-columns:1fr auto;gap:12px 14px;align-items:center;padding:16px;border:1px solid var(--line);border-radius:18px;background:radial-gradient(120% 140% at 0 0,rgba(212,168,67,.14),transparent 55%),var(--surf)}
+.bmd-id{display:flex;gap:12px;align-items:center;min-width:0}.bmd-id .av.xl{width:64px;height:64px;font-size:1.6rem}
+.bmd-nm{min-width:0}.bmd-nm h1{margin:0 0 3px;font-size:clamp(1.25rem,5vw,1.7rem);line-height:1.1;color:var(--tx);overflow-wrap:anywhere}
+.bmd-shop h1,.bmd-shop h2{font-size:clamp(1.2rem,5vw,1.6rem)!important;margin:0!important}
+.bmd-lk{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px}.bmd-lk a,.bmd-lk button{background:none;border:0;padding:4px 0;color:var(--gold);font:600 .82rem var(--ui);text-decoration:none;cursor:pointer}.bmd-lk button{color:var(--mu)}.bmd-lk button:hover,.bmd-lk a:hover{color:var(--tx)}
+.bmd-bal{display:grid;justify-items:end;padding:10px 14px;border:1px solid rgba(212,168,67,.45);border-radius:14px;background:rgba(212,168,67,.08);text-decoration:none;color:var(--tx)}
+.bmd-bal small{color:var(--mu);font:700 .66rem var(--ui);letter-spacing:.1em;text-transform:uppercase}.bmd-bal b{font:600 clamp(1.4rem,6vw,2rem)/1.05 var(--disp)}.bmd-bal span{color:var(--gold);font:700 .72rem var(--ui)}
+.bmd-ks{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.bmd-k{padding:8px 10px;border-radius:12px;background:var(--raise);border:1px solid var(--line);min-width:0}.bmd-k b{display:block;font:600 1.1rem var(--disp);color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bmd-k span{display:block;color:var(--mu);font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bmd-k i{font-style:normal}
+.bmd-todo>.box{margin-top:0!important;border-radius:16px}
+.bmd-go{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.bmd-go a{display:grid;justify-items:center;gap:4px;padding:10px 4px;border:1px solid var(--line);border-radius:14px;background:var(--surf);color:var(--tx);text-decoration:none;font:700 .74rem/1.15 var(--ui);text-align:center;min-height:66px;align-content:center}
+.bmd-go a i{font-style:normal;font-size:1.35rem;line-height:1}.bmd-go a:hover{border-color:var(--gold);background:var(--raise)}
+.bmd-go a.hot{border-color:var(--gold);background:linear-gradient(160deg,rgba(212,168,67,.25),rgba(212,168,67,.06));color:var(--gold)}
+@media(min-width:700px){.bmd-go{grid-template-columns:repeat(8,1fr)}}
+.bmd-slot:empty{display:none}.bmd-slot{display:grid;gap:10px}.bmd-slot .iv-pro{margin:0}
+.bmd-cols{display:grid;gap:14px}@media(min-width:860px){.bmd-cols{grid-template-columns:1fr 1fr}}
+.bmd-s{padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:var(--surf);min-width:0}
+.bmd-h{display:flex;align-items:center;gap:10px;margin-bottom:4px}.bmd-h h2,.bmd-s h2{margin:0;font-size:1.05rem;color:var(--gold);flex:1}
+.bmd-more{color:var(--mu);font:600 .82rem var(--ui);text-decoration:none}.bmd-more:hover{color:var(--gold)}
+.bmd-s .row2{padding:9px 0;gap:10px}.bmd-s .row2 .val{font-size:1.05rem}.bmd-s .row2 .av{width:34px;height:34px}
+.bmd-seg{margin:8px 0 2px}.bmd-seg button{min-height:36px;padding:0 12px;font-size:.84rem;flex:1}.bmd-seg small{opacity:.7}
+.bmd-s .row2{flex-wrap:nowrap;border-top:1px solid var(--line)}.bmd-h+.row2,.bmd-s .row2:first-child{border-top:0}.bmd-s .row2 .g{flex:1 1 auto}.bmd-s .row2 small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bmd-s .row2 .btn{min-height:34px;padding:0 12px;font-size:.8rem}
+.bmd .iv-pro{margin:0!important;padding:10px 14px;gap:10px;border-radius:14px}.bmd .iv-pro .e{font-size:1.5rem}.bmd .iv-pro .g{font-size:.9rem;line-height:1.3}.bmd .iv-pro .btn{min-height:38px}
+.bmd-empty{margin:8px 0 2px;font-size:.9rem}
+.bmd-all>summary h2{font-size:1.05rem}.bmd-all .stats{margin-top:6px}
+.bmd #bdBox{margin-top:0!important;border-radius:16px}
+.bmd-help{margin:2px 0 0;text-align:center;color:var(--mu);font-size:.85rem}.bmd-help a{color:var(--gold)}
+@media(max-width:380px){.bmd-me{grid-template-columns:1fr}.bmd-bal{justify-items:start;grid-template-columns:auto auto 1fr;align-items:baseline;gap:8px}}
 </style></head><body>
 
 <main class="pg" id="app"><p class="mute">Caricamento…</p></main><div id="toast" hidden role="status"></div>
 <script src="tempio.js?v=16"></script>
 <script src="badge.js?v=14"></script>
-<script src="black-market-moduli.js?v=21"></script>
+<script src="black-market-moduli.js?v=22"></script>
 <script src="shop-art-extra.js?v=1"></script>
 <script src="shop-art.js?v=13"></script>
 <script src="black-market-shop.js?v=13"></script>
@@ -83,7 +115,7 @@ h1.t{font-size:clamp(2rem,7vw,3.2rem)}h1.t em{font-style:normal;color:var(--gold
 <script src="black-market-caccia.js?v=15"></script>
 <script src="black-market-scommesse.js?v=4"></script>
 <script src="black-market-svizzera.js?v=2"></script>
-<script src="black-market-inviti.js?v=2"></script>
+<script src="black-market-inviti.js?v=3"></script>
 <script src="black-market-tessera.js?v=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
@@ -134,7 +166,8 @@ function navTiles(items,cur){const lab=new Map(items),used=new Set();
  const g=NAVG.map(([t,ks])=>[t,ks.filter(k=>lab.has(k))]);g.forEach(x=>x[1].forEach(k=>used.add(k)));
  const rest=items.map(x=>x[0]).filter(k=>!used.has(k));if(rest.length)g.push(['Altro',rest]);
  return g.filter(x=>x[1].length).map(([t,ks])=>`<p class="bm-gt">${t}</p><div class="bm-tiles">${ks.map(k=>`<a class="bm-tile" href="${k=='sentiero'?'sentiero.html':'#/'+k}" ${cur==k?'aria-current="page"':''}><i aria-hidden="true">${(NAVI[k]||['•'])[0]}</i><span>${esc(lab.get(k))}</span></a>`).join('')}</div>`).join('')}
-function shell(inner,cur){const items=[['','Dashboard'],['wanted','Most Wanted'],['new','Metti una taglia'],['log','Registro'],['wallet','Wallet'],['events','Eventi'],['sentiero','Il Sentiero']];if(BM.navItems)items.push(...BM.navItems());if(me.role=='admin')items.push(['admin','Admin']);
+function navAll(){const items=[['','Dashboard'],['wanted','Most Wanted'],['new','Metti una taglia'],['log','Registro'],['wallet','Wallet'],['events','Eventi'],['sentiero','Il Sentiero']];if(BM.navItems)items.push(...BM.navItems());if(me.role=='admin')items.push(['admin','Admin']);return items}
+function shell(inner,cur){const items=navAll();
  const key=cur=='e'?'events':cur,hit=items.find(x=>x[0]==key),ic=hit?(NAVI[hit[0]]||['•'])[0]:'◈',name=hit?hit[1]:'Black Market';
  const tiles=navTiles(items,key);
  $app.innerHTML=`<nav class="bm-head" aria-label="Sezioni del Black Market"><div class="bm-bar"><button class="bm-cur" data-act="navtog" id="bmCur" aria-expanded="${navOpen}" aria-controls="bmGrid"><span class="ic" aria-hidden="true">${ic}</span><span class="tx"><small>Sei in</small><b>${esc(name)}</b></span><span class="chev">Sezioni <i aria-hidden="true">▾</i></span></button><button class="bm-out" data-act="out">Esci</button></div>
@@ -161,12 +194,35 @@ try{if(window.BM_NOTIF)window.BM_NOTIF(BM)}catch(e){console.error('Notifiche non
 try{if(window.BM_HUNT)window.BM_HUNT(BM)}catch(e){console.error('Caccia alle taglie non caricata',e)}
 try{if(window.BM_BETS)window.BM_BETS(BM)}catch(e){console.error('Scommesse non caricate',e)}
 try{if(window.BM_SWISS)window.BM_SWISS(BM)}catch(e){console.error('Tornei svizzeri non caricati',e)}
-R['']=async()=>{const[mw,fd,hero]=await Promise.all([q(sb.from('most_wanted_v').select('*').order('bounty_value',{ascending:false}).limit(5)),q(sb.from('market_feed_v').select('*').order('at',{ascending:false}).limit(24)),BM.dashHero?BM.dashHero():''/* profilo e statistiche (black-market-moduli.js) */]);
- const bn=fd.filter(f=>f.kind=='bounty').slice(0,6),cl=fd.filter(f=>f.kind=='claim').slice(0,5);
- shell(`<h1 class="t">Black <em>Market</em></h1><p class="sub">Metti una taglia sui tuoi rivali. Chi li sconfigge in un match ufficiale verificato riscuote il montepremi.</p>${hero}
- <div class="grid c2" style="margin-top:22px"><div class="box"><p class="mute" style="margin:0">Il tuo saldo</p><div class="big">${Number(wallet).toLocaleString('it-IT')} <small>BC</small></div><div class="row" style="margin-top:14px"><a class="btn gold" href="#/new">Metti una taglia</a><a class="btn ghost" href="#/wanted">Esplora il Black Market</a></div></div>
- <div class="box"><h2>Duellanti più ricercati</h2>${mw.length?mw.map((r,i)=>card(r,i)).join(''):'<p class="mute">Nessuna taglia attiva. Sii il primo a metterne una.</p>'}</div></div>
- <div class="grid c2" style="margin-top:14px"><div class="box"><h2>Ultime taglie pubblicate</h2>${bn.map(feedRow).join('')||'<p class="mute">Ancora nessuna taglia.</p>'}</div><div class="box"><h2>Ultime riscossioni</h2>${cl.map(feedRow).join('')||'<p class="mute">Nessuna ricompensa riscossa.</p>'}</div></div>`,'')};
+/* ===== DASHBOARD: identità e saldo · da fare · scorciatoie · ricercati · attività · statistiche ===== */
+R['']=async()=>{const[mw,fd,hp]=await Promise.all([q(sb.from('most_wanted_v').select('*').order('bounty_value',{ascending:false}).limit(5)),q(sb.from('market_feed_v').select('*').order('at',{ascending:false}).limit(24)),BM.dashHero?BM.dashHero({parts:1}).catch(er=>({err:er.message})):null/* profilo e statistiche (black-market-moduli.js) */]);
+ const h=hp&&typeof hp=='object'?hp:{},tab=sessionStorage.getItem('bm.dtab')||'bounty';
+ const bn=fd.filter(f=>f.kind=='bounty').slice(0,6),cl=fd.filter(f=>f.kind=='claim').slice(0,6);
+ const avx=h.avatar||av(me).replace('class="av"','class="av xl"');
+ const kpi=(h.key||[]).map(([i,v,l])=>`<div class="bmd-k"><b>${v}</b><span><i aria-hidden="true">${i}</i> ${esc(l)}</span></div>`).join('');
+ const lab=new Map(navAll()),go=[['new','➕','Metti taglia'],['wanted','🎯','Most Wanted'],BM.huntBtn?['hunt','🗡️','Caccia']:null,['ladder','⚔️','Ladder'],['wallet','👛','Wallet'],['shop','🛍️','Shop'],['bets','🎲','Scommesse'],['events','🏆','Eventi'],['sentiero','✦','Sentiero'],['invita','🤝','Invita']]
+  .filter(x=>x&&(x[0]=='hunt'||lab.has(x[0]))).slice(0,8);
+ const sec=(t,more,body)=>`<section class="bmd-s"><div class="bmd-h"><h2>${t}</h2>${more||''}</div>${body}</section>`;
+ const pend=h.pending||'',lk=`<div class="bmd-lk"><a href="#/p/${me.id}">Profilo e taglie ›</a><button type="button" data-act="avPick">${me.avatar_img?'Cambia foto':'Aggiungi foto'}</button>${me.avatar_img?'<button type="button" data-act="avDel">Rimuovi</button>':''}<input id="avf" type="file" accept="image/*" hidden></div>`;
+ const idh=BM.shopHead&&h.eq&&Object.keys(h.eq).length?`<div class="bmd-id bmd-shop">${BM.shopHead(me,h.eq,{avatar:avx,h:'h1',tag:`<span class="tag">${ROLE[me.role]}</span>`,extra:lk,petSize:72})}</div>`
+  :`<div class="bmd-id">${avx}<div class="bmd-nm"><h1>${esc(me.nickname)}</h1><span class="tag">${ROLE[me.role]}</span>${lk}</div></div>`;
+ shell(`<div class="bmd">
+ <section class="bmd-me">${idh}
+  <a class="bmd-bal" href="#/wallet"><small>Saldo</small><b>${Number(wallet).toLocaleString('it-IT')}</b><span>BC</span></a>
+  ${kpi?`<div class="bmd-ks">${kpi}</div>`:''}</section>
+ ${pend?`<section class="bmd-todo">${pend}</section>`:''}
+ <nav class="bmd-go" aria-label="Scorciatoie">${go.map(([k,i,l])=>`<a href="${k=='sentiero'?'sentiero.html':'#/'+k}"${k=='new'?' class="hot"':''}><i aria-hidden="true">${i}</i><span>${l}</span></a>`).join('')}</nav>
+ <div class="bmd-slot"></div>
+ <div class="bmd-cols">
+ ${sec('🎯 Più ricercati','<a class="bmd-more" href="#/wanted">Tutti ›</a>',mw.length?mw.map((r,i)=>card(r,i)).join(''):'<p class="mute bmd-empty">Nessuna taglia attiva. <a href="#/new">Mettine una</a>.</p>')}
+ ${sec('📰 Attività','',`<div class="seg bmd-seg" role="tablist">${[['bounty','Nuove taglie',bn.length],['claim','Riscossioni',cl.length]].map(([v,l,n])=>`<button role="tab" data-act="dtab" data-v="${v}" aria-pressed="${tab==v}">${l}${n?` <small>${n}</small>`:''}</button>`).join('')}</div>
+  <div data-dt="bounty"${tab=='bounty'?'':' hidden'}>${bn.map(feedRow).join('')||'<p class="mute bmd-empty">Ancora nessuna taglia.</p>'}</div>
+  <div data-dt="claim"${tab=='claim'?'':' hidden'}>${cl.map(feedRow).join('')||'<p class="mute bmd-empty">Nessuna ricompensa riscossa.</p>'}</div>`)}
+ </div>
+ ${h.tiles||h.err?`<details class="bmd-s bm-fold bmd-all"><summary><h2>📊 Tutte le mie statistiche</h2></summary>${h.tiles?`<div class="stats">${h.tiles}</div>`:''}${h.note||''}${h.err?`<p class="mute">Statistiche non disponibili: ${esc(h.err)}</p>`:''}<p class="mute" style="font-size:.8rem;margin:10px 0 0">Dai match ufficiali verificati, dalle taglie e dalla Ladder. “n/d” = nessun dato.</p></details>`:''}
+ ${h.badges||''}
+ <p class="bmd-help">Come funziona il Black Market? <a href="faq.html#taglie">Leggi le FAQ</a></p>
+ </div>`,'')};
 R.wanted=async()=>{const rows=await q(sb.from('most_wanted_v').select('*'));const k=sessionStorage.getItem('bm.sort')||'value';
  rows.sort((a,b)=>k=='recent'?new Date(b.last_at)-new Date(a.last_at):k=='activity'?b.active_count-a.active_count||b.bounty_value-a.bounty_value:b.bounty_value-a.bounty_value);
  shell(`<h1 class="t">Most <em>Wanted</em></h1><p class="sub">I duellanti con le taglie più alte. Non è la classifica dei risultati WPA.</p>${BM.huntBtn?'<div class="row" style="gap:10px;margin-top:12px"><a class="btn gold sm" href="#/hunt">Caccia alle taglie: sfida e riscuoti</a></div>':''}<div class="seg" style="margin:18px 0">${[['value','Valore'],['recent','Più recenti'],['activity','Attività']].map(([v,l])=>`<button data-act="sort" data-v="${v}" aria-pressed="${k==v}">${l}</button>`).join('')}</div>
@@ -240,6 +296,7 @@ async function act(el){const a=el.dataset.act;
  if(a=='navtog'){const g=document.getElementById('bmGrid');if(g){g.hidden=!g.hidden;navOpen=!g.hidden;el.setAttribute('aria-expanded',String(navOpen));if(navOpen){const c=g.querySelector('[aria-current]')||g.querySelector('a');if(c&&c.scrollIntoView)c.scrollIntoView({block:'nearest'})}}return}
  if(a=='out'){await sb.auth.signOut();return}
  if(a=='mode'){authView(el.dataset.m);return}
+ if(a=='dtab'){sessionStorage.setItem('bm.dtab',el.dataset.v);el.parentNode.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b===el));document.querySelectorAll('#app [data-dt]').forEach(d=>d.hidden=d.dataset.dt!=el.dataset.v);return}
  if(a=='sort'){sessionStorage.setItem('bm.sort',el.dataset.v);route();return}
  if(a=='saveprof'){await rpc('update_my_profile',{p_avatar:document.getElementById('avi').value.trim()||null,p_wanted:document.getElementById('wn').checked});await core();toast('Profilo aggiornato.');route();return}
  if(a=='win'){if(!confirm('Confermare il risultato? Non potrà più essere modificato.'))return;await rpc('verify_match',{p_match:el.dataset.m,p_winner:el.dataset.w});toast('Match verificato.');route();return}
