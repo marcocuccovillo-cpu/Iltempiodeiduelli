@@ -6,8 +6,8 @@
    - Primi passi: 4 obiettivi con bonus in BC per i nuovi duellanti (scheda Oggi).
    - Pallino sulla scheda Sfide quando c'è qualcosa da fare.
    - Vetrina pubblica (chi non ha un account vede classifica e ricercati).
-   Primi passi e vetrina richiedono la migrazione black-market-semplice.sql (045):
-   senza, la pagina funziona lo stesso e queste due parti non compaiono.
+   La vetrina usa public_showcase(), la stessa funzione della Home. I primi passi richiedono
+   la migrazione black-market-semplice.sql (045): senza, semplicemente non compaiono.
    ===================================================================== */
 (function () {
   'use strict';
@@ -26,21 +26,23 @@
         scCache = data; scAt = Date.now();
       }
     } catch (e) { return }                                    // migrazione 045 non eseguita: niente vetrina
-    const d = scCache; if (!d || !d.on || !el.isConnected) return;
-    const fm = Object.keys(d.ladder || {}).sort(), avs = r => `<span class="av" aria-hidden="true">${esc(r.avatar || (r.nick || '?')[0].toUpperCase())}</span>`;
+    const d = scCache; if (!d || !d.stats || !el.isConnected) return;      // stessa funzione che alimenta la Home: { stats, people, ladder, wanted, results }
+    const P = d.people || {}, nm = id => esc((P[id] || {}).n || 'Duellante');
+    const avs = id => { const p = P[id] || {}; return `<span class="av" aria-hidden="true">${p.i ? `<img src="${esc(p.i)}" alt="">` : esc(p.a || (p.n || '?')[0].toUpperCase())}</span>` };
+    const fm = Object.keys(d.ladder || {}).filter(k => (d.ladder[k] || []).length).sort();
     let f = fm[0];
-    const lad = () => (d.ladder[f] || []).map(r => `<div class="row2"><span class="rank">${r.rank}</span>${avs(r)}<div class="g"><b>${esc(r.nick)}</b><small>${r.w}V · ${r.d}P · ${r.l}S</small></div><span class="val">${r.elo}</span></div>`).join('') || '<p class="mute bmd-empty">Ancora nessun classificato.</p>';
-    const res = r => r.res === 'draw' ? `<b>${esc(r.a)}</b> e <b>${esc(r.b)}</b> pareggiano` : r.res === 'challenger' ? `<b>${esc(r.a)}</b> batte ${esc(r.b)}` : `<b>${esc(r.b)}</b> batte ${esc(r.a)}`;
-    const sc = r => !r.score ? '' : r.res === 'opponent' ? r.score.split('-').reverse().join('-') : r.score;
-    const c = d.counts || {};
+    const lad = () => (d.ladder[f] || []).map((r, i) => `<div class="row2"><span class="rank">${i + 1}</span>${avs(r.id)}<div class="g"><b>${nm(r.id)}</b><small>${r.w}V · ${r.d}P · ${r.l}S</small></div><span class="val">${r.elo}</span></div>`).join('');
+    const res = r => r.res === 'draw' ? `<b>${nm(r.a)}</b> e <b>${nm(r.b)}</b> pareggiano` : r.res === 'challenger' ? `<b>${nm(r.a)}</b> batte ${nm(r.b)}` : `<b>${nm(r.b)}</b> batte ${nm(r.a)}`;
+    const sc = r => !r.score ? '' : r.res === 'opponent' ? String(r.score).split('-').reverse().join('-') : r.score;
+    const c = d.stats, top = fm.length ? d.ladder[fm[0]][0] : null;
     el.innerHTML = `<div class="sc">
-<div class="sc-k"><span><b>${num(c.players)}</b> duellanti</span><span><b>${num(c.bounty_bc)}</b> BC in taglie</span><span><b>${num(c.matches_30d)}</b> sfide in 30 giorni</span></div>
+<div class="sc-k"><span><b>${num(c.players)}</b> duellanti</span><span><b>${num(c.bounty_total)}</b> BC in taglie</span><span><b>${num(c.matches_week)}</b> match in 7 giorni</span></div>
 <div class="bmd-cols">
-<section class="bmd-s"><div class="bmd-h"><h2>🏆 Classifica Ladder</h2></div>${fm.length > 1 ? `<div class="seg bmd-seg">${fm.map(x => `<button type="button" data-scf="${esc(x)}" aria-pressed="${x === f}">${esc(x)}</button>`).join('')}</div>` : ''}<div class="sc-l">${lad()}</div></section>
-<section class="bmd-s"><div class="bmd-h"><h2>🎯 Più ricercati</h2></div>${(d.wanted || []).map((r, i) => `<div class="row2"><span class="rank">${i + 1}</span>${avs(r)}<div class="g"><b>${esc(r.nick)}</b><small>${r.count} ${r.count == 1 ? 'taglia' : 'taglie'}</small></div><span class="val">${num(r.value)} BC</span></div>`).join('') || '<p class="mute bmd-empty">Nessuna taglia attiva.</p>'}</section>
+<section class="bmd-s"><div class="bmd-h"><h2>🏆 Classifica Ladder</h2></div>${fm.length > 1 ? `<div class="seg bmd-seg">${fm.map(x => `<button type="button" data-scf="${esc(x)}" aria-pressed="${x === f}">${esc(x)}</button>`).join('')}</div>` : ''}<div class="sc-l">${fm.length ? lad() : '<p class="mute bmd-empty">Nessuna partita ancora: il primo posto è libero.</p>'}</div></section>
+<section class="bmd-s"><div class="bmd-h"><h2>🎯 Più ricercati</h2></div>${(d.wanted || []).map((r, i) => `<div class="row2"><span class="rank">${i + 1}</span>${avs(r.id)}<div class="g"><b>${nm(r.id)}</b><small>${r.count} ${r.count == 1 ? 'taglia' : 'taglie'} sulla testa</small></div><span class="val">${num(r.value)} BC</span></div>`).join('') || '<p class="mute bmd-empty">Nessuna taglia attiva.</p>'}</section>
 </div>
-${(d.recent || []).length ? `<section class="bmd-s" style="margin-top:14px"><div class="bmd-h"><h2>⚔️ Ultime sfide</h2></div>${d.recent.map(r => `<div class="row2"><div class="g">${res(r)}${sc(r) ? ' · ' + esc(sc(r)) : ''}<small>${esc(r.format || '')} · ${day(r.at)}</small></div></div>`).join('')}</section>` : ''}
-<p class="sc-cta">Registrati e ricevi <b>${num(d.welcome_bc || 1000)} BC</b> di benvenuto per sfidare chiunque qui sopra.</p></div>`;
+${(d.results || []).length ? `<section class="bmd-s" style="margin-top:14px"><div class="bmd-h"><h2>⚔️ Ultime sfide</h2></div>${d.results.map(r => `<div class="row2"><div class="g">${res(r)}${sc(r) ? ' · ' + esc(sc(r)) : ''}<small>${esc(r.fmt || '')} · ${day(r.at)}</small></div></div>`).join('')}</section>` : ''}
+<button type="button" class="sc-cta" data-act="mode" data-m="up" data-go="1">${top ? `Pensi di poter battere <b>${nm(top.id)}</b>? ` : ''}Registrati: ricevi <b>${num(o.welcome || 1000)} BC</b> di benvenuto e puoi sfidare chiunque.</button></div>`;
     el.querySelectorAll('[data-scf]').forEach(b => b.onclick = () => {
       f = b.dataset.scf; el.querySelectorAll('[data-scf]').forEach(x => x.setAttribute('aria-pressed', x === b)); el.querySelector('.sc-l').innerHTML = lad();
     });
@@ -212,9 +214,7 @@ ${ss.map(s => { const [i, t, d, href] = STEPS[s.step];
 .onb-r{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}.onb-r:first-of-type{border-top:0}
 .onb-r>i{font-style:normal;font-size:1.3rem;width:30px;text-align:center;flex:none}.onb-r span{flex:1;min-width:0}.onb-r b{display:block;font-size:.95rem}.onb-r small{color:var(--mu);font-size:.8rem}
 .onb-r.done{opacity:.55}.onb-r.done b{text-decoration:line-through}.onb-ok{color:#4ade9b;font-weight:800;font-size:1.2rem;padding:0 10px}
-.onb-r .btn{min-height:36px;flex:none}
-.sc{margin-top:18px}.sc-k{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.sc-k span{flex:1 1 100px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surf);color:var(--mu);font-size:.8rem}.sc-k b{display:block;color:var(--gold);font:600 1.25rem var(--disp)}
-.sc .row2 b{color:var(--tx)}.sc-cta{margin:14px 0 0;padding:12px 14px;border:1px dashed rgba(212,168,67,.6);border-radius:12px;text-align:center}.sc-cta b{color:var(--gold)}`;
+.onb-r .btn{min-height:36px;flex:none}`;
     document.head.appendChild(css);
   };
 })();

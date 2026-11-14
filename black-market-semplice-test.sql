@@ -1,5 +1,5 @@
 -- =====================================================================
--- TEST DELLA MIGRAZIONE 045 (vetrina pubblica e primi passi). SOLO su un progetto di PROVA vuoto. Finisce con ROLLBACK: non lascia dati.
+-- TEST DELLA MIGRAZIONE 045 (primi passi; la vetrina della Home resta intatta). SOLO su un progetto di PROVA vuoto. Finisce con ROLLBACK: non lascia dati.
 -- =====================================================================
 begin;
 do $$ begin
@@ -53,23 +53,19 @@ begin
   assert (select bool_and((x->>'claimed')::boolean) from jsonb_array_elements(public.onboarding_state()->'steps') x), 'S2: tutti riscossi';
   insert into t_log (msg) values ('OK S2 — 4 obiettivi pagati una volta sola, saldo e registro coerenti');
 
-  -- S3: vetrina pubblica, anche senza account; niente sospesi, niente email
+  -- S3: la vetrina della Home (public_showcase) resta quella originale e si legge senza account
   perform set_config('request.jwt.claims', json_build_object('role', 'anon')::text, true);
   execute 'set local role anon';
   r := public.public_showcase();
   execute 'reset role';
-  assert (r->>'on')::boolean, 'S3: vetrina attiva';
-  assert jsonb_array_length(r->'ladder'->'Advanced') >= 2, format('S3: classifica Advanced (%s)', r->'ladder');
-  assert jsonb_typeof(r->'wanted') = 'array', format('S3: Most Wanted (%s)', r->'wanted');
-  assert jsonb_array_length(r->'recent') = 1 and r->'recent'->0->>'a' = 'Ann', format('S3: ultimo risultato (%s)', r->'recent');
+  assert r ? 'stats' and r ? 'people' and r ? 'ladder' and r ? 'wanted', format('S3: forma originale (%s)', (select string_agg(k, ',') from jsonb_object_keys(r) k));
+  assert (r->'stats'->>'players')::int = 2, format('S3: conteggio duellanti (%s)', r->'stats');
+  assert r->'people'->(pg_temp.uid('Ann')::text)->>'n' = 'Ann', 'S3: nickname presenti';
   assert position('Cal' in r::text) = 0 and position('@test.local' in r::text) = 0, 'S3: niente sospesi né email';
-  assert (r->'counts'->>'players')::int = 2, format('S3: conteggio duellanti (%s)', r->'counts');
-  update public.system_settings set value_int = 0 where key = 'showcase_public';
-  assert not (public.public_showcase()->>'on')::boolean, 'S3: vetrina spegnibile';
   perform pg_temp.as_('Ann');
   update public.system_settings set value_int = 0 where key = 'onboarding_enabled';
   begin perform public.onboarding_claim('photo'); raise exception 'PAGATO'; exception when others then assert sqlerrm = 'I primi passi non sono attivi', 'S3: ' || sqlerrm; end;
-  insert into t_log (msg) values ('OK S3 — vetrina leggibile senza account (senza sospesi né email), spegnibile; primi passi spegnibili');
+  insert into t_log (msg) values ('OK S3 — vetrina della Home intatta e leggibile senza account; primi passi spegnibili');
 end $$;
 select msg as risultato from t_log order by n;
 rollback;

@@ -143,12 +143,14 @@ html.bm-page .sub{font-size:.92rem}
 .bm-li span{flex:1;min-width:0}.bm-li b{display:block;font:700 .98rem var(--ui)}.bm-li small{display:block;color:var(--mu);font-size:.8rem}
 .bm-li em{font-style:normal;color:var(--mu);font-size:1.3rem}
 .bm-li.off{opacity:.55;cursor:default}.bm-li.off:hover{background:none}
+.sc{margin-top:18px}.sc-k{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.sc-k span{flex:1 1 100px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surf);color:var(--mu);font-size:.8rem}.sc-k b{display:block;color:var(--gold);font:600 1.25rem var(--disp)}
+.sc .row2 b{color:var(--tx)}.sc-cta{display:block;width:100%;margin:14px 0 0;padding:14px;border:1.5px solid var(--gold);border-radius:14px;background:rgba(212,168,67,.1);color:var(--tx);font:inherit;text-align:center;cursor:pointer}.sc-cta b{color:var(--gold)}
 </style></head><body>
 
 <main class="pg" id="app"><p class="mute">Caricamento…</p></main><div id="toast" hidden role="status"></div>
 <script src="tempio.js?v=16"></script>
 <script src="badge.js?v=14"></script>
-<script src="black-market-moduli.js?v=23"></script>
+<script src="black-market-moduli.js?v=24"></script>
 <script src="shop-art-extra.js?v=1"></script>
 <script src="shop-art.js?v=13"></script>
 <script src="black-market-shop.js?v=13"></script>
@@ -158,7 +160,7 @@ html.bm-page .sub{font-size:.92rem}
 <script src="black-market-svizzera.js?v=2"></script>
 <script src="black-market-inviti.js?v=3"></script>
 <script src="black-market-tessera.js?v=1"></script>
-<script src="black-market-semplice.js?v=1"></script>
+<script src="black-market-semplice.js?v=2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 /* ============ CONFIGURAZIONE: incolla qui i due valori di Supabase (Project Settings > API) ============ */
@@ -190,7 +192,7 @@ function authView(mode){mode=mode||'in';document.documentElement.classList.remov
  <div><label for="em">Email</label><input id="em" type="email" required autocomplete="email"></div><div><label for="pw">Password (min. 8 caratteri)</label><input id="pw" type="password" required minlength="8" autocomplete="${mode=='up'?'new-password':'current-password'}"></div>
  <button class="btn gold" type="submit">${mode=='up'?'Crea account':'Entra'}</button></form>
  ${mode=='up'?'<p class="mute" style="font-size:.9rem">Riceverai '+Number(S.initial_bonus||1000).toLocaleString('it-IT')+' BC di benvenuto. I Black Credits sono una valuta solo virtuale: non si comprano e non si convertono in denaro.</p>':''}</div>`;
- if(window.BM_SHOWCASE&&sb)window.BM_SHOWCASE(sb,document.getElementById('bmShow'),{esc,mode});
+ if(window.BM_SHOWCASE&&sb)window.BM_SHOWCASE(sb,document.getElementById('bmShow'),{esc,welcome:S.initial_bonus});
  if(ivc&&sb)sb.rpc('invite_info',{p_code:ivc}).then(({data})=>{const b=document.getElementById('ivBan');if(!b||!data)return;b.hidden=false;b.className='box';b.style.cssText='margin-top:18px;max-width:460px;border:2px solid #4ade9b;background:linear-gradient(135deg,rgba(74,222,155,.14),rgba(212,168,67,.06))';b.innerHTML=`<p style="margin:0;font-size:1.05rem">🤝 <b>${esc(data.nickname)}</b> ti ha invitato nel Tempio.</p><p class="mute" style="margin:6px 0 0">Registrati: <b style="color:var(--gold)">${Number(data.welcome).toLocaleString('it-IT')} BC</b> subito e <b style="color:var(--gold)">+${Number(data.bonus).toLocaleString('it-IT')} BC</b> al tuo primo match.</p>`},()=>{});
  document.getElementById('af').onsubmit=async e=>{e.preventDefault();const em=document.getElementById('em').value.trim(),pw=document.getElementById('pw').value;
   try{if(mode=='up'){const nk=document.getElementById('nk').value.trim();localStorage.setItem('bm.nick',nk);const{data,error}=await sb.auth.signUp({email:em,password:pw});if(error)throw error;

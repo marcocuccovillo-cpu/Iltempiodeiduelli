@@ -1,7 +1,9 @@
 -- =====================================================================================
 --  Black Market semplificato (migrazione 045)
---  1. Vetrina pubblica: classifica Ladder, Most Wanted e ultimi risultati visibili
---     anche a chi non ha un account (funzione public_showcase, nessun dato privato).
+--  1. Vetrina pubblica nel Black Market: usa la funzione public_showcase() che già
+--     alimenta la Home (nessuna funzione nuova). La prima versione di questa migrazione
+--     la sovrascriveva per errore e la Home mostrava «Duellante» e zeri: rieseguendo
+--     questo file la funzione originale viene RIPRISTINATA.
 --  2. Primi passi: 4 obiettivi per i nuovi duellanti (foto, prima sfida, prima taglia,
 --     primo match concluso), ognuno paga un bonus di BC una sola volta.
 --  3. Impostazione unlock_matches: quante sfide concluse servono perché l'app mostri
@@ -25,43 +27,43 @@ end $$;
 
 -- ---------- impostazioni (modificabili da Admin › Impostazioni) ----------
 insert into public.system_settings (key, value_int, description) values
- ('showcase_public',   1,   'Vetrina: 1 = classifica e Most Wanted visibili anche senza account, 0 = solo dopo l''accesso'),
  ('onboarding_enabled', 1,  'Primi passi: 1 = attivi (bonus ai nuovi duellanti), 0 = spenti'),
  ('onboarding_step_bc', 100, 'Primi passi: BC per ciascuno dei 4 obiettivi (foto, prima sfida, prima taglia, primo match)'),
  ('unlock_matches',    3,   'Menu: sfide concluse necessarie per mostrare Scommesse, Faction Wars e Underground (0 = sempre visibili)')
 on conflict (key) do nothing;
 
--- ---------- 1. vetrina pubblica ----------
-create or replace function public.public_showcase()
-returns jsonb language plpgsql stable security definer set search_path = public as $$
-declare v_on integer; v jsonb;
+-- ---------- 1. riparazione: ripristina public_showcase() se la prima versione di questo file l'ha sovrascritta ----------
+delete from public.system_settings where key = 'showcase_public';
+do $do$
 begin
-  select value_int into v_on from public.system_settings where key = 'showcase_public';
-  if coalesce(v_on, 1) <> 1 then return jsonb_build_object('on', false); end if;
-  select jsonb_build_object(
-    'on', true,
-    'ladder', coalesce((select jsonb_object_agg(f, rows) from (
-        select s.format as f, jsonb_agg(jsonb_build_object('nick', s.nickname, 'avatar', s.avatar, 'elo', s.elo, 'rank', s.rank,
-                 'w', s.wins, 'd', s.draws, 'l', s.losses) order by s.rank) as rows
-        from public.ladder_standings_v s join public.profiles p on p.id = s.user_id
-        where not p.suspended and s.rank <= 10 and s.format is not null
-        group by s.format) x), '{}'::jsonb),
-    'wanted', coalesce((select jsonb_agg(jsonb_build_object('nick', w.nickname, 'avatar', w.avatar, 'value', w.bounty_value, 'count', w.active_count) order by w.bounty_value desc)
-        from (select w.* from public.most_wanted_v w join public.profiles p on p.id = w.id where not p.suspended order by w.bounty_value desc limit 10) w), '[]'::jsonb),
-    'recent', coalesce((select jsonb_agg(r order by r->>'at' desc) from (
-        select jsonb_build_object('a', pa.nickname, 'b', pb.nickname, 'res', m.reported_result, 'score', m.reported_score, 'format', m.format, 'at', m.closed_at) as r
-        from public.ladder_matches m join public.profiles pa on pa.id = m.challenger_id join public.profiles pb on pb.id = m.opponent_id
-        where m.status = 'closed' order by m.closed_at desc limit 8) x), '[]'::jsonb),
-    'counts', jsonb_build_object(
-        'players', (select count(*) from public.profiles where not suspended),
-        'bounty_bc', (select coalesce(sum(amount), 0) from public.bounties where status = 'active'),
-        'matches_30d', (select count(*) from public.ladder_matches where status = 'closed' and closed_at > now() - interval '30 days')),
-    'welcome_bc', (select value_int from public.system_settings where key = 'initial_bonus')
-  ) into v;
-  return v;
-end $$;
-revoke all on function public.public_showcase() from public;
-grant execute on function public.public_showcase() to anon, authenticated;
+  if exists (select 1 from pg_proc where oid = to_regprocedure('public.public_showcase()') and prosrc like '%showcase_public%') then
+    if to_regprocedure('public._public_showcase_base()') is null then
+      raise exception 'public_showcase() va ripristinata ma manca _public_showcase_base(): riesegui black-market-inviti.sql e poi black-market-eroi-raid.sql';
+    end if;
+    execute $wrap$
+create or replace function public.public_showcase() returns jsonb language plpgsql stable security definer set search_path = public as $fn$
+declare s jsonb := coalesce(public._public_showcase_base(), '{}'::jsonb); g public.game_raids%rowtype; b public.game_raid_bosses%rowtype;
+begin
+  if public._module_on('heroes') and coalesce(public._setting('game_raid_enabled'), 0) = 1 then
+    select * into g from public.game_raids where week_start = public._raid_week();
+    if found then
+      select * into b from public.game_raid_bosses where no = g.boss_no;
+      s := s || jsonb_build_object('raid', jsonb_build_object('name', b.name, 'emoji', b.emoji, 'hp', g.hp, 'max_hp', g.max_hp, 'status', g.status,
+        'ends_at', public._raid_ends_at(g.week_start), 'participants', (select count(*) from public.game_raid_damage d where d.raid_id = g.id and d.dmg > 0),
+        'top', coalesce((select jsonb_agg(jsonb_build_object('n', p.nickname, 'dmg', x.dmg) order by x.dmg desc)
+                 from (select * from public.game_raid_damage where raid_id = g.id and dmg > 0 order by dmg desc limit 3) x join public.profiles p on p.id = x.user_id), '[]'::jsonb)));
+    else
+      s := s || jsonb_build_object('raid', jsonb_build_object('status', 'waiting'));
+    end if;
+  end if;
+  return s;
+end $fn$;
+    $wrap$;
+    revoke all on function public.public_showcase() from public;
+    grant execute on function public.public_showcase() to anon, authenticated;
+    raise notice 'public_showcase() ripristinata: la Home torna a mostrare nomi e numeri.';
+  end if;
+end $do$;
 
 -- ---------- 2. primi passi ----------
 create or replace function public._onboarding_done(p_user uuid, p_step text)

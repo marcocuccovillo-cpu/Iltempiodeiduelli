@@ -171,7 +171,7 @@
     }
     /* Ladder */
     if (s.ladder && (s.ladder.Advanced || s.ladder.Edison)) {
-      h += '<div class="card"><h3>⚔️ Ladder<a class="more" href="black-market.html#/ladder">Sfida ›</a></h3><div class="seg2" role="group" aria-label="Formato"><button type="button" data-f="Advanced" aria-pressed="true">Advanced</button><button type="button" data-f="Edison" aria-pressed="false">Edison</button></div><div id="ldRows">' + ladderRows(s.ladder.Advanced || []) + '</div></div>';
+      h += '<div class="card"><h3>⚔️ Ladder<a class="more" href="black-market.html#/sfida">Sfida ›</a></h3><div class="seg2" role="group" aria-label="Formato"><button type="button" data-f="Advanced" aria-pressed="true">Advanced</button><button type="button" data-f="Edison" aria-pressed="false">Edison</button></div><div id="ldRows">' + ladderRows(s.ladder.Advanced || []) + '</div></div>';
     }
     /* Most Wanted */
     h += '<div class="card"><h3>🎯 Most Wanted<a class="more" href="black-market.html#/wanted">Caccia ›</a></h3>' + ((s.wanted || []).length ? s.wanted.map(function (w, i) {
