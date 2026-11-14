@@ -27,7 +27,7 @@
     var n0 = o.floor;                                  // piano dove sta l'eroe (0 = ingresso)
     var zone = o.zone, en = o.enemy, isBoss = !!(en && en.boss);
     var tint = (TA.tints || [])[Math.min(4, Math.max(0, (en && en.tier) || 0))] || { h: 0, s: 1, b: 1 };
-    var heroD = TA.uri('eroe'), enD = en ? TA.uri(en.sprite) : null;
+    var heroD = TA.uri('eroe', (o.hero && o.hero.look) || {}), enD = en ? TA.uri(en.sprite) : null;
     var petD = o.hero && o.hero.pet && PA && PA.uri ? PA.uri(o.hero.pet.sprite, o.hero.pet.tier || 0) : null;
     var heroI = img(heroD.url), enI = enD ? img(enD.url) : null, petI = petD ? img(petD.url) : null;
     [heroI, enI, petI].forEach(function (i) { if (i && !i.complete) i.addEventListener('load', function () { dirty = true; kick(); }); });

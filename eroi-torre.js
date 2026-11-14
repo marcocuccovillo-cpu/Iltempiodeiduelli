@@ -358,32 +358,52 @@
   };
 
   /* ---------- l'eroe (28×32) ---------- */
-  ART.eroe = function () {
-    var p = new Px(28, 32);
-    p.poly([[6, 14], [2, 30], [11, 29], [12, 16]], '#a02c52');                                                                    // mantello
-    p.rect(10, 22, 4, 8, '#3d4a6b'); p.rect(15, 22, 4, 8, '#3d4a6b'); p.rect(9, 29, 6, 2, '#5b3d1f'); p.rect(15, 29, 6, 2, '#5b3d1f');
-    p.rect(9, 12, 11, 11, '#4f78c4'); p.rect(9, 20, 11, 2, '#8b6d2c'); p.rect(11, 13, 7, 3, '#7ea2e6');
-    p.rect(6, 13, 3, 8, '#4f78c4'); p.rect(20, 13, 3, 8, '#4f78c4');
-    p.ell(14.5, 8, 5, 5, '#f1c9a1'); p.rect(10, 3, 10, 4, '#7a4a2a'); p.rect(9, 5, 2, 5, '#7a4a2a'); p.rect(18, 5, 2, 4, '#7a4a2a');
+  /* l'eroe del giocatore, personalizzabile: pelle, capelli (colore e taglio), armatura, mantello, arma */
+  var LOOK = {
+    skin: ['#f1c9a1', '#e0ac7e', '#c68a5c', '#9a6440', '#6b4428', '#9fd3a8'],
+    hair: ['#7a4a2a', '#2a1a12', '#e8c25a', '#c0392b', '#eeeeee', '#7a4ae0', '#2e86c1', '#3a8a4a'],
+    armor: ['#4f78c4', '#a8323e', '#2f8a52', '#6a4fb0', '#3a3a46', '#c8a24a', '#d8dce6', '#1f7a8a'],
+    cape: ['#a02c52', '#2a4a9a', '#2f7a3a', '#5a2a8a', '#1a1a22', '#c8a24a', '#e8e8f0', '#d0601a', null]
+  };
+  function sh(h, f) { h = h.replace('#', ''); var c = [0, 2, 4].map(function (i) { return parseInt(h.slice(i, i + 2), 16); });
+    return '#' + c.map(function (v) { v = Math.round(f < 0 ? v * (1 + f) : v + (255 - v) * f); return ('0' + Math.max(0, Math.min(255, v)).toString(16)).slice(-2); }).join(''); }
+  function lk(o) { o = o || {}; var g = function (k, n, d) { var v = Number(o[k]); return v >= 0 && v < n ? Math.floor(v) : d; };
+    return { skin: g('skin', 6, 0), hair: g('hair', 8, 0), hs: g('hs', 4, 0), armor: g('armor', 8, 0), cape: g('cape', 9, 0), weapon: g('weapon', 4, 0) }; }
+  ART.eroe = function (look) {
+    var L = lk(look), p = new Px(28, 32), sk = LOOK.skin[L.skin], hr = LOOK.hair[L.hair], ar = LOOK.armor[L.armor], cp = LOOK.cape[L.cape];
+    if (cp) p.poly([[6, 14], [2, 30], [11, 29], [12, 16]], cp);                                                                     // mantello
+    p.rect(10, 22, 4, 8, sh(ar, -.45)); p.rect(15, 22, 4, 8, sh(ar, -.45)); p.rect(9, 29, 6, 2, '#5b3d1f'); p.rect(15, 29, 6, 2, '#5b3d1f');
+    p.rect(9, 12, 11, 11, ar); p.rect(9, 20, 11, 2, '#8b6d2c'); p.rect(11, 13, 7, 3, sh(ar, .35));
+    p.rect(6, 13, 3, 8, ar); p.rect(20, 13, 3, 8, ar);
+    if (L.hs === 1) { p.rect(8, 4, 3, 12, hr); p.rect(18, 4, 3, 12, hr); }                                                          // capelli lunghi (dietro)
+    p.ell(14.5, 8, 5, 5, sk);
+    if (L.hs === 0) { p.rect(10, 3, 10, 4, hr); p.rect(9, 5, 2, 5, hr); p.rect(18, 5, 2, 4, hr); }                                    // corti
+    else if (L.hs === 1) { p.rect(10, 3, 10, 4, hr); p.rect(9, 4, 2, 4, hr); }                                                        // lunghi
+    else if (L.hs === 2) { p.rect(13, 0, 4, 6, hr); p.rect(11, 3, 8, 2, hr); }                                                        // cresta
+    else { p.rect(9, 2, 12, 5, '#9aa3b0'); p.rect(9, 6, 2, 5, '#9aa3b0'); p.rect(19, 6, 2, 5, '#9aa3b0'); p.rect(14, 0, 2, 3, hr); p.rect(10, 3, 10, 1, '#c9d0da', { flat: true }); } // elmo con pennacchio
     p.px(12, 8, '#1a1030'); p.px(17, 8, '#1a1030'); p.rect(13, 11, 3, 1, '#b5604a', { flat: true });
-    p.rect(24, 4, 2, 20, '#d8deee'); p.px(25, 4, '#fff'); p.rect(22, 22, 6, 2, '#8b6d2c'); p.rect(24, 24, 2, 4, '#5b3d1f');            // spada
-    p.ell(5, 19, 4, 5.5, '#c9a45a'); p.ell(5, 19, 2, 3.2, '#8b6d2c', { flat: true });                                              // scudo
+    if (L.weapon === 0) { p.rect(24, 4, 2, 20, '#d8deee'); p.px(25, 4, '#fff'); p.rect(22, 22, 6, 2, '#8b6d2c'); p.rect(24, 24, 2, 4, '#5b3d1f'); }   // spada
+    else if (L.weapon === 1) { p.rect(24, 6, 2, 22, '#7a5230'); p.poly([[26, 6], [28, 4], [28, 13], [26, 11]], '#c9cfdc'); p.poly([[24, 6], [21, 5], [21, 12], [24, 11]], '#aeb6c6'); } // ascia
+    else if (L.weapon === 2) { p.rect(24, 6, 2, 22, '#6b4a2a'); p.ell(25, 5, 2.6, 2.6, '#7fe3ff'); p.px(24, 4, '#ffffff'); }        // bastone magico
+    else { p.rect(24, 5, 2, 23, '#7a5230'); p.poly([[25, 0], [27.5, 6], [22.5, 6]], '#d8deee'); }                                       // lancia
+    p.ell(5, 19, 4, 5.5, '#c9a45a'); p.ell(5, 19, 2, 3.2, sh(ar, -.15), { flat: true });                                             // scudo con il colore dell'armatura
     return p.outline(OUT);
   };
 
   /* ---------- registro, cache e rendering ---------- */
   var CACHE = {};
-  function uri(key) {
-    if (CACHE[key]) return CACHE[key];
+  function uri(key, look) {
+    var ck = look ? key + ':' + JSON.stringify(lk(look)) : key;
+    if (CACHE[ck]) return CACHE[ck];
     var fn = ART[key]; if (!fn) return '';
-    var px = fn(), cv = px.canvas(4);
-    CACHE[key] = { url: cv.toDataURL('image/png'), w: px.w, h: px.h };
-    return CACHE[key];
+    var px = fn(look), cv = px.canvas(4);
+    CACHE[ck] = { url: cv.toDataURL('image/png'), w: px.w, h: px.h };
+    return CACHE[ck];
   }
   // tinta del sprite in base al "giro" (boss) o al "livello" (nemici): rotazione dell'ombra colore
   var TINTS = [{ h: 0, s: 1, b: 1 }, { h: 38, s: 1.05, b: 1.04 }, { h: 150, s: 1.1, b: 1.02 }, { h: 255, s: 1.18, b: 1.06 }, { h: 320, s: 1.25, b: 1.08 }];
   function sprite(key, o) {
-    o = o || {}; var d = uri(key); if (!d) return '';
+    o = o || {}; var d = uri(key, o.look); if (!d) return '';
     var t = TINTS[Math.min(TINTS.length - 1, Math.max(0, o.tier || 0))];
     var size = o.size || 160, sc = size / Math.max(d.w, d.h);
     var st = 'width:' + Math.round(d.w * sc) + 'px;height:' + Math.round(d.h * sc) + 'px;image-rendering:pixelated;' + (t.h ? 'filter:hue-rotate(' + t.h + 'deg) saturate(' + t.s + ') brightness(' + t.b + ');' : '');
@@ -513,5 +533,5 @@
   }
   function zoneVars(z) { return '--z1:' + z.sky[0] + ';--z2:' + z.sky[1] + ';--z3:' + z.sky[2] + ';--zg:' + z.glow + ';--zs:' + z.stone + ';--zst:' + [.25, .5, .65, .8, 1][z.star] + ';'; }
 
-  g.TorreArt = { tints: TINTS, ladder: ladder, zoneVars: zoneVars,  sprite: sprite, uri: uri, zone: zone, zones: ZONES, rank: rank, keys: Object.keys(ART), Px: Px, ART: ART, h2r: h2r, mix: mix };
+  g.TorreArt = { tints: TINTS, look: LOOK, normLook: lk, ladder: ladder, zoneVars: zoneVars,  sprite: sprite, uri: uri, zone: zone, zones: ZONES, rank: rank, keys: Object.keys(ART), Px: Px, ART: ART, h2r: h2r, mix: mix };
 })(window);

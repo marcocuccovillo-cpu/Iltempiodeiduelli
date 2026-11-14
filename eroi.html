@@ -67,15 +67,6 @@
 .er-sticky{border-bottom:1px solid var(--line)}
 .er-sticky .er-bat{padding:6px 14px 4px}.er-sticky .er-bat .bt{width:58px;height:24px;border-radius:6px}.er-sticky .er-bat .bt b{font-size:.92rem}.er-sticky .er-bat .nub{height:11px}
 .er-sticky .er-bat .bi b{font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.er-sticky .er-bat .bi .bt2{font-weight:400;color:var(--mu)}.er-sticky .er-bat .bi small{font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.er-nav{display:flex!important;gap:0;padding:2px 2px 4px!important;overflow-x:auto;border-bottom:0!important}
-.er-nav button{flex:1 1 0!important;min-width:0;min-height:48px!important;padding:3px 0!important;display:grid;justify-items:center;align-content:center;gap:1px;border-radius:12px;color:var(--mu);box-shadow:none!important}
-.er-nav button{overflow:hidden}.er-nav button .tl{width:100%;text-align:center}
-.er-nav button .ti{font-size:1.15rem;line-height:1.1;filter:grayscale(.55);opacity:.8;transition:transform .15s}
-.er-nav button .tl{font:700 .56rem var(--ui)!important;letter-spacing:-.03em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.er-nav button[aria-selected=true]{background:rgba(var(--ac-rgb),.18);color:var(--ac2);box-shadow:inset 0 0 0 1.5px rgba(var(--ac-rgb),.55)!important}
-.er-nav button[aria-selected=true] .ti{filter:none;opacity:1;transform:scale(1.12)}
-.er-nav button:hover .ti{filter:none;opacity:1}
-@media(min-width:520px){.er-nav button .tl{font-size:.74rem!important}.er-nav button .ti{font-size:1.35rem}}
 .iv{padding:12px}
 .iv-tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px}
 .iv-tabs button{display:grid;justify-items:center;gap:1px;padding:7px 2px;border-radius:12px;border:1.5px solid var(--line);background:var(--inp);color:var(--mu);cursor:pointer;font:inherit;min-width:0}
@@ -554,11 +545,64 @@ body.er-fab-on{padding-bottom:88px}
 .pt-c h3{margin:0;font-size:1.02rem;overflow-wrap:anywhere}.pt-c .lore{color:var(--mu);font-size:.8rem;margin:0}
 .pt-c .btn{min-height:46px}.pt-why{color:var(--bad);font-size:.84rem;font-weight:600;margin:0}
 .pt-go{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.pt-go .badge{font-size:.74rem;font-weight:700;padding:2px 9px;border-radius:99px;border:1px solid var(--ac);color:var(--ac2)}
+
+/* ===== Pagina Eroi: menu del gioco e batteria fissati in basso (al posto della barra globale) ===== */
+html.er-page{--erd:calc(104px + env(safe-area-inset-bottom,0px))}
+html.er-page .tm-tb{display:none!important}
+@media(max-width:719px){html.er-page{--tb-h:var(--erd)}}
+html.er-page body{padding-bottom:var(--erd)}
+.er-head{display:none}@media(min-width:720px){.er-head{display:block;margin-bottom:4px}.er-head h1{font-size:1.8rem}}
+#main>.er-sticky{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:940;margin:0;padding:0 0 env(safe-area-inset-bottom,0px);background:rgba(var(--deep-rgb),.97);border-top:1px solid var(--line);border-bottom:0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 -8px 26px rgba(0,0,0,.55)}
+@media(min-width:720px){#main>.er-sticky{left:var(--menu-w)}.er-fab{bottom:calc(var(--erd) + 12px)!important}.er-cp{bottom:calc(var(--erd) + 82px)!important}}
+#main>.er-sticky .er-bat{padding:6px 12px 2px;gap:8px}
+#main>.er-sticky .er-bat .bt{width:46px;height:20px;border-radius:5px}#main>.er-sticky .er-bat .bt b{font-size:.78rem}#main>.er-sticky .er-bat .nub{height:9px}
+#main>.er-sticky .er-bat .bi{flex:1;min-width:0}#main>.er-sticky .er-bat .bi b{font-size:.8rem}#main>.er-sticky .er-bat .bi small{display:block;font-size:.66rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.er-bbc{flex:none;display:flex;align-items:baseline;gap:3px;padding:3px 9px;border-radius:999px;border:1px solid rgba(232,184,74,.5);background:rgba(232,184,74,.1)}.er-bbc b{font:700 .86rem var(--ui);color:var(--gold)}.er-bbc small{font-size:.66rem;color:var(--gold)}
+#main>.er-sticky .tabs{display:flex!important;gap:0;margin:0;padding:0 2px 2px!important;border:0!important;overflow-x:auto;scrollbar-width:none;position:static;background:none}
+#main>.er-sticky .tabs::-webkit-scrollbar{display:none}
+#main>.er-sticky .tabs{-webkit-mask-image:linear-gradient(90deg,#000 90%,transparent);mask-image:linear-gradient(90deg,#000 90%,transparent)}@media(min-width:900px){#main>.er-sticky .tabs{-webkit-mask-image:none;mask-image:none}}
+#main>.er-sticky .tabs button,#main>.er-sticky .tabs .er-home{position:relative;flex:1 0 60px;min-width:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:58px;padding:2px 4px;border:0;background:none;color:var(--mu);font:600 .68rem var(--ui);text-decoration:none;box-shadow:none;white-space:nowrap}
+#main>.er-sticky .tabs .ti{display:grid;place-items:center;width:40px;height:28px;border-radius:14px;font-size:1.2rem;transition:background .2s}
+#main>.er-sticky .tabs button[aria-selected=true]{color:var(--ac2);box-shadow:none}
+#main>.er-sticky .tabs button[aria-selected=true] .ti{background:rgba(var(--ac-rgb),.24)}
+#main>.er-sticky .tabs .er-home{flex:0 0 58px;border-right:1px solid var(--line)}
+#main>.er-sticky .tabs .tl{font:600 .68rem var(--ui)}#main>.er-sticky .tabs button .ti{filter:none;opacity:.85}#main>.er-sticky .tabs button[aria-selected=true] .ti{opacity:1}
+.lk-prev{position:sticky;top:-14px;z-index:2}
+.er-faq{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surf);color:var(--ac2);font:600 .88rem var(--ui);text-decoration:none}
+/* ===== cruscotto dell'eroe compatto, con lo sprite ===== */
+.er-top{padding:14px}
+.er-d3{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:start}
+.er-d3>.er-st5,.er-d3>.er-spx,.er-d3>.er-eqrow,.er-d3>.pt-strip,.er-d3>.tr-strip,.er-d3>*:not(.er-stage):not(.er-info){grid-column:1/-1}
+.er-stage{display:grid;justify-items:center;gap:6px}
+.er-hero{position:relative;display:grid;place-items:end center;width:120px;height:148px;border-radius:18px;overflow:hidden;background:radial-gradient(70% 22% at 50% 92%,rgba(0,0,0,.45),transparent 70%),radial-gradient(120% 80% at 50% 0,rgba(var(--ac-rgb),.35),transparent 60%),linear-gradient(180deg,#1b1438,#0d0a18);border:1px solid rgba(var(--ac-rgb),.4)}
+.er-hs{display:block;margin-bottom:6px;animation:erIdle 2.6s ease-in-out infinite}.er-hs img{width:auto!important;height:120px!important}
+.er-ps{position:absolute;left:4px;bottom:4px;animation:erIdle 2.2s ease-in-out .4s infinite}.er-ps img{width:auto!important;height:44px!important}
+@keyframes erIdle{50%{transform:translateY(-3px)}}@media(prefers-reduced-motion:reduce){.er-hs,.er-ps{animation:none}}
+.er-cust{min-height:34px;padding:0 12px;border-radius:999px;border:1px solid rgba(var(--ac-rgb),.55);background:rgba(var(--ac-rgb),.12);color:var(--ac2);font:700 .78rem var(--ui);cursor:pointer;white-space:nowrap}
+.er-info{display:grid;gap:6px;min-width:0}
+.er-nm{display:flex;gap:10px;align-items:center;min-width:0}.er-nm .er-pic{width:40px;height:40px;border-width:1.5px;cursor:pointer;padding:0}
+.er-nm h2{font-size:1.15rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.er-nm .er-lv{font-size:.82rem;color:var(--mu)}
+.er-pts{justify-self:start;min-height:30px;padding:0 10px;border-radius:999px;border:1px solid var(--gold);background:rgba(232,184,74,.12);color:var(--gold);font:700 .76rem var(--ui);cursor:pointer}
+.er-info .er-xp{height:8px}.er-info .er-xpt{font-size:.72rem;color:var(--mu)}
+.er-kp{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;font-size:.8rem;color:var(--mu)}@media(min-width:560px){.er-kp{grid-template-columns:repeat(4,auto);justify-content:start;gap:4px 18px}}.er-kp b{color:var(--tx)}
+.er-st5{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.er-s5{display:grid;justify-items:center;padding:6px 2px;border-radius:12px;border:1px solid var(--line);background:var(--inp);min-width:0}
+.er-s5>span{font-size:.95rem;line-height:1}.er-s5 b{font:700 .9rem var(--ui);margin-top:2px}.er-s5 small{font-size:.62rem;color:var(--mu);white-space:nowrap}.er-s5 small em{font-style:normal;color:var(--good)}
+.er-d3 .er-eqrow{grid-template-columns:repeat(5,1fr);gap:5px}.er-d3 .er-eqb2 .ic{max-width:48px;font-size:1.25rem;border-radius:12px}
+.er-d3 .er-reset{font-size:.78rem}
+/* personalizzazione */
+.lk-wrap{display:grid;gap:10px}.lk-prev{display:grid;place-items:center;padding:10px;border-radius:16px;background:radial-gradient(70% 20% at 50% 92%,rgba(0,0,0,.45),transparent 70%),linear-gradient(180deg,#1b1438,#0d0a18)}
+.lk-row{display:grid;gap:6px}.lk-row>b{font-size:.85rem;color:var(--mu)}
+.lk-opts{display:flex;gap:6px;flex-wrap:wrap}
+.lk-sw{width:36px;height:36px;border-radius:50%;border:2px solid var(--line);background:var(--c);cursor:pointer;color:var(--mu);font-weight:700}
+.lk-sw.none{background:var(--inp)}.lk-sw[aria-checked=true]{border-color:#fff;box-shadow:0 0 0 2px var(--ac)}
+.lk-op{display:grid;justify-items:center;gap:2px;padding:4px 6px;border-radius:12px;border:1.5px solid var(--line);background:var(--inp);color:var(--tx);cursor:pointer}.lk-op small{font-size:.7rem}
+.lk-op[aria-checked=true]{border-color:var(--ac);background:rgba(var(--ac-rgb),.16)}
 </style></head><body>
 
+<script>document.documentElement.classList.add('er-page')</script>
 <main class="pg">
- <header><p class="kicker">Mini gioco di ruolo</p><h1>La guerra degli Eroi</h1>
- <p class="lead">Ogni duellante è un eroe con il suo nickname. Distribuisci i punti abilità, compra le abilità dal Mercante, sfida gli altri eroi in Arena (ogni duello consuma energia), abbatti con tutto il Tempio il boss gigante del raid settimanale e affronta i 100 dungeon (dal 26 a scelte, dal 56 con prove, serrature e orologio), scala la Torre Infinita, da solo o in squadra, e fatti seguire da un compagno dello Stagno che cresce con te.</p></header>
+ <header class="er-head"><h1>La guerra degli Eroi</h1></header>
 
  <section class="card er-top" id="top" aria-live="polite"><p class="mute" style="margin:0" role="status">Caricamento dell’eroe…</p></section>
 
@@ -566,7 +610,7 @@ body.er-fab-on{padding-bottom:88px}
 
  <div id="main" hidden>
  <div class="er-sticky"><div id="bat"></div>
- <div class="tabs er-nav" role="tablist" aria-label="Sezioni della guerra degli Eroi"><button role="tab" data-t="hero" aria-selected="true"><span class="ti" aria-hidden="true">🧙</span><span class="tl">Eroe</span></button><button role="tab" data-t="boss" aria-selected="false"><span class="ti" aria-hidden="true">🐉</span><span class="tl">Boss</span></button><button role="tab" data-t="dng" aria-selected="false"><span class="ti" aria-hidden="true">🏰</span><span class="tl">Dungeon</span></button><button role="tab" data-t="tower" aria-selected="false"><span class="ti" aria-hidden="true">🗼</span><span class="tl">Torre</span></button><button role="tab" data-t="arena" aria-selected="false"><span class="ti" aria-hidden="true">⚔️</span><span class="tl">Arena</span></button><button role="tab" data-t="train" aria-selected="false"><span class="ti" aria-hidden="true">🏋️</span><span class="tl">Allena</span></button><button role="tab" data-t="shop" aria-selected="false"><span class="ti" aria-hidden="true">🛒</span><span class="tl">Mercato</span></button><button role="tab" data-t="pond" aria-selected="false"><span class="ti" aria-hidden="true">🐸</span><span class="tl">Stagno</span></button><button role="tab" data-t="map" aria-selected="false"><span class="ti" aria-hidden="true">🗺️</span><span class="tl">Mappa</span></button><button role="tab" data-t="lb" aria-selected="false"><span class="ti" aria-hidden="true">🏆</span><span class="tl">Top</span></button></div></div>
+ <div class="tabs er-nav" role="tablist" aria-label="Sezioni della guerra degli Eroi"><a class="er-home" href="index.html" aria-label="Torna al Tempio"><span class="ti" aria-hidden="true">🏛️</span><span class="tl">Tempio</span></a><button role="tab" data-t="hero" aria-selected="true"><span class="ti" aria-hidden="true">🧙</span><span class="tl">Eroe</span></button><button role="tab" data-t="boss" aria-selected="false"><span class="ti" aria-hidden="true">🐉</span><span class="tl">Boss</span></button><button role="tab" data-t="dng" aria-selected="false"><span class="ti" aria-hidden="true">🏰</span><span class="tl">Dungeon</span></button><button role="tab" data-t="tower" aria-selected="false"><span class="ti" aria-hidden="true">🗼</span><span class="tl">Torre</span></button><button role="tab" data-t="arena" aria-selected="false"><span class="ti" aria-hidden="true">⚔️</span><span class="tl">Arena</span></button><button role="tab" data-t="train" aria-selected="false"><span class="ti" aria-hidden="true">🏋️</span><span class="tl">Allena</span></button><button role="tab" data-t="shop" aria-selected="false"><span class="ti" aria-hidden="true">🛒</span><span class="tl">Mercato</span></button><button role="tab" data-t="pond" aria-selected="false"><span class="ti" aria-hidden="true">🐸</span><span class="tl">Stagno</span></button><button role="tab" data-t="map" aria-selected="false"><span class="ti" aria-hidden="true">🗺️</span><span class="tl">Mappa</span></button><button role="tab" data-t="lb" aria-selected="false"><span class="ti" aria-hidden="true">🏆</span><span class="tl">Top</span></button></div></div>
  <div id="msg" role="status" aria-live="polite"></div>
  <section class="tp" id="p-hero"></section>
  <section class="tp" id="p-boss" hidden></section>
@@ -585,9 +629,9 @@ body.er-fab-on{padding-bottom:88px}
 <div id="chPanel" class="er-cp" role="dialog" aria-label="Chat degli eroi" hidden></div>
 <script src="tempio.js?v=16"></script>
 <script src="tempio-notifiche.js?v=2"></script>
-<script src="eroi-torre.js?v=2"></script>
+<script src="eroi-torre.js?v=3"></script>
 <script src="eroi-pet.js?v=2"></script>
-<script src="eroi-torre-scena.js?v=2"></script>
+<script src="eroi-torre-scena.js?v=3"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 (function(){'use strict';
@@ -601,6 +645,7 @@ const SL=Object.fromEntries(SLOTS.map(s=>[s[0],s]));
 const RAR={base:'Base',comune:'Comune',non_comune:'Non comune',raro:'Raro',epico:'Epico',leggendario:'Leggendario',mitico:'Mitico'};
 const SRC={start:'Base',shop:'Mercante',boss:'Boss',dungeon:'Dungeon',tower:'Torre'};
 const API='https://db.ygoprodeck.com/api/v7/cardinfo.php',CROP='https://images.ygoprodeck.com/images/cards_cropped/';
+let MYLOOK=null,LOOKS={},lookAvail=null,lookDraft=null;
 let AVOK=false,AV={},avOpen=false,avQ='',avRes=null,avBusy=false,FOLD={};   // FOLD: riquadri aperti (abilità, cartelle zaino)
 const REFILL_BELOW=100;      // come nel database (_game_refill_below_level): la ricarica dell'energia al livello vale solo se si parte sotto questo livello
 const SHARE={};   /* card da condividere su WhatsApp (tempio-condividi.js) */
@@ -637,8 +682,8 @@ function paintBat(){
  const el=$('bat');if(!el||!ST||!ST.energy)return;const e=ST.energy,v=enNow(),p=Math.max(0,Math.min(100,100*v/e.max)),lv=p>=50?'hi':p>=25?'mid':'lo',secs=v>=e.max?0:(e.max-v)/e.per_hour*3600;
  /* bonus ricarica totale (oggetti + pet): lo stesso conto del database, 25% per punto */
  const rb=25*Number((ST.me&&ST.me.extra_fights)||0),ph=Number(e.per_hour).toLocaleString('it-IT',{maximumFractionDigits:1});
- const key=Math.floor(v)+'|'+Math.floor(secs/60)+'|'+lv+'|'+e.max+'|'+rb+'|'+ph;if(el._k===key)return;el._k=key;
- el.innerHTML=`<div class="er-bat ${lv}" role="img" aria-label="Energia ${Math.floor(v)} su ${e.max}"><div class="bt"><i style="width:${p}%"></i><b>${Math.floor(v)}</b></div><span class="nub" aria-hidden="true"></span><div class="bi"><b>Energia ${Math.floor(v)} / ${e.max}<span class="bt2">${secs<=0?' · carica':' · piena tra '+fmtDur(secs)}</span></b><small class="er-rg${rb>0?' on':''}">${rb>0?`⚡ Ricarica <b>+${num(rb)}%</b> · ${ph}/ora`:`Ricarica ${ph}/ora`} · duello vinto −${e.win}, perso −${e.loss}</small></div></div>`}
+ const key=Math.floor(v)+'|'+Math.floor(secs/60)+'|'+lv+'|'+e.max+'|'+rb+'|'+ph+'|'+BAL;if(el._k===key)return;el._k=key;
+ el.innerHTML=`<div class="er-bat ${lv}" role="img" aria-label="Energia ${Math.floor(v)} su ${e.max}"><div class="bt"><i style="width:${p}%"></i><b>${Math.floor(v)}</b></div><span class="nub" aria-hidden="true"></span><div class="bi"><b>Energia ${Math.floor(v)} / ${e.max}<span class="bt2">${secs<=0?' · carica':' · piena tra '+fmtDur(secs)}</span></b><small class="er-rg${rb>0?' on':''}">${rb>0?`⚡ Ricarica <b>+${num(rb)}%</b> · ${ph}/ora`:`Ricarica ${ph}/ora`} · duello vinto −${e.win}, perso −${e.loss}</small></div><div class="er-bbc" aria-label="Saldo"><b>${BAL==null?'—':num(BAL)}</b><small>BC</small></div></div>`}
 function bonusTags(it){const o=[];STATS.forEach(s=>{const v=it['p_'+s[0]];if(v>0)o.push(`<span>+${v}% ${s[1]}</span>`)});
  if(it.xp_pct>0)o.push(`<span class="sp">+${it.xp_pct}% XP</span>`);if(it.extra_actions>0)o.push(`<span class="sp">+${it.extra_actions} azione boss/giorno</span>`);if(it.extra_fights>0)o.push(`<span class="sp">+${it.extra_fights*25}% ricarica energia</span>`);
  return o.length?`<div class="er-bn">${o.join('')}</div>`:''}
@@ -646,6 +691,7 @@ function itemBox(it,extra){const s=SL[it.slot]||['','','•'];return `<div class
 const pw=s=>STATS.reduce((a,x)=>a+Number((s||{})[x[0]]||0),0);   // potenza = somma delle 5 statistiche (la stessa che si vede in Arena)
 function pctSum(k){return Number((ME.bonus||{})[k]||0)}   // bonus totale: oggetti + abilità permanenti + potenziamenti attivi
 
+function faqLink(id,label){return `<a class="er-faq" href="faq.html#${id}"><span aria-hidden="true">📖</span> ${label}</a>`}
 /* ---------- finestre ---------- */
 function modal(html){const o=document.createElement('div');o.className='er-ov';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.innerHTML=`<div class="er-md">${html}</div>`;
  const close=()=>{o.remove();document.removeEventListener('keydown',k);if(o._t)clearInterval(o._t)};function k(e){if(e.key==='Escape')close()}
@@ -701,23 +747,52 @@ async function heroSheet(uid){
  }catch(e){say(errTxt(e),'bad')}}
 
 /* ---------- schermata principale ---------- */
+function heroImg(size,look,alt){return ART?ART.sprite('eroe',{size,look:look||MYLOOK||{},alt:alt||''}):'<span style="font-size:48px">🧙</span>'}
+async function loadLooks(ids){if(lookAvail===false)return;const need=[...new Set(ids)].filter(id=>id&&!(id in LOOKS));if(!need.length)return;
+ try{const r=await rpc('game_looks',{p_users:need});lookAvail=true;need.forEach(id=>LOOKS[id]=(r&&r[id])||{});if(ME)MYLOOK=LOOKS[ME.user_id]||{}}
+ catch(e){if(twMissing(e))lookAvail=false}}
 function paintTop(){
  const m=ST.me,pct=m.level>=CAP?100:Math.min(100,Math.round(100*m.xp/m.xp_need)),B=m.bonus||{};
  const eq=SLOTS.map(([k,nm,ic])=>{const i=m.equipped[k];
-  return i?`<button type="button" class="er-eqb2 r-${esc(i.rarity)}" data-slot="${k}" aria-label="${nm}: ${esc(i.name)}, ${esc(RAR[i.rarity]||i.rarity)}. Tocca per i dettagli"><span class="ic" aria-hidden="true">${ic}</span><small>${esc(RAR[i.rarity]||i.rarity)}</small></button>`
-   :`<button type="button" class="er-eqb2 empty" data-slot="${k}" aria-label="${nm}: vuoto"><span class="ic" aria-hidden="true">${ic}</span><small>vuoto</small></button>`}).join('');
- const st=STATS.map(([k,nm,ds,ab])=>`<div class="er-stt" title="${esc(nm)}: ${esc(ds)}"><span class="k">${STATICON[k]} ${ab}</span><b>${num(m.stats[k])}</b><small>${B[k]?`+${num(B[k])}% bonus`:'nessun bonus'}</small></div>`).join('');
- const sp=[m.xp_pct?`<span>⭐ +${num(m.xp_pct)}% XP</span>`:'',m.extra_actions?`<span>🎯 +${num(m.extra_actions)} azioni di supporto</span>`:'',m.extra_fights?`<span>⚡ +${num(m.extra_fights*25)}% ricarica</span>`:''].filter(Boolean).join('');
- $('top').innerHTML=`<div class="er-dash2">
-  <div class="er-who"><button type="button" class="er-pic" data-hero="${esc(m.user_id)}" aria-label="Apri la tua scheda completa">${face(m.user_id,m.nickname)}</button><div style="min-width:0"><h2>${esc(m.nickname)}</h2><div class="er-lv">Livello <b>${num(m.level)}</b>${m.stats_set&&m.points_free>0?` · <span style="color:var(--gold)">${num(m.points_free)} punti da spendere</span>`:''}</div></div><div class="er-bc"><b>${BAL==null?'—':num(BAL)}</b><span>BC</span></div></div>
-  <div><div class="er-xp" role="progressbar" aria-valuemin="0" aria-valuemax="${m.xp_need}" aria-valuenow="${m.xp}" aria-label="Esperienza"><i style="width:${pct}%"></i></div><div class="er-xpt"><span>${m.level>=CAP?'XP al massimo':`${num(m.xp)} / ${num(m.xp_need)} XP`}</span><span>${m.level>=CAP?'Livello massimo':`al livello ${num(m.level+1)}`}</span></div></div>
-  <div class="er-kpi"><div><small>Potenza</small><b>${num(pw(m.stats))}</b></div><div><small>Punti vita</small><b>${num(m.max_hp)}</b></div><div><small>Duelli</small><b>${num(m.duels_won)}<i>/${num(m.duels_lost||0)}</i></b></div><div><small>Boss</small><b>${num(m.bosses_beaten)}</b></div></div>
-  <div class="er-sts" role="group" aria-label="Statistiche">${st}</div>
+  return i?`<button type="button" class="er-eqb2 r-${esc(i.rarity)}" data-slot="${k}" aria-label="${nm}: ${esc(i.name)}, ${esc(RAR[i.rarity]||i.rarity)}. Tocca per i dettagli"><span class="ic" aria-hidden="true">${ic}</span></button>`
+   :`<button type="button" class="er-eqb2 empty" data-slot="${k}" aria-label="${nm}: vuoto"><span class="ic" aria-hidden="true">${ic}</span></button>`}).join('');
+ const st=STATS.map(([k,nm,ds,ab])=>`<div class="er-s5" title="${esc(nm)}: ${esc(ds)}${B[k]?` · +${num(B[k])}% bonus`:''}"><span aria-hidden="true">${STATICON[k]}</span><b>${num(m.stats[k])}</b><small>${ab}${B[k]?` <em>+${num(B[k])}%</em>`:''}</small></div>`).join('');
+ const sp=[m.xp_pct?`<span>⭐ +${num(m.xp_pct)}% XP</span>`:'',m.extra_actions?`<span>🎯 +${num(m.extra_actions)} azioni</span>`:'',m.extra_fights?`<span>⚡ +${num(m.extra_fights*25)}% ricarica</span>`:''].filter(Boolean).join('');
+ const p=m.pet;
+ $('top').innerHTML=`<div class="er-d3">
+  <div class="er-stage"><div class="er-hero"><span class="er-hs">${heroImg(132,null,m.nickname)}</span>${p?`<span class="er-ps">${petSprite(p,54)}</span>`:''}</div>
+   ${lookAvail===false?'':'<button type="button" class="er-cust" data-look>🎨 Personalizza</button>'}</div>
+  <div class="er-info">
+   <div class="er-nm"><button type="button" class="er-pic" data-hero="${esc(m.user_id)}" aria-label="Apri la tua scheda completa">${face(m.user_id,m.nickname)}</button><div style="min-width:0"><h2>${esc(m.nickname)}</h2><div class="er-lv">Livello <b>${num(m.level)}</b></div></div></div>
+   ${m.stats_set&&m.points_free>0?`<button type="button" class="er-pts" data-gopts>✨ ${num(m.points_free)} punti da spendere</button>`:''}
+   <div class="er-xp" role="progressbar" aria-valuemin="0" aria-valuemax="${m.xp_need}" aria-valuenow="${m.xp}" aria-label="Esperienza"><i style="width:${pct}%"></i></div>
+   <div class="er-xpt"><span>${m.level>=CAP?'XP al massimo':`${num(m.xp)} / ${num(m.xp_need)} XP`}</span></div>
+   <div class="er-kp"><span title="Potenza">⚔️ <b>${num(pw(m.stats))}</b></span><span title="Punti vita">❤️ <b>${num(m.max_hp)}</b></span><span title="Duelli vinti / persi">🤺 <b>${num(m.duels_won)}</b>/${num(m.duels_lost||0)}</span><span title="Boss battuti">👑 <b>${num(m.bosses_beaten)}</b></span></div>
+  </div>
+  <div class="er-st5" role="group" aria-label="Statistiche">${st}</div>
   ${sp?`<div class="er-spx">${sp}</div>`:''}
   <div class="er-eqrow" role="group" aria-label="Equipaggiamento indossato: tocca per i dettagli">${eq}</div>
   ${petStrip(m)}${trStrip(m)}
-  <div class="er-reset">Nuove offerte del mercante tra <b data-cd>${cd()}</b> · <button type="button" class="er-link" data-hero="${esc(m.user_id)}">la tua scheda completa</button></div></div>`}
-
+  <div class="er-reset"><button type="button" class="er-link" data-hero="${esc(m.user_id)}">📋 Scheda completa e confronto</button> · Mercante tra <b data-cd>${cd()}</b></div></div>`}
+/* ---------- personalizzazione dell'eroe ---------- */
+const LKOPT=[['skin','Pelle','sw'],['hair','Capelli','sw'],['hs','Taglio',['Corti','Lunghi','Cresta','Elmo']],['armor','Armatura','sw'],['cape','Mantello','sw'],['weapon','Arma',['Spada','Ascia','Bastone','Lancia']]];
+function lookModal(){
+ if(!ART)return;const L0=ART.normLook(MYLOOK||{});lookDraft=Object.assign({},L0);
+ const pal=k=>k==='skin'?ART.look.skin:k==='hair'?ART.look.hair:k==='armor'?ART.look.armor:ART.look.cape;
+ const body=()=>`<div class="lk-wrap"><div class="lk-prev">${heroImg(150,lookDraft)}</div>
+  ${LKOPT.map(([k,nm,t])=>`<div class="lk-row"><b>${nm}</b><div class="lk-opts" role="radiogroup" aria-label="${nm}">${t==='sw'
+   ?pal(k).map((c,i)=>`<button type="button" role="radio" aria-checked="${lookDraft[k]===i}" data-lkk="${k}" data-v="${i}" class="lk-sw${c?'':' none'}" style="${c?`--c:${c}`:''}" aria-label="${nm} ${i+1}">${c?'':'✕'}</button>`).join('')
+   :t.map((lab,i)=>`<button type="button" role="radio" aria-checked="${lookDraft[k]===i}" data-lkk="${k}" data-v="${i}" class="lk-op">${heroImg(44,Object.assign({},lookDraft,{[k]:i}))}<small>${lab}</small></button>`).join('')}</div></div>`).join('')}
+  <div class="row" style="margin-top:14px"><button class="btn gold" id="lkSave">Salva l’aspetto</button><button class="btn ghost" id="lkRnd">🎲 A caso</button><button class="btn ghost" data-close>Annulla</button></div></div>`;
+ const o=modal(`<h2 style="margin:0 0 6px">🎨 Il tuo eroe</h2><p class="mute" style="margin:0 0 12px;font-size:.9rem">Solo estetica e gratis: lo vedono tutti nella Locanda, nel Raid e nella Torre.</p><div id="lkBody">${body()}</div>`);
+ const paintB=()=>{const el=o.querySelector('#lkBody');el.innerHTML=body();bind()};
+ function bind(){o.querySelectorAll('[data-lkk]').forEach(b=>b.onclick=()=>{lookDraft[b.dataset.lkk]=+b.dataset.v;paintB()});
+  o.querySelector('#lkRnd').onclick=()=>{LKOPT.forEach(([k,,t])=>{const n=t==='sw'?pal(k).length:t.length;lookDraft[k]=Math.floor(Math.random()*n)});paintB()};
+  o.querySelectorAll('[data-close]').forEach(b=>b.onclick=o.close);
+  o.querySelector('#lkSave').onclick=async e=>{const b=e.currentTarget;b.disabled=true;
+   try{const r=await rpc('game_set_look',{p_look:lookDraft});MYLOOK=r.look||lookDraft;LOOKS[ME.user_id]=MYLOOK;o.close();paintTop();if(tab==='tower')renderTower();say('Nuovo aspetto salvato!','good')}
+   catch(err){b.disabled=false;say(twMissing(err)?'Per salvare l’aspetto va eseguita la migrazione black-market-eroi-aspetto.sql.':errTxt(err),'bad')}}}
+ bind()}
 
 function gate(html){ST=null;ME=null;$('main').hidden=true;$('gate').hidden=false;$('gate').innerHTML=html}
 function gateLogin(){gate(`<section class="card er-gate" style="margin-top:20px"><h2>Entra dal Black Market</h2><p class="mute" style="max-width:34em;margin:0 auto 14px">La guerra degli Eroi usa il tuo profilo del Black Market: lo stesso nickname e lo stesso saldo di BC. Entra (o crea il profilo) dal Black Market e poi torna qui.</p><a class="btn gold" href="black-market.html">Accedi dal Black Market</a></section>`);
@@ -741,28 +816,20 @@ function renderHero(){
  const skBody=`<p class="er-sub" style="margin:8px 0 12px">Le abilità si comprano dal <b>Mercante</b> con i BC: quelle permanenti restano per sempre, i potenziamenti durano ${S.temp_hours} ore.</p>
   <b>Permanenti</b>${m.perm_skills.length?`<div class="er-chipl">${m.perm_skills.map(n=>`<span>${esc(n)}</span>`).join('')}</div>`:'<p class="mute" style="margin:4px 0 0">Nessuna, per ora.</p>'}
   <div style="margin-top:12px"><b>Potenziamenti attivi</b></div>${nTemp?m.temp_skills.map(t=>`<div class="er-sk"><div class="nmk">${esc(t.name)} <small class="mute">· ${esc((SL[t.slot]||[0,t.slot])[1])}</small></div><div class="mute">ancora <b data-ut="${esc(t.until)}">${lf(new Date(t.until).getTime()-Date.now())}</b></div></div>`).join(''):'<p class="mute" style="margin:4px 0 0">Nessuno attivo.</p>'}`;
- $('p-hero').innerHTML=`${!m.stats_set?`<p class="er-msg" style="margin:0 0 16px"><b>Benvenuto, eroe!</b> Per iniziare distribuisci i tuoi ${m.points} punti abilità e salva: poi potrai combattere.</p>`:m.points_free>0?`<p class="er-msg good" style="margin:0 0 16px">✨ Hai <b>${num(m.points_free)}</b> punti abilità da spendere: ne ricevi <b>${S.points_per_level}</b> a ogni livello. Distribuiscili qui sotto e salva.</p>`:''}
- ${AVOK?`<h2 class="er-h">Avatar</h2><p class="er-sub">Scegli l’illustrazione di una carta Yu-Gi-Oh! come faccia del tuo eroe: la vedono tutti.</p>
- <div class="card"><div class="er-avbox"><div class="er-avbig" aria-hidden="true">${face(m.user_id,m.nickname)}</div><div style="min-width:0"><b style="overflow-wrap:anywhere">${AV[m.user_id]?esc(AV[m.user_id].n):'Nessun avatar'}</b>
+ $('p-hero').innerHTML=`${!m.stats_set?`<p class="er-msg" style="margin:0 0 16px"><b>Benvenuto, eroe!</b> Per iniziare distribuisci i tuoi ${m.points} punti abilità e salva: poi potrai combattere.</p>`:''}
+ ${AVOK?`<div style="margin-top:4px">${fold('avatar','🖼️','Foto profilo (carta)','La carta che fa da faccia al tuo eroe',null,`<div style="padding-top:10px"><div class="er-avbox"><div class="er-avbig" aria-hidden="true">${face(m.user_id,m.nickname)}</div><div style="min-width:0"><b style="overflow-wrap:anywhere">${AV[m.user_id]?esc(AV[m.user_id].n):'Nessun avatar'}</b>
   <div class="row" style="margin-top:8px"><button class="btn sm" id="avToggle">${avOpen?'Chiudi':'Scegli una carta'}</button>${AV[m.user_id]?'<button class="btn ghost sm" id="avClear">Rimuovi</button>':''}</div></div></div>
   ${avOpen?`<div class="er-avsrch"><input id="avQ" type="search" placeholder="Nome della carta (es. Dark Magician)" value="${esc(avQ)}" maxlength="60" aria-label="Nome della carta" autocomplete="off"><button class="btn" id="avGo" ${avBusy?'disabled':''}>Cerca</button></div>
    ${!avRes?'':avRes.wait?'<p class="mute" style="margin:10px 0 0">Ricerca in corso…</p>':avRes.err?`<p class="warn">${esc(avRes.err)}</p>`:avRes.list.length?`<div class="er-avgrid">${avRes.list.map(c=>`<button data-avpick="${c.id}" data-avname="${esc(c.name)}" aria-label="Usa ${esc(c.name)}"><img src="${CROP}${c.id}.jpg" alt="" loading="lazy" referrerpolicy="no-referrer"><span>${esc(c.name)}</span></button>`).join('')}</div>`:'<p class="mute" style="margin:10px 0 0">Nessuna carta trovata.</p>'}
-   <p class="er-note">Le immagini arrivano dall’archivio di YGOPRODeck. L’avatar è sempre una carta: non si possono caricare foto.</p>`:''}</div>`:''}
- <h2 class="er-h">Punti abilità</h2><p class="er-sub">Hai <b>${num(m.points)}</b> punti in tutto: ${S.points} all’inizio più ${S.points_per_level} a ogni livello${m.train_points>0?` più <b>${num(m.train_points)}</b> guadagnat${m.train_points===1?'o':'i'} con l’allenamento amichevole`:''} (massimo ${num(cap)} su una statistica per ora). Le statistiche valgono <b>5 + punti × livello</b>, più i bonus di oggetti e abilità.</p>
+   <p class="er-note">Le immagini arrivano dall’archivio di YGOPRODeck. L’avatar è sempre una carta: non si possono caricare foto.</p>`:''}</div>`)}</div>`:''}
+ <h2 class="er-h" id="erPts">Punti abilità</h2><p class="er-sub">${num(m.points)} punti in tutto · massimo ${num(cap)} su una statistica</p>
  <div class="card"><div class="er-left"><span>Punti da assegnare</span><b>${num(left)}</b></div>${rows}
   <p class="er-note">PV con questa distribuzione: <b>${num(hpD)}</b>.${pays?` <span style="color:var(--warn)">Togliere punti già assegnati costa <b>${S.respec_cost} BC</b>.</span>`:m.stats_set&&m.fights_total>0&&S.respec_cost>0?` Aggiungere punti nuovi è sempre gratis; togliere punti già assegnati, una volta combattuto, costa ${S.respec_cost} BC.`:' Finché non combatti puoi cambiare idea gratis.'}</p>
   <div class="row" style="margin-top:12px"><button class="btn" id="stSave" ${(!changed&&m.stats_set)||left<0||(!m.stats_set&&used===0)?'disabled':''}>${pays?`Salva (${S.respec_cost} BC)`:'Salva i punti'}</button><button class="btn ghost" id="stReset" ${changed?'':'disabled'}>Annulla</button></div></div>
  <div style="margin-top:26px">${fold('skills','✨','Abilità',`${m.perm_skills.length} permanent${m.perm_skills.length===1?'e':'i'} · ${nTemp} potenziament${nTemp===1?'o attivo':'i attivi'}`,m.perm_skills.length+nTemp,skBody)}</div>
- <h2 class="er-h">Zaino</h2>${(m.xp_pct||m.extra_actions||m.extra_fights)?`<p class="er-sub">Bonus speciali attivi: ${[m.xp_pct?`+${m.xp_pct}% XP`:'',m.extra_actions?`+${m.extra_actions} azioni boss al giorno`:'',m.extra_fights?`+${m.extra_fights*25}% ricarica energia`:''].filter(Boolean).join(' · ')}</p>`:''}<p class="er-sub">Scegli una categoria: in alto l’oggetto che indossi, sotto quelli che lo superano. Il numero colorato dice di quanto cambiano i tuoi bonus.</p><div class="card iv" id="zaino">${inv}</div>
+ <h2 class="er-h">Zaino</h2>${(m.xp_pct||m.extra_actions||m.extra_fights)?`<p class="er-sub">Bonus speciali attivi: ${[m.xp_pct?`+${m.xp_pct}% XP`:'',m.extra_actions?`+${m.extra_actions} azioni boss al giorno`:'',m.extra_fights?`+${m.extra_fights*25}% ricarica energia`:''].filter(Boolean).join(' · ')}</p>`:''}<div class="card iv" id="zaino">${inv}</div>
  ${ISADM?`<h2 class="er-h">Strumenti admin</h2><div class="card"><p class="mute" style="margin:0 0 10px">Visibile solo a te (amministratore). Riporta la tua batteria al 100%; l’uso viene registrato nell’audit.</p><button class="btn gold" id="admEn">⚡ Ricarica la mia energia</button></div>`:''}
- <h2 class="er-h">Come si gioca</h2><details class="card"><summary>Le regole in breve</summary><ul class="mute er-how" style="padding-left:20px;margin:6px 0 0">
-  <li><b>Boss del giorno</b>: ogni giorno compare un boss, lo stesso per tutti. Ogni eroe ha <b>una lobby al giorno</b>: ne crea una sua (anche da solo) oppure entra in una già aperta. Quando siete pronti uno qualunque dei presenti la fa partire (dopo la partenza non si entra più). I PV del boss si calcolano sugli eroi presenti${S.min_players>1?`, e servono almeno <b>${S.min_players} eroi</b>`:''}.</li>
-  <li>Una volta partito, puoi <b>attaccare quando vuoi</b>, senza limiti: ogni attacco però ti costa PV, perché il boss reagisce, e a 0 PV sei KO finché un alleato non ti cura. Ogni giorno hai inoltre ${S.actions} azioni di supporto (difendi, cura, studia) e i danni di chi è nella tua lobby si sommano. Se lo abbattete, <b>tutti quelli della lobby</b> ricevono <b>${S.boss_bc} BC</b>, <b>XP doppia</b> e <b>un oggetto casuale</b>.</li>
-  <li>Ogni lobby ha il suo boss: ognuno può batterlo, anche se un’altra lobby c’è già riuscita. Se almeno una lo batte, il giorno dopo arriva uno più forte (ce ne sono ${ST.boss.total}); se nessuno ci riesce, il boss ritorna.</li>
-  <li><b>Arena</b>: sfida gli altri eroi quante volte vuoi, anche lo stesso avversario più volte. Ogni duello consuma <b>energia</b> (la batteria in alto): ${ST.energy.win} se vinci, ${ST.energy.loss} se perdi, e ne servono almeno ${ST.energy.min} per sfidare. La batteria arriva a ${ST.energy.max} e si ricarica da sola in ${Math.round(ST.energy.max/ST.energy.per_hour)} ore circa. Vincere dà <b>solo XP</b>, mai BC. <b>Finché sei sotto il livello 100, ogni volta che sali di livello la batteria si ricarica al 100%</b>: dal livello 100 in poi la ricarica non c’è più e l’energia torna solo con il tempo. Il boss non consuma energia.</li>
-  <li><b>Punti abilità</b>: ${S.points} all’inizio e <b>${S.points_per_level} a ogni livello</b>, da mettere nelle statistiche.</li>
-  <li><b>Mercante</b>: ogni giorno propone oggetti diversi; vende anche <b>abilità permanenti</b> (+% a una statistica, per sempre) e <b>potenziamenti temporanei</b> (+% per ${S.temp_hours} ore su un equipaggiamento). Accetta solo BC.</li>
-  <li>I livelli arrivano fino al <b>${num(CAP)}</b>${m_over()}.</li></ul></details>`;
+<div style="margin-top:20px">${faqLink('eroi','Come si gioca: le regole nelle FAQ')}</div>`;
 }
 
 /* ---------- scheda Boss ---------- */
@@ -834,7 +901,7 @@ function renderRaid(){
  else if(M.ko)why='Sei KO: un alleato deve curarti, oppure torni in forze domani.';
  const can=!why,canS=can&&M.actions_left>0;
  const tgt=today.find(x=>x.user_id===rTarget),tgtHurt=tgt&&tgt.hp<tgt.max_hp;
- const hero=ART?ART.sprite('eroe',{size:104,alt:m.nickname}):'<span style="font-size:56px">🧑</span>';
+ const hero=ART?ART.sprite('eroe',{size:104,alt:m.nickname,look:MYLOOK||{}}):'<span style="font-size:56px">🧑</span>';
  const boss=ART?ART.sprite(b.sprite,{tier:b.tint,size:Math.max(120,Math.min(200,Math.round((($('p-boss')||{}).clientWidth||innerWidth)*0.44))),alt:b.name,cls:'rd-bs'}):`<span style="font-size:110px">${esc(b.emoji)}</span>`;
  const ally=x=>`<button type="button" class="rd-ally ${x.user_id===rTarget?'on':''} ${x.hp<=0?'ko':''}" data-rt="${esc(x.user_id)}" title="${esc(x.nickname)}"><span class="av">${face(x.user_id,x.nickname)}</span><span class="hb"><i style="width:${rPct(x.hp,x.max_hp)}%"></i></span><small>${esc(x.nickname)}${x.user_id===m.user_id?' (tu)':''}</small></button>`;
  const rules=RAID.rules||{},top=rules.top||[];
@@ -938,7 +1005,7 @@ async function arData(){
 async function loadArena(){await arData();renderArena()}
 function renderArenaOld(){
  const m=ST.me,S=ST.settings,d=ST.duels,en=ST.energy,ev=enNow(),canE=ev>=en.min,list=AR||[];lastCan=canE;
- $('p-arena').innerHTML=`<h2 class="er-h">Arena</h2><p class="er-sub">Sfida un altro eroe: vince chi ha più PV alla fine. Vincere ti dà <b>solo XP</b> (di più se l’avversario è più forte di te). Nessun BC in gioco, ma ogni duello consuma <b>energia</b>: ${en.win} se vinci, ${en.loss} se perdi.</p>
+ $('p-arena').innerHTML=`<h2 class="er-h">Arena</h2><p class="er-sub">Solo XP · energia −${en.win} se vinci, −${en.loss} se perdi</p>
  <div class="card"><div class="row" style="justify-content:space-between"><span>Energia</span><b>${Math.floor(ev)} / ${en.max}</b></div>
   <p class="er-note" style="margin:4px 0 0">Per sfidare servono almeno ${en.min}. ${ev>=en.max?'La batteria è carica.':`Piena tra ${fmtDur((en.max-ev)/en.per_hour*3600)}.`} Duelli fatti oggi: ${d.used}.</p>
   <div class="er-sw" style="margin-top:6px"><span>Accetto sfide in Arena</span><input type="checkbox" id="arOpen" ${m.arena_open?'checked':''} aria-label="Accetto sfide in Arena"></div></div>
@@ -967,13 +1034,7 @@ function renderArena(){
  const ctl=`<div class="card"><div class="row" style="justify-content:space-between"><span>Energia</span><b>${Math.floor(ev)} / ${en.max}</b></div>
   <p class="er-note" style="margin:4px 0 0">Ogni sfida consuma energia (${en.win} se vinci, ${en.loss} se perdi): ne servono almeno ${en.min}. ${ev>=en.max?'La batteria è carica.':`Piena tra ${fmtDur((en.max-ev)/en.per_hour*3600)}.`} Duelli fatti oggi: ${ST.duels.used}.</p>
   <div class="er-sw" style="margin-top:6px"><span>Accetto sfide in Arena</span><input type="checkbox" id="arOpen" ${m.arena_open?'checked':''} aria-label="Accetto sfide in Arena"></div>
-  <details style="margin-top:8px"><summary><b>Come funzionano i punti</b></summary><ul class="er-note" style="margin:8px 0 0;padding-left:18px;display:grid;gap:4px">
-   <li>Vince chi ha più PV alla fine. Vincere ti dà XP; <b>nessun BC</b> in gioco.</li>
-   <li>Sfidando, i tuoi <b>punti Arena</b> salgono se vinci e scendono se perdi: di più se l’avversario ha più punti di te, di meno se ne ha meno.</li>
-   <li><b>Chi viene sfidato non perde né guadagna punti.</b> Così puoi lasciare le sfide aperte senza rischi.</li>
-   <li>Contro lo stesso avversario contano al massimo <b>${S.pair_max} sfide al giorno</b>: le altre si combattono, ma non cambiano i punti.</li>
-   <li>La stagione dura un mese. Poi i punti tornano a metà strada verso ${num(S.start)} e le leghe si ricominciano a scalare. Il podio della stagione chiusa resta nell’albo d’oro.</li>
-   <li>Leghe: ${S.leagues.map(l=>`${esc(lgm(l.key)[1])} ${esc(l.name)} da ${num(l.min_points)}`).join(' · ')}.</li></ul></details></div>
+  <div style="margin-top:8px">${faqLink('come-funziona-l-arena','Come funzionano i punti Arena')}</div></div>
   ${!m.stats_set?'<p class="er-msg">Assegna prima i tuoi punti abilità nella scheda <b>Eroe</b>.</p>':!canE?`<p class="er-msg bad">Energia troppo bassa per sfidare: ne servono ${en.min}. Piena tra ${fmtDur((en.max-ev)/en.per_hour*3600)}.</p>`:''}`;
  const pods=B.length?`<div class="ar-pod" role="list" aria-label="Podio della stagione">${pod.map((b,i)=>b?`<div class="p${[2,1,3][i]}" role="listitem"><span class="md" aria-hidden="true">${med[i]}</span><div class="av" aria-hidden="true">${arFace(b.user_id,b.nickname)}</div><b>${esc(b.nickname)}</b><small>${num(b.points)} pt</small></div>`:'<div style="visibility:hidden"></div>').join('')}</div>`:'';
  const rest=B.slice(3),shown=arAll?rest:rest.slice(0,5);
@@ -1140,23 +1201,14 @@ function renderDng(){
     <div class="dg-btns">${Object.keys(ROLES).map(k=>`<button class="btn sm ghost" data-djoin="${esc(l.run_id)}" data-role="${k}" ${can2&&av(k)?'':'disabled'}>Entra: ${ROLES[k][1]} ${ROLES[k][0]}</button>`).join('')}</div>
     ${!d.open?'<p class="er-note">Per te questo dungeon è ancora bloccato.</p>':!d.level_ok?`<p class="er-note">Serve il livello ${num(d.min_level)}.</p>`:full?'<p class="er-note">Lobby piena.</p>':''}</div>`}).join(''):'<p class="mute">Nessuna lobby aperta in questo momento. Creane una dall’elenco qui sotto!</p>'}`;
  const epic=S.cleared>=S.total?'Hai completato tutti i dungeon!':`Prossimo oggetto <b style="color:#c084fc">epico</b> tra ${S.next_epic_in} ${S.next_epic_in===1?'dungeon completato':'dungeon completati'}.`;
- $('p-dng').innerHTML=`<h2 class="er-h">Dungeon</h2><p class="er-sub">${S.total} dungeon a difficoltà crescente: ${S.dungeons.filter(x=>x.kind!=='path').length} classici e ${S.dungeons.filter(x=>x.kind==='path').length} <b>a scelte</b>, dove decidi tu la strada. Da soli o in squadra (fino a ${S.max_party}). Ogni partenza costa <b>${S.cost} energie</b> a testa e dà BC, XP e un oggetto esclusivo.</p>
+ $('p-dng').innerHTML=`<h2 class="er-h">Dungeon</h2><p class="er-sub">${S.total} dungeon · fino a ${S.max_party} eroi · −${S.cost} energia a testa</p>
   ${fold('dng_done','🏆','Dungeon completati',`${S.cleared} su ${S.total}<span class="er-mb" role="progressbar" aria-valuemin="0" aria-valuemax="${S.total}" aria-valuenow="${S.cleared}" aria-label="Dungeon completati"><i style="width:${pct}%"></i></span>`,pct+'%',`<p class="er-note" style="margin:8px 0 0">${epic}${done.length?` Puoi rigiocare i dungeon completati: ${S.replay_bc_pct}% dei BC e ${S.replay_xp_pct}% dell’XP.`:''}</p>${done.length?grp(done.slice().reverse()):'<p class="mute" style="margin:10px 0 0">Nessun dungeon completato, per ora.</p>'}`)}
   ${why?`<p class="er-msg ${!m.stats_set?'':'bad'}">${why}</p>`:''}
   <h2 class="er-h">${my?'Il tuo ruolo':'Scegli il tuo ruolo'}</h2>${picker}
   ${LOBBY}${my?'':LOBBIES}
   <h2 class="er-h">Da completare</h2>
   ${todoHtml}
-  <h2 class="er-h">Come funzionano</h2><details class="card"><summary>Le regole in breve</summary><ul class="mute er-how">
-   <li>I dungeon si sbloccano <b>uno dopo l’altro</b>: completa il precedente per aprire il successivo. Alcuni chiedono anche un livello minimo.</li>
-   <li>Ogni giocatore spende <b>${S.cost} energie</b> quando il dungeon parte, vinca o perda il gruppo.</li>
-   <li>Da soli o in lobby da 2 a ${S.max_party} eroi. Ruoli: <b>1 Tank</b>, <b>1 Supporto</b> e fino a <b>2 Danni</b>. Il capo della lobby fa partire quando vuole; una lobby non avviata scade dopo ${S.lobby_minutes} minuti.</li>
-   <li>I dungeon classici si risolvono in automatico, stanza dopo stanza, in base a livello, punti abilità, oggetti e ruoli. Tra una stanza e l’altra il gruppo riprende fiato. Se tutti cadono, il dungeon è fallito.</li>
-   <li><b>Dungeon a scelte</b> (dal 26): a ogni bivio il <b>capo gruppo</b> sceglie, gli altri guardano e la schermata si aggiorna da sola. Le scelte danno indizi, bonus o malus di potenza e PV, e aprono o chiudono strade: senza l’indizio giusto certe opzioni restano bloccate. Gli scontri si risolvono da soli, in base alla potenza della spedizione. Alcune scelte fanno fallire subito. Esistono più <b>finali</b>: il migliore paga fino al <b>140%</b> dei BC e dell’XP, il più magro l’85%, e ogni finale scoperto resta segnato. Se nessuno decide per ${S.path_minutes} minuti, la spedizione fallisce.</li>
-   <li><b>Dungeon avanzati</b> (dal 56 al ${S.total}, per eroi fino al livello 600): oltre alle scelte compaiono <b>prove di abilità</b> (🎲 con la probabilità indicata, che dipende dalle statistiche del gruppo), <b>serrature a simboli</b> (🔐 un codice da indovinare con pochi tentativi), <b>azioni uniche</b> (🧭), <b>scelta dell’eroe</b> (👤 il capo sceglie chi agisce), <b>azioni di ruolo</b> (🛡️ servono Tank, Danni o Supporto vivi) e, in alcuni, un <b>orologio</b> (⏳) che consuma tempo a ogni scelta: se finisce, il gruppo viene raggiunto dai nemici. Servono indizi, buoni ruoli e un po’ di fortuna per arrivare al finale migliore.</li>
-   <li><b>Prima vittoria</b>: BC pieni (<b>+${S.party_bonus_pct}% per ogni compagno</b> nel gruppo), XP pieni e l’<b>oggetto esclusivo</b> del dungeon, <b>epico</b> ogni 5 dungeon completati. A volte arriva anche un secondo oggetto.</li>
-   <li><b>Repliche</b>: ${S.replay_bc_pct}% dei BC, ${S.replay_xp_pct}% dell’XP e, ogni tanto, un oggetto casuale. <b>Sconfitta</b>: nessun BC, un po’ di XP di consolazione.</li>
-  </ul></details>`;
+  <div style="margin-top:20px">${faqLink('come-funzionano-i-dungeon','Come funzionano i dungeon')}</div>`;
  paintDut()}
 function paintDut(){document.querySelectorAll('[data-dut]').forEach(e=>{const t=new Date(e.dataset.dut).getTime()-Date.now();e.textContent=t>0?fmtDur(t/1000):'scaduta'})}
 function dngModal(res,no){
@@ -1227,11 +1279,11 @@ function renderPond(){
  const el=$('p-pond');
  if(petAvail===false){el.innerHTML=`<h2 class="er-h">Lo stagno</h2><p class="er-msg">Lo Stagno non è ancora attivo: nel database va eseguita la migrazione <b>black-market-eroi-stagno.sql</b>.</p>`;return}
  if(!PD){el.innerHTML='<p class="mute">Caricamento…</p>';return}
- const P=PD.pets,how=fold('pt_how','📖','Come funziona lo Stagno','Regole in breve',null,`<ul class="er-how"><li>Scegli <b>uno dei tre compagni base</b> (gratis, una volta sola): da quel momento ti segue ovunque.</li><li>Il compagno attivo dà <b>bonus alle tue statistiche</b> in ogni combattimento: duelli, boss, dungeon e Torre.</li><li>Guadagna il <b>${PD.xp_pct}% dell’XP</b> che ottieni tu e sale di livello (fino al livello ${PD.max_level}, mai oltre il tuo eroe). Più sale, più i bonus <b>diventano forti e numerosi</b>: se ne sbloccano di nuovi ai livelli 10, 25, 45 e 70.</li><li>Gli altri <b>${P.filter(p=>!p.starter).length} compagni</b> si comprano con i BC, in ${Math.max(...P.map(p=>p.tier))} gradi (fino al livello ${num(Math.max(...P.map(p=>p.min_level)))}): più alto è il grado, più costano e più sono forti e belli. Si compra solo dopo aver scelto il compagno base.</li><li>Puoi cambiare compagno quando vuoi: ognuno <b>conserva il suo livello</b>, ma solo quello attivo guadagna esperienza.</li></ul>`);
+ const P=PD.pets,how=faqLink('stagno','Come funziona lo Stagno');
  if(!PD.chosen){
-  el.innerHTML=`<div class="pt-pond"><h2 class="er-h" style="position:relative">Lo stagno</h2><p class="er-sub" style="position:relative">Un compagno ti aspetta tra le ninfee. Scegli quello che ti segue: uno solo tra i tre, e ti accompagnerà in ogni battaglia crescendo con te (guadagna il ${PD.xp_pct}% della tua XP).</p></div>
+  el.innerHTML=`<div class="pt-pond"><h2 class="er-h" style="position:relative">Lo stagno</h2><p class="er-sub" style="position:relative">Scegli il tuo primo compagno: è gratis e cresce con te.</p></div>
   <h2 class="er-h">Scegli il tuo compagno</h2><div class="pt-grid">${P.filter(p=>p.starter).map(pChoose).join('')}</div>
-  <h2 class="er-h">Gli altri compagni</h2><p class="er-sub">Dopo la scelta potrai comprare i 27 compagni dei gradi superiori con i BC. Eccoli in anteprima.</p>
+  <h2 class="er-h">Gli altri compagni</h2>
   <div class="pt-grid">${P.filter(p=>!p.starter&&p.tier<=1).map(p=>`<div class="pt-c r-${prc(p.tier)}"><div class="pt-sp">${petSprite(p,80)}</div><div><div class="er-rar">${pgrade(p.tier)}</div><h3>${esc(p.name)}</h3></div><div class="er-pr"><b>${num(p.price)} BC</b></div></div>`).join('')}</div>
   <p class="er-note">… e altri ${P.filter(p=>!p.starter&&p.tier>1).length} compagni fino al grado ${Math.max(...P.map(p=>p.tier))}.</p>${how}`;return}
  const a=P.find(x=>x.active),own=P.filter(x=>x.owned),shop=P.filter(x=>!x.starter&&!x.owned);
@@ -1269,7 +1321,7 @@ function renderTrain(){
  if(trAvail===false){el.innerHTML=`<h2 class="er-h">Allenamento</h2><p class="er-msg">L’Allenamento non è ancora attivo: nel database va eseguita la migrazione <b>black-market-eroi-allenamento.sql</b>.</p>`;return}
  if(!TR){el.innerHTML='<p class="mute">Caricamento…</p>';return}
  const m=ST.me,a=TR.active,sp=TR.spar,td=sp.today,wps=sp.per_point;
- const lead=`<h2 class="er-h">Allenamento</h2><p class="er-sub">Un’attività <b>senza energia, XP né BC</b>: allena una statistica col passare del tempo, oppure combatti in amichevole per guadagnare punti abilità. <b>Mentre ti alleni non puoi entrare nei dungeon.</b> Ti alleni in una sola forma alla volta.</p>`;
+ const lead=`<h2 class="er-h">Allenamento</h2><p class="er-sub">Senza energia · mentre ti alleni non entri nei dungeon</p>`;
  let body='';
  if(a&&a.kind==='stat'){
   const t0=new Date(a.started_at).getTime(),t1=new Date(a.ends_at).getTime(),pct=Math.min(100,Math.max(0,Math.round(100*(Date.now()-t0)/Math.max(1,t1-t0)))),lv=TR.levels.find(x=>x.level===a.target_level);
@@ -1301,7 +1353,7 @@ function renderTrain(){
     <small>${nx?`Prossimo: livello ${nx.level} · ${trHours(nx.hours)} · bonus +${nx.bonus_pct}%`:'Livello massimo raggiunto'}</small></div>
     <button class="btn sm" data-tstart="stat" data-tstat="${esc(s.stat)}" ${nx&&!TR.in_dungeon?'':'disabled'} aria-label="Allena ${esc(nm)}">${nx?'Allena':'Al massimo'}</button></div>`}).join('');
   body=`${stop}${inD}<div class="tr-two"><section class="card"><h2 class="er-h" style="margin-top:0">🏋️ Allena una statistica</h2><p class="er-sub" style="margin-top:0">Scegli una statistica e lascia passare il tempo: a ogni livello il bonus <b>permanente</b> cresce di +1%, fino a +${TR.levels[TR.levels.length-1].bonus_pct}%. Gratis.</p>${rows}</section>
-   <section class="card"><h2 class="er-h" style="margin-top:0">🤺 Allenamento amichevole</h2><p class="er-sub" style="margin-top:0">Combatti in amichevole con altri eroi, senza energia, XP né BC. Ogni <b>${wps} vittorie valide</b> guadagni <b>1 punto abilità</b> da distribuire. Fino a ${td.max_wins} vittorie valide al giorno (${td.pair_max} contro lo stesso avversario).</p>
+   <section class="card"><h2 class="er-h" style="margin-top:0">🤺 Allenamento amichevole</h2><p class="er-sub" style="margin-top:0">${wps} vittorie = 1 punto abilità · max ${td.max_wins} al giorno</p>
     <div class="tr-sp"><div><span>Vittorie valide totali</span><b>${num(sp.wins)}</b></div><div><span>Al prossimo punto abilità</span><b>${num(sp.to_next)}</b></div><div><span>Punti guadagnati finora</span><b>${num(TR.train_points)}</b></div></div>
     <button class="btn gold" data-tstart="spar" ${TR.in_dungeon?'disabled':''}>Inizia l’allenamento amichevole</button></section></div>`}
  const info=`<details class="card" style="margin-top:14px"><summary><b>Livelli di allenamento</b></summary><div class="tr-sp" style="margin-top:8px">${TR.levels.map(l=>`<div><span>Livello ${l.level}</span><b>${trHours(l.hours)} · bonus +${l.bonus_pct}%</b></div>`).join('')}</div></details>`;
@@ -1353,10 +1405,10 @@ function renderTower(){
  ${fold('tw_lb','🏆','Classifica della Torre','Chi è salito più in alto',TW.top.length,lb)}
  ${fold('tw_hall','👑','Albo delle prime conquiste','Chi ha sconfitto per primo ogni boss',TW.hall.length,hall)}
  ${fold('tw_rec','📜','I tuoi ultimi tentativi','Vittorie e sconfitte recenti',TW.recent.length,rec)}
- ${fold('tw_how','📖','Come funziona la Torre','Regole in breve',null,`<ul class="er-how"><li>Si sale <b>un piano alla volta, da soli</b>: ogni tentativo è un combattimento con le stesse regole dei duelli in Arena e costa <b>${TW.cost} energia</b>, che tu vinca o perda.</li><li>Se vinci passi al piano dopo e incassi <b>BC e XP</b> di quel piano, una volta sola. Se perdi resti dove sei: rafforza l’eroe e riprova.</li><li>Ogni <b>10 piani</b> c’è un boss con una reliquia esclusiva (fino al piano 600). Chi lo sconfigge per primo entra nell’albo.</li><li>Alcuni nemici hanno un <b>tratto</b> (Corazzato, Furioso, Veloce, Mistico, Anziano, Fragile) che cambia le loro statistiche: lo vedi prima di salire.</li><li>I nemici crescono di piano in piano, senza fine: il tuo limite dipende da livello, statistiche e oggetti.</li></ul>`)}`;twMount()}
+ ${faqLink('come-funziona-la-torre-infinita','Come funziona la Torre')}`;twMount()}
 
 function twMount(){const h=$('twScene');if(TWS){TWS.destroy();TWS=null}if(!h||!window.TorreScena||!TW||!ART)return;
- try{TWS=TorreScena.make(h,{floor:TW.best_floor,enemy:TW.enemy,zone:ART.zone(TW.next_floor),bossFloor:TW.enemy&&TW.enemy.boss?TW.next_floor:0,hero:{pet:ST.me.pet}})}catch(err){console.error(err)}}
+ try{TWS=TorreScena.make(h,{floor:TW.best_floor,enemy:TW.enemy,zone:ART.zone(TW.next_floor),bossFloor:TW.enemy&&TW.enemy.boss?TW.next_floor:0,hero:{pet:ST.me.pet,look:MYLOOK||{}}})}catch(err){console.error(err)}}
 function twResHtml(r,e,nxt){return r.won?`<div class="tw-res"><h3 class="w">🏆 Piano ${num(r.floor)} conquistato!</h3>
     <div class="tw-rw" style="justify-content:center"><span>🪙 +${num(r.bc)} BC</span><span>✨ +${num(r.xp)} XP</span><span>🔋 −${r.energy_cost}</span></div>
     ${r.levels>0?`<p class="er-note" style="text-align:center">Sei salito al livello <b>${num(r.level)}</b>!${r.energy_full?' Energia ricaricata al <b>100%</b>.':''}</p>`:''}
@@ -1366,7 +1418,7 @@ function twResHtml(r,e,nxt){return r.won?`<div class="tw-res"><h3 class="w">🏆
    :`<div class="tw-res"><h3 class="l">💥 Sconfitto al piano ${num(r.floor)}</h3><p class="er-note" style="text-align:center">${esc(e.name)} ti ha respinto (stima di partenza ${e.chance}%). Energia −${r.energy_cost}. Rafforza l’eroe (statistiche, abilità, oggetti) oppure riprova: i dadi possono girare.</p></div>`}
 function towerModal(r){
  const e=r.enemy,z=ART?ART.zone(r.floor):null,me=ST.me,L=r.log||[],lv0=r.level-(r.levels||0);let i=0;
- const hero=ART?ART.sprite('eroe',{size:112,alt:me.nickname}):'<span style="font-size:60px">🧑</span>';
+ const hero=ART?ART.sprite('eroe',{size:112,alt:me.nickname,look:MYLOOK||{}}):'<span style="font-size:60px">🧑</span>';
  const o=modal(`<div class="tw-ar" style="${z?ART.zoneVars(z):''}"><h2>Piano ${num(r.floor)}${e.boss?' <span class="tw-tag b">BOSS</span>':''}${e.affix?` <span class="tw-tag a">${esc(e.affix.name)}</span>`:''}</h2>
   <div class="tw-field" id="twF"><div class="tw-duel">
    <div class="tw-side me"><span class="tw-hpt" id="twAt">${num(r.max_a)} / ${num(r.max_a)}</span><div class="tw-hpb"><i id="twA" style="width:100%"></i></div><div class="tw-body me" id="twBa"><span class="tw-av" aria-hidden="true">${face(me.user_id,me.nickname)}</span>${hero}</div><div class="nm">${esc(me.nickname)}<br><span style="font-weight:400;opacity:.8">Liv. ${num(lv0)}</span></div></div>
@@ -1470,7 +1522,7 @@ async function loadMap(quiet){
  try{MAP=await rpc('game_map_state');mapAvail=!!(MAP&&MAP.enabled)}catch(e){if(twMissing(e)){mapAvail=false;mapTab();return}if(!quiet)say(errTxt(e),'bad');return}
  if(MAP&&MAP.enabled)await loadVil(true);
  mapTab();if(mapView==='tavern')await loadTavern(true);if(tab==='map'&&!document.querySelector('.er-ov'))renderMap()}
-async function loadTavern(quiet){try{TAV=await rpc('game_tavern_state')}catch(e){if(!quiet)say(errTxt(e),'bad')}}
+async function loadTavern(quiet){try{TAV=await rpc('game_tavern_state');if(TAV&&TAV.present)await loadLooks(TAV.present.map(h=>h.user_id))}catch(e){if(!quiet)say(errTxt(e),'bad')}}
 function tavPoll(){clearInterval(tavTimer);tavTimer=setInterval(async()=>{if(tab!=='map'||mapView!=='tavern'||busy||document.hidden)return;await loadTavern(true);if(!document.querySelector('.er-ov')&&!diceAnim)renderMap()},20000)}
 async function balance(){const w=await sb.from('wallets').select('balance').eq('user_id',ME.user_id).maybeSingle();return w.data?w.data.balance:null}
 function plotOf(id){return MAP.plots.find(p=>p[0]===id)}
@@ -1523,7 +1575,7 @@ function plotPanel(id,lv){
 function tavHtml(){
  if(!TAV)return '<p class="mute">Entri nella Locanda…</p>';
  const T=TAV,D=T.dice,me=ST.me.user_id,pr=T.present||[];
- const heroes=pr.slice(0,8).map((h,i)=>`<div class="tv-h" style="--d:${i*0.35}s"><span class="tv-s">${ART?ART.sprite('eroe',{size:58,alt:''}):'🧙'}</span><small>${esc(h.nickname)}</small><em>Liv. ${num(h.level)}</em></div>`).join('');
+ const heroes=pr.slice(0,8).map((h,i)=>`<div class="tv-h" style="--d:${i*0.35}s"><span class="tv-s">${ART?ART.sprite('eroe',{size:58,alt:'',look:LOOKS[h.user_id]||{}}):'🧙'}</span><small>${esc(h.nickname)}</small><em>Liv. ${num(h.level)}</em></div>`).join('');
  const roundWait=T.round_next?Math.max(0,new Date(T.round_next).getTime()-Date.now()):0;
  const open=(D.open||[]),mineOpen=open.filter(g=>g.mine).length,poor=s=>BAL!=null&&BAL<s,leftToday=Math.max(0,D.daily-D.played_today);
  return `<div class="card tv-sc" ${ART?`style="${ART.zoneVars(ART.zone(150))}"`:''}><div class="tv-sign">🍺 La Locanda del Tempio</div>
@@ -1978,8 +2030,7 @@ function vilSwitch(){
 function vilFoundHtml(){
  const P=VIL.my_plots||[],cost=VIL.rules.found_cost;
  return `<div class="card vl-found"><div class="vl-hero" aria-hidden="true">🏘️</div><h3 class="rd-h" style="margin-top:0">${(VIL.mine||[]).length?'Fonda un altro villaggio':'Fonda il tuo villaggio'}</h3>
-  <p>Ogni tuo terreno può diventare un villaggio, ognuno con edifici, risorse, cassa ed esercito suoi.${(VIL.mine||[]).length?` Hai già ${VIL.mine.length} ${VIL.mine.length===1?'villaggio':'villaggi'}: il prossimo costa <b>${num(VIL.rules.found_cost)} BC</b> (ogni villaggio in più costa 10.000 BC in più).`:''}</p>
-  <p>Diventa <b>sindaco</b>: costruisci segheria, cava e fattoria per avere legno, pietra e cibo; addestra fanti, arcieri e cavalieri; lasciane qualcuno a <b>difendere</b> e manda gli altri a <b>saccheggiare</b> i villaggi vicini. Per 48 ore dopo la fondazione nessuno può attaccarti.</p>
+  <p class="mute" style="margin:0 0 8px">Ogni tuo terreno può diventare un villaggio${(VIL.mine||[]).length?` · il prossimo costa <b>${num(VIL.rules.found_cost)} BC</b>`:''}.</p>${faqLink('come-fondo-un-villaggio','Come funzionano i villaggi')}
   ${P.length?`<form id="vilFound" class="vl-ff"><label>Nome del villaggio<input id="vilName" maxlength="24" minlength="3" required placeholder="es. Rocca del Drago"></label>
    <label>Su quale terreno<select id="vilPlot">${P.map(p=>{const r=regOf(p.region);return `<option value="${p.id}"${p.id===vilPlotPre?' selected':''}>${r.emoji} ${esc(r.name)} · lotto n° ${p.id+1} · ${LANDLV[p.level][0]}</option>`}).join('')}</select></label>
    <button class="btn ${pending==='vfound'?'gold':''}" ${BAL!=null&&BAL<cost?'disabled':''}>${BAL!=null&&BAL<cost?'BC insufficienti':pending==='vfound'?`Conferma: ${num(cost)} BC`:`Fonda · ${num(cost)} BC`}</button></form>`
@@ -2041,7 +2092,7 @@ async function vilAct(btn,fn){await run(btn,async()=>{await fn();await Promise.a
 /* ---------- Classifica ---------- */
 async function loadLb(){loadOnline();try{const{data,error}=await sb.from('game_leaderboard_v').select('*').order('rank',{ascending:true}).order('nickname',{ascending:true}).limit(50);if(error)throw new Error(error.message);LB=data||[]}catch(e){LB=[];say(errTxt(e),'bad')}renderLb()}
 function renderLb(){
- $('p-lb').innerHTML=`<h2 class="er-h">Classifica degli eroi</h2><p class="er-sub">Ordinata per livello e, a parità, per XP. Compaiono gli eroi che hanno assegnato i loro punti.</p>
+ $('p-lb').innerHTML=`<h2 class="er-h">Classifica degli eroi</h2>
  ${chatAvail!==true?'':`<p class="er-lbon"><span class="er-on" style="margin:0" aria-hidden="true"></span><span><b>${ONL.size}</b> ${ONL.size===1?'eroe online':'eroi online'} adesso: il pallino verde accanto al nome</span></p>`}
  ${LB==null?'<p class="mute">Caricamento…</p>':LB.length?LB.map(r=>`<div class="er-lb ${r.user_id===ST.me.user_id?'me':''}"><div class="rk">${r.rank}</div><div class="av" aria-hidden="true">${face(r.user_id,r.nickname)}</div>
    <div style="min-width:0"><button class="er-link" data-hero="${esc(r.user_id)}">${esc(r.nickname)}</button>${ONL.has(r.user_id)?'<span class="er-on" role="img" aria-label="Online" title="Online"></span>':''}<small>${num(r.bosses_beaten)} boss · ${num(r.duels_won)} duelli vinti</small></div><div class="lv">Lv. ${num(r.level)}</div></div>`).join(''):'<p class="mute">Nessun eroe in classifica, per ora.</p>'}`}
@@ -2114,6 +2165,8 @@ function paint(){
 function setTab(t,push){
  tab=t;document.querySelectorAll('.tabs [data-t]').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));const cb=document.querySelector('.tabs [data-t="'+t+'"]');if(cb&&cb.scrollIntoView)try{cb.scrollIntoView({inline:'nearest',block:'nearest'})}catch(_){}
  ['hero','boss','dng','tower','arena','train','shop','pond','map','lb'].forEach(x=>$('p-'+x).hidden=x!==t);
+ {const tp=$('top');if(tp)tp.hidden=t!=='hero'}
+ if(push!==false)try{scrollTo({top:0,behavior:'instant'})}catch(_){scrollTo(0,0)}
  if(push!==false)history.replaceState(null,'','#'+t);
  clearSay();pending=null;
  if(!ST)return;paint();
@@ -2125,6 +2178,7 @@ async function load(keepDraft){
  if(ISADM===null){try{ISADM=(await rpc('is_admin'))===true}catch(_){ISADM=false}}      // la voce admin si vede solo a chi è davvero amministratore (il database lo ricontrolla comunque)
  if(!keepDraft)draft=null;
  await loadAvatars();
+ await loadLooks([ME.user_id]);
  try{const c=await sb.from('system_settings').select('value_int').eq('key','game_level_cap').maybeSingle();const n=c&&c.data?Number(c.data.value_int):9999;CAP=n>=100&&n<=9999?n:9999}catch(_){CAP=9999}
  try{const w=await sb.from('wallets').select('balance').eq('user_id',ME.user_id).maybeSingle();BAL=w.data?w.data.balance:null}catch(_){}
  $('gate').hidden=true;$('main').hidden=false;paint();
@@ -2219,6 +2273,8 @@ document.addEventListener('click',e=>{
  if(t.dataset.fold){toggleFold(t);return}
  if(t.dataset.slot){slotSheet(t.dataset.slot);return}
  if(t.dataset.hero){heroSheet(t.dataset.hero);return}
+ if(t.dataset.look!==undefined){lookModal();return}
+ if(t.dataset.gopts!==undefined){const e=$('erPts');if(e&&e.scrollIntoView)try{e.scrollIntoView({block:'start',behavior:'smooth'})}catch(_){}return}
  const a=t.dataset.a;
  if(a&&draft){const k=t.dataset.k;const used=STATS.reduce((s,x)=>s+draft[x[0]],0),stp={'+':1,'-':-1,'+10':10,'-10':-10}[a]||0;
   draft[k]=Math.max(0,Math.min(draft[k]+stp,draft[k]+Math.min(capNow()-draft[k],ST.me.points-used)));renderHero();
