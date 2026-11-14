@@ -1,17 +1,24 @@
-/* tempio.js — menu a colonna sinistra (su smartphone: barra in alto + colonna che scorre da sinistra)
-   e registrazione del service worker. Tutti i percorsi sono relativi alla cartella della pagina. */
+/* tempio.js — navigazione globale e registrazione del service worker. Tutti i percorsi sono relativi alla cartella della pagina.
+   Computer e tablet larghi: menu a colonna a sinistra.
+   Smartphone: barra in alto con il nome della pagina + BARRA IN BASSO come nelle app (Home, Black Market, Eroi, Strumenti, FAQ);
+   «Strumenti» apre un foglio dal basso con Duel Simulator, Gestisci torneo, Match Pro, Deck Analyzer e Installa app.
+   Il Sentiero e Invita amici non sono più nel menu globale: stanno tra le sezioni del Black Market. */
 (function () {
   var NAV = [
     ['Home', 'index.html', '⌂', ''],
-    ['Il Sentiero', 'sentiero.html', '✦', ''],
     ['Black Market', 'black-market.html', '◈', 'bm'],
-    ['Invita amici', 'black-market.html#/invita', '✉', 'inv'],
     ['La guerra degli Eroi', 'eroi.html', '⚜', ''],
     ['Duel Simulator', 'duel-simulator.html', '♠', ''],
     ['Gestisci torneo', 'gestisci-torneo.html', '♜', ''],
     ['Match Pro', 'match-pro.html', '⏱', ''],
-    ['Deck Analyzer', 'deck-analyzer.html', '▤', '']
+    ['Deck Analyzer', 'deck-analyzer.html', '▤', ''],
+    ['FAQ', 'faq.html', '?', 'faq']
   ];
+  /* il Sentiero vive nel Black Market: lì si accende la voce Black Market */
+  var ALIAS = { 'sentiero.html': 'black-market.html' };
+  var TOOLS = ['duel-simulator.html', 'gestisci-torneo.html', 'match-pro.html', 'deck-analyzer.html'];
+  var TAB = [['Home', 'index.html', '⌂'], ['Black Market', 'black-market.html', '◈'], ['Eroi', 'eroi.html', '⚜'], ['Strumenti', '#strumenti', '🧰'], ['FAQ', 'faq.html', '?']];
+  var TITLE = { 'index.html': 'Il Tempio Dei Duelli', 'black-market.html': 'Black Market', 'sentiero.html': 'Il Sentiero', 'eroi.html': 'La guerra degli Eroi', 'duel-simulator.html': 'Duel Simulator', 'gestisci-torneo.html': 'Gestisci torneo', 'match-pro.html': 'Match Pro', 'deck-analyzer.html': 'Deck Analyzer', 'faq.html': 'Domande frequenti' };
   /* ---- link d'invito: index.html?invito=CODICE → si ricorda il codice (lo usa il Black Market alla registrazione) e si pulisce l'indirizzo ---- */
   try {
     var inv = /[?&]invito=([A-Za-z0-9]{6})(?:&|$)/.exec(location.search);
@@ -53,10 +60,8 @@
     function k(e) { if (e.key === 'Escape') close(); }
     c.onclick = close; m.onclick = function (e) { if (e.target === m) close(); }; document.addEventListener('keydown', k);
   }
-  function here() {
-    var p = location.pathname.split('/').pop();
-    return p || 'index.html';
-  }
+  function page() { return location.pathname.split('/').pop() || 'index.html'; }
+  function here() { var p = page(); return ALIAS[p] || p; }
   function mount() {
     if (document.getElementById('tmCol')) return;
     var cur = here();
@@ -73,29 +78,49 @@
     var col = document.createElement('aside');
     col.className = 'tm'; col.id = 'tmCol'; col.setAttribute('aria-label', 'Navigazione');
     col.innerHTML = '<div class="tm-h"><a class="tm-b" href="index.html"><img src="tempio-logo.svg?v=1" alt="" width="512" height="512"><span class="tm-t">Il Tempio<br>Dei Duelli</span></a><button class="tm-x" id="tmX" type="button">Chiudi menu</button></div>' +
-      '<nav class="tm-n">' + links + '<button type="button" class="tm-i" id="tmI"><i aria-hidden="true">⤓</i>Installa app</button></nav><div class="tm-f">Community Yu-Gi-Oh! · Bologna · v9</div>';
+      '<nav class="tm-n">' + links + '<button type="button" class="tm-i" id="tmI"><i aria-hidden="true">⤓</i>Installa app</button></nav><div class="tm-f">Community Yu-Gi-Oh! · Bologna · v10</div>';
     var bar = document.createElement('div');
     bar.className = 'tm-bar';
-    bar.innerHTML = '<button type="button" id="tmT" aria-label="Apri il menu" aria-expanded="false" aria-controls="tmCol">☰</button><img src="tempio-mark.png" alt=""><span>Il Tempio Dei Duelli</span>';
+    bar.innerHTML = '<a class="tm-home" href="index.html" aria-label="Home"><img src="tempio-mark.png" alt=""></a><span>' + (TITLE[page()] || document.title.split('—')[0].trim() || 'Il Tempio Dei Duelli') + '</span>';
+    /* barra in basso (smartphone) */
+    var isTool = TOOLS.indexOf(cur) >= 0;
+    var tb = document.createElement('nav');
+    tb.className = 'tm-tb'; tb.id = 'tmTb'; tb.setAttribute('aria-label', 'Navigazione principale');
+    tb.innerHTML = TAB.map(function (n) {
+      var on = n[1] === '#strumenti' ? isTool : n[1] === cur;
+      if (n[1] === '#strumenti') return '<button type="button" id="tmTools" aria-haspopup="dialog" aria-expanded="false"' + (on ? ' aria-current="page"' : '') + '><i aria-hidden="true">' + n[2] + '</i><span>' + n[0] + '</span></button>';
+      return '<a href="' + n[1] + '"' + (on ? ' aria-current="page"' : '') + '><i aria-hidden="true">' + n[2] + '</i><span>' + n[0] + '</span></a>';
+    }).join('');
+    /* foglio «Strumenti» */
+    var sh = document.createElement('div');
+    sh.className = 'tm-sh'; sh.id = 'tmSh'; sh.setAttribute('role', 'dialog'); sh.setAttribute('aria-modal', 'true'); sh.setAttribute('aria-label', 'Strumenti'); sh.hidden = true;
+    sh.innerHTML = '<div class="tm-shb"><div class="tm-grab" aria-hidden="true"></div><h2>Strumenti</h2><div class="tm-shg">' +
+      [['duel-simulator.html', '♠', 'Duel Simulator', 'Duelli 1 contro 1'], ['gestisci-torneo.html', '♜', 'Gestisci torneo', 'Swiss, tavoli, classifica'], ['match-pro.html', '⏱', 'Match Pro', 'Life Points e timer'], ['deck-analyzer.html', '▤', 'Deck Analyzer', 'Probabilità e mani']].map(function (n) {
+        return '<a href="' + n[0] + '"' + (n[0] === cur ? ' aria-current="page"' : '') + '><i aria-hidden="true">' + n[1] + '</i><b>' + n[2] + '</b><small>' + n[3] + '</small></a>';
+      }).join('') + '</div><button type="button" class="tm-shi" id="tmI2"><i aria-hidden="true">⤓</i>Installa l\'app sul telefono</button><button type="button" class="tm-shx" id="tmShX">Chiudi</button></div>';
     var s = document.createElement('div');
     s.className = 'tm-s';
-    document.body.append(col, bar, s);
-    var t = document.getElementById('tmT'), x = document.getElementById('tmX');
-    function set(v) {
-      col.classList.toggle('open', v); s.classList.toggle('on', v);
-      t.setAttribute('aria-expanded', v);
-      (v ? x : t).focus();
+    document.body.append(col, bar, tb, sh, s);
+    document.documentElement.classList.add('tm-has-tb');
+    var x = document.getElementById('tmX'), tt = document.getElementById('tmTools');
+    function set(v) { col.classList.toggle('open', v); s.classList.toggle('on', v); if (v) x.focus(); }
+    function sheet(v) {
+      if (v) { sh.hidden = false; requestAnimationFrame(function () { sh.classList.add('open'); }); s.classList.add('on'); tt.setAttribute('aria-expanded', 'true'); var f = sh.querySelector('a'); if (f) f.focus(); }
+      else { sh.classList.remove('open'); s.classList.remove('on'); tt.setAttribute('aria-expanded', 'false'); setTimeout(function () { if (!sh.classList.contains('open')) sh.hidden = true; }, 220); }
     }
+    tt.onclick = function () { sheet(sh.hidden || !sh.classList.contains('open')); };
+    document.getElementById('tmShX').onclick = function () { sheet(false); tt.focus(); };
+    document.getElementById('tmI2').onclick = function () { sheet(false); install(); };
+    var i2 = document.getElementById('tmI2'); if (standalone()) i2.hidden = true;
     addEventListener('hashchange', function () {
       var as = col.querySelectorAll('.tm-n a');
       NAV.forEach(function (n, i) { if (isCur(n)) as[i].setAttribute('aria-current', 'page'); else as[i].removeAttribute('aria-current'); });
     });
     document.getElementById('tmI').onclick = function () { set(false); install(); };
     refreshInstall();
-    t.onclick = function () { set(true); };
     x.onclick = function () { set(false); };
-    s.onclick = function () { set(false); };
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && col.classList.contains('open')) set(false); });
+    s.onclick = function () { set(false); sheet(false); };
+    document.addEventListener('keydown', function (e) { if (e.key !== 'Escape') return; if (col.classList.contains('open')) set(false); if (!sh.hidden) { sheet(false); tt.focus(); } });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
   if ('serviceWorker' in navigator) addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });

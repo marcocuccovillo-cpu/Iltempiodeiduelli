@@ -10,7 +10,7 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png?v=2" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="tempio.css?v=10">
+<link rel="stylesheet" href="tempio.css?v=11">
 </head><body>
 <main class="pg">
 <style>
@@ -68,6 +68,15 @@
 .pills li{padding:4px 10px;border-radius:99px;border:1px solid var(--line);font-size:.88rem;font-weight:700}
 .h3{font-size:1rem;margin:14px 0 8px}
 .dock .btn.wa{background:#25d366;border-color:#25d366;color:#05230f}
+/* scorciatoie e FAQ (Home sfoltita) */
+.hm-go{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hm-t{display:grid;gap:2px;padding:14px;border-radius:18px;border:1px solid var(--line);background:var(--surf);color:var(--tx);text-decoration:none;box-shadow:0 0 18px rgba(var(--ac-rgb),.06)}
+.hm-t i{font-style:normal;font-size:1.5rem;color:var(--ac2)}.hm-t b{font:700 1.02rem var(--disp)}.hm-t small{color:var(--mu);font-size:.82rem;line-height:1.3}
+.hm-t.bm{border-color:rgba(232,184,74,.45)}.hm-t.bm i,.hm-t.bm b{color:var(--gold)}
+.hm-faq{display:flex;align-items:center;gap:12px;margin-top:12px;padding:14px 16px;border-radius:18px;border:1.5px solid rgba(var(--ac-rgb),.5);background:linear-gradient(135deg,rgba(var(--ac-rgb),.16),transparent 70%),var(--surf);color:var(--tx);text-decoration:none}
+.hm-faq i{flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:var(--ac);color:var(--on-ac);font:800 1.3rem var(--ui);font-style:normal}
+.hm-faq span{flex:1}.hm-faq b{display:block}.hm-faq small{color:var(--mu);font-size:.85rem}.hm-faq em{font-style:normal;font-size:1.6rem;color:var(--ac2)}
+@media(max-width:719px){.hero img{width:min(46%,190px)}.hero .lead{font-size:.95rem}}
 </style>
 
  <header class="hero sm">
@@ -76,7 +85,7 @@
   <p class="tagline">Yu-Gi-Oh! · Bologna</p>
   <p class="lead">La nostra community, anche fuori dal locale: sfide a classifica, taglie sui rivali e un gioco di ruolo con boss e dungeon.</p>
   <div id="ivb" hidden></div>
-  <div class="row" id="heroCta"><a class="btn gold" href="black-market.html">Entra gratis · 1000 BC</a><a class="btn ghost" href="#come">Come funziona</a></div>
+  <div class="row" id="heroCta"><a class="btn gold" href="black-market.html">Entra gratis · 1000 BC</a><a class="btn ghost" href="faq.html">Come funziona</a></div>
  </header>
 
  <section class="sec" id="live" aria-labelledby="live-h">
@@ -84,84 +93,15 @@
   <div id="lvBody"><div class="stats" aria-hidden="true"><div class="sk" style="height:62px"></div><div class="sk" style="height:62px"></div><div class="sk" style="height:62px"></div><div class="sk" style="height:62px"></div></div><div class="lv"><div class="sk"></div><div class="sk"></div></div></div>
  </section>
 
- <section class="sec" id="come"><h2>Inizia in 3 passi</h2>
-  <ol class="flow"><li>Crea il profilo</li><li>Sfida qualcuno</li><li>Guadagna BC</li></ol>
-  <p style="margin:0">Profilo dal <a href="black-market.html">Black Market</a> con <b>1000 BC</b> di benvenuto: con lo stesso account giochi a tutto. Torneo, Match Pro e Deck Analyzer funzionano anche senza account.</p>
-
-  <details class="how"><summary>🎯 Come mettere una taglia</summary><div>
-   <ul class="qk">
-    <li><i>1</i><span><b>Attiva «Accetto taglie su di me»</b><small>Black Market → «Il mio profilo e le taglie» → Salva</small></span></li>
-    <li><i>2</i><span><b>Il bersaglio deve averlo attivato</b><small>Elenco vuoto = nessuno l’ha ancora fatto</small></span></li>
-    <li><i>3</i><span><b>Scegli bersaglio e importo</b><small>Da 50 a 500 BC</small></span></li>
-   </ul>
-   <div class="row" style="margin-top:12px"><a class="btn gold sm" href="black-market.html#/new">Metti una taglia</a></div>
-  </div></details>
-
-  <details class="how"><summary>💰 Black Market</summary><div>
-   <ul class="qk two">
-    <li><i>🎁</i><span><b>1000 BC</b> all’ingresso</span></li>
-    <li><i>🏆</i><span><b>+30 BC</b> a evento</span></li>
-    <li><i>🎯</i><span>Taglie <b>50–500 BC</b></span></li>
-    <li><i>💥</i><span>Batti il bersaglio: <b>incassi</b></span></li>
-    <li><i>🔒</i><span>BC <b>solo virtuali</b></span></li>
-    <li><i>🤝</i><span><b>+200 BC</b> per ogni amico invitato</span></li>
-   </ul>
-   <div class="row" style="margin-top:12px"><a class="btn gold sm" href="black-market.html">Apri il Black Market</a></div>
-  </div></details>
-
-  <details class="how"><summary>⚔️ Ladder</summary><div>
-   <ol class="flow"><li>Sfida</li><li>Accetta</li><li>Duello</li><li>Conferma</li></ol>
-   <p class="mute" style="margin:0 0 10px;font-size:.9rem">Formati <b>Advanced</b> ed <b>Edison</b>, con Elo separato.</p>
-   <ul class="qk two">
-    <li><i>✍️</i><span><b>1 solo</b> inserisce il risultato</span></li>
-    <li><i>✅</i><span>L’altro <b>conferma</b></span></li>
-    <li><i>🏅</i><span>Vittoria: <b>+20 BC</b> e Elo</span></li>
-    <li><i>📋</i><span>Match WPA <b>automatico</b></span></li>
-    <li><i>🎯</i><span>Normale, <b>taglia</b> o entrambe</span></li>
-    <li><i>⛔</i><span>Max <b>3 premi</b>/giorno</span></li>
-   </ul>
-   <div class="row" style="margin-top:12px"><a class="btn gold sm" href="black-market.html#/ladder">Vai alla Ladder</a></div>
-  </div></details>
-
-  <details class="how"><summary>🛡️ La guerra degli Eroi</summary><div>
-   <ul class="qk two">
-    <li><i>⚡</i><span><b>Energia 100</b><small>ricarica in 8 ore</small></span></li>
-    <li><i>🆙</i><span><b>3 punti</b> a livello</span></li>
-    <li><i>🐉</i><span><b>Raid settimanale</b><small>un boss per tutto il Tempio · premi per danni</small></span></li>
-    <li><i>🥊</i><span><b>Arena</b><small>tra eroi · leghe e stagioni</small></span></li>
-   </ul>
-   <h3 class="h3">🏰 100 Dungeon e Torre Infinita</h3>
-   <ul class="qk two">
-    <li><i>👥</i><span><b>1–4</b> giocatori</span></li>
-    <li><i>💰</i><span>Premi in <b>BC</b></span></li>
-    <li><i>🎖️</i><span><b>Epico</b> ogni 5</span></li>
-    <li><i>🔓</i><span>Sblocco <b>in ordine</b></span></li>
-   </ul>
-   <ul class="pills"><li>🛡️ Tank</li><li>⚔️ Danni</li><li>💚 Supporto</li></ul>
-   <div class="row" style="margin-top:12px"><a class="btn gold sm" href="eroi.html">Il mio eroe</a></div>
-  </div></details>
-
-  <details class="how"><summary>🎖️ Badge</summary><div>
-   <ul class="qk two">
-    <li><i>🏅</i><span><b>140+</b> traguardi</span></li>
-    <li><i>🥉</i><span>Bronzo → <b>Leggenda</b></span></li>
-    <li><i>🤖</i><span>Assegnati in automatico</span></li>
-    <li><i>📲</i><span>Si <b>condividono</b> su WhatsApp</span></li>
-   </ul>
-   <div class="row" style="margin-top:12px"><a class="btn gold sm" href="sentiero.html">Vai al Sentiero</a></div>
-  </div></details>
+ <section class="sec" aria-labelledby="go-h"><h2 id="go-h">Vai a</h2>
+  <div class="hm-go">
+   <a class="hm-t bm" href="black-market.html"><i aria-hidden="true">◈</i><b>Black Market</b><small>Taglie, Ladder, badge</small></a>
+   <a class="hm-t" href="eroi.html"><i aria-hidden="true">⚜</i><b>Eroi</b><small>Raid, dungeon, Torre, Mappa</small></a>
+   <a class="hm-t" href="gestisci-torneo.html"><i aria-hidden="true">♜</i><b>Torneo</b><small>Swiss e classifica</small></a>
+   <a class="hm-t" href="match-pro.html"><i aria-hidden="true">⏱</i><b>Match Pro</b><small>Life Points e timer</small></a>
+  </div>
+  <a class="hm-faq" href="faq.html"><i aria-hidden="true">?</i><span><b>Come funziona?</b><small>BC, taglie, Ladder, badge ed Eroi: tutte le risposte nelle FAQ</small></span><em aria-hidden="true">›</em></a>
  </section>
-
- <section class="sec"><h2>Gli strumenti</h2>
-  <div class="tools">
-   <a class="tool" href="sentiero.html"><h3>Il Sentiero</h3><p>Badge, libretto e campionato.</p></a>
-   <a class="tool bm" href="black-market.html"><h3>Black Market</h3><p>Taglie, Most Wanted e Ladder.</p></a>
-   <a class="tool" href="eroi.html"><h3>La guerra degli Eroi</h3><p>Eroe, boss, Arena e 100 dungeon.</p></a>
-   <a class="tool" href="duel-simulator.html"><h3>Duel Simulator</h3><p>Duelli 1 contro 1 al meglio di 3.</p></a>
-   <a class="tool" href="gestisci-torneo.html"><h3>Gestisci torneo</h3><p>Swiss, tavoli e classifica.</p></a>
-   <a class="tool" href="match-pro.html"><h3>Match Pro</h3><p>Life Points e timer.</p></a>
-   <a class="tool" href="deck-analyzer.html"><h3>Deck Analyzer</h3><p>Probabilità e mani simulate.</p></a>
-  </div></section>
 </main>
 
 <div class="dock" id="dock" hidden></div>
@@ -260,6 +200,6 @@
   }).catch(function () { document.getElementById('live').hidden = true; });
 })();
 </script>
-<script src="tempio.js?v=15"></script>
+<script src="tempio.js?v=16"></script>
 <script src="tempio-notifiche.js?v=2"></script>
 </body></html>

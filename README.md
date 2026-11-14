@@ -784,5 +784,12 @@ Le statistiche degli oggetti del mercante seguono ora la stessa curva dei dungeo
 - Il pulsante **«Sali al piano N»** è dentro la scena, in basso, con energia e stima di vittoria; durante la salita sparisce e compare «Salta». La scheda del nemico (statistiche, tratto, descrizione) è sotto la scena. Con "riduci movimento" attivo nel telefono si torna al riepilogo classico senza animazione.
 - File: `eroi-torre-scena.js` (nuovo, v=2), `eroi-torre.js` (v=2), `eroi.html`, `sw.js`.
 
+## App più semplice: barra in basso, Home sfoltita, FAQ (14 novembre 2026, nessuna migrazione)
+- **Smartphone**: niente più menu ☰. In alto una barra sottile con il nome della pagina; **in basso la barra delle app** con Home, Black Market, Eroi, Strumenti e FAQ. «Strumenti» apre un foglio dal basso con Duel Simulator, Gestisci torneo, Match Pro, Deck Analyzer e «Installa l'app». I pulsanti e gli avvisi fissati in basso (barra della Home, chat degli Eroi, avvisi) salgono sopra la barra; a tavolo pieno nel Duel Simulator la barra si nasconde. Computer e tablet larghi: resta il menu a sinistra, con la voce FAQ.
+- **Il Sentiero e Invita amici** non sono più nel menu globale: stanno tra le Sezioni del Black Market (Il Sentiero in «Competizioni», con «‹ Black Market» per tornare).
+- **Home sfoltita**: logo, vetrina «Adesso nel Tempio», quattro scorciatoie e il riquadro «Come funziona?» che porta alle FAQ. Le spiegazioni (passi, taglie, Black Market, Ladder, Eroi, dungeon, badge) sono passate nelle FAQ.
+- **FAQ** (`faq.html`, nuova): domande e risposte per argomento (Per iniziare, Black Market e BC, Taglie, Ladder, Sentiero, Eroi, Raid/Arena/Dungeon/Torre, Stagno, Mappa e Villaggi, Strumenti, Problemi), ricerca istantanea, scorciatoie per argomento e link diretti alle singole domande (`faq.html#come-funziona-l-energia`).
+- File: `tempio.js` (v=16), `tempio.css` (v=11), `faq.html` (nuova), `index.html`, `black-market.html`, `sentiero.html`, `sw.js` e le altre pagine (solo il numero di versione di tempio.css/tempio.js).
+
 ## Nota sui rischi
 Le taglie possono essere usate per prendere di mira qualcuno: per questo si ricevono solo con consenso. Nomina almeno due admin e leggi le contestazioni. Due amici possono accordarsi per far riscuotere una taglia a uno dei due: il tetto di 500 BC, la revisione admin e (per i match Ladder) l'attesa di 24 ore la limitano, non la eliminano.
