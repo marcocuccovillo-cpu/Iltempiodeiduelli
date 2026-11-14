@@ -630,6 +630,15 @@ html.er-page body{padding-bottom:var(--erd)}
 .twt-cl b{max-width:66px;font:700 .68rem var(--ui);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.twt-cl small{font-size:.6rem;color:var(--mu)}.twt-cl.me b{color:var(--gold)}
 .twt-team{position:absolute;right:8px;top:6px;padding:2px 8px;border-radius:99px;background:rgba(127,227,176,.16);border:1px solid #7fe3b0;color:#b9f5d6;font:700 .64rem var(--ui)}
 .twt-gap{padding:3px 0;text-align:center;font:600 .68rem var(--ui);color:var(--mu);background:repeating-linear-gradient(90deg,#0c0a16 0 22px,#12101e 22px 44px)}.twt-gap.base{padding:6px 0;color:#ffe7a8}
+
+/* dungeon: banner delle schede e palco della spedizione */
+.dg-card{overflow:hidden}.dg-banw{position:relative;margin:-14px -14px 10px;height:92px;background:#0c0a16}
+.dg-ban{display:block;width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
+.dg-bno{position:absolute;left:10px;top:8px;padding:2px 9px;border-radius:99px;background:rgba(10,8,20,.75);border:1px solid rgba(255,255,255,.2);color:#ffe7a8;font:700 .72rem Cinzel,Georgia,serif}
+.dg-bth{position:absolute;left:10px;bottom:8px;color:#fff;font:600 .7rem var(--ui);opacity:.85;text-shadow:0 1px 3px #000}
+.dg-stage{position:fixed;inset:0;z-index:2000;background:#05040c;display:grid;place-items:center;animation:mpUp .25s ease-out}
+.dg-stw{position:relative;width:min(100vw,560px);height:min(100dvh,860px)}.dg-sth{position:absolute;inset:0}.dg-sth canvas{display:block;image-rendering:pixelated}
+.dg-skip{position:absolute;right:12px;top:calc(10px + env(safe-area-inset-top,0px));z-index:2;padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(10,8,20,.75);color:#fff;font:600 .82rem var(--ui);cursor:pointer}
 </style></head><body>
 
 <script>document.documentElement.classList.add('er-page')</script>
@@ -664,6 +673,7 @@ html.er-page body{padding-bottom:var(--erd)}
 <script src="eroi-torre.js?v=3"></script>
 <script src="eroi-pet.js?v=2"></script>
 <script src="eroi-torre-scena.js?v=4"></script>
+<script src="eroi-dungeon.js?v=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 (function(){'use strict';
@@ -1148,7 +1158,8 @@ function dngCard(d,can,prev){
  else if(!d.level_ok)act=`<p class="er-note" style="margin:0">Serve il livello ${num(d.min_level)} (tu sei al ${num(m.level)}).</p>`;
  else act=`<div class="row"><button class="btn" data-dsolo="${d.no}" ${can?'':'disabled'}>⚔️ Parti da solo</button><button class="btn ghost" data-dnew="${d.no}" ${can?'':'disabled'}>👥 Crea lobby</button></div>`;
  return `<article class="card dg-card ${lock?'lock':''}${pth?' dg-path':''}" aria-label="Dungeon ${d.no}: ${esc(d.name)}">
-  <div class="dg-h"><div style="min-width:0"><div class="dg-no">Dungeon ${d.no}</div><h3>${esc(d.emoji)} ${esc(d.name)}</h3></div>${chip}</div>
+  ${window.DungeonArt?`<div class="dg-banw"><canvas class="dg-ban" data-dgb="${d.no}"${lock?' data-lock="1"':''} width="640" height="180" aria-hidden="true"></canvas><span class="dg-bno">Dungeon ${d.no}</span><span class="dg-bth">${esc(DungeonArt.theme(d).name)}</span></div>`:''}
+  <div class="dg-h"><div style="min-width:0">${window.DungeonArt?'':`<div class="dg-no">Dungeon ${d.no}</div>`}<h3>${esc(d.emoji)} ${esc(d.name)}</h3></div>${chip}</div>
   <div class="dg-meta"><span>Livello consigliato <b>${num(d.ref_level)}</b>${d.min_level>1?` · minimo ${num(d.min_level)}`:''}</span>${pth?`<span><b>${d.forks}</b> bivi · finali scoperti <b>${d.endings_found}/${d.endings_total}</b></span>`:`<span><b>${d.rooms.length}</b> stanze</span>`}</div>
   ${lock?'':`<p class="mute" style="margin:0;font-size:.9rem">${esc(d.lore)}</p>`}
   ${!lock&&d.inter&&d.inter.length?`<div class="dg-inter" aria-label="Interazioni di questo dungeon">${d.inter.filter(k=>INTER[k]).map(k=>`<span class="chip" title="${esc(INTER[k][2])}">${INTER[k][0]} ${INTER[k][1]}</span>`).join('')}</div>`:''}
@@ -1241,9 +1252,26 @@ function renderDng(){
   <h2 class="er-h">Da completare</h2>
   ${todoHtml}
   <div style="margin-top:20px">${faqLink('come-funzionano-i-dungeon','Come funzionano i dungeon')}</div>`;
- paintDut()}
+ paintDut();dngBanners()}
 function paintDut(){document.querySelectorAll('[data-dut]').forEach(e=>{const t=new Date(e.dataset.dut).getTime()-Date.now();e.textContent=t>0?fmtDur(t/1000):'scaduta'})}
-function dngModal(res,no){
+/* banner dei dungeon: si disegnano solo quando entrano nello schermo */
+let dgIO=null;
+function dngBanners(){if(!window.DungeonArt||!DS)return;const paint=cv=>{if(cv.dataset.done)return;cv.dataset.done=1;const d=DS.dungeons.find(x=>x.no===Number(cv.dataset.dgb));if(d)try{DungeonArt.banner(cv,d,!!cv.dataset.lock)}catch(e){console.error(e)}};
+ if(!dgIO&&'IntersectionObserver' in window)dgIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){dgIO.unobserve(e.target);paint(e.target)}}),{rootMargin:'300px'});
+ document.querySelectorAll('canvas[data-dgb]:not([data-done])').forEach(cv=>dgIO?dgIO.observe(cv):paint(cv))}
+/* la spedizione animata (eroi-dungeon.js), poi il riepilogo */
+async function dngModal(res,no){
+ const rooms=res&&res.rooms||[];
+ if(!window.DungeonScena||!rooms.length||matchMedia('(prefers-reduced-motion: reduce)').matches)return dngResult(res,no);
+ const d=(DS&&DS.dungeons||[]).find(x=>x.no===no)||{no,name:'Dungeon',emoji:'🏰',rooms:[]};
+ try{await loadLooks((res.members||[]).map(x=>x.user_id))}catch(_){}
+ const ov=document.createElement('div');ov.className='dg-stage';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','Spedizione in corso');ov.innerHTML='<div class="dg-stw"><div class="dg-sth"></div><button type="button" class="dg-skip">Salta ⏩</button></div>';
+ document.body.appendChild(ov);
+ try{const looks={};(res.members||[]).forEach(x=>looks[x.user_id]=x.user_id===ME.user_id?(MYLOOK||{}):(LOOKS[x.user_id]||{}));
+  const S=DungeonScena.play(ov.querySelector('.dg-sth'),{dungeon:d,res,me:ME.user_id,looks,pet:ST&&ST.me&&ST.me.pet});ov.querySelector('.dg-skip').onclick=()=>S.skip();await S.done}
+ catch(e){console.error(e)}
+ ov.remove();dngResult(res,no)}
+function dngResult(res,no){
  const d=(DS&&DS.dungeons||[]).find(x=>x.no===no)||{name:'Dungeon',emoji:'🏰'},mem=res.members||[],me=mem.find(x=>x.user_id===ME.user_id),win=!!res.win,S=DS||{};
  const rooms=(res.rooms||[]).map(r=>`<details class="dg-rm ${r.cleared?'ok':'ko'}" ${(!r.cleared||r.boss)?'open':''}><summary><span>${r.cleared?'✅':'❌'} ${r.no}. ${esc(r.emoji)} ${esc(r.name)}${r.boss?' · BOSS':''}</span><small>${num(r.rounds)} round</small></summary>
   <div>${r.members.map(x=>`<p style="margin:4px 0"><b>${esc(x.nickname)}</b> ${ROLES[x.role]?ROLES[x.role][1]:''}<small>Danni ${num(x.dealt)} · subiti ${num(x.taken)}${x.healed?` · cure ${num(x.healed)}`:''} · ${x.ko?'KO':num(x.hp)+' / '+num(x.max_hp)+' PV'}</small></p>`).join('')}</div></details>`).join('');
