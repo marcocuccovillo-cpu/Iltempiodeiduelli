@@ -639,6 +639,17 @@ html.er-page body{padding-bottom:var(--erd)}
 .dg-stage{position:fixed;inset:0;z-index:2000;background:#05040c;display:grid;place-items:center;animation:mpUp .25s ease-out}
 .dg-stw{position:relative;width:min(100vw,560px);height:min(100dvh,860px)}.dg-sth{position:absolute;inset:0}.dg-sth canvas{display:block;image-rendering:pixelated}
 .dg-skip{position:absolute;right:12px;top:calc(10px + env(safe-area-inset-top,0px));z-index:2;padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(10,8,20,.75);color:#fff;font:600 .82rem var(--ui);cursor:pointer}
+
+/* spedizione a scelte dal vivo */
+.dg-live{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#0c0a16;box-shadow:0 14px 34px rgba(0,0,0,.5)}
+.dg-lvst{position:relative;height:clamp(250px,40vh,400px);background:#05040c}.dg-lvsc{position:absolute;inset:0}.dg-lvsc canvas{display:block;image-rendering:pixelated}
+.dg-lvtop{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:6px;padding:8px 10px 18px;background:linear-gradient(180deg,rgba(0,0,0,.75),transparent);color:#fff;pointer-events:none}
+.dg-lvtop b{flex:1;min-width:0;font:700 .9rem Cinzel,Georgia,serif;color:#ffe7a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dg-lvtop span{flex:none;padding:2px 8px;border-radius:99px;background:rgba(10,8,20,.75);border:1px solid rgba(255,255,255,.2);font:700 .72rem var(--ui)}.dg-lvtop .low{border-color:#ff6b7a;color:#ffb4bc}
+.dg-lvfl{position:absolute;left:8px;right:8px;bottom:6px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;pointer-events:none}.dg-lvfl .chip{flex:none;background:rgba(10,8,20,.8)}
+.dg-lvpn{display:grid;gap:10px;padding:12px;border-top:2px solid rgba(255,255,255,.08);transition:opacity .25s}
+.dg-lvpn .dg-sc{margin:0}.dg-lvpn .dg-sc h3{margin:0 0 4px}
+.dg-live.busy .dg-lvpn{opacity:.35;pointer-events:none}
 </style></head><body>
 
 <script>document.documentElement.classList.add('er-page')</script>
@@ -673,7 +684,7 @@ html.er-page body{padding-bottom:var(--erd)}
 <script src="eroi-torre.js?v=3"></script>
 <script src="eroi-pet.js?v=2"></script>
 <script src="eroi-torre-scena.js?v=4"></script>
-<script src="eroi-dungeon.js?v=1"></script>
+<script src="eroi-dungeon.js?v=2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 (function(){'use strict';
@@ -1171,6 +1182,38 @@ function pathLog(L){return (L||[]).map(x=>{
  if(x.k==='l')return `<li>🔐 <b>${esc(x.l)}</b> <small class="mute">${x.ok?'giusto':'sbagliato'}</small>${x.r?`<br>${esc(x.r)}`:''}</li>`;
  if(x.k==='t')return `<li>⏳ ${esc(x.r)}</li>`;
  return `<li>${x.win?'⚔️ Scontro vinto':'💀 Scontro perso'}: ${esc(x.em||'')} ${esc(x.e)}${x.boss?' · BOSS':''}</li>`}).join('')}
+/* ---- spedizione a scelte dal vivo: il palco resta acceso e anima ogni novità della cronaca ---- */
+let DGL=null,dgBusy=false;
+function dngLiveStop(){if(DGL){try{DGL.S.stop()}catch(_){}DGL=null}dgBusy=false}
+async function dngLiveRun(L){   // anima le voci nuove della cronaca, una dopo l'altra
+ const S=DGL&&DGL.S;if(!S||!L.length)return;dgBusy=true;const lv=$('dgLive');if(lv)lv.classList.add('busy');
+ try{for(const x of L){if(!DGL||DGL.S!==S)return;
+   if(x.k==='c'){S.caption('➤ '+x.l+(x.w?' ('+x.w+')':''),null,'#ffe7a8',1500);await S.walk(900);if(x.chk)await S.dice(STAT_IT[x.chk.s]||x.chk.s,x.chk.p,!!x.chk.ok);if(x.r){S.caption(x.r);await S.wait(Math.min(2600,900+x.r.length*18))}}
+   else if(x.k==='l'){S.caption(x.ok?'🔐 Codice giusto: la serratura scatta!':'🔐 Codice sbagliato.',x.ok?'#4ade9b':'#ff6b7a');await S.wait(1100);if(x.r){S.caption(x.r);await S.wait(1400)}}
+   else if(x.k==='t'){S.caption('⏳ '+x.r,'#ffd36b');await S.wait(1300)}
+   else{await S.fight({name:x.e,emoji:x.em,boss:!!x.boss,cleared:!!x.win,rounds:x.rounds},DGL.fights++,0,DGL.fights);}}}
+ catch(e){console.error(e)}
+ finally{dgBusy=false;const l2=$('dgLive');if(l2)l2.classList.remove('busy');if(DGL&&DS&&DS.active)try{DGL.S.party(DS.active.members)}catch(_){}}}
+function dngLiveMount(d,A){const h=$('dgLvSc');if(!h)return;
+ if(DGL&&DGL.run!==A.run_id)dngLiveStop();
+ if(!DGL){const looks={};A.members.forEach(x=>looks[x.user_id]=x.user_id===ME.user_id?(MYLOOK||{}):(LOOKS[x.user_id]||{}));
+  try{DGL={run:A.run_id,seen:(A.log||[]).length,fights:(A.log||[]).filter(x=>!['c','l','t'].includes(x.k)).length,S:DungeonScena.live(h,{dungeon:d,members:A.members,me:ME.user_id,looks,pet:ST.me.pet})}}catch(e){console.error(e);return}
+  loadLooks(A.members.map(x=>x.user_id)).catch(()=>{});return}
+ DGL.S.attach(h);
+ const L=(A.log||[]).slice(DGL.seen);DGL.seen=(A.log||[]).length;
+ if(L.length)(DGL.q=(DGL.q||Promise.resolve()).then(()=>dngLiveRun(L)));else if(!dgBusy)DGL.S.party(A.members)}
+/* fine della spedizione a scelte: anima ciò che manca, poi l'esito sul palco */
+async function dngLiveEnd(res){if(!DGL)return false;const S=DGL.S,L=(res.story||[]).slice(DGL.seen);DGL.seen=(res.story||[]).length;
+ try{await (DGL.q||Promise.resolve());await dngLiveRun(L);dgBusy=true;const me=(res.members||[]).find(x=>x.user_id===ME.user_id);
+  if(res.ending&&res.ending.title){S.caption(res.ending.title,res.win?'#ffd36b':'#ff6b7a','#ffe7a8',2000);await S.wait(900)}
+  await S.finale(!!res.win,me?(res.win?`+${num(me.bc)} BC · +${num(me.xp)} XP`:`+${num(me.xp)} XP di consolazione`):'')}catch(e){console.error(e)}
+ dngLiveStop();return true}
+async function dngChosen(r){   // dopo una scelta: se la spedizione è finita si chiude sul palco, altrimenti si aggiorna
+ if(r.expired){say('La spedizione è stata data per fallita: nessuno aveva più deciso.','bad')}
+ if(r.result)seenSet(r.run_id);
+ const onStage=r.result?await dngLiveEnd(r.result):false;
+ await load(true);await loadDng(true);
+ if(r.result){if(onStage)dngResult(r.result,r.dungeon_no);else dngModal(r.result,r.dungeon_no)}}
 function renderPath(){
  const S=DS,A=S.active,m=ST.me,d=S.dungeons.find(x=>x.no===A.dungeon_no)||{name:'Dungeon',emoji:'🏰'},leader=A.leader_id===m.user_id,sc=A.scene,ldr=A.members.find(x=>x.user_id===A.leader_id);
  const mem=A.members.map(x=>`<div class="dg-mem"><div class="av" aria-hidden="true">${face(x.user_id,x.nickname)}</div><div style="min-width:0"><b>${esc(x.nickname)}</b>${x.user_id===A.leader_id?' <span class="chip s">Capo</span>':''}<div class="er-hp me sm" style="margin-top:4px"><i style="width:${x.max_hp?Math.max(0,100*x.hp/x.max_hp):0}%"></i><span>${num(x.hp)} / ${num(x.max_hp)}</span></div></div><span class="dg-role">${ROLES[x.role]?ROLES[x.role][1]+' '+ROLES[x.role][0]:''}</span></div>`).join('');
@@ -1195,22 +1238,33 @@ function renderPath(){
    <p class="er-note" style="margin:8px 0 0">Tentativi rimasti: <b>${num(L.tries_left)}</b> · Tocca ${L.len} simboli nell’ordine che pensi sia giusto.</p>
    ${leader?`<div class="dg-btns"><button class="btn gold" data-lksend="1" ${full&&L.tries_left>0?'':'disabled'}>🔐 Prova il codice</button><button class="btn ghost" data-lkclr="1" ${lkSel.length?'':'disabled'}>Azzera</button></div>`:''}</div>`}
  const clk=A.clock?`<div class="dg-clock${A.clock.left<=2?' low':''}" role="progressbar" aria-valuemin="0" aria-valuemax="${A.clock.total}" aria-valuenow="${Math.max(0,A.clock.left)}" aria-label="Tempo rimasto"><span>⏳ Tempo</span><div class="dg-clk-bar"><i style="width:${A.clock.total?Math.max(0,100*A.clock.left/A.clock.total):0}%"></i></div><b>${Math.max(0,A.clock.left)} / ${A.clock.total}</b></div>`:'';
- $('p-dng').innerHTML=`<h2 class="er-h">${esc(d.emoji||'')} ${esc(d.name)}</h2><p class="er-sub">Dungeon a scelte · ogni decisione conta, e qualcuna porta dritta al fallimento. Decide il capo gruppo${leader?' (sei tu)':ldr?`: <b>${esc(ldr.nickname)}</b>`:''}.</p>
+ const LV=!!(window.DungeonScena&&DungeonScena.live);
+ const hud=`<div class="dg-lvtop"><b>${esc(d.emoji||'')} ${esc(d.name)}</b><span>⚡ ${pwt}</span>${A.clock?`<span class="${A.clock.left<=2?'low':''}">⏳ ${Math.max(0,A.clock.left)}/${A.clock.total}</span>`:''}</div>`;
+ const body=`${sc?`<div class="dg-sc" role="group" aria-label="Scena"><h3>${esc(sc.type==='lock'?'🔐 '+sc.title:sc.title)}</h3><p>${esc(sc.text)}</p></div>
+   ${sc.type==='lock'?lockUi:`<div class="dg-opts" role="group" aria-label="Le tue scelte">${opts}</div>`}
+   <p class="er-note">${leader?`Scegli con cura: non si torna indietro. Alcune scelte restano bloccate finché non trovi l’indizio giusto${A.clock?'; ogni scelta consuma tempo':''}.`:`Sta scegliendo ${ldr?esc(ldr.nickname):'il capo gruppo'}: la schermata si aggiorna da sola.`} Se nessuno decide entro <b data-dut="${esc(A.expires_at)}">…</b>, la spedizione viene data per fallita.</p>`:''}
+   ${leader?`<div class="dg-btns"><button class="btn ghost sm" id="dgAbandon">${pending==='abandon'?'Conferma: ritirarsi e fallire':'🏳️ Ritirati'}</button></div>`:''}`;
+ $('p-dng').innerHTML=LV?`<section class="dg-live${dgBusy?' busy':''}" id="dgLive" aria-label="Spedizione in corso">
+   <div class="dg-lvst"><div class="dg-lvsc" id="dgLvSc"></div>${hud}${flags?`<div class="dg-lvfl" aria-label="Indizi trovati">${flags}</div>`:''}</div>
+   <div class="dg-lvpn">${body}</div></section>
+  <p class="er-sub" style="margin-top:10px">Dungeon a scelte · decide il capo gruppo${leader?' (sei tu)':ldr?`: <b>${esc(ldr.nickname)}</b>`:''}.</p>
+  ${fold('dng_party','👥','Il gruppo','Punti vita e ruoli',A.members.length,mem)}
+  ${A.log&&A.log.length?fold('dng_log','📜','Cronaca','Cosa è successo finora',A.log.length,`<ul class="dg-log">${pathLog(A.log)}</ul>`):''}`
+ :`<h2 class="er-h">${esc(d.emoji||'')} ${esc(d.name)}</h2><p class="er-sub">Dungeon a scelte · ogni decisione conta, e qualcuna porta dritta al fallimento. Decide il capo gruppo${leader?' (sei tu)':ldr?`: <b>${esc(ldr.nickname)}</b>`:''}.</p>
   <section class="card dg-path" aria-label="Spedizione in corso">
    <div class="row" style="justify-content:space-between"><span>Potenza della spedizione</span><b>${pwt}</b></div>
    ${clk}
    ${flags?`<div class="dg-flags" aria-label="Indizi trovati">${flags}</div>`:''}
    ${mem}
-   ${sc?`<div class="dg-sc" role="group" aria-label="Scena"><h3>${esc(sc.type==='lock'?'🔐 '+sc.title:sc.title)}</h3><p>${esc(sc.text)}</p></div>
-   ${sc.type==='lock'?lockUi:`<div class="dg-opts" role="group" aria-label="Le tue scelte">${opts}</div>`}
-   <p class="er-note">${leader?`Scegli con cura: non si torna indietro. Alcune scelte restano bloccate finché non trovi l’indizio giusto${A.clock?'; ogni scelta consuma tempo':''}.`:`Sta scegliendo ${ldr?esc(ldr.nickname):'il capo gruppo'}: la schermata si aggiorna da sola.`} Se nessuno decide entro <b data-dut="${esc(A.expires_at)}">…</b>, la spedizione viene data per fallita.</p>`:''}
-   ${leader?`<div class="dg-btns"><button class="btn ghost sm" id="dgAbandon">${pending==='abandon'?'Conferma: ritirarsi e fallire':'🏳️ Ritirati'}</button></div>`:''}
+   ${body}
   </section>
   ${A.log&&A.log.length?`<h2 class="er-h">Cronaca</h2><div class="card"><ul class="dg-log">${pathLog(A.log)}</ul></div>`:''}`;
+ if(LV)dngLiveMount(d,A);
  paintDut()}
 function renderDng(){
  if(!DS){$('p-dng').innerHTML='<p class="mute">Caricamento…</p>';return}
  if(DS.active){renderPath();return}
+ if(DGL&&!dgBusy)dngLiveStop();
  const m=ST.me,S=DS,ev=enNow(),canE=ev>=S.cost,my=S.my_run,leader=!!my&&my.leader_id===m.user_id,perHour=ST.energy.per_hour;lastDngCan=canE;
  const dn=no=>S.dungeons.find(x=>x.no===no)||{name:'Dungeon',emoji:'🏰',open:false,level_ok:false,min_level:1};
  const me=my?my.members.find(x=>x.user_id===m.user_id):null,cur=me?me.role:dngRole;
@@ -2385,12 +2439,8 @@ document.addEventListener('click',e=>{
  if(t.dataset.dpickx){pickOpt=null;renderDng();return}
  if(t.dataset.lk!=null&&t.dataset.lk!==''){const L=DS.active&&DS.active.scene&&DS.active.scene.lock;if(L&&lkSel.length<L.len){lkSel.push(Number(t.dataset.lk));renderDng()}return}
  if(t.dataset.lkclr){lkSel=[];renderDng();return}
- if(t.dataset.lksend){const code=lkSel.join(',');dngRun(t,async()=>{lkSel=[];const r=await rpc('game_dungeon_choose',{p_run:DS.active.run_id,p_option:'lock',p_arg:code});
-   if(r.expired){say('La spedizione è stata data per fallita: nessuno aveva più deciso.','bad')}
-   if(r.result)seenSet(r.run_id);await load(true);await loadDng(true);if(r.result)dngModal(r.result,r.dungeon_no)});return}
- if(t.dataset.dchoose){pickOpt=null;dngRun(t,async()=>{const a={p_run:DS.active.run_id,p_option:t.dataset.dchoose};if(t.dataset.darg)a.p_arg=t.dataset.darg;const r=await rpc('game_dungeon_choose',a);
-   if(r.expired){say('La spedizione è stata data per fallita: nessuno aveva più deciso.','bad')}
-   if(r.result)seenSet(r.run_id);await load(true);await loadDng(true);if(r.result)dngModal(r.result,r.dungeon_no)});return}
+ if(t.dataset.lksend){const code=lkSel.join(',');dngRun(t,async()=>{lkSel=[];const r=await rpc('game_dungeon_choose',{p_run:DS.active.run_id,p_option:'lock',p_arg:code});await dngChosen(r)});return}
+ if(t.dataset.dchoose){pickOpt=null;dngRun(t,async()=>{const a={p_run:DS.active.run_id,p_option:t.dataset.dchoose};if(t.dataset.darg)a.p_arg=t.dataset.darg;const r=await rpc('game_dungeon_choose',a);await dngChosen(r)});return}
  if(t.id==='twGo'){run(t,async()=>{const r=await rpc('game_tower_climb');clearSay();
   if(TWS&&!matchMedia('(prefers-reduced-motion: reduce)').matches){TWLAST=null;const inf=$('twInf');if(inf){inf.classList.add('fight');inf.classList.remove('has-res');const ir=inf.querySelector('.tw-ir');if(ir)ir.remove()}twBusy=true;const hud=$('twHud');if(hud)hud.hidden=true;const sk=$('twSkipA');if(sk){sk.hidden=false;sk.onclick=()=>TWS&&TWS.skip()}
    const pv=document.querySelector('.tw-pov');if(pv&&pv.scrollIntoView)try{pv.scrollIntoView({block:'start',behavior:'smooth'})}catch(_){}
@@ -2399,7 +2449,7 @@ document.addEventListener('click',e=>{
   else{await load(true);await loadTower();towerModal(r)}});return}
  if(t.dataset.twlast!==undefined){TWLAST=null;renderTower();return}
  if(t.id==='dgAbandon'){if(pending!=='abandon'){pending='abandon';renderDng();setTimeout(()=>{if(pending==='abandon'){pending=null;if(tab==='dng')renderDng()}},5000);return}
-  pending=null;dngRun(t,async()=>{const r=await rpc('game_dungeon_abandon',{p_run:DS.active.run_id});seenSet(r.run_id);await load(true);await loadDng(true);dngModal(r.result,r.dungeon_no)});return}
+  pending=null;dngRun(t,async()=>{const r=await rpc('game_dungeon_abandon',{p_run:DS.active.run_id});seenSet(r.run_id);const on=r.result?await dngLiveEnd(r.result):false;await load(true);await loadDng(true);if(on)dngResult(r.result,r.dungeon_no);else dngModal(r.result,r.dungeon_no)});return}
  if(t.dataset.djoin){dngRun(t,async()=>{await rpc('game_dungeon_join',{p_run:t.dataset.djoin,p_role:t.dataset.role});say('Sei nella lobby! Aspetta che il capo faccia partire il dungeon.','good');await loadDng(true)});return}
  if(t.id==='dgLeave'){dngRun(t,async()=>{await rpc('game_dungeon_leave',{p_run:DS.my_run.run_id});say('Sei uscito dalla lobby.');await loadDng(true)});return}
  if(t.id==='dgStart'){dngRun(t,async()=>{const r=await rpc('game_dungeon_start',{p_run:DS.my_run.run_id});clearSay();if(r.result)seenSet(r.run_id);await load(true);await loadDng(true);if(r.result)dngModal(r.result,r.dungeon_no)});return}
