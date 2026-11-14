@@ -547,27 +547,26 @@ body.er-fab-on{padding-bottom:88px}
 .pt-go{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.pt-go .badge{font-size:.74rem;font-weight:700;padding:2px 9px;border-radius:99px;border:1px solid var(--ac);color:var(--ac2)}
 
 /* ===== Pagina Eroi: menu del gioco e batteria fissati in basso (al posto della barra globale) ===== */
-html.er-page{--erd:calc(104px + env(safe-area-inset-bottom,0px))}
+html.er-page{--erd:calc(80px + env(safe-area-inset-bottom,0px))}@media(min-width:520px){html.er-page{--erd:calc(90px + env(safe-area-inset-bottom,0px))}}
 html.er-page .tm-tb{display:none!important}
+html.er-page .er-fab{width:46px;height:46px;font-size:1.25rem;right:10px}
 @media(max-width:719px){html.er-page{--tb-h:var(--erd)}}
 html.er-page body{padding-bottom:var(--erd)}
 .er-head{display:none}@media(min-width:720px){.er-head{display:block;margin-bottom:4px}.er-head h1{font-size:1.8rem}}
 #main>.er-sticky{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:940;margin:0;padding:0 0 env(safe-area-inset-bottom,0px);background:rgba(var(--deep-rgb),.97);border-top:1px solid var(--line);border-bottom:0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 -8px 26px rgba(0,0,0,.55)}
 @media(min-width:720px){#main>.er-sticky{left:var(--menu-w)}.er-fab{bottom:calc(var(--erd) + 12px)!important}.er-cp{bottom:calc(var(--erd) + 82px)!important}}
-#main>.er-sticky .er-bat{padding:6px 12px 2px;gap:8px}
+#main>.er-sticky .er-bat{padding:4px 10px 0;gap:8px}
 #main>.er-sticky .er-bat .bt{width:46px;height:20px;border-radius:5px}#main>.er-sticky .er-bat .bt b{font-size:.78rem}#main>.er-sticky .er-bat .nub{height:9px}
 #main>.er-sticky .er-bat .bi{flex:1;min-width:0}#main>.er-sticky .er-bat .bi b{font-size:.8rem}#main>.er-sticky .er-bat .bi small{display:block;font-size:.66rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .er-bbc{flex:none;display:flex;align-items:baseline;gap:3px;padding:3px 9px;border-radius:999px;border:1px solid rgba(232,184,74,.5);background:rgba(232,184,74,.1)}.er-bbc b{font:700 .86rem var(--ui);color:var(--gold)}.er-bbc small{font-size:.66rem;color:var(--gold)}
-#main>.er-sticky .tabs{display:flex!important;gap:0;margin:0;padding:0 2px 2px!important;border:0!important;overflow-x:auto;scrollbar-width:none;position:static;background:none}
-#main>.er-sticky .tabs::-webkit-scrollbar{display:none}
-#main>.er-sticky .tabs{-webkit-mask-image:linear-gradient(90deg,#000 90%,transparent);mask-image:linear-gradient(90deg,#000 90%,transparent)}@media(min-width:900px){#main>.er-sticky .tabs{-webkit-mask-image:none;mask-image:none}}
-#main>.er-sticky .tabs button,#main>.er-sticky .tabs .er-home{position:relative;flex:1 0 60px;min-width:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:58px;padding:2px 4px;border:0;background:none;color:var(--mu);font:600 .68rem var(--ui);text-decoration:none;box-shadow:none;white-space:nowrap}
-#main>.er-sticky .tabs .ti{display:grid;place-items:center;width:40px;height:28px;border-radius:14px;font-size:1.2rem;transition:background .2s}
-#main>.er-sticky .tabs button[aria-selected=true]{color:var(--ac2);box-shadow:none}
-#main>.er-sticky .tabs button[aria-selected=true] .ti{background:rgba(var(--ac-rgb),.24)}
-#main>.er-sticky .tabs .er-home{flex:0 0 58px;border-right:1px solid var(--line)}
-#main>.er-sticky .tabs .tl{font:600 .68rem var(--ui)}#main>.er-sticky .tabs button .ti{filter:none;opacity:.85}#main>.er-sticky .tabs button[aria-selected=true] .ti{opacity:1}
-.lk-prev{position:sticky;top:-14px;z-index:2}
+#main>.er-sticky .tabs{display:grid!important;grid-template-columns:repeat(11,minmax(0,1fr));gap:0;margin:0;padding:0 2px 2px!important;border:0!important;overflow:visible;position:static;background:none}
+#main>.er-sticky .tabs button,#main>.er-sticky .tabs .er-home{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:0;min-height:46px;padding:2px 0;border:0;border-radius:10px;background:none;color:var(--mu);text-decoration:none;box-shadow:none}
+#main>.er-sticky .tabs .ti{display:grid;place-items:center;width:30px;height:24px;border-radius:12px;font-size:1.05rem;line-height:1;filter:none;opacity:.85}
+#main>.er-sticky .tabs .tl{font:600 .56rem var(--ui)!important;letter-spacing:-.02em;max-width:100%;overflow:hidden;text-overflow:clip;white-space:nowrap}
+#main>.er-sticky .tabs button[aria-selected=true]{color:var(--ac2)}
+#main>.er-sticky .tabs button[aria-selected=true] .ti{background:rgba(var(--ac-rgb),.26);opacity:1}
+#main>.er-sticky .tabs .er-home .tl{display:none}#main>.er-sticky .tabs .er-home{border-right:1px solid var(--line);border-radius:0}
+@media(min-width:520px){#main>.er-sticky .tabs .tl{font-size:.7rem!important}#main>.er-sticky .tabs .ti{font-size:1.25rem;width:40px;height:28px}#main>.er-sticky .tabs button,#main>.er-sticky .tabs .er-home{min-height:54px}#main>.er-sticky .tabs .er-home .tl{display:block}}
 .er-faq{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surf);color:var(--ac2);font:600 .88rem var(--ui);text-decoration:none}
 /* ===== cruscotto dell'eroe compatto, con lo sprite ===== */
 .er-top{padding:14px}
@@ -610,7 +609,7 @@ html.er-page body{padding-bottom:var(--erd)}
 
  <div id="main" hidden>
  <div class="er-sticky"><div id="bat"></div>
- <div class="tabs er-nav" role="tablist" aria-label="Sezioni della guerra degli Eroi"><a class="er-home" href="index.html" aria-label="Torna al Tempio"><span class="ti" aria-hidden="true">🏛️</span><span class="tl">Tempio</span></a><button role="tab" data-t="hero" aria-selected="true"><span class="ti" aria-hidden="true">🧙</span><span class="tl">Eroe</span></button><button role="tab" data-t="boss" aria-selected="false"><span class="ti" aria-hidden="true">🐉</span><span class="tl">Boss</span></button><button role="tab" data-t="dng" aria-selected="false"><span class="ti" aria-hidden="true">🏰</span><span class="tl">Dungeon</span></button><button role="tab" data-t="tower" aria-selected="false"><span class="ti" aria-hidden="true">🗼</span><span class="tl">Torre</span></button><button role="tab" data-t="arena" aria-selected="false"><span class="ti" aria-hidden="true">⚔️</span><span class="tl">Arena</span></button><button role="tab" data-t="train" aria-selected="false"><span class="ti" aria-hidden="true">🏋️</span><span class="tl">Allena</span></button><button role="tab" data-t="shop" aria-selected="false"><span class="ti" aria-hidden="true">🛒</span><span class="tl">Mercato</span></button><button role="tab" data-t="pond" aria-selected="false"><span class="ti" aria-hidden="true">🐸</span><span class="tl">Stagno</span></button><button role="tab" data-t="map" aria-selected="false"><span class="ti" aria-hidden="true">🗺️</span><span class="tl">Mappa</span></button><button role="tab" data-t="lb" aria-selected="false"><span class="ti" aria-hidden="true">🏆</span><span class="tl">Top</span></button></div></div>
+ <div class="tabs er-nav" role="tablist" aria-label="Sezioni della guerra degli Eroi"><a class="er-home" href="index.html" aria-label="Torna al Tempio"><span class="ti" aria-hidden="true">🏛️</span><span class="tl">Tempio</span></a><button role="tab" data-t="hero" aria-selected="true"><span class="ti" aria-hidden="true">🧙</span><span class="tl">Eroe</span></button><button role="tab" data-t="boss" aria-selected="false"><span class="ti" aria-hidden="true">🐉</span><span class="tl">Boss</span></button><button role="tab" data-t="dng" aria-selected="false"><span class="ti" aria-hidden="true">🏰</span><span class="tl">Dung.</span></button><button role="tab" data-t="tower" aria-selected="false"><span class="ti" aria-hidden="true">🗼</span><span class="tl">Torre</span></button><button role="tab" data-t="arena" aria-selected="false"><span class="ti" aria-hidden="true">⚔️</span><span class="tl">Arena</span></button><button role="tab" data-t="train" aria-selected="false"><span class="ti" aria-hidden="true">🏋️</span><span class="tl">Allena</span></button><button role="tab" data-t="shop" aria-selected="false"><span class="ti" aria-hidden="true">🛒</span><span class="tl">Merc.</span></button><button role="tab" data-t="pond" aria-selected="false"><span class="ti" aria-hidden="true">🐸</span><span class="tl">Stagno</span></button><button role="tab" data-t="map" aria-selected="false"><span class="ti" aria-hidden="true">🗺️</span><span class="tl">Mappa</span></button><button role="tab" data-t="lb" aria-selected="false"><span class="ti" aria-hidden="true">🏆</span><span class="tl">Top</span></button></div></div>
  <div id="msg" role="status" aria-live="polite"></div>
  <section class="tp" id="p-hero"></section>
  <section class="tp" id="p-boss" hidden></section>
