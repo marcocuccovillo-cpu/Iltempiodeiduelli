@@ -1400,7 +1400,7 @@ async function loadPond(){
  petTab();if(tab==='pond'&&!document.querySelector('.er-ov'))renderPond()}
 function pLines(p){
  return `<ul class="pt-ls">${p.lines.map(l=>{
-  if(p.owned&&l.value>0)return `<li><span>${petLabel(l,l.value)}</span><small>${l.value<l.max?`fino a ${petLabel(l,l.max)} al liv. ${PD.max_level}`:'al massimo'}</small></li>`;
+  if(p.owned&&l.value>0)return `<li><span>${petLabel(l,l.value)}</span><small>${l.value<l.max?`fino a ${petLabel(l,l.max)} al liv. ${l.effect==='fights'?Math.min(100,PD.max_level):PD.max_level}`:'al massimo'}</small></li>`;
   if(p.owned)return `<li class="off"><span>🔒 ${petLabel(l,l.max)}</span><small>si sblocca al livello ${l.unlock}</small></li>`;
   return `<li><span>fino a ${petLabel(l,l.max)}</span><small>${l.unlock>1?`dal livello ${l.unlock} del pet`:'subito'}</small></li>`}).join('')}</ul>`}
 function pXp(p){const cap=Math.min(PD.max_level,PD.hero_level),atcap=p.level>=cap,pct=atcap?100:Math.min(100,Math.round(100*p.xp/p.xp_need));
