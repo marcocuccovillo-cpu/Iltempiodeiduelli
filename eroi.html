@@ -677,6 +677,8 @@ html.er-page body{padding-bottom:var(--erd)}
 .pn-det h3{margin:2px 0 0;font:700 1.15rem Cinzel,Georgia,serif;color:var(--tx)}.pn-det h3 small{font:700 .8rem var(--ui);color:var(--rc,var(--mu))}.pn-det .lore{margin:0;font-size:.86rem;color:var(--mu);font-style:italic}
 .pn-act{width:100%;min-height:50px;font-size:1rem}.pn-on{margin:0;padding:10px 12px;border-radius:12px;background:rgba(127,227,176,.12);border:1px solid #7fe3b0;color:#b9f5d6;font-weight:600;font-size:.9rem;text-align:center}
 @media(prefers-reduced-motion:reduce){.pn-spr{animation:none}}
+
+.rd-rev{display:grid;gap:6px;margin-top:10px;padding:12px;border-radius:14px;border:1px solid rgba(212,168,67,.55);background:rgba(212,168,67,.08)}.rd-rev .btn{min-height:50px;font-size:1rem}.rd-rev small{color:var(--mu);font-size:.8rem;text-align:center}
 </style></head><body>
 
 <script>document.documentElement.classList.add('er-page')</script>
@@ -978,7 +980,8 @@ function renderRaid(){
  if(!m.stats_set)why='Prima assegna i tuoi punti abilità nella scheda <b>Eroe</b>.';
  else if(won)why='Il boss di questa settimana è caduto: il prossimo arriva lunedì.';
  else if(!open)why='Il raid è chiuso: il prossimo arriva lunedì.';
- else if(M.ko)why='Sei KO: un alleato deve curarti, oppure torni in forze domani.';
+ else if(M.ko)why=M.revive_cost>0?'Sei KO: rientra pagando la quota, fatti curare da un alleato oppure torna in forze domani.':'Sei KO: un alleato deve curarti, oppure torni in forze domani.';
+ const rv=open&&!won&&M.ko&&M.revive_cost>0,rvNo=rv&&BAL!=null&&BAL<M.revive_cost;
  const can=!why,canS=can&&M.actions_left>0;
  const tgt=today.find(x=>x.user_id===rTarget),tgtHurt=tgt&&tgt.hp<tgt.max_hp;
  const hero=ART?ART.sprite('eroe',{size:104,alt:m.nickname,look:MYLOOK||{}}):'<span style="font-size:56px">🧑</span>';
@@ -1006,6 +1009,7 @@ function renderRaid(){
    <button class="hel" data-rb="heal" ${canS&&(tgtHurt||(!tgt&&M.hp<M.max_hp))?'':'disabled'}>💚 Cura<small>${tgt&&tgt.user_id!==m.user_id?`Rida PV a ${esc(tgt.nickname)}${tgt.hp<=0?' (KO: lo rianimi)':''}.`:'Rida PV a te (scegli un alleato sopra).'}</small></button>
    <button class="stu" data-rb="study" ${canS&&R.weak<40?'':'disabled'}>🔎 Studia<small>Debolezza per tutto il Tempio: più danni a tutti (max +40%).</small></button>
   </div>
+  ${rv?`<div class="rd-rev"><button class="btn gold" data-rrev="1" ${rvNo?'disabled':''}>💰 Rientra in battaglia · ${num(M.revive_cost)} BC</button><small>${rvNo?`Ti mancano ${num(M.revive_cost-BAL)} BC. `:''}Torni con tutti i PV. ${M.revives>0?`Sei già rientrato ${num(M.revives)} ${M.revives===1?'volta':'volte'} questa settimana: `:''}a ogni rientro la quota sale.</small></div>`:''}
   ${why?`<p class="er-note">${why}</p>`:''}
  </div>
  ${won&&mine?`<div class="card er-win" style="margin-top:12px"><h3>🏆 Raid vinto! Sei arrivato ${num(mine.rank)}° per danni</h3><p style="margin:6px 0 0"><b>+${num(mine.bc)} BC</b> · <b>+${num(mine.xp)} XP</b>${mine.item?` · oggetto: <b>${esc(mine.item)}</b>`:''}${mine.item2?` e <b>${esc(mine.item2)}</b>`:''}</p>${window.TempioShare?'<button type="button" class="btn sm" style="margin-top:10px;background:#25d366;border-color:#25d366;color:#05230f" data-er-share="raid">Condividi su WhatsApp</button>':''}</div>`:''}
@@ -1047,7 +1051,7 @@ async function raidAct(btn,kind,times){
   else if(kind==='guard')t=`Scudo di <b>${num(r.amount)}</b> ${r.target&&r.target!==ST.me.user_id?'all’alleato':'per te'}.`;
   else if(kind==='heal')t=`Hai curato di <b>${num(r.amount)}</b> PV${r.note==='rianimato'?' e rianimato l’alleato!':'.'}`;
   else t=`Debolezza svelata: <b>+${num(r.amount)}%</b> ai danni di tutto il Tempio (totale ${r.weak}%).`;
-  if(r.ko)t+=' <b>Sei KO!</b> Serve la cura di un alleato, oppure torni domani.';
+  if(r.ko)t+=r.revive_cost>0?` <b>Sei KO!</b> Puoi rientrare subito pagando ${num(r.revive_cost)} BC, farti curare da un alleato o tornare domani.`:' <b>Sei KO!</b> Serve la cura di un alleato, oppure torni domani.';
   if(r.defeated){const w=r.reward;t=`<b>🏆 Il boss del raid è caduto!</b> ${t}`+(w?` Sei <b>${w.rank}°</b> per danni: <b>+${num(w.bc)} BC</b>, <b>+${num(w.xp)} XP</b>${w.item?`, oggetto <b>${esc(w.item)}</b>`:''}${w.item2?` e <b>${esc(w.item2)}</b>`:''}.`:'')}
   await wait(reduce?0:700);
   try{RAID=await rpc('game_raid_state')}catch(_){}
@@ -1057,7 +1061,7 @@ async function raidAct(btn,kind,times){
 function logLine(l){const n=`<b>${esc(l.nickname)}</b>`,a=num(l.amount);
  switch(l.action){case 'attack':return `${n} attacca per ${a} danni${l.note==='colpo finale'?' — <b>colpo finale!</b>':l.note==='critico'?' (critico)':l.note==='schivata'?' e schiva il contraccolpo':''}`;
   case 'guard':return `${n} alza lo scudo di ${a}`;case 'heal':return `${n} cura ${l.target?`<b>${esc(l.target)}</b> `:''}di ${a} PV${l.note==='rianimato'?' e lo <b>rianima</b>':''}`;
-  case 'study':return `${n} studia il boss: debolezza +${a}%`;default:return n}}
+  case 'study':return `${n} studia il boss: debolezza +${a}%`;case 'revive':return `${n} rientra in battaglia (${a} BC)`;default:return n}}
 
 async function bossAct(btn,kind){
  await run(btn,async()=>{
@@ -2458,6 +2462,7 @@ document.addEventListener('click',e=>{
  if(t.dataset.shs){shopSec=t.dataset.shs;pending=null;renderShop();return}
  if(t.dataset.sho){shopOpen[t.dataset.sho]=!shopOpen[t.dataset.sho];renderShop();return}
  if(t.dataset.rt){rTarget=t.dataset.rt;paint();return}
+ if(t.dataset.rrev){run(t,async()=>{const r=await rpc('game_raid_revive');BAL=r.balance;say(`Sei di nuovo in battaglia con tutti i PV: −${num(r.cost)} BC. Il prossimo rientro costerà ${num(r.next_cost)} BC.`,'good');try{RAID=await rpc('game_raid_state')}catch(_){}await load(true);if(tab==='boss')renderRaid()});return}
  if(t.dataset.rb){raidAct(t,t.dataset.rb,Number(t.dataset.n)||1);return}
  if(t.dataset.erShare){const o=SHARE[t.dataset.erShare];if(o&&window.TempioShare)window.TempioShare.share(o);return}
  if(t.id==='retry'){boot();return}
