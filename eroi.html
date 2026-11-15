@@ -650,6 +650,33 @@ html.er-page body{padding-bottom:var(--erd)}
 .dg-lvpn{display:grid;gap:10px;padding:12px;border-top:2px solid rgba(255,255,255,.08);transition:opacity .25s}
 .dg-lvpn .dg-sc{margin:0}.dg-lvpn .dg-sc h3{margin:0 0 4px}
 .dg-live.busy .dg-lvpn{opacity:.35;pointer-events:none}
+
+/* Lo Stagno: scena viva */
+.pn{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#0c0a16;box-shadow:0 14px 34px rgba(0,0,0,.5)}
+.pn-sc{position:relative;height:clamp(300px,46vh,440px);overflow:hidden;background:#0a1830}
+.pn-cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.pn-top{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px 20px;background:linear-gradient(180deg,rgba(0,0,0,.6),transparent);color:#fff;pointer-events:none}
+.pn-top b{font:700 1rem Cinzel,Georgia,serif;color:#ffe7a8}.pn-top span{padding:3px 10px;border-radius:99px;background:rgba(10,8,20,.75);border:1px solid rgba(255,220,120,.5);font:700 .78rem var(--ui);color:#ffe7a8}
+.pn-cap{position:absolute;left:12px;right:12px;top:36px;margin:0;color:#fff;font:600 .78rem var(--ui);text-shadow:0 1px 4px #000;pointer-events:none}
+.pn-pet{position:absolute;transform:translate(-50%,-100%);display:grid;justify-items:center;gap:1px;padding:0;border:0;background:none;color:#fff;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pn-spr{display:block;animation:pnBob 2.6s ease-in-out infinite;animation-delay:var(--d,0s);filter:drop-shadow(0 4px 3px rgba(0,0,0,.45));transform-origin:50% 100%}
+.pn-pet.sel .pn-spr{animation-duration:1.1s;filter:drop-shadow(0 0 10px var(--rc,#ffd36b)) drop-shadow(0 4px 3px rgba(0,0,0,.45))}
+.pn-pet.lk .pn-spr img,.pn-dsp.lk img{filter:brightness(0) opacity(.72)}
+.pn-pet:active .pn-spr{transform:scale(.92)}
+@keyframes pnBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.pn-nm{position:absolute;top:100%;margin-top:14px;max-width:120px;padding:1px 8px;border-radius:99px;background:rgba(8,6,18,.78);font:700 .68rem var(--ui);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pn-pet.sel .pn-nm{background:var(--rc,#ffd36b);color:#16120a}
+.pn-tg{position:absolute;top:100%;margin-top:32px;font:700 .64rem var(--ui);color:#ffe7a8;text-shadow:0 1px 3px #000;white-space:nowrap}.pn-pet.own .pn-tg{color:#b9f5d6}
+.pn-ar{position:absolute;top:50%;width:38px;height:54px;border:0;border-radius:12px;background:rgba(8,6,18,.6);color:#fff;font-size:1.6rem;cursor:pointer}.pn-ar.l{left:4px}.pn-ar.r{right:4px}.pn-ar:disabled{opacity:.25}
+.pn-pgn{position:absolute;right:10px;bottom:6px;font:700 .7rem var(--ui);color:#fff;opacity:.8}
+.pn-chips{display:flex;gap:6px;overflow-x:auto;padding:10px;scrollbar-width:none;border-top:2px solid rgba(255,255,255,.08)}.pn-chips::-webkit-scrollbar{display:none}
+.pn-chip{flex:none;display:grid;justify-items:center;min-width:70px;padding:6px 10px;border:1.5px solid var(--line);border-radius:12px;background:var(--surf);color:var(--tx);font:inherit;cursor:pointer}
+.pn-chip b{font:700 .8rem var(--ui);color:var(--rc,var(--tx));white-space:nowrap}.pn-chip small{font-size:.66rem;color:var(--mu);white-space:nowrap}
+.pn-chip[aria-pressed=true]{border-color:var(--rc,var(--gold));background:rgba(255,255,255,.08);box-shadow:0 0 0 1px var(--rc,var(--gold)) inset}.pn-chip.full small{color:#7fe3b0}.pn-chip.lk{opacity:.6}
+.pn-det{display:grid;gap:8px;padding:4px 14px 14px}.pn-dh{display:flex;align-items:center;gap:12px}.pn-dsp{flex:none;display:grid;place-items:center;width:84px;height:84px;border-radius:16px;background:radial-gradient(circle at 50% 60%,rgba(255,255,255,.12),transparent 70%);border:1.5px solid var(--rc,var(--line))}
+.pn-det h3{margin:2px 0 0;font:700 1.15rem Cinzel,Georgia,serif;color:var(--tx)}.pn-det h3 small{font:700 .8rem var(--ui);color:var(--rc,var(--mu))}.pn-det .lore{margin:0;font-size:.86rem;color:var(--mu);font-style:italic}
+.pn-act{width:100%;min-height:50px;font-size:1rem}.pn-on{margin:0;padding:10px 12px;border-radius:12px;background:rgba(127,227,176,.12);border:1px solid #7fe3b0;color:#b9f5d6;font-weight:600;font-size:.9rem;text-align:center}
+@media(prefers-reduced-motion:reduce){.pn-spr{animation:none}}
 </style></head><body>
 
 <script>document.documentElement.classList.add('er-page')</script>
@@ -1389,24 +1416,76 @@ function pShop(p){const id='pb:'+p.id,ask=pending===id,bal=BAL==null?0:BAL;let w
  return `<div class="pt-c r-${prc(p.tier)}"><div class="pt-sp">${petSprite(p,96)}</div><div><div class="er-rar">${esc(p.family)} · ${pgrade(p.tier)}</div><h3>${esc(p.name)}</h3></div><p class="lore">${esc(p.lore||'')}</p>${pLines(p)}
   <div class="er-pr"><b>${num(p.price)} BC</b><span class="mute">· eroe Lv. ${num(p.min_level)}+</span></div>
   <button class="btn ${ask?'gold':''}" data-pbuy="${esc(p.id)}" ${why?'disabled':''}>${ask?`Conferma l’acquisto (${num(p.price)} BC)`:'Compra'}</button>${why?`<p class="pt-why">${why}</p>`:''}</div>`}
+/* ---- Lo Stagno: scena viva. I compagni stanno sulle ninfee; tocchi quello che ti interessa e sotto compare la sua scheda ---- */
+let pnTab=null,pnSel=null,pnPg=0,pnRaf=null;
+const PN_SLOTS={1:[[50,66]],2:[[30,64],[70,64]],3:[[19,60],[50,74],[81,60]],4:[[18,52],[42,76],[66,52],[82,78]],5:[[14,50],[38,72],[62,50],[84,72],[50,88]],6:[[15,48],[40,48],[65,48],[28,78],[53,78],[80,78]]};
+function pnNight(){const h=window.__mapHour!=null?window.__mapHour:new Date().getHours();return h<6||h>=20}
+/* disegna stagno, ninfee e riflessi (t in secondi) */
+function pnPaint(cv,t){const c=cv.getContext('2d'),r=cv.getBoundingClientRect();if(r.width<10)return;const D=Math.min(2,devicePixelRatio||1),W=Math.round(r.width),H=Math.round(r.height);
+ if(cv.width!==W*D||cv.height!==H*D){cv.width=W*D;cv.height=H*D}c.setTransform(D,0,0,D,0,0);
+ const night=cv.dataset.night==='1',hue=Number(cv.dataset.hue||0),wy=H*.3,sl=JSON.parse(cv.dataset.slots||'[]'),sel=Number(cv.dataset.sel);
+ let g=c.createLinearGradient(0,0,0,wy);g.addColorStop(0,night?'#070b22':'#3f8fd0');g.addColorStop(1,night?'#1c2a52':'#bfe6f2');c.fillStyle=g;c.fillRect(0,0,W,wy);
+ if(night){for(let i=0;i<26;i++){const x=(i*97.3)%W,y=(i*53.7)%(wy*.8);c.fillStyle=`rgba(255,255,255,${.35+.45*Math.abs(Math.sin(t*1.3+i))})`;c.fillRect(x,y,1.5,1.5)}}
+ c.fillStyle=night?'#f4f1d8':'#fff6c8';c.beginPath();c.arc(W*.8,wy*.38,night?15:19,0,6.3);c.fill();c.fillStyle=night?'rgba(244,241,216,.14)':'rgba(255,246,200,.3)';c.beginPath();c.arc(W*.8,wy*.38,34,0,6.3);c.fill();
+ /* colline e canneto */
+ c.fillStyle=night?'#12233a':'#5aa07a';c.beginPath();c.moveTo(0,wy);for(let x=0;x<=W;x+=20)c.lineTo(x,wy-18-14*Math.sin(x/70+1)-8*Math.sin(x/23));c.lineTo(W,wy);c.fill();
+ c.fillStyle=night?'#0c1a2c':'#3d7d5c';for(let i=0;i<7;i++){const x=(i*W/6.5+((i*37)%30))%W,k=.7+((i*13)%10)/20;c.beginPath();c.arc(x,wy-16*k,26*k,0,6.3);c.fill();c.fillRect(x-3,wy-16*k,6,18*k)}
+ /* acqua */
+ g=c.createLinearGradient(0,wy,0,H);g.addColorStop(0,`hsl(${190+hue},${night?45:55}%,${night?22:48}%)`);g.addColorStop(1,`hsl(${205+hue},${night?55:60}%,${night?10:26}%)`);c.fillStyle=g;c.fillRect(0,wy,W,H-wy);
+ c.fillStyle=night?'rgba(244,241,216,.16)':'rgba(255,246,200,.28)';for(let i=0;i<7;i++){const y=wy+6+i*9,w=30-i*3+6*Math.sin(t*1.6+i);c.fillRect(W*.8-w/2,y,w,2)}
+ c.strokeStyle='rgba(255,255,255,.13)';c.lineWidth=1.5;for(let i=0;i<9;i++){const y=wy+14+i*(H-wy)/9,x=((i*83+t*(8+i*2))%(W+120))-60;c.beginPath();c.moveTo(x,y);c.lineTo(x+34+i*4,y);c.stroke()}
+ /* canne ai lati */
+ for(let i=0;i<8;i++){const left=i%2===0,x=left?6+i*5:W-8-i*5,hh=50+((i*29)%40),sw=Math.sin(t*1.2+i)*3;c.strokeStyle=night?'#0f2a22':'#2f6a48';c.lineWidth=3;c.beginPath();c.moveTo(x,H);c.quadraticCurveTo(x+sw,H-hh*.6,x+sw*2,H-hh);c.stroke();c.fillStyle=night?'#3a2a1c':'#6a4a2a';c.fillRect(x+sw*2-2.5,H-hh-12,5,14)}
+ /* ninfee sotto ogni compagno */
+ sl.forEach((p,i)=>{const x=W*p[0]/100,y=H*p[1]/100+Math.sin(t*1.5+i*1.7)*2,rx=Math.min(58,W*.15)*(sl.length>3?.82:1),ry=rx*.34;
+  const rp=((t*.5+i*.37)%1);c.strokeStyle=`rgba(255,255,255,${.3*(1-rp)})`;c.lineWidth=1.5;c.beginPath();c.ellipse(x,y+2,rx*(1+rp*.5),ry*(1+rp*.5),0,0,6.3);c.stroke();
+  c.fillStyle='rgba(0,0,0,.25)';c.beginPath();c.ellipse(x,y+5,rx,ry,0,0,6.3);c.fill();
+  c.fillStyle=night?'#1f5a3a':'#3f9a56';c.beginPath();c.moveTo(x,y);c.ellipse(x,y,rx,ry,0,.25,6.03);c.closePath();c.fill();
+  c.fillStyle=night?'#2a7a4c':'#5cc070';c.beginPath();c.moveTo(x,y-1);c.ellipse(x,y-1,rx*.8,ry*.74,0,.3,5.98);c.closePath();c.fill();
+  if(i===sel){c.strokeStyle='rgba(255,220,120,.95)';c.lineWidth=3;c.beginPath();c.ellipse(x,y,rx+4,ry+3,0,0,6.3);c.stroke();c.fillStyle='rgba(255,220,120,.16)';c.beginPath();c.ellipse(x,y-ry,rx*.9,ry*3.2,0,0,6.3);c.fill()}
+  if(i%2){c.fillStyle='#ff9ac8';for(let k=0;k<5;k++){const a=k*1.257+.3;c.beginPath();c.ellipse(x+rx*.62+Math.cos(a)*4,y-ry*.2+Math.sin(a)*2.4,3.4,2,a,0,6.3);c.fill()}c.fillStyle='#ffe66b';c.fillRect(x+rx*.62-1.5,y-ry*.2-1.5,3,3)}});
+ /* lucciole di notte, libellule di giorno */
+ for(let i=0;i<10;i++){const x=(W*.1+i*W*.09+Math.sin(t*.7+i*2)*24)%W,y=wy*.5+((i*61)%(H*.6))+Math.cos(t*.9+i)*10;c.fillStyle=night?`rgba(190,255,120,${.25+.6*Math.abs(Math.sin(t*2+i*1.3))})`:'rgba(255,255,255,.55)';c.fillRect(x,y,night?3:2,night?3:2)}}
+function pnStart(){if(pnRaf)return;const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const step=ts=>{pnRaf=null;const cv=$('pnCv');if(!cv||tab!=='pond')return;try{pnPaint(cv,still?0:ts/1000)}catch(e){console.error(e);return}if(!still)pnRaf=requestAnimationFrame(step)};pnRaf=requestAnimationFrame(step)}
+/* scheda del compagno selezionato, con il pulsante giusto per la sua situazione */
+function pnDetail(p){const bal=BAL==null?0:BAL;let act='';
+ if(!PD.chosen){const id='pc:'+p.id,ask=pending===id;
+  act=p.starter?`<button class="btn gold pn-act" data-pchoose="${esc(p.id)}">${ask?`Conferma: ${esc(p.name)} sarà il tuo compagno`:'🐾 Scegli questo compagno · gratis'}</button>`
+   :`<div class="er-pr"><b>${num(p.price)} BC</b><span class="mute">· eroe Lv. ${num(p.min_level)}+</span></div><p class="pt-why">Prima scegli il tuo primo compagno tra quelli base: è gratis.</p>`}
+ else if(p.active)act=`<p class="pn-on">★ È il tuo compagno: ti segue e guadagna il ${PD.xp_pct}% della tua esperienza.</p>`;
+ else if(p.owned)act=`<button class="btn gold pn-act" data-pact="${esc(p.id)}">🐾 Rendilo il tuo compagno</button>`;
+ else{const id='pb:'+p.id,ask=pending===id;let why='';if(PD.hero_level<p.min_level)why=`Ti serve un eroe di livello ${num(p.min_level)} (ora ${num(PD.hero_level)}).`;else if(bal<p.price)why=`Ti mancano ${num(p.price-bal)} BC.`;
+  act=`<button class="btn gold pn-act" data-pbuy="${esc(p.id)}" ${why?'disabled':''}>${ask?`Conferma l’acquisto (${num(p.price)} BC)`:`Compra · ${num(p.price)} BC`}</button>${why?`<p class="pt-why">${why}</p>`:`<p class="er-note" style="margin:0;text-align:center">Per eroi dal livello ${num(p.min_level)}</p>`}`}
+ return `<div class="pn-det r-${prc(p.tier)}"><div class="pn-dh"><div class="pn-dsp${!p.owned&&PD.hero_level<p.min_level?' lk':''}">${petSprite(p,72)}</div><div style="min-width:0"><div class="er-rar">${esc(p.family)} · ${pgrade(p.tier)}</div><h3>${esc(p.name)}${p.owned?` <small>Lv. ${num(p.level)}</small>`:''}</h3></div></div>
+  ${act}${p.lore?`<p class="lore">${esc(p.lore)}</p>`:''}${p.owned?pXp(p):''}${pLines(p)}</div>`}
 function renderPond(){
  const el=$('p-pond');
  if(petAvail===false){el.innerHTML=`<h2 class="er-h">Lo stagno</h2><p class="er-msg">Lo Stagno non è ancora attivo: nel database va eseguita la migrazione <b>black-market-eroi-stagno.sql</b>.</p>`;return}
  if(!PD){el.innerHTML='<p class="mute">Caricamento…</p>';return}
- const P=PD.pets,how=faqLink('stagno','Come funziona lo Stagno');
- if(!PD.chosen){
-  el.innerHTML=`<div class="pt-pond"><h2 class="er-h" style="position:relative">Lo stagno</h2><p class="er-sub" style="position:relative">Scegli il tuo primo compagno: è gratis e cresce con te.</p></div>
-  <h2 class="er-h">Scegli il tuo compagno</h2><div class="pt-grid">${P.filter(p=>p.starter).map(pChoose).join('')}</div>
-  <h2 class="er-h">Gli altri compagni</h2>
-  <div class="pt-grid">${P.filter(p=>!p.starter&&p.tier<=1).map(p=>`<div class="pt-c r-${prc(p.tier)}"><div class="pt-sp">${petSprite(p,80)}</div><div><div class="er-rar">${pgrade(p.tier)}</div><h3>${esc(p.name)}</h3></div><div class="er-pr"><b>${num(p.price)} BC</b></div></div>`).join('')}</div>
-  <p class="er-note">… e altri ${P.filter(p=>!p.starter&&p.tier>1).length} compagni fino al grado ${Math.max(...P.map(p=>p.tier))}.</p>${how}`;return}
- const a=P.find(x=>x.active),own=P.filter(x=>x.owned),shop=P.filter(x=>!x.starter&&!x.owned);
- const TMAX=Math.max(9,...P.map(p=>p.tier));let g0=1;for(let t=1;t<=TMAX;t++){if(P.some(x=>x.tier===t&&!x.owned)){g0=t;break}}
- if(!FOLD._pt){FOLD._pt=1;FOLD['pt_g'+g0]=true}
- const groups=[];for(let t=1;t<=TMAX;t++){const L=shop.filter(x=>x.tier===t);if(L.length)groups.push(fold('pt_g'+t,'🐾',`Grado ${t}`,`Eroe Lv. ${num(L[0].min_level)}+ · ${num(L[0].price)} BC l’uno`,L.length,`<div class="pt-grid">${L.map(pShop).join('')}</div>`))}
- el.innerHTML=`<div class="pt-pond r-${prc(a.tier)}"><div class="pt-hero"><div class="pt-big">${petSprite(a,128)}</div><div><div class="er-rar">Il tuo compagno · ${esc(a.family)} · ${pgrade(a.tier)}</div><h2>${esc(a.name)} <em>Lv. ${num(a.level)}</em></h2>${pXp(a)}<p class="er-note" style="margin-top:6px">Guadagna il ${PD.xp_pct}% della tua esperienza.</p>${pLines(a)}</div></div></div>
- <h2 class="er-h">I tuoi compagni <small class="mute">(${own.length} su 30)</small></h2><div class="pt-grid">${own.map(pOwned).join('')}</div>
- <h2 class="er-h">In vendita</h2>${groups.length?`<p class="er-sub">Il tuo saldo: <b>${BAL==null?'—':num(BAL)} BC</b></p>${groups.join('')}`:'<p class="mute">Hai tutti i compagni dello Stagno: complimenti!</p>'}${how}`}
+ const P=PD.pets,how=faqLink('stagno','Come funziona lo Stagno'),a=P.find(x=>x.active),own=P.filter(x=>x.owned).sort((x,y)=>(y.active-x.active)||(y.tier-x.tier)||(x.no-y.no));
+ const tiers=[...new Set(P.map(p=>p.tier))].sort((x,y)=>x-y);
+ if(pnTab==null||(pnTab==='mine'&&!own.length)||(pnTab!=='mine'&&!tiers.includes(pnTab))){pnTab=PD.chosen&&own.length?'mine':tiers[0];pnPg=0}
+ const all=pnTab==='mine'?own:P.filter(p=>p.tier===pnTab).sort((x,y)=>x.no-y.no),pages=Math.max(1,Math.ceil(all.length/6));pnPg=Math.max(0,Math.min(pages-1,pnPg));
+ const L=all.slice(pnPg*6,pnPg*6+6);
+ if(!L.some(p=>p.id===pnSel)){const s=all.find(p=>p.id===pnSel);if(s){pnPg=Math.floor(all.indexOf(s)/6);return renderPond()}pnSel=(L.find(p=>p.active)||L.find(p=>!p.owned&&PD.hero_level>=p.min_level)||L[0]||{}).id}
+ const sp=L.find(p=>p.id===pnSel)||L[0],slots=PN_SLOTS[L.length]||PN_SLOTS[6],big=L.length<=3,size=big?96:70;
+ const chip=(k,l,sub,cls)=>`<button type="button" class="pn-chip ${cls||''}" data-pntab="${k}" aria-pressed="${pnTab===k}"><b>${l}</b><small>${sub}</small></button>`;
+ const chips=(own.length?chip('mine','★ I miei',`${own.length} su ${P.length}`):'')+tiers.map(t=>{const T=P.filter(p=>p.tier===t),o=T.filter(p=>p.owned).length,lk=PD.hero_level<T[0].min_level;
+   return chip(t,t===0?'Base':'Grado '+t,lk?`🔒 Lv. ${num(T[0].min_level)}`:o===T.length?'✓ tutti':T[0].price?`${twK(T[0].price)} BC`:'gratis',`r-${prc(t)}${o===T.length?' full':''}${lk?' lk':''}`)}).join('');
+ el.innerHTML=`<section class="pn" aria-label="Lo Stagno">
+  <div class="pn-sc"><canvas id="pnCv" class="pn-cv" aria-hidden="true" data-night="${pnNight()?1:0}" data-hue="${pnTab==='mine'?0:(Number(pnTab)*23)%70-20}" data-slots="${esc(JSON.stringify(slots.slice(0,L.length)))}" data-sel="${L.indexOf(sp)}"></canvas>
+   <div class="pn-top"><b>Lo Stagno</b><span>🪙 ${BAL==null?'—':num(BAL)} BC</span></div>
+   <p class="pn-cap">${!PD.chosen?'Scegli il tuo primo compagno: è gratis e cresce con te.':pnTab==='mine'?'I tuoi compagni · tocca per vederli':`${pgrade(pnTab)} · tocca un compagno`}</p>
+   ${L.map((p,i)=>{const lk=!p.owned&&PD.hero_level<p.min_level;return `<button type="button" class="pn-pet r-${prc(p.tier)}${p.id===sp.id?' sel':''}${lk?' lk':''}${p.owned?' own':''}" style="left:${slots[i][0]}%;top:${slots[i][1]}%;--d:${(i*.37).toFixed(2)}s" data-pnsel="${esc(p.id)}" aria-pressed="${p.id===sp.id}" aria-label="${esc(p.name)}${p.active?', compagno attivo':p.owned?', tuo':lk?', bloccato':''}">
+     <span class="pn-spr">${petSprite(p,size)}</span><span class="pn-nm">${p.active?'★ ':''}${esc(p.name)}</span><span class="pn-tg">${p.owned?`Lv. ${num(p.level)}`:lk?`🔒 Lv. ${num(p.min_level)}`:p.price?`${twK(p.price)} BC`:'gratis'}</span></button>`}).join('')}
+   ${pages>1?`<button type="button" class="pn-ar l" data-pnpg="-1" ${pnPg?'':'disabled'} aria-label="Pagina precedente">‹</button><button type="button" class="pn-ar r" data-pnpg="1" ${pnPg<pages-1?'':'disabled'} aria-label="Pagina successiva">›</button><span class="pn-pgn">${pnPg+1} / ${pages}</span>`:''}
+  </div>
+  <div class="pn-chips" role="group" aria-label="Scegli cosa vedere">${chips}</div>
+  ${sp?pnDetail(sp):''}</section>
+ ${a?`<p class="er-note" style="margin-top:10px">Ti segue <b>${esc(a.name)}</b> (Lv. ${num(a.level)}). Hai ${own.length} compagni su ${P.length}.</p>`:''}${how}`;
+ const ac=el.querySelector('.pn-chip[aria-pressed="true"]');if(ac&&ac.scrollIntoView)try{const bx=ac.parentNode;bx.scrollLeft=ac.offsetLeft-bx.clientWidth/2+ac.clientWidth/2}catch(_){}
+ pnStart()}
 async function pondDone(msg){say(msg,'good');await load(true);await loadPond()}
 
 /* ---------- Allenamento ---------- */
@@ -2395,6 +2474,9 @@ document.addEventListener('click',e=>{
   pending=null;run(t,async()=>{const r=await rpc('game_train_stop');TR=r;lastTr=Date.now();trAR=null;await load(true);say(r.lost?'Allenamento fermato: il progresso è andato perso.':r.stopped?'Allenamento fermato.':'Allenamento completato.',r.lost?'':'good');renderTrain()});return}
  if(t.dataset.spar){run(t,async()=>{const r=await rpc('game_spar',{p_target:t.dataset.spar});await loadTrain();if(r.point_gained)await load(true);duelModal(r,t.dataset.spar)});return}
  if(t.dataset.pond!=null){setTab('pond');window.scrollTo({top:0,behavior:'smooth'});return}
+ if(t.dataset.pnsel){pnSel=t.dataset.pnsel;pending=null;renderPond();return}
+ if(t.dataset.pntab!=null){pnTab=t.dataset.pntab==='mine'?'mine':Number(t.dataset.pntab);pnPg=0;pnSel=null;pending=null;renderPond();return}
+ if(t.dataset.pnpg){pnPg+=Number(t.dataset.pnpg);pnSel=null;renderPond();return}
  if(t.dataset.pchoose){const id='pc:'+t.dataset.pchoose;
   if(pending!==id){pending=id;renderPond();setTimeout(()=>{if(pending===id){pending=null;if(tab==='pond')renderPond()}},5000);return}
   pending=null;run(t,async()=>{const r=await rpc('game_pet_choose',{p_pet:t.dataset.pchoose});await pondDone(`<b>${esc(r.pet)}</b> è il tuo compagno: ti seguirà da ora in poi!`)});return}
