@@ -224,8 +224,8 @@
         burst(foe.x, foe.y - EH * .5, [zone.glow, '#ffffff', '#ffe66b'], 40, -.2);
         await tween(900, function (k) { foe.dead = k; foe.alpha = 1 - k; hp.show = 1 - k; });
         burst(hero.x, hero.y - HH, ['#ffd23f', '#ffe66b', '#fff3a0'], 30, 1.2);
-        if (!r.reclaim) fx({ k: 'num', x: hero.x, y: hero.y - HH - 30, txt: '+' + fmt(r.bc) + ' BC', col: '#ffd36b', big: true, d: 1500 });
-        banner = r.reclaim ? { t0: performance.now(), win: true, txt: '⬆️ Piano ' + fmt(r.floor) + ' riconquistato', sub: 'Premi già incassati · record piano ' + fmt(r.record_floor) }
+        if (r.bc > 0) fx({ k: 'num', x: hero.x, y: hero.y - HH - 30, txt: '+' + fmt(r.bc) + ' BC', col: '#ffd36b', big: true, d: 1500 });
+        banner = r.reclaim ? { t0: performance.now(), win: true, txt: '⬆️ Piano ' + fmt(r.floor) + ' riconquistato', sub: 'Premio ridotto: +' + fmt(r.xp) + ' XP · record piano ' + fmt(r.record_floor) }
           : { t0: performance.now(), win: true, txt: (r.enemy && r.enemy.boss ? '👑 ' : '🏆 ') + 'Piano ' + fmt(r.floor) + ' conquistato!', sub: '+' + fmt(r.xp) + ' XP' + (r.levels > 0 ? ' · livello ' + fmt(r.level) + '!' : '') };
         var jy = hero.y; await tween(520, function (k) { hero.y = jy - Math.sin(k * Math.PI) * 26; cam.s = 1.22 - .22 * k; });
       } else {
