@@ -1604,7 +1604,7 @@ function renderTower(){
    <div class="tw-ib" role="img" aria-label="Stima di vittoria ${e.chance}%"><i style="width:${e.chance}%;background:${ch[1]}"></i></div>
    <div class="tw-id">
     <div class="tw-is">${st('PV',e.max_hp)}${st('FOR',e.s_for)}${st('DES',e.s_des)}${st('VIG',e.s_vig)}${st('SPI',e.s_spi)}${st('FRT',e.s_frt)}</div>
-    ${e.trait||e.affix||e.lore?`<p class="tw-il">${[e.trait,e.affix&&e.affix.descr,e.lore].filter(Boolean).map(esc).join(' · ')}</p>`:''}
+    ${e.trait||e.affix||e.lore||e.miasma?`<p class="tw-il">${[e.trait,e.affix&&e.affix.descr,e.miasma?`☠️ Miasma: le tue cure −${e.miasma}%`:'',e.lore].filter(Boolean).map(esc).join(' · ')}</p>`:''}
     <div class="tw-iw"><small>Premio</small><span>🪙 +${num(rw.bc)} BC</span><span>✨ +${num(rw.xp)} XP</span>${rw.item?`<span class="g">🎁 ${esc(rw.item.name)}</span>`:''}</div>
     <p class="tw-iy"><b>Tu</b> PV ${twK(m.max_hp)} · FOR ${twK(m.stats.for)} · DES ${twK(m.stats.des)} · VIG ${twK(m.stats.vig)} · SPI ${twK(m.stats.spi)} · FRT ${twK(m.stats.frt)}</p>
    </div></div>
