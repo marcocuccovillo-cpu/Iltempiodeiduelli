@@ -2207,8 +2207,8 @@ const VB={hall:['🏛️','Municipio','Fa maturare BC nella cassa e permette di 
  barracks:['⚔️','Caserma','Quanti soldati puoi avere; sblocca arcieri (3) e cavalieri (5).'],wall:['🧱','Mura','+10% alla difesa per livello.']};
 const VU=[['inf','🗡️','Fanti','fante'],['arc','🏹','Arcieri','arciere'],['cav','🐎','Cavalieri','cavaliere']];
 const VR=[['wood','🪵','Legno'],['stone','🪨','Pietra'],['food','🍖','Cibo']];
-const vProd=k=>k<=0?0:Math.round(30*k*Math.pow(1.2,k-1)),vCap=k=>Math.round(1000*Math.pow(1.5,k)),vBc=k=>Math.round(200*k*Math.pow(1.25,k-1)),vArmy=k=>25*k*(k+1)/2;
-function vEffect(k,l){if(l<=0)return '—';switch(k){case'hall':return `${num(vBc(l))} BC/giorno`;case'lumber':case'quarry':case'farm':return `${num(vProd(l))}/ora`;case'warehouse':return `${num(vCap(l))} a risorsa`;case'barracks':return `${num(vArmy(l))} soldati`;case'wall':return `+${l*10}% difesa`}}
+const vProd=k=>k<=0?0:Math.round(30*k*Math.pow(1.2,k-1)),vFood=k=>k<=0?0:Math.round(60*k*Math.pow(1.2,k-1)),vCap=k=>Math.round(1000*Math.pow(1.5,k)),vBc=k=>Math.round(200*k*Math.pow(1.25,k-1)),vArmy=k=>25*k*(k+1)/2;
+function vEffect(k,l){if(l<=0)return '—';switch(k){case'hall':return `${num(vBc(l))} BC/giorno`;case'lumber':case'quarry':return `${num(vProd(l))}/ora`;case'farm':return `${num(vFood(l))} cibo/ora`;case'warehouse':return `${num(vCap(l))} a risorsa`;case'barracks':return `${num(vArmy(l))} soldati`;case'wall':return `+${l*10}% difesa`}}
 async function loadVil(quiet){
  try{VIL=await rpc('game_village_state',{p_plot:vilCur});vilAvail=!!(VIL&&VIL.enabled);vilLoadedAt=Date.now();if(VIL&&VIL.enabled)vilCur=VIL.me?VIL.me.plot:null}catch(e){if(twMissing(e)){vilAvail=false;VIL=null;return}if(!quiet)say(errTxt(e),'bad')}
  if(MAP)MAP.villages=VIL&&VIL.enabled?VIL.villages:[]}
