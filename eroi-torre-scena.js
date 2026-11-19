@@ -224,11 +224,12 @@
         burst(foe.x, foe.y - EH * .5, [zone.glow, '#ffffff', '#ffe66b'], 40, -.2);
         await tween(900, function (k) { foe.dead = k; foe.alpha = 1 - k; hp.show = 1 - k; });
         burst(hero.x, hero.y - HH, ['#ffd23f', '#ffe66b', '#fff3a0'], 30, 1.2);
-        fx({ k: 'num', x: hero.x, y: hero.y - HH - 30, txt: '+' + fmt(r.bc) + ' BC', col: '#ffd36b', big: true, d: 1500 });
-        banner = { t0: performance.now(), win: true, txt: (r.enemy && r.enemy.boss ? '👑 ' : '🏆 ') + 'Piano ' + fmt(r.floor) + ' conquistato!', sub: '+' + fmt(r.xp) + ' XP' + (r.levels > 0 ? ' · livello ' + fmt(r.level) + '!' : '') };
+        if (r.bc > 0) fx({ k: 'num', x: hero.x, y: hero.y - HH - 30, txt: '+' + fmt(r.bc) + ' BC', col: '#ffd36b', big: true, d: 1500 });
+        banner = r.reclaim ? { t0: performance.now(), win: true, txt: '⬆️ Piano ' + fmt(r.floor) + ' riconquistato', sub: 'Premio ridotto: +' + fmt(r.xp) + ' XP · record piano ' + fmt(r.record_floor) }
+          : { t0: performance.now(), win: true, txt: (r.enemy && r.enemy.boss ? '👑 ' : '🏆 ') + 'Piano ' + fmt(r.floor) + ' conquistato!', sub: '+' + fmt(r.xp) + ' XP' + (r.levels > 0 ? ' · livello ' + fmt(r.level) + '!' : '') };
         var jy = hero.y; await tween(520, function (k) { hero.y = jy - Math.sin(k * Math.PI) * 26; cam.s = 1.22 - .22 * k; });
       } else {
-        banner = { t0: performance.now(), win: false, txt: '💥 Sconfitto al piano ' + fmt(r.floor), sub: 'Rafforza l’eroe e riprova' };
+        banner = { t0: performance.now(), win: false, txt: '💥 Sconfitto al piano ' + fmt(r.floor), sub: r.fell > 0 ? 'Cadi al piano ' + fmt(r.best_floor) : 'Rafforza l’eroe e riprova' };
         await tween(300, function (k) { hero.rot = -hero.dir * k * .5; hp.show = 1 - k * .5; });
         /* ruzzola giù per le scale */
         var hx1 = hero.x, cyA = cam.y, sA = cam.s;
